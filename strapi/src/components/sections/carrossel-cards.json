@@ -1,0 +1,44 @@
+{
+  "collectionName": "components_sections_carrosseis_cards",
+  "info": {
+    "displayName": "Carrossel de cards",
+    "icon": "apps",
+    "description": "Título, texto de apoio e uma fileira de cards que passa para o lado (ex.: Neste domingo / unidades)."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "texto_apoio": {
+      "type": "text",
+      "maxLength": 200
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "items.card",
+      "min": 1,
+      "max": 12
+    },
+    "estilo_imagem": {
+      "type": "enumeration",
+      "enum": ["foto", "arte"],
+      "default": "foto",
+      "required": true
+    },
+    "posicao_imagem": {
+      "type": "enumeration",
+      "enum": ["acima", "abaixo"],
+      "default": "acima",
+      "required": true
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}

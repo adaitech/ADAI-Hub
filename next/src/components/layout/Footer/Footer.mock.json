@@ -1,0 +1,75 @@
+{
+  "completo": {
+    "id": 1,
+    "texto_marca": "Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo.",
+    "copyright": "© 2026 ADAI. Todos os direitos reservados.",
+    "assinatura": "Amar · Servir · Influenciar.",
+    "colunas": [
+      {
+        "id": 1,
+        "titulo": "Igreja",
+        "links": [
+          { "id": 6, "texto": "Nossa história", "url": "/nossa-historia", "nova_aba": false },
+          { "id": 7, "texto": "A igreja que vemos", "url": "/a-igreja-que-vemos", "nova_aba": false },
+          { "id": 8, "texto": "No que acreditamos", "url": "/no-que-acreditamos", "nova_aba": false },
+          { "id": 9, "texto": "Jesus", "url": "/jesus", "nova_aba": false }
+        ]
+      },
+      {
+        "id": 2,
+        "titulo": "Participe",
+        "links": [
+          { "id": 10, "texto": "Unidades", "url": "/unidades", "nova_aba": false },
+          { "id": 11, "texto": "Agenda", "url": "/agenda", "nova_aba": false },
+          { "id": 12, "texto": "Ministérios", "url": "/ministerios", "nova_aba": false },
+          { "id": 13, "texto": "Contribua", "url": "/contribua", "nova_aba": false }
+        ]
+      },
+      {
+        "id": 3,
+        "titulo": "Contato",
+        "links": [
+          { "id": 14, "texto": "E-mail", "url": "/contato", "nova_aba": false },
+          { "id": 15, "texto": "WhatsApp", "url": "/contato", "nova_aba": false },
+          { "id": 16, "texto": "Instagram", "url": "https://www.instagram.com/", "nova_aba": true },
+          { "id": 17, "texto": "YouTube", "url": "https://www.youtube.com/", "nova_aba": true }
+        ]
+      }
+    ]
+  },
+  "minimo": {
+    "id": 2,
+    "texto_marca": null,
+    "copyright": null,
+    "assinatura": null,
+    "colunas": []
+  },
+  "texto_longo": {
+    "id": 3,
+    "texto_marca": "Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo — em cinco localidades e online, todos os domingos.",
+    "copyright": "© 2026 Assembleia de Deus ADAI. Todos os direitos reservados.",
+    "assinatura": "Amar a Deus · Servir as pessoas · Influenciar o mundo.",
+    "colunas": [
+      {
+        "id": 4,
+        "titulo": "Conheça a igreja",
+        "links": [
+          { "id": 18, "texto": "Nossa história e nossos valores", "url": "/nossa-historia", "nova_aba": false },
+          { "id": 19, "texto": "A igreja que vemos", "url": "/a-igreja-que-vemos", "nova_aba": false },
+          { "id": 20, "texto": "No que acreditamos", "url": "/no-que-acreditamos", "nova_aba": false },
+          { "id": 21, "texto": "Jesus", "url": "/jesus", "nova_aba": false },
+          { "id": 22, "texto": "Liderança", "url": "/lideranca", "nova_aba": false },
+          { "id": 23, "texto": "Connect para igrejas", "url": "/connect", "nova_aba": false }
+        ]
+      },
+      {
+        "id": 5,
+        "titulo": "Participe",
+        "links": [
+          { "id": 24, "texto": "Unidades e horários de culto", "url": "/unidades", "nova_aba": false },
+          { "id": 25, "texto": "Agenda", "url": "/agenda", "nova_aba": false }
+        ]
+      }
+    ]
+  }
+}

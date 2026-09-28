@@ -1,0 +1,136 @@
+/* O carrossel ocupa as áreas "controles" e "trilha" da grade da seção (display: contents). */
+.carrossel {
+  display: contents;
+}
+
+.controles {
+  grid-area: controles;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.setas {
+  display: flex;
+  gap: var(--space-8);
+  margin-left: auto;
+}
+
+.seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--carrossel-botao);
+  height: var(--carrossel-botao);
+  padding: 0;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+}
+
+.seta:hover {
+  background-color: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.seta:active {
+  transform: scale(0.92);
+}
+
+.seta svg {
+  transition: transform var(--duration-base) var(--easing-standard);
+}
+
+.seta:hover svg {
+  transform: translateX(var(--space-4));
+}
+
+.seta:first-child:hover svg {
+  transform: translateX(calc(-1 * var(--space-4)));
+}
+
+.trilha {
+  grid-area: trilha;
+  display: grid;
+  grid-auto-flow: column;
+  column-gap: var(--space-12);
+  margin-inline: calc(-1 * var(--space-gutter));
+  padding-inline: var(--space-gutter);
+  padding-block: var(--space-4);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--space-gutter);
+  scrollbar-width: none;
+}
+
+.trilha::-webkit-scrollbar {
+  display: none;
+}
+
+.trilha:focus-visible {
+  outline-offset: -2px;
+}
+
+.trilha > li {
+  scroll-snap-align: start;
+  transition:
+    opacity var(--duration-base) var(--easing-standard),
+    transform var(--duration-base) var(--easing-standard);
+}
+
+/*
+ * Movimento: cards que saem de vista encolhem e descem um pouco; os que entram sobem de volta.
+ * Sem mexer na opacidade, para o texto manter o contraste AA mesmo parcialmente visível.
+ */
+.trilha > li[data-visivel='false'] {
+  transform: translateY(var(--space-8)) scale(0.95);
+}
+
+.progresso {
+  grid-area: progresso;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-subtle);
+}
+
+.progressoBarra {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--color-bg-inverse);
+  transition:
+    transform var(--duration-base) var(--easing-standard),
+    width var(--duration-base) var(--easing-standard);
+}
+
+/* Sem setas nem barra quando todos os cards cabem: mobile mostra 1 card por vez */
+.carrossel[data-total='1'] .setas,
+.carrossel[data-total='1'] .progresso {
+  display: none;
+}
+
+/* tier: tablet — cabem 2 cards e um pedaço do terceiro */
+@media (min-width: 769px) {
+  .carrossel[data-total='2'] .setas,
+  .carrossel[data-total='2'] .progresso {
+    display: none;
+  }
+}
+
+/* tier: desktop — cabem 5 cards (Figma) */
+@media (min-width: 1024px) {
+  .carrossel:is([data-total='2'], [data-total='3'], [data-total='4'], [data-total='5']) .setas,
+  .carrossel:is([data-total='2'], [data-total='3'], [data-total='4'], [data-total='5']) .progresso {
+    display: none;
+  }
+}

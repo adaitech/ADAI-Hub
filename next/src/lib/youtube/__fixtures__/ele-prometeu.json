@@ -1,0 +1,446 @@
+{
+  "playlist": {
+    "id": "PLQfoGbsdZPXo",
+    "snippet": {
+      "title": "Ele Prometeu",
+      "publishedAt": "2026-08-02T11:57:41.038878Z"
+    },
+    "contentDetails": {
+      "itemCount": 5
+    }
+  },
+  "itens": [
+    {
+      "id": "UExRZm9HYnNkWlBYby4wOTA3OTZBNzVEMTUzOTMy",
+      "snippet": {
+        "title": "Ele Prometeu Provisão | Pr. Eduardo Isidio",
+        "position": 0,
+        "publishedAt": "2026-08-30T11:17:53Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "nc4vbdtBH1s",
+        "videoPublishedAt": "2026-08-30T16:32:23Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "id": "UExRZm9HYnNkWlBYby41MjE1MkI0OTQ2QzJGNzNG",
+      "snippet": {
+        "title": "Ele Prometeu Paz | Pr. Rodrigo Soeiro",
+        "position": 1,
+        "publishedAt": "2026-08-23T12:15:42Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "QpF4GJRFEsM",
+        "videoPublishedAt": "2026-08-24T03:56:49Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "id": "UExRZm9HYnNkWlBYby4wMTcyMDhGQUE4NTIzM0Y5",
+      "snippet": {
+        "title": "Ele Prometeu Perdão | Pr. Fellipe Magalhães",
+        "position": 2,
+        "publishedAt": "2026-08-16T12:35:53Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "Q7kl6t6_EcA",
+        "videoPublishedAt": "2026-08-17T04:24:55Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "id": "UExRZm9HYnNkWlBYby4yODlGNEE0NkRGMEEzMEQy",
+      "snippet": {
+        "title": "Ele Prometeu Presença | Pr. Diego Alves",
+        "position": 3,
+        "publishedAt": "2026-08-09T13:29:40Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "3RTYy8hjL4Q",
+        "videoPublishedAt": "2026-08-09T17:06:01Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "id": "UExRZm9HYnNkWlBYby41NkI0NEY2RDEwNTU3Q0M2",
+      "snippet": {
+        "title": "Ele Prometeu Proteção | Pr. Rodrigo Soeiro",
+        "position": 4,
+        "publishedAt": "2026-08-02T11:59:21Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "vEIki9d8ysM",
+        "videoPublishedAt": "2026-08-02T16:18:01Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    }
+  ],
+  "videos": [
+    {
+      "id": "nc4vbdtBH1s",
+      "snippet": {
+        "title": "Ele Prometeu Provisão | Pr. Eduardo Isidio",
+        "publishedAt": "2026-08-30T16:32:23Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/nc4vbdtBH1s/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-08-30T14:20:36Z",
+        "actualEndTime": "2026-08-30T16:23:40Z",
+        "scheduledStartTime": "2026-08-30T14:00:00Z"
+      }
+    },
+    {
+      "id": "QpF4GJRFEsM",
+      "snippet": {
+        "title": "Ele Prometeu Paz | Pr. Rodrigo Soeiro",
+        "publishedAt": "2026-08-24T03:56:49Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/QpF4GJRFEsM/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-08-23T13:56:58Z",
+        "actualEndTime": "2026-08-23T15:45:57Z",
+        "scheduledStartTime": "2026-08-23T14:00:00Z"
+      }
+    },
+    {
+      "id": "Q7kl6t6_EcA",
+      "snippet": {
+        "title": "Ele Prometeu Perdão | Pr. Fellipe Magalhães",
+        "publishedAt": "2026-08-17T04:24:55Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/Q7kl6t6_EcA/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-08-16T14:00:47Z",
+        "actualEndTime": "2026-08-16T15:53:07Z",
+        "scheduledStartTime": "2026-08-16T14:00:00Z"
+      }
+    },
+    {
+      "id": "3RTYy8hjL4Q",
+      "snippet": {
+        "title": "Ele Prometeu Presença | Pr. Diego Alves",
+        "publishedAt": "2026-08-09T17:06:01Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/3RTYy8hjL4Q/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-08-09T14:07:54Z",
+        "actualEndTime": "2026-08-09T15:58:58Z",
+        "scheduledStartTime": "2026-08-09T14:00:00Z"
+      }
+    },
+    {
+      "id": "vEIki9d8ysM",
+      "snippet": {
+        "title": "Ele Prometeu Proteção | Pr. Rodrigo Soeiro",
+        "publishedAt": "2026-08-02T16:18:01Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/vEIki9d8ysM/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-08-02T14:08:10Z",
+        "actualEndTime": "2026-08-02T16:10:08Z",
+        "scheduledStartTime": "2026-08-02T14:00:00Z"
+      }
+    }
+  ]
+}

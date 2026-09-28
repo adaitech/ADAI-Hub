@@ -1,0 +1,20 @@
+{
+  "completo": {
+    "__component": "sections.proximos-eventos",
+    "id": 12,
+    "titulo": "Agenda da ADAI",
+    "texto_apoio": "Exemplo com 4 eventos e cards pretos. Os eventos vêm da inChurch.",
+    "quantidade": 4,
+    "cor_cards": "preto",
+    "link": null
+  },
+  "minimo": {
+    "__component": "sections.proximos-eventos",
+    "id": 10,
+    "titulo": "Próximos eventos",
+    "texto_apoio": null,
+    "quantidade": 8,
+    "cor_cards": "cinza",
+    "link": null
+  }
+}

@@ -1,0 +1,36 @@
+/* Figma: "HorizontalBorder" (texto com borda inferior) nos cards de unidade. Seta: proposta 🟡. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch-target-min);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-text);
+  text-decoration: none;
+}
+
+.texto {
+  border-bottom: var(--border-width) solid currentColor;
+}
+
+.clara {
+  color: var(--color-text-primary);
+}
+
+.escura {
+  color: var(--color-text-inverse);
+}
+
+.escura:focus-visible {
+  outline-color: var(--color-focus-ring-inverse);
+}
+
+.seta {
+  flex-shrink: 0;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.link:hover .seta {
+  transform: translateX(var(--space-4));
+}

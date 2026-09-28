@@ -1,0 +1,54 @@
+{
+  "uid": "layout.footer",
+  "nome": "Rodapé",
+  "resumo": "Fim de todas as páginas: logo e frase da marca, até três colunas de links, a linha de direitos autorais e a palavra ADAI gigante ao fundo (fixa, não editável).",
+  "ondeAparece": "Final de todas as páginas do site, sobre fundo cinza-claro.",
+  "boasPraticas": [
+    "Organize os links em colunas com assunto claro (ex.: Igreja, Participe, Contato).",
+    "Para redes sociais e contatos externos, ative \"Abrir em nova aba\" no link.",
+    "Atualize o ano do texto de direitos autorais em janeiro."
+  ],
+  "campos": [
+    {
+      "campo": "texto_marca",
+      "label": "Frase da marca",
+      "descricao": "Frase curta que resume quem é a ADAI, logo abaixo do logo.",
+      "placeholder": "Ex.: Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo.",
+      "ondeAparece": "Primeira coluna, abaixo do logo, em cinza.",
+      "obrigatorio": false,
+      "limite": "Até 140 caracteres",
+      "exemplo": "Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo."
+    },
+    {
+      "campo": "colunas",
+      "label": "Colunas de links",
+      "descricao": "Até 3 colunas (ex.: Igreja, Participe, Contato), cada uma com título e até 6 links.",
+      "placeholder": "",
+      "ondeAparece": "À direita da frase da marca, lado a lado no computador e empilhadas no celular.",
+      "obrigatorio": false,
+      "limite": "Até 3 colunas · 6 links cada",
+      "exemplo": "Igreja: Nossa história, No que acreditamos · Participe: Unidades, Agenda · Contato: WhatsApp, Instagram",
+      "componente": "items.coluna-links"
+    },
+    {
+      "campo": "copyright",
+      "label": "Direitos autorais",
+      "descricao": "Texto legal da linha final do rodapé.",
+      "placeholder": "Ex.: © 2026 ADAI. Todos os direitos reservados.",
+      "ondeAparece": "Canto inferior esquerdo, em letras pequenas.",
+      "obrigatorio": false,
+      "limite": "Até 80 caracteres",
+      "exemplo": "© 2026 ADAI. Todos os direitos reservados."
+    },
+    {
+      "campo": "assinatura",
+      "label": "Assinatura",
+      "descricao": "Frase curta da linha final do rodapé.",
+      "placeholder": "Ex.: Amar · Servir · Influenciar.",
+      "ondeAparece": "Canto inferior direito, em letras pequenas.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Amar · Servir · Influenciar."
+    }
+  ]
+}

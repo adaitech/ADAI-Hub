@@ -1,0 +1,168 @@
+{
+  "completo": {
+    "__component": "sections.imagem-texto",
+    "id": 58,
+    "posicao_imagem": "esquerda",
+    "rotulo": null,
+    "titulo": "Primeira vez na\nADAI?",
+    "texto": "Chegar num lugar novo pode ser estranho. Por isso, vale saber um pouco antes de ir.",
+    "preto_e_branco": true,
+    "imagem": {
+      "id": 7,
+      "name": "primeira-vez-culto.jpg",
+      "alternativeText": "Culto na ADAI: pessoas sentadas diante do palco, com o telão exibindo \"Bem-vindos, voluntários\"",
+      "width": 2160,
+      "height": 1440,
+      "mime": "image/jpeg",
+      "url": "/mocks/primeira-vez-culto.jpg"
+    },
+    "lista": [
+      {
+        "id": 58,
+        "titulo": "Como é o culto",
+        "texto": "Louvor, uma mensagem da Bíblia pra vida real e gente disposta a te receber bem."
+      },
+      {
+        "id": 59,
+        "titulo": "Seus filhos",
+        "texto": "O ADAI Kids cuida das crianças enquanto você participa do culto."
+      },
+      {
+        "id": 60,
+        "titulo": "Fale com a gente",
+        "texto": "Avise que vai e alguém do nosso time te espera na entrada."
+      }
+    ],
+    "botao": {
+      "id": 248,
+      "texto": "Planeje sua visita",
+      "url": "/planeje-sua-visita",
+      "estilo": "solido",
+      "nova_aba": false
+    },
+    "link": null
+  },
+  "direita": {
+    "__component": "sections.imagem-texto",
+    "id": 57,
+    "posicao_imagem": "direita",
+    "rotulo": "Pastores Líderes",
+    "titulo": "Rodrigo &\nTati Soeiro",
+    "texto": "Rodrigo Soeiro é pastor líder da ADAI e lidera a igreja com uma visão apaixonada por pessoas. Tati Soeiro co-lidera ao seu lado, com foco especial no ministério feminino.",
+    "preto_e_branco": false,
+    "imagem": {
+      "id": 9,
+      "name": "lideranca-rodrigo-tati-soeiro.jpg",
+      "alternativeText": "Pastores Rodrigo e Tati Soeiro sorrindo, abraçados, em frente a uma parede de mármore",
+      "width": 1268,
+      "height": 1584,
+      "mime": "image/jpeg",
+      "url": "/mocks/lideranca-rodrigo-tati-soeiro.jpg"
+    },
+    "lista": [],
+    "botao": {
+      "id": 247,
+      "texto": "Nossa liderança",
+      "url": "/lideranca",
+      "estilo": "solido",
+      "nova_aba": false
+    },
+    "link": null
+  },
+  "com_link": {
+    "__component": "sections.imagem-texto",
+    "id": 60,
+    "posicao_imagem": "direita",
+    "rotulo": "Exemplo",
+    "titulo": "Foto à direita\ncom botão e link",
+    "texto": "Variação sem lista: título grande, parágrafo, botão principal e link secundário.",
+    "preto_e_branco": true,
+    "imagem": {
+      "id": 7,
+      "name": "primeira-vez-culto.jpg",
+      "alternativeText": "Culto na ADAI: pessoas sentadas diante do palco, com o telão exibindo \"Bem-vindos, voluntários\"",
+      "width": 2160,
+      "height": 1440,
+      "mime": "image/jpeg",
+      "url": "/mocks/primeira-vez-culto.jpg"
+    },
+    "lista": [],
+    "botao": {
+      "id": 266,
+      "texto": "Planeje sua visita",
+      "url": "/planeje-sua-visita",
+      "estilo": "solido",
+      "nova_aba": false
+    },
+    "link": {
+      "id": 354,
+      "texto": "Falar no WhatsApp",
+      "url": "/contato",
+      "nova_aba": false
+    }
+  },
+  "minimo": {
+    "__component": "sections.imagem-texto",
+    "id": 95,
+    "posicao_imagem": "esquerda",
+    "rotulo": null,
+    "titulo": "Primeira vez na ADAI?",
+    "texto": null,
+    "imagem": {
+      "id": 7,
+      "name": "primeira-vez-culto.jpg",
+      "alternativeText": "Culto na ADAI: pessoas sentadas diante do palco, com o telão exibindo \"Bem-vindos, voluntários\"",
+      "width": 2160,
+      "height": 1440,
+      "mime": "image/jpeg",
+      "url": "/mocks/primeira-vez-culto.jpg"
+    },
+    "lista": [],
+    "botao": null,
+    "link": null,
+    "preto_e_branco": true
+  },
+  "texto_longo": {
+    "__component": "sections.imagem-texto",
+    "id": 96,
+    "posicao_imagem": "direita",
+    "rotulo": "Um rótulo um pouco mais longo",
+    "titulo": "Um título grande que ocupa\nduas linhas inteiras",
+    "texto": "Parágrafo longo para testar a leitura: a ADAI é uma igreja que ama a Deus, serve as pessoas e influencia o mundo em cinco localidades.\nSegundo parágrafo: tem espaço pra todas as idades e fases da vida, e alguém do nosso time vai te receber na entrada.",
+    "imagem": {
+      "id": 9,
+      "name": "lideranca-rodrigo-tati-soeiro.jpg",
+      "alternativeText": "Pastores Rodrigo e Tati Soeiro sorrindo, abraçados, em frente a uma parede de mármore",
+      "width": 1268,
+      "height": 1584,
+      "mime": "image/jpeg",
+      "url": "/mocks/lideranca-rodrigo-tati-soeiro.jpg"
+    },
+    "lista": [
+      {
+        "id": 961,
+        "titulo": "Primeiro item com título longo",
+        "texto": "Explicação um pouco maior para ver como a caixa cresce quando o texto ocupa mais de uma linha no computador."
+      },
+      {
+        "id": 962,
+        "titulo": "Curto",
+        "texto": null
+      }
+    ],
+    "botao": {
+      "id": 963,
+      "texto": "Planeje sua visita",
+      "url": "/planeje-sua-visita",
+      "estilo": "solido",
+      "nova_aba": false
+    },
+    "link": {
+      "id": 964,
+      "texto": "Falar no WhatsApp",
+      "url": "/contato",
+      "nova_aba": false
+    },
+    "preto_e_branco": false
+  }
+}

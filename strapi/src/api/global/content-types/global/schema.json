@@ -4,49 +4,27 @@
   "info": {
     "singularName": "global",
     "pluralName": "globals",
-    "displayName": "Global",
-    "description": ""
+    "displayName": "Configurações do site",
+    "description": "Cabeçalho, rodapé e SEO padrão, iguais em todas as páginas."
   },
   "options": {
-    "draftAndPublish": true
-  },
-  "pluginOptions": {
-    "i18n": {
-      "localized": true
-    }
+    "draftAndPublish": false
   },
   "attributes": {
+    "header": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.header"
+    },
+    "footer": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.footer"
+    },
     "seo": {
       "type": "component",
       "repeatable": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "component": "shared.seo"
-    },
-    "navbar": {
-      "displayName": "Navbar",
-      "type": "component",
-      "repeatable": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "component": "global.navbar"
-    },
-    "footer": {
-      "displayName": "Footer",
-      "type": "component",
-      "repeatable": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "component": "global.footer"
     }
   }
 }

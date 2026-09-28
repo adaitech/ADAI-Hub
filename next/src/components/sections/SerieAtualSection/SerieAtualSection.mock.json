@@ -1,0 +1,23 @@
+{
+  "completo": {
+    "__component": "sections.serie-atual",
+    "id": 6,
+    "exibir": true,
+    "titulo_personalizado": "Ele Prometeu — agosto",
+    "playlist_url": "https://www.youtube.com/playlist?list=PLQfoGbsdZPXo"
+  },
+  "minimo": {
+    "__component": "sections.serie-atual",
+    "id": 4,
+    "exibir": true,
+    "titulo_personalizado": null,
+    "playlist_url": null
+  },
+  "texto_longo": {
+    "__component": "sections.serie-atual",
+    "id": 6,
+    "exibir": true,
+    "titulo_personalizado": "Não compre essa briga: batalhas que não são suas para lutar",
+    "playlist_url": "https://www.youtube.com/playlist?list=PLQfoGbsdZPXo"
+  }
+}

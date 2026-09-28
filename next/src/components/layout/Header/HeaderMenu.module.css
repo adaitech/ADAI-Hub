@@ -1,0 +1,92 @@
+/* Menu mobile/tablet — não existe no Figma (proposta 🟡). Some a partir de 1024px. */
+.alternar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-16);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-text);
+  cursor: pointer;
+}
+
+/* Ícone de três linhas (vira X quando aberto) desenhado com gradientes, sem asset. */
+.icone {
+  position: relative;
+  width: var(--space-16);
+  height: var(--space-12);
+  background:
+    linear-gradient(currentColor, currentColor) top / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) bottom / 100% 2px no-repeat;
+  transition: background-size var(--duration-fast) var(--easing-standard);
+}
+
+.icone[data-aberto='true'] {
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(-45deg, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+.painel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  padding: var(--space-8) var(--space-gutter) var(--space-32);
+  border-top: var(--border-width) solid var(--color-bg-subtle);
+  background-color: var(--color-bg-page);
+}
+
+.painel[hidden] {
+  display: none;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  min-height: var(--button-height-md);
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-text);
+  text-decoration: none;
+  border-bottom: var(--border-width) solid var(--color-bg-subtle);
+}
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-24);
+}
+
+.acao {
+  width: 100%;
+}
+
+/* tier: tablet — botões lado a lado */
+@media (min-width: 769px) {
+  .acoes {
+    flex-direction: row;
+  }
+
+  .acao {
+    width: auto;
+  }
+}
+
+/* tier: desktop — menu completo fica visível no Header */
+@media (min-width: 1024px) {
+  .menu {
+    display: none;
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "uid": "shared.botao",
+  "nome": "Botão",
+  "resumo": "Botão de ação usado em várias seções. O visual (cores, formato) é definido pelo design; você escolhe apenas o texto, o destino e o estilo.",
+  "ondeAparece": "Dentro das seções que oferecem botões (Hero, Cabeçalho…).",
+  "boasPraticas": [
+    "Comece com um verbo: Planeje, Assista, Conheça, Participe.",
+    "Use Sólido para a ação principal e Contorno para a secundária."
+  ],
+  "campos": [
+    {
+      "campo": "texto",
+      "label": "Texto do botão",
+      "descricao": "Ação curta, começando com verbo.",
+      "placeholder": "Ex.: Planeje sua visita",
+      "ondeAparece": "Dentro do botão.",
+      "obrigatorio": true,
+      "limite": "Até 30 caracteres",
+      "exemplo": "Planeje sua visita"
+    },
+    {
+      "campo": "url",
+      "label": "Link de destino",
+      "descricao": "Página do site (começando com /) ou endereço completo (https://…).",
+      "placeholder": "Ex.: /unidades",
+      "ondeAparece": "Não aparece; é para onde o botão leva.",
+      "obrigatorio": true,
+      "limite": "Até 300 caracteres",
+      "exemplo": "/planeje-sua-visita"
+    },
+    {
+      "campo": "estilo",
+      "label": "Estilo",
+      "descricao": "Sólido: preenchido, para a ação principal. Contorno: só a borda, para a ação secundária.",
+      "placeholder": "",
+      "ondeAparece": "Muda a aparência do botão.",
+      "obrigatorio": true,
+      "limite": "Sólido ou Contorno",
+      "exemplo": "Sólido"
+    },
+    {
+      "campo": "nova_aba",
+      "label": "Abrir em nova aba",
+      "descricao": "Ative só para sites externos (ex.: YouTube, Instagram).",
+      "placeholder": "",
+      "ondeAparece": "Não aparece; muda como o link abre.",
+      "obrigatorio": false,
+      "limite": "Sim ou Não",
+      "exemplo": "Não"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_sections_series_atuais",
+  "info": {
+    "displayName": "Série atual (mensagens do YouTube)",
+    "icon": "play",
+    "description": "Série de mensagens atual, montada automaticamente a partir do YouTube da ADAI. Só tem configurações opcionais."
+  },
+  "options": {},
+  "attributes": {
+    "exibir": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "titulo_personalizado": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "playlist_url": {
+      "type": "string",
+      "maxLength": 300
+    }
+  }
+}

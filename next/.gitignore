@@ -37,5 +37,7 @@ next-env.d.ts
 
 
 # env vars
-.env 
-.contentlayer
+.env
+
+# guia do editor copiado de strapi/src/editor-guide (ver scripts/sync-editor-guide.mjs)
+/src/generated/

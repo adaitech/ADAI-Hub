@@ -1,0 +1,42 @@
+{
+  "uid": "api::global.global",
+  "nome": "Configurações do site",
+  "resumo": "O que é igual em todas as páginas: cabeçalho, rodapé e o SEO padrão.",
+  "ondeAparece": "Em todas as páginas do site.",
+  "boasPraticas": ["Mudanças aqui aparecem no site inteiro — revise antes de salvar."],
+  "campos": [
+    {
+      "campo": "header",
+      "label": "Cabeçalho",
+      "descricao": "Menu e botões do topo de todas as páginas.",
+      "placeholder": "",
+      "ondeAparece": "Topo de todas as páginas.",
+      "obrigatorio": false,
+      "limite": "—",
+      "exemplo": "",
+      "componente": "layout.header"
+    },
+    {
+      "campo": "footer",
+      "label": "Rodapé",
+      "descricao": "Frase da marca, colunas de links e textos finais de todas as páginas.",
+      "placeholder": "",
+      "ondeAparece": "Final de todas as páginas.",
+      "obrigatorio": false,
+      "limite": "—",
+      "exemplo": "",
+      "componente": "layout.footer"
+    },
+    {
+      "campo": "seo",
+      "label": "SEO padrão",
+      "descricao": "Usado quando uma página não tem SEO próprio.",
+      "placeholder": "",
+      "ondeAparece": "Google e compartilhamento de links.",
+      "obrigatorio": false,
+      "limite": "—",
+      "exemplo": "",
+      "componente": "shared.seo"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "completo": {
+    "id": 1,
+    "links": [
+      { "id": 1, "texto": "Localidades", "url": "/localidades", "nova_aba": false },
+      { "id": 2, "texto": "Sermões", "url": "/sermoes", "nova_aba": false },
+      { "id": 3, "texto": "Agenda", "url": "/agenda", "nova_aba": false },
+      { "id": 4, "texto": "Ministérios", "url": "/ministerios", "nova_aba": false },
+      { "id": 5, "texto": "Contribua", "url": "/contribua", "nova_aba": false }
+    ],
+    "botoes": [
+      { "id": 1, "texto": "Ao vivo", "url": "/ao-vivo", "estilo": "contorno", "nova_aba": false },
+      { "id": 2, "texto": "Planeje sua visita", "url": "/planeje-sua-visita", "estilo": "solido", "nova_aba": false }
+    ]
+  },
+  "minimo": {
+    "id": 2,
+    "links": [],
+    "botoes": []
+  },
+  "texto_longo": {
+    "id": 3,
+    "links": [
+      { "id": 6, "texto": "Localidades e horários", "url": "/localidades", "nova_aba": false },
+      { "id": 7, "texto": "Sermões e séries", "url": "/sermoes", "nova_aba": false },
+      { "id": 8, "texto": "Agenda", "url": "/agenda", "nova_aba": false },
+      { "id": 9, "texto": "Ministérios", "url": "/ministerios", "nova_aba": false },
+      { "id": 10, "texto": "Connect", "url": "/connect", "nova_aba": false },
+      { "id": 11, "texto": "Contribua", "url": "/contribua", "nova_aba": false }
+    ],
+    "botoes": [
+      { "id": 3, "texto": "Assista ao vivo", "url": "https://www.youtube.com/", "estilo": "contorno", "nova_aba": true },
+      { "id": 4, "texto": "Planeje sua visita", "url": "/planeje-sua-visita", "estilo": "solido", "nova_aba": false }
+    ]
+  }
+}

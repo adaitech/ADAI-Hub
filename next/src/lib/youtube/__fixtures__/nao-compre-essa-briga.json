@@ -1,0 +1,274 @@
+{
+  "playlist": {
+    "id": "PLVW0JDZGWu3Q",
+    "snippet": {
+      "title": "Não Compre Essa Briga",
+      "publishedAt": "2026-09-13T13:07:50.009170515Z"
+    },
+    "contentDetails": {
+      "itemCount": 3
+    }
+  },
+  "itens": [
+    {
+      "id": "UExWVzBKRFpHV3UzUS4wMTcyMDhGQUE4NTIzM0Y5",
+      "snippet": {
+        "title": "Culto ao vivo | ADAI On",
+        "position": 0,
+        "publishedAt": "2026-09-27T11:53:29Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "oHUiMUWzd8I",
+        "videoPublishedAt": "2026-09-27T21:06:22Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "id": "UExWVzBKRFpHV3UzUS4yODlGNEE0NkRGMEEzMEQy",
+      "snippet": {
+        "title": "Não compre essa briga | Batalhas morais | Pr. Rodrigo Soeiro",
+        "position": 1,
+        "publishedAt": "2026-09-20T10:56:33Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "inoApu1FEqY",
+        "videoPublishedAt": "2026-09-20T16:19:23Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "id": "UExWVzBKRFpHV3UzUS41NkI0NEY2RDEwNTU3Q0M2",
+      "snippet": {
+        "title": "Não compre essa briga | Batalhas externas | Pr. Rodrigo Soeiro",
+        "position": 2,
+        "publishedAt": "2026-09-13T13:08:28Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "contentDetails": {
+        "videoId": "t6NRyTBJo-E",
+        "videoPublishedAt": "2026-09-13T16:33:51Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    }
+  ],
+  "videos": [
+    {
+      "id": "oHUiMUWzd8I",
+      "snippet": {
+        "title": "Culto ao vivo | ADAI On",
+        "publishedAt": "2026-09-27T21:06:22Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/oHUiMUWzd8I/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-09-27T14:21:34Z",
+        "actualEndTime": "2026-09-27T16:37:27Z",
+        "scheduledStartTime": "2026-09-27T14:00:00Z"
+      }
+    },
+    {
+      "id": "inoApu1FEqY",
+      "snippet": {
+        "title": "Não compre essa briga | Batalhas morais | Pr. Rodrigo Soeiro",
+        "publishedAt": "2026-09-20T16:19:23Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/inoApu1FEqY/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-09-20T14:09:24Z",
+        "actualEndTime": "2026-09-20T16:11:52Z",
+        "scheduledStartTime": "2026-09-20T14:00:00Z"
+      }
+    },
+    {
+      "id": "t6NRyTBJo-E",
+      "snippet": {
+        "title": "Não compre essa briga | Batalhas externas | Pr. Rodrigo Soeiro",
+        "publishedAt": "2026-09-13T16:33:51Z",
+        "liveBroadcastContent": "none",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          },
+          "standard": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/sddefault.jpg",
+            "width": 640,
+            "height": 480
+          },
+          "maxres": {
+            "url": "https://i.ytimg.com/vi/t6NRyTBJo-E/maxresdefault.jpg",
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "status": {
+        "privacyStatus": "public",
+        "embeddable": true
+      },
+      "liveStreamingDetails": {
+        "actualStartTime": "2026-09-13T14:06:45Z",
+        "actualEndTime": "2026-09-13T16:26:21Z",
+        "scheduledStartTime": "2026-09-13T14:00:00Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "uid": "api::page.page",
+  "nome": "Página",
+  "resumo": "Uma página do site. Você monta a página empilhando seções (Hero, e em breve outras) na ordem em que devem aparecer.",
+  "ondeAparece": "No endereço do site definido em \"Endereço (URL)\". A página inicial usa o endereço home.",
+  "boasPraticas": [
+    "Comece a página pelo Hero.",
+    "Preencha o SEO: é o que aparece no Google e ao compartilhar no WhatsApp."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Nome da página",
+      "descricao": "Nome interno da página. Também gera o endereço (URL) automaticamente.",
+      "placeholder": "Ex.: Ministério KIDS",
+      "ondeAparece": "Não aparece no site; identifica a página aqui no painel.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Página inicial"
+    },
+    {
+      "campo": "slug",
+      "label": "Endereço (URL)",
+      "descricao": "Parte final do endereço (ex.: kids → adai.com.br/kids). A página inicial deve ser home.",
+      "placeholder": "Ex.: kids",
+      "ondeAparece": "Na barra de endereço do navegador.",
+      "obrigatorio": true,
+      "limite": "Letras minúsculas, números e hífens",
+      "exemplo": "home"
+    },
+    {
+      "campo": "seo",
+      "label": "SEO (Google e compartilhamento)",
+      "descricao": "Título e descrição que aparecem no Google e ao compartilhar o link.",
+      "placeholder": "",
+      "ondeAparece": "Resultados do Google e prévia de links no WhatsApp/redes.",
+      "obrigatorio": false,
+      "limite": "—",
+      "exemplo": "ADAI — Amar. Servir. Influenciar.",
+      "componente": "shared.seo"
+    },
+    {
+      "campo": "sections",
+      "label": "Seções",
+      "descricao": "Adicione as seções na ordem em que devem aparecer, de cima para baixo.",
+      "placeholder": "",
+      "ondeAparece": "O conteúdo da página, entre o cabeçalho e o rodapé.",
+      "obrigatorio": false,
+      "limite": "—",
+      "exemplo": "Hero · Carrossel de cards · Imagem e texto · Série atual · Próximos eventos"
+    }
+  ]
+}
