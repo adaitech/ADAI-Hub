@@ -6,7 +6,7 @@ import type { Core } from '@strapi/strapi';
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 11;
+const SEED_VERSION = 14;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
@@ -89,7 +89,7 @@ const seo = {
     'Uma igreja que ama, serve e influencia em cinco localidades, com as portas abertas todo domingo. Tem um lugar pra você aqui.',
 };
 
-/** Home conforme o Figma `adai.com.br` (Hero, Neste domingo, Primeira vez, Nossa liderança). */
+/** Home conforme o Figma `adai.com.br`, incluindo a lista de ministérios e Contribua. */
 async function homeSections(strapi: Core.Strapi) {
   const hero = await image(
     strapi,
@@ -184,6 +184,67 @@ async function homeSections(strapi: Core.Strapi) {
       quantidade: 8,
       cor_cards: 'cinza',
     },
+    {
+      __component: 'sections.ministerios',
+      titulo: 'Encontre seu lugar',
+      texto_apoio: 'Tem espaço pra todas as idades e fases da vida.\nEscolha por onde começar.',
+      botao: { texto: 'Quero servir', url: 'https://forms.gle/4wAWu99WyUVR8BcU7', estilo: 'solido', nova_aba: true },
+      ministerios: [
+        { nome: 'KIDS', publico: 'Crianças' },
+        { nome: 'INPULSE', publico: 'Adolescentes' },
+        { nome: 'PULSE', publico: 'Jovens' },
+        { nome: 'FLORES', publico: 'Mulheres' },
+        { nome: 'ENRAIZADOS', publico: 'Homens' },
+        { nome: 'ESPORTE', publico: 'Esporte e comunidade' },
+        { nome: 'MUSIC', publico: 'Louvor e adoração' },
+        { nome: 'CRTV', publico: 'Criativo' },
+      ],
+    },
+    {
+      __component: 'sections.imagem-texto',
+      imagem: hero,
+      posicao_imagem: 'esquerda',
+      preto_e_branco: true,
+      titulo: 'Contribua',
+      texto: 'Dizimar e ofertar não é obrigação. É um ato de fidelidade e gratidão, e o privilégio de participar do que Deus está fazendo aqui na terra.',
+      botao: { texto: 'Contribuir agora', url: '/contribua', estilo: 'solido' },
+      botoes_secundarios: [
+        { texto: 'Projeto Nossa Casa', url: 'https://www.adai.com.br/nossacasa', estilo: 'contorno', nova_aba: true },
+        { texto: 'Outras formas de contribuir', url: '/contribua', estilo: 'contorno' },
+      ],
+    },
+    {
+      __component: 'sections.texto-botoes',
+      titulo: 'A igreja no seu bolso',
+      texto_apoio: 'Bíblia, planos de leitura, agenda, inscrições, pedidos de oração e cultos ao vivo no app da ADAI.',
+      botoes: [
+        { texto: 'Baixar na App Store', url: 'https://apps.apple.com/mw/app/igreja-adai/id6736497082', estilo: 'solido', nova_aba: true },
+        { texto: 'Baixar no Google Play', url: 'https://play.google.com/store/apps/details?id=br.com.inchurch.adaltoipiranga&hl=pt_BR&pli=1', estilo: 'contorno', nova_aba: true },
+      ],
+    },
+    {
+      __component: 'sections.perguntas-frequentes',
+      titulo: 'Perguntas frequentes',
+      texto_apoio: 'Separamos algumas dúvidas comuns de quem está chegando pela primeira vez à ADAI.',
+      perguntas: [
+        {
+          pergunta: 'Posso ir sozinho(a)?',
+          resposta: 'Claro. Muitas pessoas vêm pela primeira vez sozinhas e são recebidas com muita naturalidade. Se quiser, avise antes e alguém te espera na entrada.',
+        },
+        {
+          pergunta: 'Como funciona o ADAI Kids?',
+          resposta: 'O ADAI Kids cuida das crianças com segurança e carinho, com atividades pensadas por faixa etária. Você participa do culto tranquilo(a) sabendo que elas estão sendo bem acompanhadas.',
+        },
+        {
+          pergunta: 'Tem estacionamento?',
+          resposta: 'Sim, a unidade possui espaço pra estacionamento e acesso facilitado. Também é possível chegar por transporte público, dependendo da sua região.',
+        },
+        {
+          pergunta: 'Como me conectar com a igreja depois do culto?',
+          resposta: 'Você pode conversar com a equipe, participar de grupos, eventos e ministérios. O importante é começar, e a gente te ajuda a encontrar o melhor caminho.',
+        },
+      ],
+    },
   ];
 }
 
@@ -210,7 +271,7 @@ async function exemplosSections(strapi: Core.Strapi) {
   return [
     {
       __component: 'sections.carrossel-cards',
-      titulo: 'Encontre seu lugar',
+      titulo: 'Cards de ministérios (exemplo)',
       texto_apoio:
         'Exemplo com fotos, cores, botão e link de contato. Com mais cards do que cabem na tela, as setas aparecem.',
       posicao_imagem: 'acima',

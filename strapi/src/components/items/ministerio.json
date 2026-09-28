@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_items_ministerios",
+  "info": {
+    "displayName": "Ministério da lista",
+    "icon": "bulletList",
+    "description": "Nome, público e destino opcional de uma linha da lista de ministérios."
+  },
+  "options": {},
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "publico": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "url": {
+      "type": "string",
+      "maxLength": 255
+    }
+  }
+}

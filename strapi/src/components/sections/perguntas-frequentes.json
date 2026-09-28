@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_perguntas_frequentes",
+  "info": {
+    "displayName": "Perguntas frequentes",
+    "icon": "question",
+    "description": "Lista de perguntas com respostas expansíveis."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": { "type": "string", "required": true, "maxLength": 80 },
+    "texto_apoio": { "type": "text", "maxLength": 200 },
+    "perguntas": {
+      "type": "component",
+      "repeatable": true,
+      "component": "items.pergunta-frequente",
+      "required": true,
+      "min": 1,
+      "max": 12
+    }
+  }
+}

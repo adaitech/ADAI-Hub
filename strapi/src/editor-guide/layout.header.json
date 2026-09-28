@@ -6,7 +6,7 @@
   "boasPraticas": [
     "Use nomes curtos e diretos no menu (uma ou duas palavras).",
     "Mantenha no máximo 5 ou 6 links para o menu caber no computador.",
-    "Os botões são para as ações mais importantes do momento (ex.: assistir ao vivo, planejar a visita)."
+    "O botão Ao vivo aparece somente durante uma transmissão confirmada no YouTube; mantenha sua URL como /ao-vivo no cadastro."
   ],
   "campos": [
     {
@@ -23,7 +23,7 @@
     {
       "campo": "botoes",
       "label": "Botões de destaque",
-      "descricao": "Até 2 botões. Ex.: Ao vivo (Contorno) e Planeje sua visita (Sólido).",
+      "descricao": "Até 2 botões. Ao vivo só aparece durante uma live confirmada; Planeje sua visita aparece sempre.",
       "placeholder": "",
       "ondeAparece": "Lado direito do cabeçalho (no celular, dentro do Menu).",
       "obrigatorio": false,

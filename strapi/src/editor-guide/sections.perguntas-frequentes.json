@@ -1,0 +1,44 @@
+{
+  "uid": "sections.perguntas-frequentes",
+  "nome": "Perguntas frequentes",
+  "resumo": "Apresenta dúvidas comuns em caixas expansíveis, com pergunta e resposta editadas no Strapi.",
+  "ondeAparece": "Na Home, depois da chamada para o aplicativo; também pode ser usada em outras páginas.",
+  "boasPraticas": [
+    "Coloque primeiro as dúvidas de quem visita a ADAI pela primeira vez.",
+    "Mantenha as respostas atualizadas quando horários ou serviços mudarem.",
+    "Cadastre uma pergunta por item e revise a ordem de leitura."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da seção",
+      "descricao": "Nome curto da área de perguntas.",
+      "placeholder": "Ex.: Perguntas frequentes",
+      "ondeAparece": "Letras grandes acima da lista.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Perguntas frequentes"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Explique para quem servem estas respostas em uma frase curta.",
+      "placeholder": "Ex.: Dúvidas comuns de quem está chegando pela primeira vez.",
+      "ondeAparece": "Abaixo do título, antes das perguntas.",
+      "obrigatorio": false,
+      "limite": "Até 200 caracteres",
+      "exemplo": "Separamos algumas dúvidas comuns de quem está chegando pela primeira vez à ADAI."
+    },
+    {
+      "campo": "perguntas",
+      "label": "Perguntas e respostas",
+      "descricao": "Cadastre de 1 a 12 dúvidas na ordem desejada.",
+      "placeholder": "",
+      "ondeAparece": "Caixas cinza abaixo do texto de apoio.",
+      "obrigatorio": true,
+      "limite": "De 1 a 12 itens",
+      "exemplo": "Posso ir sozinho(a)?",
+      "componente": "items.pergunta-frequente"
+    }
+  ]
+}

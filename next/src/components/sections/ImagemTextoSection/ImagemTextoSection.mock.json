@@ -40,6 +40,32 @@
       "estilo": "solido",
       "nova_aba": false
     },
+    "botoes_secundarios": [],
+    "link": null
+  },
+  "contribua": {
+    "__component": "sections.imagem-texto",
+    "id": 101,
+    "posicao_imagem": "esquerda",
+    "rotulo": null,
+    "titulo": "Contribua",
+    "texto": "Dizimar e ofertar não é obrigação. É um ato de fidelidade e gratidão, e o privilégio de participar do que Deus está fazendo aqui na terra.",
+    "preto_e_branco": true,
+    "imagem": {
+      "id": 1,
+      "name": "hero-adai.jpg",
+      "alternativeText": "Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar",
+      "width": 1440,
+      "height": 1800,
+      "mime": "image/jpeg",
+      "url": "/mocks/hero-adai.jpg"
+    },
+    "lista": [],
+    "botao": { "id": 101, "texto": "Contribuir agora", "url": "/contribua", "estilo": "solido", "nova_aba": false },
+    "botoes_secundarios": [
+      { "id": 102, "texto": "Projeto Nossa Casa", "url": "https://www.adai.com.br/nossacasa", "estilo": "contorno", "nova_aba": true },
+      { "id": 103, "texto": "Outras formas de contribuir", "url": "/contribua", "estilo": "contorno", "nova_aba": false }
+    ],
     "link": null
   },
   "direita": {

@@ -20,6 +20,9 @@ Cada componente tem três artefatos coerentes entre si:
 | [imagem-texto.md](./imagem-texto.md) | Imagem e texto | `sections.imagem-texto` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [serie-atual.md](./serie-atual.md) | Série atual (mensagens do YouTube) | `sections.serie-atual` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [proximos-eventos.md](./proximos-eventos.md) | Próximos eventos (inChurch) | `sections.proximos-eventos` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
+| [ministerios.md](./ministerios.md) | Encontre seu lugar | `sections.ministerios` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
+| [texto-botoes.md](./texto-botoes.md) | A igreja no seu bolso | `sections.texto-botoes` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
+| [perguntas-frequentes.md](./perguntas-frequentes.md) | Perguntas frequentes | `sections.perguntas-frequentes` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [footer.md](./footer.md) | Footer | `layout.footer` | single type `global` | implementado · publicado (dev) |
 
 Status possíveis: **proposto → implementado → publicado no Strapi → validado**.

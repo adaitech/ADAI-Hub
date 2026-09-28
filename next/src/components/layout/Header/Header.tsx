@@ -9,11 +9,12 @@ import styles from './Header.module.css';
 
 interface HeaderProps {
   data: HeaderData | null | undefined;
+  aoVivoUrl?: string | null;
 }
 
 /** Figma: "Header" (node 1:13). Logo fixo + menu e botões vindos de `global.header` no Strapi. */
-export function Header({ data }: HeaderProps) {
-  const { links, botoes } = normalizeHeader(data);
+export function Header({ data, aoVivoUrl }: HeaderProps) {
+  const { links, botoes } = normalizeHeader(data, aoVivoUrl);
   const temMenu = links.length > 0 || botoes.length > 0;
 
   return (

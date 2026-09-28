@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_sections_textos_botoes",
+  "info": {
+    "displayName": "Texto e botões",
+    "icon": "bulletList",
+    "description": "Chamada centralizada com título, texto de apoio e até dois botões."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": { "type": "string", "required": true, "maxLength": 80 },
+    "texto_apoio": { "type": "text", "maxLength": 200 },
+    "botoes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.botao",
+      "max": 2
+    }
+  }
+}

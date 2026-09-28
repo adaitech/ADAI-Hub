@@ -3,11 +3,16 @@ import apiPage from './api.page.json';
 import itemsCard from './items.card.json';
 import itemsColunaLinks from './items.coluna-links.json';
 import itemsDestaque from './items.destaque.json';
+import itemsMinisterio from './items.ministerio.json';
+import itemsPerguntaFrequente from './items.pergunta-frequente.json';
 import layoutFooter from './layout.footer.json';
 import layoutHeader from './layout.header.json';
 import sectionsCarrosselCards from './sections.carrossel-cards.json';
 import sectionsHero from './sections.hero.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
+import sectionsMinisterios from './sections.ministerios.json';
+import sectionsPerguntasFrequentes from './sections.perguntas-frequentes.json';
+import sectionsTextoBotoes from './sections.texto-botoes.json';
 import sectionsProximosEventos from './sections.proximos-eventos.json';
 import sectionsSerieAtual from './sections.serie-atual.json';
 import sharedBotao from './shared.botao.json';
@@ -43,11 +48,16 @@ export const editorGuides: EditorGuide[] = [
   sectionsSerieAtual,
   sectionsProximosEventos,
   sectionsImagemTexto,
+  sectionsMinisterios,
+  sectionsTextoBotoes,
+  sectionsPerguntasFrequentes,
   layoutHeader,
   layoutFooter,
   itemsCard,
   itemsColunaLinks,
   itemsDestaque,
+  itemsMinisterio,
+  itemsPerguntaFrequente,
   sharedBotao,
   sharedLink,
   sharedSeo,
@@ -61,4 +71,6 @@ export const mainFields: Record<string, string> = {
   'items.coluna-links': 'titulo',
   'items.card': 'titulo',
   'items.destaque': 'titulo',
+  'items.ministerio': 'nome',
+  'items.pergunta-frequente': 'pergunta',
 };

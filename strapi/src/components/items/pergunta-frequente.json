@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_items_perguntas_frequentes",
+  "info": {
+    "displayName": "Pergunta frequente",
+    "icon": "question",
+    "description": "Pergunta e resposta do FAQ."
+  },
+  "options": {},
+  "attributes": {
+    "pergunta": { "type": "string", "required": true, "maxLength": 120 },
+    "resposta": { "type": "text", "required": true, "maxLength": 500 }
+  }
+}

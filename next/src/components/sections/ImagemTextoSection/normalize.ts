@@ -24,6 +24,7 @@ export function normalizeImagemTexto(data: ImagemTextoData): ImagemTextoView | n
     paragrafos: splitLines(data.texto),
     lista,
     botao: normalizeBotoes(data.botao ? [data.botao] : [])[0] ?? null,
+    botoesSecundarios: normalizeBotoes(data.botoes_secundarios).slice(0, 2),
     link: normalizeLink(data.link),
   };
 }

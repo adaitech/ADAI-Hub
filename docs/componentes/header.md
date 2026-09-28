@@ -9,6 +9,8 @@
 
 Topo de todas as páginas: logo da ADAI (fixo, leva à Home), menu principal e até dois botões de destaque ("Ao vivo", "Planeje sua visita").
 
+O botão **Ao vivo** só aparece quando a API do YouTube confirma uma transmissão em andamento na série atual. O destino passa a ser o vídeo confirmado; sem confirmação recente ou com erro da API, o botão fica oculto nos layouts desktop e mobile. A checagem usa cache de 5 minutos e descarta um resultado com mais de 10 minutos. O cadastro `/ao-vivo` no Strapi identifica essa ação.
+
 **Onde é usado:** todas as páginas (layout do grupo `(site)`).
 
 ## 2. Escopo
@@ -53,6 +55,7 @@ Textos completos no guia do editor. Resumo:
 | não cadastrar links nem botões | só o logo aparece (sem botão Menu) |
 | criar link sem texto, sem URL ou com URL inválida | o link não aparece |
 | passar de 6 links / 2 botões | só os primeiros aparecem |
+| cadastrar “Ao vivo” enquanto não há transmissão confirmada | o botão é ocultado; os demais permanecem |
 
 ## 6. Layout e acessibilidade
 

@@ -33,10 +33,10 @@ Peça os valores reais ao responsável do projeto (cofre da equipe). Sem as chav
 
 ### Conteúdo do Strapi
 
-O banco local (SQLite em `strapi/.tmp/`) **não** vai para o Git (tem usuários e tokens). Há dois caminhos, e os dois dão o mesmo conteúdo de dev:
+O banco local (SQLite em `strapi/.tmp/`) **não** vai para o Git (tem usuários e tokens). Há dois caminhos para reproduzir o conteúdo de dev:
 
-1. **Automático (padrão):** na primeira vez que o Strapi sobe, o bootstrap aplica os **guias do editor** ao painel, libera leitura pública de páginas e configurações e cria o conteúdo (cabeçalho, rodapé, Home e `/exemplos`) a partir de `strapi/src/bootstrap/seed.ts` + imagens em `strapi/seed/`.
-2. **Snapshot versionado:** `strapi/data/adai-conteudo.tar.gz` (conteúdo + mídias, **sem** admins, tokens ou configurações). Útil quando alguém editou conteúdo no painel e quer compartilhar:
+1. **Automático (padrão):** na primeira vez que o Strapi sobe, o bootstrap aplica os **guias do editor** ao painel, libera leitura pública de páginas e configurações e cria o conteúdo (cabeçalho, rodapé, Home e `/exemplos`) a partir do seed v14 em `strapi/src/bootstrap/seed.ts` + imagens em `strapi/seed/`. Quando a versão do seed sobe, ele reconstrói as seções da Home.
+2. **Snapshot versionado:** `strapi/data/adai-conteudo.tar.gz` (conteúdo + mídias, **sem** admins ou tokens; inclui os papéis e permissões públicos exportados pelo Strapi). Use quando precisar reproduzir também edições feitas no painel. A importação substitui o conteúdo local, então execute-a com o Strapi parado e num banco de desenvolvimento:
 
 ```bash
 yarn data:import   # substitui o conteúdo local pelo snapshot (Strapi parado)
@@ -44,6 +44,8 @@ yarn data:export   # gera um novo snapshot a partir do seu banco local
 ```
 
 Crie seu usuário administrador em http://localhost:1337/admin.
+
+O estado atual da Home inclui “Encontre seu lugar”, “Contribua”, “A igreja no seu bolso” e “Perguntas frequentes”. Os componentes têm exemplos e guias em `/componentes/ministerios`, `/componentes/imagem-texto`, `/componentes/texto-botoes` e `/componentes/perguntas-frequentes`. O botão “Ao vivo” do cabeçalho só é exibido após confirmação recente de live pelo YouTube; sem API disponível ou live ativa ele fica oculto.
 
 ## Onde ver o quê
 

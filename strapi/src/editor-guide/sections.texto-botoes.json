@@ -1,0 +1,44 @@
+{
+  "uid": "sections.texto-botoes",
+  "nome": "Texto e botões",
+  "resumo": "Chamada centralizada com título grande, texto de apoio e até dois botões.",
+  "ondeAparece": "Na Home, depois de Contribua; também pode ser usada em outras páginas.",
+  "boasPraticas": [
+    "Use um título curto e uma frase de apoio direta.",
+    "Cadastre primeiro a ação principal (botão sólido) e depois a alternativa (contorno).",
+    "Para lojas de aplicativos, use os links públicos oficiais e abra em nova aba."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título",
+      "descricao": "Frase principal da chamada, em poucas palavras.",
+      "placeholder": "Ex.: A igreja no seu bolso",
+      "ondeAparece": "Letras grandes no centro da seção.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "A igreja no seu bolso"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Explique em uma ou duas frases o que a pessoa encontra ao seguir os botões.",
+      "placeholder": "Ex.: Bíblia, planos de leitura e agenda no app da ADAI.",
+      "ondeAparece": "Abaixo do título, centralizado.",
+      "obrigatorio": false,
+      "limite": "Até 200 caracteres",
+      "exemplo": "Bíblia, planos de leitura, agenda, inscrições, pedidos de oração e cultos ao vivo no app da ADAI."
+    },
+    {
+      "campo": "botoes",
+      "label": "Botões",
+      "descricao": "Até dois botões com texto e URL. Sem texto ou URL, o botão não aparece.",
+      "placeholder": "",
+      "ondeAparece": "Abaixo do texto de apoio, lado a lado quando houver espaço.",
+      "obrigatorio": false,
+      "limite": "Até 2 botões",
+      "exemplo": "Baixar na App Store · Baixar no Google Play",
+      "componente": "shared.botao"
+    }
+  ]
+}

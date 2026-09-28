@@ -14,6 +14,13 @@ describe('Header', () => {
     const nav = screen.getByRole('navigation', { name: 'Principal' });
     expect(nav.querySelectorAll('a')).toHaveLength(5);
     expect(screen.getByRole('link', { name: 'Planeje sua visita' })).toHaveAttribute('href', '/planeje-sua-visita');
+    expect(screen.queryByRole('link', { name: /Ao vivo/ })).not.toBeInTheDocument();
+  });
+
+  it('mostra Ao vivo apenas com transmissão confirmada e usa a URL atual', () => {
+    const url = 'https://www.youtube.com/watch?v=abc123def45';
+    render(<Header data={completo} aoVivoUrl={url} />);
+    expect(screen.getByRole('link', { name: /Ao vivo/ })).toHaveAttribute('href', url);
   });
 
   it('abre e fecha o menu mobile, devolvendo o foco com Esc', () => {

@@ -1,0 +1,43 @@
+{
+  "uid": "items.ministerio",
+  "nome": "Ministério da lista",
+  "resumo": "Uma linha com o nome do ministério e o público atendido. O destino é opcional até a página do ministério existir.",
+  "ondeAparece": "Na coluna direita da seção Lista de ministérios.",
+  "boasPraticas": [
+    "Use o nome oficial do ministério, curto e reconhecível.",
+    "Descreva o público em poucas palavras; não repita o nome.",
+    "Só preencha a URL quando o destino público estiver funcionando."
+  ],
+  "campos": [
+    {
+      "campo": "nome",
+      "label": "Nome do ministério",
+      "descricao": "Nome oficial exibido em destaque na linha.",
+      "placeholder": "Ex.: KIDS",
+      "ondeAparece": "Letras grandes à esquerda da linha.",
+      "obrigatorio": true,
+      "limite": "Até 40 caracteres",
+      "exemplo": "KIDS"
+    },
+    {
+      "campo": "publico",
+      "label": "Público ou atuação",
+      "descricao": "Frase curta que ajuda a pessoa a escolher o ministério.",
+      "placeholder": "Ex.: Crianças",
+      "ondeAparece": "Texto pequeno à direita do nome (abaixo no celular).",
+      "obrigatorio": false,
+      "limite": "Até 50 caracteres",
+      "exemplo": "Crianças"
+    },
+    {
+      "campo": "url",
+      "label": "Destino da linha",
+      "descricao": "Link público do ministério. Se ficar vazio, a linha aparece sem ser clicável.",
+      "placeholder": "Ex.: /ministerios/kids",
+      "ondeAparece": "Torna a linha inteira clicável quando preenchido.",
+      "obrigatorio": false,
+      "limite": "Até 255 caracteres",
+      "exemplo": "/ministerios/kids"
+    }
+  ]
+}

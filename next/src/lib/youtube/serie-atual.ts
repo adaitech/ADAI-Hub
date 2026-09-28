@@ -54,6 +54,13 @@ const playlistCache = unstable_cache(
   { revalidate: TTL_NORMAL_S, tags: [YOUTUBE_CACHE_TAG] },
 );
 
+/** O cabeçalho precisa descobrir o início da transmissão mesmo com a série em cache de 4h. */
+const livePlaylistCache = unstable_cache(
+  () => resolveCurrentSeriesPlaylist(null, { obterChannelId: () => channelIdCache(getChannelHandle()) }),
+  ['youtube', 'playlist-ao-vivo'],
+  { revalidate: TTL_AO_VIVO_S, tags: [YOUTUBE_CACHE_TAG] },
+);
+
 const serieNormalCache = unstable_cache(carregarSerie, ['youtube', 'serie', 'normal'], {
   revalidate: TTL_NORMAL_S,
   tags: [YOUTUBE_CACHE_TAG],
@@ -78,6 +85,26 @@ export function precisaCacheCurto(serie: SerieYoutube, agora: Date): boolean {
  * vitru-portal). Cobre o caso em que o Data Cache não tem nada utilizável e o YouTube falha.
  */
 const ultimoValido = new Map<string, SerieYoutube>();
+
+/** Só exibe a ação se a API confirmou uma live recentemente; dados antigos não bastam. */
+export function urlAoVivoConfirmada(serie: SerieYoutube, agora: Date = new Date()): string | null {
+  if (!serie.aoVivo) return null;
+  const idade = agora.getTime() - Date.parse(serie.atualizadoEm);
+  if (!Number.isFinite(idade) || idade < 0 || idade > TTL_AO_VIVO_S * 2 * 1000) return null;
+  return serie.conteudos.find((conteudo) => conteudo.status === 'live')?.video.youtubeUrl ?? null;
+}
+
+/** Link público da transmissão atual no canal da ADAI. Erro ou ausência de confirmação → oculto. */
+export async function getAoVivoAtual(): Promise<string | null> {
+  try {
+    const playlist = await livePlaylistCache();
+    const serie = await serieAoVivoCache(playlist.playlistId, playlist.titulo);
+    return urlAoVivoConfirmada(serie);
+  } catch (error) {
+    console.warn(`[youtube] Estado ao vivo indisponível (${mensagem(error)}): botão oculto.`);
+    return null;
+  }
+}
 
 /** Apenas para testes. */
 export function __limparUltimoValido(): void {
