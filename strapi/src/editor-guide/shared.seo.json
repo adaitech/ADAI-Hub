@@ -1,0 +1,21 @@
+{
+  "uid": "shared.seo",
+  "nome": "SEO",
+  "resumo": "Como a página aparece no Google e quando alguém compartilha o link.",
+  "ondeAparece": "Resultados de busca e prévia de links em WhatsApp e redes sociais.",
+  "boasPraticas": [
+    "Título com até 60 caracteres, começando pelo assunto da página.",
+    "Descrição de 50 a 160 caracteres, convidativa e verdadeira.",
+    "Campos avançados (robots, viewport, dados estruturados, URL canônica): deixe em branco, são de uso técnico."
+  ],
+  "campos": [
+    { "campo": "metaTitle", "label": "Título no Google", "descricao": "Até 60 caracteres. Aparece como título azul no Google e na aba do navegador.", "placeholder": "Ex.: Ministério KIDS | ADAI", "ondeAparece": "Google e aba do navegador.", "obrigatorio": true, "limite": "Até 60 caracteres", "exemplo": "ADAI — Amar. Servir. Influenciar." },
+    { "campo": "metaDescription", "label": "Descrição no Google", "descricao": "De 50 a 160 caracteres. Resume a página em uma frase convidativa.", "placeholder": "Ex.: Conheça o ADAI Kids: um lugar seguro e divertido para as crianças aprenderem sobre Jesus.", "ondeAparece": "Texto cinza abaixo do título no Google.", "obrigatorio": true, "limite": "50 a 160 caracteres", "exemplo": "Uma igreja que ama, serve e influencia em cinco localidades. Tem um lugar pra você aqui." },
+    { "campo": "metaImage", "label": "Imagem de compartilhamento", "descricao": "Imagem horizontal (1200×630 px) mostrada ao compartilhar o link.", "placeholder": "", "ondeAparece": "Prévia do link no WhatsApp e redes.", "obrigatorio": false, "limite": "Uma imagem", "exemplo": "" },
+    { "campo": "keywords", "label": "Palavras-chave", "descricao": "Opcional. Palavras separadas por vírgula.", "placeholder": "Ex.: igreja, santo andré, culto", "ondeAparece": "Não aparece.", "obrigatorio": false, "limite": "—", "exemplo": "" },
+    { "campo": "metaRobots", "label": "Robots (técnico)", "descricao": "Uso técnico. Deixe em branco.", "placeholder": "", "ondeAparece": "Não aparece.", "obrigatorio": false, "limite": "—", "exemplo": "" },
+    { "campo": "structuredData", "label": "Dados estruturados (técnico)", "descricao": "Uso técnico. Deixe em branco.", "placeholder": "", "ondeAparece": "Não aparece.", "obrigatorio": false, "limite": "—", "exemplo": "" },
+    { "campo": "metaViewport", "label": "Viewport (técnico)", "descricao": "Uso técnico. Deixe em branco.", "placeholder": "", "ondeAparece": "Não aparece.", "obrigatorio": false, "limite": "—", "exemplo": "" },
+    { "campo": "canonicalURL", "label": "URL canônica (técnico)", "descricao": "Uso técnico. Deixe em branco.", "placeholder": "", "ondeAparece": "Não aparece.", "obrigatorio": false, "limite": "—", "exemplo": "" }
+  ]
+}

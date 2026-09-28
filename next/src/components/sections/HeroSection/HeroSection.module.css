@@ -1,0 +1,92 @@
+/* Figma: Hero (1:32) — frame desktop 1440. Mobile/tablet: proposta 🟡 (sem Figma). */
+.hero {
+  padding-inline: var(--space-gutter);
+}
+
+.cartao {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: var(--hero-min-height-mobile);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-media);
+  color: var(--color-text-inverse);
+}
+
+.imagem {
+  z-index: -2;
+  object-fit: cover;
+  object-position: center;
+  filter: grayscale(1);
+}
+
+.degrade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--gradient-media-overlay);
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  width: 100%;
+  padding: var(--space-24);
+}
+
+.titulo {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.linha {
+  display: block;
+}
+
+.apoio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  max-width: var(--hero-apoio-max);
+}
+
+.texto {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-lead);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-text);
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+}
+
+/* tier: tablet */
+@media (min-width: 769px) {
+  .conteudo {
+    padding: var(--space-40);
+  }
+}
+
+/* tier: desktop — Figma: conteúdo em linha, título à esquerda e apoio à direita, padding 56 */
+@media (min-width: 1024px) {
+  .cartao {
+    min-height: var(--hero-min-height);
+  }
+
+  .conteudo {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-40);
+    padding: var(--space-56);
+  }
+}

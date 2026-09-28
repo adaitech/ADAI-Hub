@@ -1,0 +1,218 @@
+/*
+ * Figma: Neste domingo (1:51) — 5 cards de 261px (gap 12) em 1440. Estilo do card não extraído
+ * do Figma (limite do MCP): fundo cinza e raio são proposta 🟡.
+ */
+.secao {
+  display: grid;
+  grid-template-areas:
+    'intro'
+    'controles'
+    'trilha'
+    'progresso';
+  row-gap: var(--space-24);
+  padding: var(--space-section) var(--space-gutter) 0;
+  overflow: hidden;
+}
+
+.intro {
+  grid-area: intro;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  max-width: var(--intro-max);
+}
+
+.tituloSecao {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h2);
+  letter-spacing: var(--letter-spacing-h2);
+}
+
+.apoio {
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-text);
+}
+
+/* Trilha: cada card ocupa as mesmas linhas (subgrid) para alinhar título, destaques, texto e ações. */
+.trilha {
+  grid-auto-columns: 80%;
+  grid-template-rows: repeat(4, auto);
+  row-gap: var(--space-16);
+}
+
+.trilha.comImagem {
+  grid-template-rows: repeat(5, auto);
+}
+
+.card {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  padding: var(--space-24);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+}
+
+.comImagem .card {
+  grid-row: span 5;
+}
+
+/* Cores do card (Strapi "Cor do card"). Escuras: todo texto em branco puro (AA ≥ 5,4:1). */
+.card[data-cor='branco'] {
+  background-color: var(--card-branco);
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-border-subtle);
+}
+
+.card:is([data-cor='preto'], [data-cor='azul'], [data-cor='verde'], [data-cor='laranja'], [data-cor='vinho']) {
+  color: var(--color-text-inverse);
+}
+
+.card:is([data-cor='preto'], [data-cor='azul'], [data-cor='verde'], [data-cor='laranja'], [data-cor='vinho']) .texto {
+  color: var(--color-text-inverse);
+}
+
+.card:is([data-cor='preto'], [data-cor='azul'], [data-cor='verde'], [data-cor='laranja'], [data-cor='vinho']) :focus-visible {
+  outline-color: var(--color-focus-ring-inverse);
+}
+
+.card[data-cor='preto'] {
+  background-color: var(--card-preto);
+}
+
+.card[data-cor='azul'] {
+  background-color: var(--card-azul);
+}
+
+.card[data-cor='verde'] {
+  background-color: var(--card-verde);
+}
+
+.card[data-cor='laranja'] {
+  background-color: var(--card-laranja);
+}
+
+.card[data-cor='vinho'] {
+  background-color: var(--card-vinho);
+}
+
+.midia {
+  position: relative;
+  grid-row: 1;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-media);
+}
+
+.imagem {
+  object-fit: cover;
+  filter: grayscale(1);
+}
+
+.titulo {
+  grid-row: 1;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h3);
+}
+
+.destaques {
+  grid-row: 2;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-destaque);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-destaque);
+}
+
+.texto {
+  grid-row: 3;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-text);
+}
+
+.linha {
+  display: block;
+}
+
+.acoes {
+  grid-row: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: end;
+  gap: var(--space-8);
+}
+
+.comImagem .titulo {
+  grid-row: 2;
+}
+
+.comImagem .destaques {
+  grid-row: 3;
+}
+
+.comImagem .texto {
+  grid-row: 4;
+}
+
+.comImagem .acoes {
+  grid-row: 5;
+}
+
+/* Arte de divulgação (Strapi "Tipo de imagem dos cards" = arte): 16:9 e colorida, sem cortar o texto. */
+.arte .midia {
+  aspect-ratio: 16 / 9;
+}
+
+.arte .imagem {
+  filter: none;
+}
+
+/* Foto abaixo (Strapi "Posição da foto nos cards"): título na linha 1, foto na última. */
+.imagemAbaixo .titulo {
+  grid-row: 1;
+}
+
+.imagemAbaixo .destaques {
+  grid-row: 2;
+}
+
+.imagemAbaixo .texto {
+  grid-row: 3;
+}
+
+.imagemAbaixo .acoes {
+  grid-row: 4;
+}
+
+.imagemAbaixo .midia {
+  grid-row: 5;
+}
+
+/* tier: tablet — 2 cards e meio visíveis */
+@media (min-width: 769px) {
+  .trilha {
+    grid-auto-columns: 40%;
+  }
+}
+
+/* tier: desktop — 5 cards por vez (Figma); título e controles na mesma linha */
+@media (min-width: 1024px) {
+  .secao {
+    grid-template-areas:
+      'intro controles'
+      'trilha trilha'
+      'progresso progresso';
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    row-gap: var(--space-40);
+  }
+
+  .trilha {
+    grid-auto-columns: calc((100% - 4 * var(--space-12)) / 5);
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_shared_botoes",
+  "info": {
+    "displayName": "Botão",
+    "icon": "cursor",
+    "description": "Botão de ação (CTA) com estilo definido pelo design."
+  },
+  "options": {},
+  "attributes": {
+    "texto": {
+      "type": "string",
+      "required": true,
+      "maxLength": 30
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "maxLength": 300
+    },
+    "estilo": {
+      "type": "enumeration",
+      "enum": ["solido", "contorno"],
+      "default": "solido",
+      "required": true
+    },
+    "nova_aba": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

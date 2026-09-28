@@ -2,24 +2,24 @@
   "collectionName": "components_shared_links",
   "info": {
     "displayName": "Link",
-    "icon": "link"
+    "icon": "link",
+    "description": "Link de texto simples (menu, rodapé)."
   },
   "options": {},
   "attributes": {
-    "text": {
-      "type": "string"
+    "texto": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
     },
-    "URL": {
-      "type": "string"
+    "url": {
+      "type": "string",
+      "required": true,
+      "maxLength": 300
     },
-    "target": {
-      "type": "enumeration",
-      "enum": [
-        "_blank",
-        "_self",
-        "_parent",
-        "_top"
-      ]
+    "nova_aba": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

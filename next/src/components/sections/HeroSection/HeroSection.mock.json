@@ -1,0 +1,77 @@
+{
+  "completo": {
+    "__component": "sections.hero",
+    "id": 2,
+    "titulo": "Amar.\nServir.\nInfluenciar.",
+    "texto_apoio": "Uma igreja que ama, serve e influencia em cinco localidades, com as portas abertas todo domingo.\nTem um lugar pra você aqui.",
+    "imagem": {
+      "id": 1,
+      "documentId": "szlw61ubpvr73pdblhttnygi",
+      "name": "hero-adai.jpg",
+      "alternativeText": "Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar",
+      "caption": "Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar",
+      "width": 2100,
+      "height": 1400,
+      "formats": null,
+      "hash": "hero_adai_9e0d014aa7",
+      "ext": ".jpg",
+      "mime": "image/jpeg",
+      "size": 193.62,
+      "url": "/mocks/hero-adai.jpg",
+      "previewUrl": null,
+      "provider": "local",
+      "provider_metadata": null
+    },
+    "botoes": [
+      { "id": 5, "texto": "Planeje sua visita", "url": "/planeje-sua-visita", "estilo": "solido", "nova_aba": false },
+      { "id": 6, "texto": "Unidades", "url": "/unidades", "estilo": "contorno", "nova_aba": false }
+    ]
+  },
+  "minimo": {
+    "__component": "sections.hero",
+    "id": 3,
+    "titulo": "Amar.",
+    "texto_apoio": null,
+    "imagem": {
+      "id": 1,
+      "name": "hero-adai.jpg",
+      "alternativeText": "Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar",
+      "width": 2100,
+      "height": 1400,
+      "formats": null,
+      "mime": "image/jpeg",
+      "url": "/mocks/hero-adai.jpg"
+    },
+    "botoes": []
+  },
+  "texto_longo": {
+    "__component": "sections.hero",
+    "id": 4,
+    "titulo": "Encontre seu lugar\nno Reino.\nVenha como está.",
+    "texto_apoio": "Somos uma família espalhada por cinco localidades, com cultos todos os domingos, ministérios para todas as idades e gente disposta a caminhar com você em cada fase da vida.\nTem um lugar pra você aqui.",
+    "imagem": {
+      "id": 1,
+      "name": "hero-adai.jpg",
+      "alternativeText": "Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar",
+      "width": 2100,
+      "height": 1400,
+      "formats": null,
+      "mime": "image/jpeg",
+      "url": "/mocks/hero-adai.jpg"
+    },
+    "botoes": [
+      { "id": 7, "texto": "Planeje sua visita agora", "url": "/planeje-sua-visita", "estilo": "solido", "nova_aba": false },
+      { "id": 8, "texto": "Assista ao vivo", "url": "https://www.youtube.com/", "estilo": "contorno", "nova_aba": true }
+    ]
+  },
+  "sem_imagem": {
+    "__component": "sections.hero",
+    "id": 5,
+    "titulo": "Amar.\nServir.\nInfluenciar.",
+    "texto_apoio": "Foto ainda não enviada: o fundo fica cinza-escuro.",
+    "imagem": null,
+    "botoes": [
+      { "id": 9, "texto": "Unidades", "url": "/unidades", "estilo": "contorno", "nova_aba": false }
+    ]
+  }
+}

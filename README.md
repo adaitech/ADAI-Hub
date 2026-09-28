@@ -1,103 +1,84 @@
-# ADAI-Hub
-"O ADAI Hub é a iniciativa que centraliza a tecnologia do nosso site oficial. Ele representa a união entre o nosso front-end e o sistema de gerenciamento de conteúdo Strapi, com a visão de criar um ecossistema digital onde todos os serviços da ADAI estejam perfeitamente conectados e integrados.
+# ADAI Hub
 
-# 
-Strapi 
+Novo ecossistema digital da ADAI — **Amar a Deus. Servir as pessoas. Influenciar o mundo.**
 
-- A Strapi project with content-types and data already onboard
-- A Next.js client that's primed and ready to fetch the content from Strapi faster than you can say "blast off!"
+Site em **Next.js 16 + React 19** (`next/`) alimentado pelo CMS **Strapi 5** (`strapi/`): ministérios e o time Criativo montam páginas empilhando seções reutilizáveis, sem depender de desenvolvimento.
 
-## 🌌 Get started
+> **Antes de codar, leia o [`AGENTS.md`](AGENTS.md)** — ele aponta as regras do projeto (`.agents/rules/`), as skills (`.agents/skills/`) e a visão ([`Visao-do-Projeto.md`](.agents/rules/Visao-do-Projeto.md)).
 
-Strap yourself in! You can get started with this project on your local machine by following the instructions below, or you can [request a private instance on our website](https://strapi.io/demo)
+## Requisitos
 
+- Node.js 22 LTS
+- Yarn 1.x
 
-- Navigate to your project folder by running `cd ADAI-hub`.
+## Rodar localmente
 
-## 2. Set up environment variables
-
-Before you take off, set up the required environment variables for both Strapi and Next.js.
-
-To create the Strapi .env file, copy the content of the `./strapi/.env.example` file into a new file named `./strapi/.env`, then modify the values to match your setup:
-
-```sh
-cp ./strapi/.env.example ./strapi/.env
+```bash
+yarn setup   # instala dependências e cria next/.env e strapi/.env a partir dos .env.example
+yarn dev     # sobe Strapi (http://localhost:1337) e, quando ele responder, o Next (http://localhost:3000)
 ```
 
-Then do the same for the Next.js .env file, and modify it too:
+Depois do `yarn setup`, preencha os `.env` (nunca commitar; os `.env.example` têm só os nomes):
 
-```sh
-cp ./next/.env.example ./next/.env
+| Variável | Onde | Para quê |
+| --- | --- | --- |
+| `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `JWT_SECRET`, `ENCRYPTION_KEY` | `strapi/.env` | Segredos do Strapi — trocar os `tobemodified` por valores aleatórios |
+| `PREVIEW_SECRET` | `strapi/.env` **e** `next/.env` (mesmo valor) | Pré-visualização de rascunhos |
+| `REVALIDATE_SECRET` | `next/.env` (e no webhook do Strapi) | Webhook que atualiza o site quando o conteúdo muda |
+| `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_IMAGE_ALLOW_LOCAL_IP` | `next/.env` | URLs e imagens locais |
+| `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_HANDLE` | `next/.env` (só servidor) | Série atual (YouTube Data API v3) |
+| `INCHURCH_API_BASE_PUBLIC`, `INCHURCH_API_KEY`, `INCHURCH_API_SECRET` | `next/.env` (só servidor) | Próximos eventos (inChurch Public API) |
+
+Peça os valores reais ao responsável do projeto (cofre da equipe). Sem as chaves do YouTube/inChurch o site funciona, só sem as seções Série atual e Próximos eventos.
+
+### Conteúdo do Strapi
+
+O banco local (SQLite em `strapi/.tmp/`) **não** vai para o Git (tem usuários e tokens). Há dois caminhos, e os dois dão o mesmo conteúdo de dev:
+
+1. **Automático (padrão):** na primeira vez que o Strapi sobe, o bootstrap aplica os **guias do editor** ao painel, libera leitura pública de páginas e configurações e cria o conteúdo (cabeçalho, rodapé, Home e `/exemplos`) a partir de `strapi/src/bootstrap/seed.ts` + imagens em `strapi/seed/`.
+2. **Snapshot versionado:** `strapi/data/adai-conteudo.tar.gz` (conteúdo + mídias, **sem** admins, tokens ou configurações). Útil quando alguém editou conteúdo no painel e quer compartilhar:
+
+```bash
+yarn data:import   # substitui o conteúdo local pelo snapshot (Strapi parado)
+yarn data:export   # gera um novo snapshot a partir do seu banco local
 ```
 
-## 3. Start Strapi
+Crie seu usuário administrador em http://localhost:1337/admin.
 
-Take a deep breath. It's time to power up the Strapi engines. Navigate to your ./my-projects/ADAI-hub/strapi folder by running:
+## Onde ver o quê
 
-Navigate to your `./my-projects/ADAI-hub/strapi` folder by running `cd strapi` from your command line.
+| Endereço | O que é |
+| --- | --- |
+| http://localhost:3000 | Site (Home) |
+| http://localhost:3000/exemplos | Página montada no Strapi com as variações dos componentes |
+| http://localhost:3000/componentes | **Vitrine de componentes**: variações em 375/768/1440 px e o guia de como preencher cada componente no Strapi (só em dev/homologação) |
+| http://localhost:1337/admin | Painel do Strapi |
 
-- Run the following command in your `./ADAI-hub/strapi` folder:
+## Qualidade
 
-```
-yarn && yarn seed && yarn develop
-```
-
-This will install dependencies, sprinkle in some data magic, and run the server. (You can run these commands separately, but why not be efficient?)
-
-## 4. Start Next.js
-
-We're almost ready for lift-off! Next.js is your sleek, futuristic interface for getting all that glorious content out into the world. 🚀
-
-Open a new terminal tab or window to leave Strapi running, and navigate to your `./my-projects/ADAI-hub/next` folder by running `cd next`.
-
-- Run the following command in your `./ADAI-hub/next` folder
-
-```
-yarn && yarn build && yarn start
+```bash
+yarn quality   # em next/: lint + typecheck + testes (inclui a checagem da vitrine e do guia do editor)
+yarn build     # build do Strapi e do Next
 ```
 
-This installs dependencies, builds your project, and starts your server. You’re now a spacefaring content master!
+## Fontes de dados
 
-## Features Overview ✨
+| Fonte | O que vem de lá | Onde no código |
+| --- | --- | --- |
+| **Strapi** | Páginas, seções, textos, imagens editoriais, configurações das seções | `next/src/lib/strapi/` |
+| **inChurch Public API** — fonte prioritária de dados da igreja | Eventos (Próximos eventos); próximos: células/GCs, grupos | `next/src/lib/inchurch/` · [docs](https://docs.inchurch.com.br) |
+| **YouTube Data API v3** | Mensagens/séries (Série atual) | `next/src/lib/youtube/` |
 
-### User
+Regras de cada integração: `.agents/rules/Stack-Fontes-e-Bibliotecas.md` §3.6 e `.agents/rules/Arquitetura-e-Governanca.md` §4.1.
 
-<br />
+## Estrutura
 
-**An intuitive, minimal editor** The editor allows you to pull in dynamic blocks of content. It’s 100% open-source, and it’s fully extensible.<br />
-**Media Library** Upload images, video or any files and crop and optimize their sizes, without quality loss.<br />
-**Flexible content management** Build any type of category, section, format or flow to adapt to your needs. <br />
-**Sort and Filter** Built-in sorting and filtering: you can manage thousands of entries without effort.<br />
-**User-friendly interface** The most user-friendly open-source interface on the market.<br />
-**SEO optimized** Easily manage your SEO metadata with a repeatable field and use our Media Library to add captions, notes, and custom filenames to optimize the SEO of media assets.<br /><br />
-
-### Global
-
-<br />
-
-[Customizable API](https://strapi.io/features/customizable-api): Automatically build out the schema, models, controllers for your API from the editor. Get REST or GraphQL API out of the box without writing a single line of code.<br />
-[Media Library](https://strapi.io/features/media-library): The media library allows you to store your images, videos and files in your Strapi admin panel with many ways to visualize and manage them.<br />
-[Role-Based Access Control (RBAC)](https://strapi.io/features/custom-roles-and-permissions): Role-Based Access Control is a feature available in the Administration Panel settings that let your team members have access rights only to the information they need.<br />
-[Internationalization (i18n)](https://strapi.io/features/internationalization): Internationalization (i18n) lets you create many content versions, also called locales, in different languages and for different countries.<br />
-[Audit Logs](https://strapi.io/blog/reasons-and-best-practices-for-using-audit-logs-in-your-application)The Audit Logs section provides a searchable and filterable display of all activities performed by users of the Strapi application<br />
-[Data transfer](https://strapi.io/blog/importing-exporting-and-transferring-data-with-the-strapi-cli) Streams your data from one Strapi instance to another Strapi instance.<br />
-[Review Worfklows](https://docs.strapi.io/user-docs/settings/review-workflows) Create and manage any desired review stages for your content, enabling your team to collaborate in the content creation flow from draft to publication. <br />
-
-## Resources
-
-[Docs](https://docs.strapi.io) • [Demo](https://strapi.io/demo) • [Forum](https://forum.strapi.io/) • [Discord](https://discord.strapi.io) • [Youtube](https://www.youtube.com/c/Strapi/featured) • [Strapi Design System](https://design-system.strapi.io/) • [Marketplace](https://market.strapi.io/) • [Cloud Free Trial](https://cloud.strapi.io)
-
-## Todo
-
-- [ ] Implement the official Strapi SEO plugin
-- [ ] Implement the community Strapi preview plugin
-- [ ] Create localized content for the pricing plans and products
-- [ ] Populate creator fields when it'll work on Strapi 5 (article authors information are missing)
-
-## Customization
-
-- The Strapi application contains a custom population middleware in order to populate more data than what it is set by default. You can find it in the `./strapi/src/middlewares/deepPopulate.ts` file.
-
-- The Strapi application contains a postinstall script that will regenerate an uuid for the project in order to get some anonymous usage information concerning this demo. You can disable it by removing the uuid inside the `./strapi/packages.json` file.
-
-- The Strapi application contains a patch for the @strapi/admin package. It is only necessary for the hosted demos since we automatically create the Super Admin users for them when they request this demo on our website.
+```
+ADAI-Hub/
+├── AGENTS.md / CLAUDE.md     # orientações para agentes de IA e devs
+├── .agents/rules/            # regras (arquitetura, componentes/CMS, tokens, mobile-first, DoD…)
+├── .agents/skills/           # skills (espelhadas em .claude/skills/)
+├── docs/componentes/         # contrato Strapi ↔ front de cada componente
+├── next/                     # site (Next.js)
+└── strapi/                   # CMS (Strapi)
+```

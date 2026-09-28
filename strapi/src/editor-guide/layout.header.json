@@ -1,0 +1,35 @@
+{
+  "uid": "layout.header",
+  "nome": "Cabeçalho",
+  "resumo": "Faixa fixa no topo de todas as páginas com o logo da ADAI, o menu principal e até dois botões de destaque. O logo não é editável: ele sempre leva para a página inicial.",
+  "ondeAparece": "Topo de todas as páginas do site. No celular, os links do menu ficam dentro do botão \"Menu\".",
+  "boasPraticas": [
+    "Use nomes curtos e diretos no menu (uma ou duas palavras).",
+    "Mantenha no máximo 5 ou 6 links para o menu caber no computador.",
+    "Os botões são para as ações mais importantes do momento (ex.: assistir ao vivo, planejar a visita)."
+  ],
+  "campos": [
+    {
+      "campo": "links",
+      "label": "Links do menu",
+      "descricao": "Até 6 links, na ordem em que aparecem da esquerda para a direita.",
+      "placeholder": "",
+      "ondeAparece": "Centro do cabeçalho no computador; dentro do botão Menu no celular.",
+      "obrigatorio": false,
+      "limite": "Até 6 links",
+      "exemplo": "Localidades · Sermões · Agenda · Ministérios · Contribua",
+      "componente": "shared.link"
+    },
+    {
+      "campo": "botoes",
+      "label": "Botões de destaque",
+      "descricao": "Até 2 botões. Ex.: Ao vivo (Contorno) e Planeje sua visita (Sólido).",
+      "placeholder": "",
+      "ondeAparece": "Lado direito do cabeçalho (no celular, dentro do Menu).",
+      "obrigatorio": false,
+      "limite": "Até 2 botões",
+      "exemplo": "Ao vivo (Contorno) · Planeje sua visita (Sólido)",
+      "componente": "shared.botao"
+    }
+  ]
+}

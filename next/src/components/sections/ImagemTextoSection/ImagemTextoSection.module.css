@@ -1,0 +1,130 @@
+/*
+ * Figma: Primeira vez (1:107) e Nossa Liderança (6:4) — foto 633 × 792 (4:5) e texto em
+ * colunas iguais, 86px entre elas, conteúdo centralizado na vertical. Mobile: proposta 🟡.
+ */
+.secao {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-32);
+  padding: var(--space-section) var(--space-gutter) 0;
+}
+
+.midia {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-md); /* Figma: raio 20px nas fotos (nodes 1:108 e 6:14) */
+  background-color: var(--color-bg-media);
+}
+
+.imagem {
+  object-fit: cover;
+}
+
+/* Figma: "Primeira vez" em P&B; "Foto da liderança" colorida — o editor escolhe. */
+.midia[data-pb='true'] .imagem {
+  filter: grayscale(1);
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-20);
+}
+
+.rotulo {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-text);
+}
+
+.titulo {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h2);
+  letter-spacing: var(--letter-spacing-h2);
+}
+
+.linha {
+  display: block;
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: var(--texto-max);
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-text);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  width: 100%;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-20) var(--space-24);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+}
+
+.itemTitulo {
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-text);
+}
+
+.itemTexto {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-text);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-16) var(--space-24);
+}
+
+/* tier: tablet — lista com título e explicação lado a lado (Figma) */
+@media (min-width: 769px) {
+  .item {
+    flex-direction: row;
+    gap: var(--space-20);
+  }
+
+  .itemTitulo {
+    flex: 0 0 var(--lista-rotulo);
+  }
+}
+
+/* tier: desktop — foto e texto em colunas iguais; lado da foto vem do Strapi */
+@media (min-width: 1024px) {
+  .secao {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    column-gap: var(--space-coluna);
+  }
+
+  .secao[data-posicao='direita'] .midia {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .secao[data-posicao='direita'] .conteudo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .secao[data-sem-imagem='true'] .conteudo {
+    grid-column: 1 / -1;
+  }
+}

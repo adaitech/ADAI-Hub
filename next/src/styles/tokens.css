@@ -1,0 +1,124 @@
+/* Design tokens do ADAI Hub — fonte: .agents/rules/Design-Tokens.md (manter sincronizado). */
+:root {
+  /* ---------- Cores: primitivos (usar só aqui) ---------- */
+  --black: #000000;
+  --white: #ffffff;
+  --gray-900: #333333;
+  --gray-600: #6b6b6b; /* acessível: 4,76:1 sobre --gray-100 (o #777 do Figma dá 4,00:1 e falha AA) */
+  --gray-500: #777777; /* valor do Figma — não usar em texto sobre --gray-100 */
+  --gray-100: #f2f2f2;
+  --gray-300: #d9d9d9; /* 🟡 borda do card branco */
+
+  /* Paleta de cards — 🟡 proposta (não está no Figma); todas com texto branco ≥ 5,4:1 (AA) */
+  --blue-700: #1d4e89; /* 8,39:1 */
+  --green-700: #1e6b4f; /* 6,42:1 */
+  --orange-700: #b3471d; /* 5,47:1 */
+  --wine-700: #7b1e3a; /* 10,05:1 */
+  --overlay-strong: rgba(0, 0, 0, 0.6);
+  --overlay-soft: rgba(0, 0, 0, 0.05);
+
+  /* ---------- Cores: semânticos (usar nos componentes) ---------- */
+  --color-bg-page: var(--white);
+  --color-bg-subtle: var(--gray-100);
+  --color-bg-inverse: var(--black);
+  --color-bg-media: var(--gray-900);
+  --color-text-primary: var(--black);
+  --color-text-muted: var(--gray-600);
+  --color-text-inverse: var(--white);
+  --color-border-strong: var(--black);
+  --color-border-inverse: var(--white);
+  --color-focus-ring: var(--black);
+  --color-focus-ring-inverse: var(--white);
+  --gradient-media-overlay: linear-gradient(to top, var(--overlay-strong), var(--overlay-soft) 65%);
+  --color-border-subtle: var(--gray-300);
+
+  /* Cores de card (campo "Cor do card" no Strapi) */
+  --card-cinza: var(--color-bg-subtle);
+  --card-branco: var(--color-bg-page);
+  --card-preto: var(--black);
+  --card-azul: var(--blue-700);
+  --card-verde: var(--green-700);
+  --card-laranja: var(--orange-700);
+  --card-vinho: var(--wine-700);
+
+  /* ---------- Tipografia ---------- */
+  /* --font-body e --font-display são definidos pelo next/font em src/app/fonts.ts */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  --font-size-mega: clamp(96px, 30vw, 432px);
+  --font-size-display: clamp(48px, 9vw, 129.6px);
+  --font-size-h2: clamp(40px, 5vw, 72px); /* 🟡 linha de 74px no Figma (Neste domingo, Primeira vez) */
+  --font-size-h3: 1.75rem; /* 🟡 linha de 32px no Figma (nome da unidade) */
+  --font-size-destaque: 2rem; /* 🟡 horários: 3 linhas em 109px no Figma */
+  --font-size-lead: 1.125rem;
+  --font-size-body-lg: 1.0625rem;
+  --font-size-body: 1rem;
+  --font-size-sm: 0.875rem;
+  --font-size-xs: 0.8125rem;
+
+  --line-height-mega: 0.72;
+  --line-height-display: 0.88;
+  --line-height-text: 1.5;
+  --line-height-h2: 1.03;
+  --line-height-h3: 1.15;
+  --line-height-destaque: 1.1;
+
+  --letter-spacing-mega: -0.07em;
+  --letter-spacing-display: -0.055em;
+  --letter-spacing-h2: -0.04em;
+
+  /* ---------- Espaçamento ---------- */
+  --space-4: 0.25rem;
+  --space-8: 0.5rem;
+  --space-10: 0.625rem;
+  --space-12: 0.75rem;
+  --space-14: 0.875rem;
+  --space-16: 1rem;
+  --space-20: 1.25rem;
+  --space-24: 1.5rem;
+  --space-30: 1.875rem;
+  --space-32: 2rem;
+  --space-40: 2.5rem;
+  --space-48: 3rem;
+  --space-56: 3.5rem;
+  --space-96: 6rem;
+
+  --space-gutter: clamp(16px, 3vw, 57.6px);
+  --space-coluna: clamp(32px, 6vw, 86.4px); /* 86,4px entre foto e texto no Figma (6%) */
+  --space-section: clamp(64px, 9vw, 172.8px);
+  --container-max: 90rem;
+
+  /* ---------- Raios, bordas, opacidade ---------- */
+  --radius-lg: 28px;
+  --radius-md: 20px; /* ✅ fotos de Imagem e texto (Figma 20px); cards e caixas de lista: 🟡 */
+  --radius-sm: 12px; /* 🟡 foto dentro do card */
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --opacity-ghost: 0.18;
+
+  /* ---------- Componentes ---------- */
+  --button-height-sm: 40px;
+  --button-height-md: 52px;
+  --touch-target-min: 44px;
+  --header-height: 80px;
+  --topbar-height: 36px;
+  --hero-min-height-mobile: 600px; /* 🟡 proposta: sem Figma mobile */
+  --hero-min-height: clamp(600px, 48.75vw, 702px); /* 702px no Figma (1440) */
+  --hero-apoio-max: 22.5rem; /* 360px no Figma */
+  --footer-texto-max: 18.75rem; /* 300px no Figma */
+  --carrossel-botao: 52px; /* setas: 52 × 52 no Figma (Próximos eventos) */
+  --lista-rotulo: 10.625rem; /* 170px: coluna do título na lista (Primeira vez) */
+  --texto-max: 32.5rem; /* 520px: largura máxima do texto de apoio */
+  --intro-max: 47rem; /* 751px: bloco título + apoio de seção (Neste domingo) */
+  --font-size-titulo-serie: clamp(2.25rem, 4vw, 3.6rem); /* 57,6px no Figma (Mensagens 1:139) */
+  --serie-caixa-padding: clamp(24px, 5vw, 72px); /* 72px no Figma (Mensagens 1:133) */
+  --serie-play: 60px; /* botão play sobre a thumbnail (1:149) */
+  --serie-parte-min: 180px; /* altura mínima do card de parte (1:152) */
+
+  /* ---------- Movimento ---------- */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}

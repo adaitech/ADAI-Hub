@@ -1,0 +1,55 @@
+{
+  "uid": "sections.hero",
+  "nome": "Hero (abertura da página)",
+  "resumo": "Primeira faixa da página: uma foto grande em preto e branco com a frase principal em letras enormes, um texto de apoio e até dois botões.",
+  "ondeAparece": "Topo da página, logo abaixo do cabeçalho. Use apenas um Hero por página, sempre como primeira seção.",
+  "boasPraticas": [
+    "Frase principal curta: uma ideia por linha (ex.: Amar. / Servir. / Influenciar.).",
+    "Foto horizontal com pessoas reais da ADAI, bem iluminada. Ela fica em preto e branco automaticamente — suba a foto colorida.",
+    "Preencha o \"Texto alternativo\" da foto na Biblioteca de Mídia descrevendo a cena para quem não enxerga (ex.: \"Voluntária sorri segurando placa com as palavras Amar, Servir, Influenciar\").",
+    "O primeiro botão é a ação principal (estilo Sólido); o segundo, uma alternativa (estilo Contorno)."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Frase principal",
+      "descricao": "Uma frase por linha (aperte Enter para quebrar). Até 3 linhas curtas.",
+      "placeholder": "Ex.: Amar. (Enter) Servir. (Enter) Influenciar.",
+      "ondeAparece": "Letras enormes brancas no canto inferior esquerdo da foto.",
+      "obrigatorio": true,
+      "limite": "Até 3 linhas · 60 caracteres no total",
+      "exemplo": "Amar.\nServir.\nInfluenciar."
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Convite curto que complementa a frase principal. Aperte Enter para começar nova linha.",
+      "placeholder": "Ex.: Tem um lugar pra você aqui.",
+      "ondeAparece": "Texto branco menor, à direita e acima dos botões (no celular, abaixo da frase principal).",
+      "obrigatorio": false,
+      "limite": "Até 220 caracteres",
+      "exemplo": "Uma igreja que ama, serve e influencia em cinco localidades, com as portas abertas todo domingo.\nTem um lugar pra você aqui."
+    },
+    {
+      "campo": "imagem",
+      "label": "Foto de fundo",
+      "descricao": "Foto horizontal, mín. 2000 px de largura. Aparece em preto e branco. Preencha o texto alternativo na Biblioteca de Mídia.",
+      "placeholder": "",
+      "ondeAparece": "Fundo inteiro da faixa, com cantos arredondados e um leve escurecimento embaixo para o texto ficar legível.",
+      "obrigatorio": true,
+      "limite": "Uma imagem (JPG, PNG ou WebP), horizontal",
+      "exemplo": "Foto do culto com pessoas sorrindo na entrada"
+    },
+    {
+      "campo": "botoes",
+      "label": "Botões",
+      "descricao": "Até 2 botões. O primeiro costuma ser Sólido (ação principal) e o segundo, Contorno.",
+      "placeholder": "",
+      "ondeAparece": "Abaixo do texto de apoio.",
+      "obrigatorio": false,
+      "limite": "Até 2 botões",
+      "exemplo": "Planeje sua visita (Sólido) · Unidades (Contorno)",
+      "componente": "shared.botao"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "uid": "items.destaque",
+  "nome": "Destaque da lista",
+  "resumo": "Um item da lista da seção Imagem e texto.",
+  "ondeAparece": "Caixa cinza com o título à esquerda e a explicação à direita (no celular, um embaixo do outro).",
+  "boasPraticas": ["Título de 1 a 3 palavras; explicação em uma frase."],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título do item",
+      "descricao": "Uma a três palavras, em negrito.",
+      "placeholder": "Ex.: Seus filhos",
+      "ondeAparece": "Lado esquerdo da caixa, em negrito.",
+      "obrigatorio": true,
+      "limite": "Até 30 caracteres",
+      "exemplo": "Seus filhos"
+    },
+    {
+      "campo": "texto",
+      "label": "Explicação",
+      "descricao": "Uma frase curta explicando o item.",
+      "placeholder": "Ex.: O ADAI Kids cuida das crianças enquanto você participa do culto.",
+      "ondeAparece": "Lado direito da caixa.",
+      "obrigatorio": false,
+      "limite": "Até 160 caracteres",
+      "exemplo": "O ADAI Kids cuida das crianças enquanto você participa do culto."
+    }
+  ]
+}

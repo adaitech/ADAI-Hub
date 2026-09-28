@@ -1,0 +1,26 @@
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-gutter);
+  background-color: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-sm);
+}
+
+.botao {
+  min-height: var(--touch-target-min);
+  padding-inline: var(--space-16);
+  border: var(--border-width) solid var(--color-border-inverse);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.botao:focus-visible {
+  outline-color: var(--color-focus-ring-inverse);
+}

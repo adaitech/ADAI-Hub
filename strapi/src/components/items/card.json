@@ -1,0 +1,46 @@
+{
+  "collectionName": "components_items_cards",
+  "info": {
+    "displayName": "Card",
+    "icon": "dashboard",
+    "description": "Card do carrossel: foto opcional, título, destaques (ex.: horários), texto e ações."
+  },
+  "options": {},
+  "attributes": {
+    "cor": {
+      "type": "enumeration",
+      "enum": ["cinza", "branco", "preto", "azul", "verde", "laranja", "vinho"],
+      "default": "cinza",
+      "required": true
+    },
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "destaques": {
+      "type": "text",
+      "maxLength": 80
+    },
+    "texto": {
+      "type": "text",
+      "maxLength": 160
+    },
+    "botao": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.botao"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}

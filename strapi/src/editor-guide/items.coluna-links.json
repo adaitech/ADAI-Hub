@@ -1,0 +1,30 @@
+{
+  "uid": "items.coluna-links",
+  "nome": "Coluna de links",
+  "resumo": "Uma coluna do rodapé, com título em negrito e uma lista de links.",
+  "ondeAparece": "Rodapé, à direita da frase da marca.",
+  "boasPraticas": ["Título de uma palavra que resuma o grupo (Igreja, Participe, Contato)."],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da coluna",
+      "descricao": "Uma ou duas palavras que resumem os links abaixo.",
+      "placeholder": "Ex.: Participe",
+      "ondeAparece": "Topo da coluna, em negrito.",
+      "obrigatorio": true,
+      "limite": "Até 30 caracteres",
+      "exemplo": "Participe"
+    },
+    {
+      "campo": "links",
+      "label": "Links",
+      "descricao": "Até 6 links, na ordem de cima para baixo.",
+      "placeholder": "",
+      "ondeAparece": "Lista abaixo do título da coluna.",
+      "obrigatorio": false,
+      "limite": "Até 6 links",
+      "exemplo": "Unidades · Agenda · Ministérios · Contribua",
+      "componente": "shared.link"
+    }
+  ]
+}

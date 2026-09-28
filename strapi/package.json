@@ -1,16 +1,15 @@
 {
-  "name": "strapi",
+  "name": "adai-hub-strapi",
   "private": true,
   "version": "0.1.0",
-  "description": "A Strapi application",
+  "description": "CMS do ADAI Hub (Strapi 5)",
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",
-    "deploy": "strapi deploy",
-    "seed": "strapi import -f ./data/export_20250116105447.tar.gz",
-    "postinstall": "node ./scripts/updateUuid.js"
+    "data:export": "strapi export --no-encrypt --only content,files -f data/adai-conteudo",
+    "data:import": "strapi import -f data/adai-conteudo.tar.gz --only content,files --force"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -19,24 +18,17 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.17.0",
     "@strapi/plugin-seo": "^2.0.4",
     "@strapi/plugin-users-permissions": "5.17.0",
     "@strapi/strapi": "5.17.0",
     "better-sqlite3": "11.7.0",
-    "patch-package": "^8.0.0",
-    "pluralize": "^8.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0",
-    "uuid": "^10.0.0"
-  },
-  "author": {
-    "name": "A Strapi developer"
+    "styled-components": "^6.0.0"
   },
   "strapi": {
-    "uuid": "LAUNCHPAD-LOCAL-cf7ced34-55f2-449e-bd9b-62575b0493cc"
+    "telemetryDisabled": true
   },
   "engines": {
     "node": ">=18.0.0 <=22.x.x",

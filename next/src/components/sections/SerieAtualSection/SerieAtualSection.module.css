@@ -1,0 +1,252 @@
+/*
+ * Figma: Mensagens (1:132) — caixa #F2F2F2, raio 28, padding 72; texto 517px + thumbnail 620px
+ * (gap 72); cards de 443px (gap 12, raio 20, padding 24, altura mín. 180). Mobile e tablet: 🟡.
+ */
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-section) var(--space-gutter) 0;
+}
+
+.caixa {
+  display: grid;
+  gap: var(--space-32);
+  padding: var(--serie-caixa-padding);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-subtle);
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.rotulo {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-text);
+}
+
+.titulo {
+  margin-top: var(--space-16);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-titulo-serie);
+  font-weight: var(--font-weight-bold);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.aoVivo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-16);
+  padding: var(--space-4) var(--space-12);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pontoAoVivo {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: pulsar 1.6s var(--easing-standard) infinite;
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.descricao {
+  margin-top: var(--space-16);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-text);
+}
+
+.linha {
+  display: block;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin-top: var(--space-24);
+}
+
+.botao {
+  cursor: pointer;
+}
+
+.midia {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-media);
+}
+
+.thumbGatilho {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.thumbGatilho:focus-visible {
+  outline-offset: -4px;
+  outline-color: var(--color-focus-ring-inverse);
+}
+
+.thumb {
+  object-fit: cover;
+  transition: transform var(--duration-base) var(--easing-standard);
+}
+
+.play {
+  position: absolute;
+  bottom: var(--space-20);
+  left: var(--space-20);
+  display: grid;
+  place-items: center;
+  width: var(--serie-play);
+  height: var(--serie-play);
+  border-radius: 50%;
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.thumbGatilho:hover .thumb {
+  transform: scale(1.02);
+}
+
+.thumbGatilho:hover .play {
+  transform: scale(1.08);
+}
+
+/* Partes da série */
+.partes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-12);
+}
+
+.parte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-height: var(--serie-parte-min);
+  padding: var(--space-24);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+}
+
+/* Parte futura: sem vídeo, sem clique. Borda tracejada em vez de opacidade (mantém o contraste AA). */
+.parte[data-status='upcoming'] {
+  background-color: transparent;
+  border: var(--border-width) dashed var(--color-text-muted);
+}
+
+.parteMeta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-text);
+}
+
+.parteRodape {
+  margin-top: auto;
+}
+
+.parteTitulo {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+/* O botão fica no título, mas a área clicável é o card inteiro. */
+.parteGatilho {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.parteGatilho::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.parte:has(.parteGatilho:hover) {
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-border-strong);
+}
+
+.parteGatilho:focus-visible {
+  outline: none;
+}
+
+.parteGatilho:focus-visible::after {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pontoAoVivo {
+    animation: none;
+  }
+}
+
+/* tier: tablet */
+@media (min-width: 769px) {
+  .partes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* tier: desktop — texto e thumbnail lado a lado; até 4 partes por linha */
+@media (min-width: 1024px) {
+  .caixa {
+    grid-template-columns: minmax(0, 517fr) minmax(0, 620fr);
+    column-gap: var(--serie-caixa-padding);
+  }
+
+  .partes[data-colunas='1'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .partes[data-colunas='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .partes[data-colunas='4'] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

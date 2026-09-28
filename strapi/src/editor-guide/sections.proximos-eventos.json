@@ -1,0 +1,65 @@
+{
+  "uid": "sections.proximos-eventos",
+  "nome": "Próximos eventos",
+  "resumo": "Cards com os próximos eventos da ADAI, com a arte, a data e o horário. Os eventos vêm sozinhos da inChurch — não é preciso cadastrar nada aqui além do título.",
+  "ondeAparece": "Na Home, depois da Série atual. Os cards passam para o lado com as setas.",
+  "boasPraticas": [
+    "Para um evento aparecer no site, marque \"Mostrar no site\" no evento da inChurch. Para esconder, desmarque — o site obedece.",
+    "Eventos de GC (Grupos de Conexão) nunca aparecem aqui: use a categoria \"Grupo de Conexão\" ou comece o nome com \"GC\".",
+    "A arte do evento (16:9) é a imagem cadastrada na inChurch. Evite texto encostado nas bordas.",
+    "Eventos com várias datas (ex.: Semana de Jejum) aparecem uma vez só, com a próxima data."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da seção",
+      "descricao": "Frase curta acima dos cards.",
+      "placeholder": "Ex.: Próximos eventos",
+      "ondeAparece": "Título grande da seção.",
+      "obrigatorio": true,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Próximos eventos"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Opcional. Uma frase abaixo do título.",
+      "placeholder": "Ex.: Participe da vida da igreja.",
+      "ondeAparece": "Abaixo do título, antes dos cards.",
+      "obrigatorio": false,
+      "limite": "Até 200 caracteres",
+      "exemplo": "Cultos especiais, conferências e encontros para toda a igreja."
+    },
+    {
+      "campo": "quantidade",
+      "label": "Quantidade de eventos",
+      "descricao": "Quantos eventos mostrar, do mais próximo para o mais distante.",
+      "placeholder": "",
+      "ondeAparece": "Número de cards.",
+      "obrigatorio": true,
+      "limite": "1 a 12",
+      "exemplo": "8"
+    },
+    {
+      "campo": "cor_cards",
+      "label": "Cor dos cards",
+      "descricao": "Cinza é o padrão. O texto se ajusta sozinho para ficar legível.",
+      "placeholder": "",
+      "ondeAparece": "Fundo de todos os cards da seção.",
+      "obrigatorio": true,
+      "limite": "Cinza, Branco, Preto, Azul, Verde, Laranja ou Vinho",
+      "exemplo": "Cinza"
+    },
+    {
+      "campo": "link",
+      "label": "Link \"agenda completa\"",
+      "descricao": "Opcional. Leva para a agenda completa (ex.: app ou página de eventos).",
+      "placeholder": "",
+      "ondeAparece": "Ao lado das setas, acima dos cards.",
+      "obrigatorio": false,
+      "limite": "1 link",
+      "exemplo": "Agenda completa → https://…",
+      "componente": "shared.link"
+    }
+  ]
+}

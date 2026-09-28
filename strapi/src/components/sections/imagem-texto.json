@@ -1,0 +1,56 @@
+{
+  "collectionName": "components_sections_imagens_textos",
+  "info": {
+    "displayName": "Imagem e texto",
+    "icon": "picture",
+    "description": "Foto grande de um lado e texto do outro: rótulo, título grande, texto, lista, botão e link (ex.: Primeira vez na ADAI, Pastores líderes)."
+  },
+  "options": {},
+  "attributes": {
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "posicao_imagem": {
+      "type": "enumeration",
+      "enum": ["esquerda", "direita"],
+      "default": "esquerda",
+      "required": true
+    },
+    "preto_e_branco": {
+      "type": "boolean",
+      "default": true
+    },
+    "rotulo": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "titulo": {
+      "type": "text",
+      "required": true,
+      "maxLength": 80
+    },
+    "texto": {
+      "type": "text",
+      "maxLength": 400
+    },
+    "lista": {
+      "type": "component",
+      "repeatable": true,
+      "component": "items.destaque",
+      "max": 5
+    },
+    "botao": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.botao"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}

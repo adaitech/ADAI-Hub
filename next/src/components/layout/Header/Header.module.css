@@ -1,0 +1,56 @@
+/* Figma: Header (1:13) — 1440 × 80. Abaixo de 1024px o menu vai para o HeaderMenu (proposta 🟡). */
+.header {
+  position: relative;
+  z-index: 10;
+  background-color: var(--color-bg-page);
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  min-height: var(--header-height);
+  padding-inline: var(--space-gutter);
+}
+
+.logo {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-primary);
+}
+
+.navDesktop,
+.acoesDesktop {
+  display: none;
+}
+
+.lista {
+  display: flex;
+  gap: var(--space-32);
+}
+
+.link {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-text);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* tier: desktop */
+@media (min-width: 1024px) {
+  .navDesktop {
+    display: block;
+  }
+
+  .acoesDesktop {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+  }
+}

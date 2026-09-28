@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_sections_heroes",
+  "info": {
+    "displayName": "Hero (abertura)",
+    "icon": "picture",
+    "description": "Primeira faixa da página: foto grande em preto e branco, frase principal e até dois botões."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "text",
+      "required": true,
+      "maxLength": 60
+    },
+    "texto_apoio": {
+      "type": "text",
+      "maxLength": 220
+    },
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "botoes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.botao",
+      "max": 2
+    }
+  }
+}

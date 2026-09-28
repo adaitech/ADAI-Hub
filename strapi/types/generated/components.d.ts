@@ -1,440 +1,339 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
-export interface CardsGlobeCard extends Struct.ComponentSchema {
-  collectionName: 'components_cards_globe_cards';
+export interface ItemsCard extends Struct.ComponentSchema {
+  collectionName: 'components_items_cards';
   info: {
-    description: '';
-    displayName: 'Globe_Card';
+    description: 'Card do carrossel: foto opcional, t\u00EDtulo, destaques (ex.: hor\u00E1rios), texto e a\u00E7\u00F5es.';
+    displayName: 'Card';
     icon: 'dashboard';
   };
   attributes: {
-    description: Schema.Attribute.String;
-    span: Schema.Attribute.Enumeration<['one', 'two', 'three']>;
-    title: Schema.Attribute.String;
+    botao: Schema.Attribute.Component<'shared.botao', false>;
+    cor: Schema.Attribute.Enumeration<
+      ['cinza', 'branco', 'preto', 'azul', 'verde', 'laranja', 'vinho']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'cinza'>;
+    destaques: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    imagem: Schema.Attribute.Media<'images'>;
+    link: Schema.Attribute.Component<'shared.link', false>;
+    texto: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
   };
 }
 
-export interface CardsGraphCard extends Struct.ComponentSchema {
-  collectionName: 'components_cards_graph_cards';
+export interface ItemsColunaLinks extends Struct.ComponentSchema {
+  collectionName: 'components_items_colunas_links';
   info: {
-    description: '';
-    displayName: 'Graph_Card';
-    icon: 'dashboard';
-  };
-  attributes: {
-    description: Schema.Attribute.String;
-    highlighted_text: Schema.Attribute.String;
-    span: Schema.Attribute.Enumeration<['one', 'two', 'three']>;
-    title: Schema.Attribute.String;
-    top_items: Schema.Attribute.Component<'items.graph-card-top-items', true>;
-  };
-}
-
-export interface CardsRayCard extends Struct.ComponentSchema {
-  collectionName: 'components_cards_ray_cards';
-  info: {
-    description: '';
-    displayName: 'Ray_Card';
-    icon: 'dashboard';
-  };
-  attributes: {
-    after_ray_items: Schema.Attribute.Component<'items.ray-items', false>;
-    before_ray_items: Schema.Attribute.Component<'items.ray-items', false>;
-    description: Schema.Attribute.String;
-    span: Schema.Attribute.Enumeration<['one', 'two', 'three']>;
-    title: Schema.Attribute.String;
-  };
-}
-
-export interface CardsSocialMediaCard extends Struct.ComponentSchema {
-  collectionName: 'components_cards_social_media_cards';
-  info: {
-    description: '';
-    displayName: 'Social_Media_Card';
-    icon: 'dashboard';
-  };
-  attributes: {
-    Description: Schema.Attribute.String;
-    logos: Schema.Attribute.Relation<'oneToMany', 'api::logo.logo'>;
-    span: Schema.Attribute.Enumeration<['one', 'two', 'three']>;
-    Title: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneBrands extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_brands';
-  info: {
-    description: '';
-    displayName: 'Brands';
+    description: 'Coluna do rodap\u00E9: t\u00EDtulo e lista de links.';
+    displayName: 'Coluna de links';
     icon: 'bulletList';
   };
   attributes: {
-    heading: Schema.Attribute.String;
-    logos: Schema.Attribute.Relation<'oneToMany', 'api::logo.logo'>;
-    sub_heading: Schema.Attribute.String;
+    links: Schema.Attribute.Component<'shared.link', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 6;
+        },
+        number
+      >;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
   };
 }
 
-export interface DynamicZoneCta extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_ctas';
+export interface ItemsDestaque extends Struct.ComponentSchema {
+  collectionName: 'components_items_destaques';
   info: {
-    description: '';
-    displayName: 'CTA';
-    icon: 'cursor';
-  };
-  attributes: {
-    CTAs: Schema.Attribute.Component<'shared.button', true>;
-    heading: Schema.Attribute.String;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneFaq extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_faqs';
-  info: {
-    displayName: 'FAQ';
-    icon: 'question';
-  };
-  attributes: {
-    faqs: Schema.Attribute.Relation<'oneToMany', 'api::faq.faq'>;
-    heading: Schema.Attribute.String;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneFeatures extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_features';
-  info: {
-    description: '';
-    displayName: 'Features';
+    description: 'Item da lista da se\u00E7\u00E3o Imagem e texto: t\u00EDtulo curto em negrito e explica\u00E7\u00E3o.';
+    displayName: 'Destaque da lista';
     icon: 'bulletList';
   };
   attributes: {
-    globe_card: Schema.Attribute.Component<'cards.globe-card', false>;
-    graph_card: Schema.Attribute.Component<'cards.graph-card', false>;
-    heading: Schema.Attribute.String;
-    ray_card: Schema.Attribute.Component<'cards.ray-card', false>;
-    social_media_card: Schema.Attribute.Component<
-      'cards.social-media-card',
-      false
-    >;
-    sub_heading: Schema.Attribute.String;
+    texto: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
   };
 }
 
-export interface DynamicZoneFormNextToSection extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_form_next_to_sections';
+export interface LayoutFooter extends Struct.ComponentSchema {
+  collectionName: 'components_layout_footers';
   info: {
-    description: '';
-    displayName: 'Form_Next_To_Section';
-    icon: 'book';
-  };
-  attributes: {
-    form: Schema.Attribute.Component<'shared.form', false>;
-    heading: Schema.Attribute.String;
-    section: Schema.Attribute.Component<'shared.section', false>;
-    social_media_icon_links: Schema.Attribute.Component<
-      'shared.social-media-icon-links',
-      true
-    >;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneHero extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_heroes';
-  info: {
-    description: '';
-    displayName: 'Hero';
+    description: 'Rodap\u00E9 de todas as p\u00E1ginas: frase da marca, colunas de links e linha final.';
+    displayName: 'Rodap\u00E9';
     icon: 'layout';
   };
   attributes: {
-    CTAs: Schema.Attribute.Component<'shared.button', true>;
-    heading: Schema.Attribute.String;
-    sub_heading: Schema.Attribute.String;
+    assinatura: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    colunas: Schema.Attribute.Component<'items.coluna-links', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+        },
+        number
+      >;
+    copyright: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    texto_marca: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 140;
+      }>;
   };
 }
 
-export interface DynamicZoneHowItWorks extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_how_it_works';
+export interface LayoutHeader extends Struct.ComponentSchema {
+  collectionName: 'components_layout_headers';
   info: {
-    description: '';
-    displayName: 'How_It_Works';
-    icon: 'question';
+    description: 'Menu principal e bot\u00F5es de destaque no topo de todas as p\u00E1ginas.';
+    displayName: 'Cabe\u00E7alho';
+    icon: 'layout';
   };
   attributes: {
-    heading: Schema.Attribute.String;
-    steps: Schema.Attribute.Component<'shared.steps', true>;
-    sub_heading: Schema.Attribute.String;
+    botoes: Schema.Attribute.Component<'shared.botao', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2;
+        },
+        number
+      >;
+    links: Schema.Attribute.Component<'shared.link', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 6;
+        },
+        number
+      >;
   };
 }
 
-export interface DynamicZoneLaunches extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_launches';
+export interface SectionsCarrosselCards extends Struct.ComponentSchema {
+  collectionName: 'components_sections_carrosseis_cards';
   info: {
-    description: '';
-    displayName: 'Launches';
-    icon: 'rocket';
-  };
-  attributes: {
-    heading: Schema.Attribute.String;
-    launches: Schema.Attribute.Component<'shared.launches', true>;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZonePricing extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_pricings';
-  info: {
-    description: '';
-    displayName: 'Pricing';
-    icon: 'shoppingCart';
-  };
-  attributes: {
-    heading: Schema.Attribute.String;
-    plans: Schema.Attribute.Relation<'oneToMany', 'api::plan.plan'>;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneRelatedArticles extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_related_articles';
-  info: {
-    description: '';
-    displayName: 'related_articles';
-    icon: 'bulletList';
-  };
-  attributes: {
-    articles: Schema.Attribute.Relation<'oneToMany', 'api::article.article'>;
-    heading: Schema.Attribute.String;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneRelatedProducts extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_related_products';
-  info: {
-    displayName: 'Related_Products';
-    icon: 'stack';
-  };
-  attributes: {
-    heading: Schema.Attribute.String;
-    products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
-    sub_heading: Schema.Attribute.String;
-  };
-}
-
-export interface DynamicZoneTestimonials extends Struct.ComponentSchema {
-  collectionName: 'components_dynamic_zone_testimonials';
-  info: {
-    description: '';
-    displayName: 'Testimonials';
-    icon: 'emotionHappy';
-  };
-  attributes: {
-    heading: Schema.Attribute.String;
-    sub_heading: Schema.Attribute.String;
-    testimonials: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::testimonial.testimonial'
-    >;
-  };
-}
-
-export interface GlobalFooter extends Struct.ComponentSchema {
-  collectionName: 'components_global_footers';
-  info: {
-    description: '';
-    displayName: 'Footer';
+    description: 'T\u00EDtulo, texto de apoio e uma fileira de cards que passa para o lado (ex.: Neste domingo / unidades).';
+    displayName: 'Carrossel de cards';
     icon: 'apps';
   };
   attributes: {
-    built_with: Schema.Attribute.String;
-    copyright: Schema.Attribute.String;
-    description: Schema.Attribute.String;
-    designed_developed_by: Schema.Attribute.String;
-    internal_links: Schema.Attribute.Component<'shared.link', true>;
-    logo: Schema.Attribute.Relation<'oneToOne', 'api::logo.logo'>;
-    policy_links: Schema.Attribute.Component<'shared.link', true>;
-    social_media_links: Schema.Attribute.Component<'shared.link', true>;
+    cards: Schema.Attribute.Component<'items.card', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      >;
+    estilo_imagem: Schema.Attribute.Enumeration<['foto', 'arte']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'foto'>;
+    link: Schema.Attribute.Component<'shared.link', false>;
+    posicao_imagem: Schema.Attribute.Enumeration<['acima', 'abaixo']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'acima'>;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
   };
 }
 
-export interface GlobalNavbar extends Struct.ComponentSchema {
-  collectionName: 'components_global_navbars';
+export interface SectionsHero extends Struct.ComponentSchema {
+  collectionName: 'components_sections_heroes';
   info: {
-    displayName: 'Navbar';
-    icon: 'bold';
+    description: 'Primeira faixa da p\u00E1gina: foto grande em preto e branco, frase principal e at\u00E9 dois bot\u00F5es.';
+    displayName: 'Hero (abertura)';
+    icon: 'picture';
   };
   attributes: {
-    left_navbar_items: Schema.Attribute.Component<'shared.link', true>;
-    logo: Schema.Attribute.Relation<'oneToOne', 'api::logo.logo'>;
-    right_navbar_items: Schema.Attribute.Component<'shared.link', true>;
+    botoes: Schema.Attribute.Component<'shared.botao', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2;
+        },
+        number
+      >;
+    imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 220;
+      }>;
+    titulo: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
   };
 }
 
-export interface ItemsGraphCardTopItems extends Struct.ComponentSchema {
-  collectionName: 'components_items_graph_card_top_items';
+export interface SectionsImagemTexto extends Struct.ComponentSchema {
+  collectionName: 'components_sections_imagens_textos';
   info: {
-    displayName: 'Graph_Card_Top_Items';
-    icon: 'bulletList';
+    description: 'Foto grande de um lado e texto do outro: r\u00F3tulo, t\u00EDtulo grande, texto, lista, bot\u00E3o e link (ex.: Primeira vez na ADAI, Pastores l\u00EDderes).';
+    displayName: 'Imagem e texto';
+    icon: 'picture';
   };
   attributes: {
-    number: Schema.Attribute.String;
-    text: Schema.Attribute.String;
+    botao: Schema.Attribute.Component<'shared.botao', false>;
+    imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    link: Schema.Attribute.Component<'shared.link', false>;
+    lista: Schema.Attribute.Component<'items.destaque', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+        },
+        number
+      >;
+    posicao_imagem: Schema.Attribute.Enumeration<['esquerda', 'direita']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'esquerda'>;
+    preto_e_branco: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    rotulo: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    texto: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+      }>;
+    titulo: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
   };
 }
 
-export interface ItemsInput extends Struct.ComponentSchema {
-  collectionName: 'components_items_inputs';
+export interface SectionsProximosEventos extends Struct.ComponentSchema {
+  collectionName: 'components_sections_proximos_eventos';
   info: {
-    description: '';
-    displayName: 'Input';
-    icon: 'apps';
+    description: 'Eventos da ADAI vindos automaticamente da inChurch, em cards que passam para o lado. Aqui s\u00F3 t\u00EDtulo, texto e quantidade.';
+    displayName: 'Pr\u00F3ximos eventos (inChurch)';
+    icon: 'calendar';
   };
   attributes: {
-    name: Schema.Attribute.String;
-    placeholder: Schema.Attribute.String;
-    type: Schema.Attribute.Enumeration<
-      [
-        'text',
-        'email',
-        'password',
-        'submit',
-        'textarea',
-        'button',
-        'checkbox',
-        'color',
-        'date',
-        'datetime-local',
-        'file',
-        'hidden',
-        'image',
-        'month',
-        'number',
-        'radio',
-        'range',
-        'reset',
-        'search',
-        'tel',
-        'time',
-        'url',
-        'week',
-      ]
+    cor_cards: Schema.Attribute.Enumeration<
+      ['cinza', 'branco', 'preto', 'azul', 'verde', 'laranja', 'vinho']
     > &
-      Schema.Attribute.DefaultTo<'text'>;
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'cinza'>;
+    link: Schema.Attribute.Component<'shared.link', false>;
+    quantidade: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<8>;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }> &
+      Schema.Attribute.DefaultTo<'Pr\u00F3ximos eventos'>;
   };
 }
 
-export interface ItemsLeftNavbarItems extends Struct.ComponentSchema {
-  collectionName: 'components_items_left_navbar_items';
+export interface SectionsSerieAtual extends Struct.ComponentSchema {
+  collectionName: 'components_sections_series_atuais';
   info: {
-    displayName: 'Left_Navbar_Items';
-    icon: 'bulletList';
+    description: 'S\u00E9rie de mensagens atual, montada automaticamente a partir do YouTube da ADAI. S\u00F3 tem configura\u00E7\u00F5es opcionais.';
+    displayName: 'S\u00E9rie atual (mensagens do YouTube)';
+    icon: 'play';
   };
   attributes: {
-    name: Schema.Attribute.String;
-    URL: Schema.Attribute.String;
+    exibir: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    playlist_url: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
+    titulo_personalizado: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
   };
 }
 
-export interface ItemsRayItems extends Struct.ComponentSchema {
-  collectionName: 'components_items_ray_items';
+export interface SharedBotao extends Struct.ComponentSchema {
+  collectionName: 'components_shared_botoes';
   info: {
-    description: '';
-    displayName: 'Ray_Card_Items';
-    icon: 'bulletList';
-  };
-  attributes: {
-    item_1: Schema.Attribute.String;
-    item_2: Schema.Attribute.String;
-    item_3: Schema.Attribute.String;
-  };
-}
-
-export interface SharedButton extends Struct.ComponentSchema {
-  collectionName: 'components_shared_buttons';
-  info: {
-    description: '';
-    displayName: 'Button';
+    description: 'Bot\u00E3o de a\u00E7\u00E3o (CTA) com estilo definido pelo design.';
+    displayName: 'Bot\u00E3o';
     icon: 'cursor';
   };
   attributes: {
-    target: Schema.Attribute.Enumeration<
-      ['_blank', '_self', '_parent', '_top']
-    >;
-    text: Schema.Attribute.String;
-    URL: Schema.Attribute.String;
-    variant: Schema.Attribute.Enumeration<
-      ['simple', 'outline', 'primary', 'muted']
-    > &
-      Schema.Attribute.DefaultTo<'primary'>;
-  };
-}
-
-export interface SharedForm extends Struct.ComponentSchema {
-  collectionName: 'components_shared_forms';
-  info: {
-    description: '';
-    displayName: 'Form';
-    icon: 'paperPlane';
-  };
-  attributes: {
-    inputs: Schema.Attribute.Component<'items.input', true>;
-  };
-}
-
-export interface SharedLaunches extends Struct.ComponentSchema {
-  collectionName: 'components_shared_launches';
-  info: {
-    description: '';
-    displayName: 'Launches';
-    icon: 'rocket';
-  };
-  attributes: {
-    description: Schema.Attribute.String;
-    mission_number: Schema.Attribute.String;
-    title: Schema.Attribute.String;
+    estilo: Schema.Attribute.Enumeration<['solido', 'contorno']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'solido'>;
+    nova_aba: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    texto: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
+    url: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
   };
 }
 
 export interface SharedLink extends Struct.ComponentSchema {
   collectionName: 'components_shared_links';
   info: {
+    description: 'Link de texto simples (menu, rodap\u00E9).';
     displayName: 'Link';
     icon: 'link';
   };
   attributes: {
-    target: Schema.Attribute.Enumeration<
-      ['_blank', '_self', '_parent', '_top']
-    >;
-    text: Schema.Attribute.String;
-    URL: Schema.Attribute.String;
-  };
-}
-
-export interface SharedPerks extends Struct.ComponentSchema {
-  collectionName: 'components_shared_perks';
-  info: {
-    description: '';
-    displayName: 'Perks';
-    icon: 'check';
-  };
-  attributes: {
-    text: Schema.Attribute.String;
-  };
-}
-
-export interface SharedSection extends Struct.ComponentSchema {
-  collectionName: 'components_shared_sections';
-  info: {
-    displayName: 'Section';
-    icon: 'cursor';
-  };
-  attributes: {
-    heading: Schema.Attribute.String;
-    sub_heading: Schema.Attribute.String;
-    users: Schema.Attribute.Component<'shared.user', true>;
+    nova_aba: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    texto: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    url: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 300;
+      }>;
   };
 }
 
@@ -464,82 +363,22 @@ export interface SharedSeo extends Struct.ComponentSchema {
   };
 }
 
-export interface SharedSocialMediaIconLinks extends Struct.ComponentSchema {
-  collectionName: 'components_shared_social_media_icon_links';
-  info: {
-    description: '';
-    displayName: 'Social_Media_Icon_Links';
-    icon: 'expand';
-  };
-  attributes: {
-    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    link: Schema.Attribute.Component<'shared.link', true>;
-  };
-}
-
-export interface SharedSteps extends Struct.ComponentSchema {
-  collectionName: 'components_shared_steps';
-  info: {
-    description: '';
-    displayName: 'Steps';
-    icon: 'bulletList';
-  };
-  attributes: {
-    description: Schema.Attribute.String;
-    title: Schema.Attribute.String;
-  };
-}
-
-export interface SharedUser extends Struct.ComponentSchema {
-  collectionName: 'components_shared_users';
-  info: {
-    description: '';
-    displayName: 'User';
-    icon: 'user';
-  };
-  attributes: {
-    firstname: Schema.Attribute.String;
-    image: Schema.Attribute.Media<'images'>;
-    job: Schema.Attribute.String;
-    lastname: Schema.Attribute.String;
-  };
-}
-
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
-      'cards.globe-card': CardsGlobeCard;
-      'cards.graph-card': CardsGraphCard;
-      'cards.ray-card': CardsRayCard;
-      'cards.social-media-card': CardsSocialMediaCard;
-      'dynamic-zone.brands': DynamicZoneBrands;
-      'dynamic-zone.cta': DynamicZoneCta;
-      'dynamic-zone.faq': DynamicZoneFaq;
-      'dynamic-zone.features': DynamicZoneFeatures;
-      'dynamic-zone.form-next-to-section': DynamicZoneFormNextToSection;
-      'dynamic-zone.hero': DynamicZoneHero;
-      'dynamic-zone.how-it-works': DynamicZoneHowItWorks;
-      'dynamic-zone.launches': DynamicZoneLaunches;
-      'dynamic-zone.pricing': DynamicZonePricing;
-      'dynamic-zone.related-articles': DynamicZoneRelatedArticles;
-      'dynamic-zone.related-products': DynamicZoneRelatedProducts;
-      'dynamic-zone.testimonials': DynamicZoneTestimonials;
-      'global.footer': GlobalFooter;
-      'global.navbar': GlobalNavbar;
-      'items.graph-card-top-items': ItemsGraphCardTopItems;
-      'items.input': ItemsInput;
-      'items.left-navbar-items': ItemsLeftNavbarItems;
-      'items.ray-items': ItemsRayItems;
-      'shared.button': SharedButton;
-      'shared.form': SharedForm;
-      'shared.launches': SharedLaunches;
+      'items.card': ItemsCard;
+      'items.coluna-links': ItemsColunaLinks;
+      'items.destaque': ItemsDestaque;
+      'layout.footer': LayoutFooter;
+      'layout.header': LayoutHeader;
+      'sections.carrossel-cards': SectionsCarrosselCards;
+      'sections.hero': SectionsHero;
+      'sections.imagem-texto': SectionsImagemTexto;
+      'sections.proximos-eventos': SectionsProximosEventos;
+      'sections.serie-atual': SectionsSerieAtual;
+      'shared.botao': SharedBotao;
       'shared.link': SharedLink;
-      'shared.perks': SharedPerks;
-      'shared.section': SharedSection;
       'shared.seo': SharedSeo;
-      'shared.social-media-icon-links': SharedSocialMediaIconLinks;
-      'shared.steps': SharedSteps;
-      'shared.user': SharedUser;
     }
   }
 }

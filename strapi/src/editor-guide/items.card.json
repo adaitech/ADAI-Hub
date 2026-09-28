@@ -1,0 +1,86 @@
+{
+  "uid": "items.card",
+  "nome": "Card",
+  "resumo": "Um card do carrossel. Todos os campos, menos o título, são opcionais: o card se adapta ao que foi preenchido.",
+  "ondeAparece": "Dentro do Carrossel de cards.",
+  "boasPraticas": [
+    "Título curto (nome da unidade, do evento, do ministério).",
+    "Botão para a ação principal (ex.: Planeje sua visita) e link para a secundária (ex.: Como chegar, Falar no WhatsApp).",
+    "Foto horizontal, com texto alternativo preenchido na Biblioteca de Mídia.",
+    "Cores ajudam a diferenciar itens (ex.: um ministério por cor). Use com moderação: na Home, as unidades ficam em cinza."
+  ],
+  "campos": [
+    {
+      "campo": "cor",
+      "label": "Cor do card",
+      "descricao": "Cinza é o padrão. Branco, Preto ou uma das cores (Azul, Verde, Laranja, Vinho). O texto se ajusta sozinho para ficar legível.",
+      "placeholder": "",
+      "ondeAparece": "Fundo do card inteiro.",
+      "obrigatorio": true,
+      "limite": "Cinza, Branco, Preto, Azul, Verde, Laranja ou Vinho",
+      "exemplo": "Azul"
+    },
+    {
+      "campo": "imagem",
+      "label": "Foto",
+      "descricao": "Opcional. Foto horizontal (3:2) no topo do card. Preencha o texto alternativo na Biblioteca de Mídia.",
+      "placeholder": "",
+      "ondeAparece": "Topo do card, com cantos arredondados.",
+      "obrigatorio": false,
+      "limite": "Uma imagem horizontal",
+      "exemplo": "Fachada da unidade Campestre"
+    },
+    {
+      "campo": "titulo",
+      "label": "Título do card",
+      "descricao": "Nome curto do item (unidade, evento, ministério).",
+      "placeholder": "Ex.: Campestre",
+      "ondeAparece": "Em negrito, no alto do card.",
+      "obrigatorio": true,
+      "limite": "Até 40 caracteres",
+      "exemplo": "Campestre"
+    },
+    {
+      "campo": "destaques",
+      "label": "Destaques (ex.: horários)",
+      "descricao": "Um por linha (aperte Enter). Ex.: horários dos cultos. Até 4 linhas curtas.",
+      "placeholder": "Ex.: 9h (Enter) 11h (Enter) 18h",
+      "ondeAparece": "Letras grandes, abaixo do título.",
+      "obrigatorio": false,
+      "limite": "Até 4 linhas · 80 caracteres",
+      "exemplo": "9h\n11h\n18h"
+    },
+    {
+      "campo": "texto",
+      "label": "Texto",
+      "descricao": "Informação de apoio, como o endereço. Aperte Enter para quebrar linha.",
+      "placeholder": "Ex.: Av. Dom Pedro II, 3405 (Enter) Santo André",
+      "ondeAparece": "Abaixo dos destaques, em cinza.",
+      "obrigatorio": false,
+      "limite": "Até 160 caracteres",
+      "exemplo": "Av. Dom Pedro II, 3405\nSanto André"
+    },
+    {
+      "campo": "botao",
+      "label": "Botão",
+      "descricao": "Opcional. Ação principal do card.",
+      "placeholder": "",
+      "ondeAparece": "Rodapé do card, alinhado entre todos os cards.",
+      "obrigatorio": false,
+      "limite": "1 botão",
+      "exemplo": "Planeje sua visita (Sólido)",
+      "componente": "shared.botao"
+    },
+    {
+      "campo": "link",
+      "label": "Link",
+      "descricao": "Opcional. Ação secundária, como \"Como chegar\" ou \"Falar no WhatsApp\".",
+      "placeholder": "",
+      "ondeAparece": "Rodapé do card, sublinhado, abaixo do botão.",
+      "obrigatorio": false,
+      "limite": "1 link",
+      "exemplo": "Como chegar → Google Maps",
+      "componente": "shared.link"
+    }
+  ]
+}

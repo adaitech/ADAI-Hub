@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_layout_footers",
+  "info": {
+    "displayName": "Rodapé",
+    "icon": "layout",
+    "description": "Rodapé de todas as páginas: frase da marca, colunas de links e linha final."
+  },
+  "options": {},
+  "attributes": {
+    "texto_marca": {
+      "type": "text",
+      "maxLength": 140
+    },
+    "colunas": {
+      "type": "component",
+      "repeatable": true,
+      "component": "items.coluna-links",
+      "max": 3
+    },
+    "copyright": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "assinatura": {
+      "type": "string",
+      "maxLength": 60
+    }
+  }
+}

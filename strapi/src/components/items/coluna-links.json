@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_items_colunas_links",
+  "info": {
+    "displayName": "Coluna de links",
+    "icon": "bulletList",
+    "description": "Coluna do rodapé: título e lista de links."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 30
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link",
+      "max": 6
+    }
+  }
+}

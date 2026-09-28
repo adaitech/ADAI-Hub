@@ -1,18 +1,18 @@
 {
-  "name": "strapi-next-launchpad-example",
+  "name": "adai-hub",
   "version": "1.0.0",
-  "description": "Next.js Launchpad Example powered by Strapi",
+  "private": true,
+  "description": "ADAI Hub — site da ADAI (Next.js) + CMS (Strapi)",
   "type": "module",
   "scripts": {
-    "next": "yarn dev --prefix ../next/",
-    "strapi": "yarn dev --prefix ../strapi/",
     "setup:next": "cd next && yarn && node --loader ts-node/esm ../scripts/copy-env.mts ./",
     "setup:strapi": "cd strapi && yarn && node --loader ts-node/esm ../scripts/copy-env.mts ./",
     "setup": "yarn install && yarn setup:next && yarn setup:strapi",
-    "dev": "yarn concurrently \"cd strapi && yarn develop\" \"npx wait-on http://localhost:1337 && cd next && yarn dev\"",
-    "seed": "cd strapi && yarn strapi import -f ./data/export_20250116105447.tar.gz --force",
-    "export": "cd strapi && yarn strapi export --no-encrypt -f ./data/export_20250116105447",
-    "repo:upstream": "git fetch upstream && git merge upstream/main"
+    "dev": "concurrently -n strapi,next -c magenta,cyan \"cd strapi && yarn develop\" \"wait-on http://localhost:1337/_health && cd next && yarn dev\"",
+    "quality": "cd next && yarn quality",
+    "build": "cd strapi && yarn build && cd ../next && yarn build",
+    "data:export": "cd strapi && yarn data:export",
+    "data:import": "cd strapi && yarn data:import"
   },
   "dependencies": {
     "@types/node": "^22.5.2",

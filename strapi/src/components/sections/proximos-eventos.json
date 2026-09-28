@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_sections_proximos_eventos",
+  "info": {
+    "displayName": "Próximos eventos (inChurch)",
+    "icon": "calendar",
+    "description": "Eventos da ADAI vindos automaticamente da inChurch, em cards que passam para o lado. Aqui só título, texto e quantidade."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60,
+      "default": "Próximos eventos"
+    },
+    "texto_apoio": {
+      "type": "text",
+      "maxLength": 200
+    },
+    "quantidade": {
+      "type": "integer",
+      "min": 1,
+      "max": 12,
+      "default": 8,
+      "required": true
+    },
+    "cor_cards": {
+      "type": "enumeration",
+      "enum": ["cinza", "branco", "preto", "azul", "verde", "laranja", "vinho"],
+      "default": "cinza",
+      "required": true
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}

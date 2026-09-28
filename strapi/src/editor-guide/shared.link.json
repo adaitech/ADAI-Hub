@@ -1,0 +1,42 @@
+{
+  "uid": "shared.link",
+  "nome": "Link",
+  "resumo": "Link de texto simples, usado no menu e no rodapé.",
+  "ondeAparece": "Menu do cabeçalho e colunas do rodapé.",
+  "boasPraticas": [
+    "Texto curto que diga para onde o link leva.",
+    "Para sites externos, ative \"Abrir em nova aba\"."
+  ],
+  "campos": [
+    {
+      "campo": "texto",
+      "label": "Texto do link",
+      "descricao": "Nome curto que aparece no menu ou rodapé.",
+      "placeholder": "Ex.: Ministérios",
+      "ondeAparece": "O próprio texto clicável.",
+      "obrigatorio": true,
+      "limite": "Até 40 caracteres",
+      "exemplo": "Ministérios"
+    },
+    {
+      "campo": "url",
+      "label": "Link de destino",
+      "descricao": "Página do site (começando com /) ou endereço completo (https://…).",
+      "placeholder": "Ex.: /ministerios",
+      "ondeAparece": "Não aparece; é para onde o link leva.",
+      "obrigatorio": true,
+      "limite": "Até 300 caracteres",
+      "exemplo": "/ministerios"
+    },
+    {
+      "campo": "nova_aba",
+      "label": "Abrir em nova aba",
+      "descricao": "Ative só para sites externos (ex.: WhatsApp, Instagram).",
+      "placeholder": "",
+      "ondeAparece": "Não aparece; muda como o link abre.",
+      "obrigatorio": false,
+      "limite": "Sim ou Não",
+      "exemplo": "Não"
+    }
+  ]
+}

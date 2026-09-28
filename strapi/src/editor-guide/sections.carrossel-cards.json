@@ -1,0 +1,76 @@
+{
+  "uid": "sections.carrossel-cards",
+  "nome": "Carrossel de cards",
+  "resumo": "Título, texto de apoio e uma fileira de cards que passa para o lado com as setas. Quando chega no último card, a seta volta para o primeiro. Use para unidades, eventos, ministérios ou qualquer lista de opções.",
+  "ondeAparece": "No meio da página, abaixo do Hero ou de outra seção. Na Home é a seção \"Neste domingo\" com as unidades.",
+  "boasPraticas": [
+    "Use cards do mesmo tipo na mesma fileira (ex.: só unidades).",
+    "Ou todos os cards com foto, ou todos sem foto: misturar deixa a fileira desalinhada visualmente.",
+    "Destaques curtos, um por linha (ex.: 9h, 11h, 18h). Cards com 2 ou 3 destaques ficam alinhados automaticamente.",
+    "As setas aparecem sozinhas quando os cards não cabem na tela."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da seção",
+      "descricao": "Frase curta que apresenta a lista.",
+      "placeholder": "Ex.: Neste domingo",
+      "ondeAparece": "Título grande acima dos cards.",
+      "obrigatorio": true,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Neste domingo"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Uma frase que ajuda a escolher entre os cards.",
+      "placeholder": "Ex.: Escolha a unidade mais perto de você.",
+      "ondeAparece": "Abaixo do título, antes dos cards.",
+      "obrigatorio": false,
+      "limite": "Até 200 caracteres",
+      "exemplo": "Escolha a unidade mais perto de você ou participe de casa pela ADAI On."
+    },
+    {
+      "campo": "cards",
+      "label": "Cards",
+      "descricao": "De 1 a 12 cards, na ordem em que aparecem da esquerda para a direita.",
+      "placeholder": "",
+      "ondeAparece": "Fileira que passa para o lado com as setas.",
+      "obrigatorio": true,
+      "limite": "1 a 12 cards",
+      "exemplo": "Campestre · Anália Franco · São Bernardo · Santos · ADAI On",
+      "componente": "items.card"
+    },
+    {
+      "campo": "estilo_imagem",
+      "label": "Tipo de imagem dos cards",
+      "descricao": "Foto: 3:2 em preto e branco (padrão). Arte de divulgação: 16:9 colorida, sem cortar o texto da arte.",
+      "placeholder": "",
+      "ondeAparece": "Formato e cor das imagens de todos os cards.",
+      "obrigatorio": true,
+      "limite": "foto ou arte",
+      "exemplo": "foto"
+    },
+    {
+      "campo": "posicao_imagem",
+      "label": "Posição da foto nos cards",
+      "descricao": "Foto acima do título (padrão) ou abaixo das ações. Vale para todos os cards da fileira.",
+      "placeholder": "",
+      "ondeAparece": "Dentro de cada card que tem foto.",
+      "obrigatorio": true,
+      "limite": "acima ou abaixo",
+      "exemplo": "acima"
+    },
+    {
+      "campo": "link",
+      "label": "Link \"ver todos\"",
+      "descricao": "Opcional. Leva para a página com a lista completa.",
+      "placeholder": "",
+      "ondeAparece": "Ao lado das setas, acima dos cards.",
+      "obrigatorio": false,
+      "limite": "1 link",
+      "exemplo": "Ver todas as unidades → /unidades",
+      "componente": "shared.link"
+    }
+  ]
+}

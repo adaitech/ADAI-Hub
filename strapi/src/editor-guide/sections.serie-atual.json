@@ -1,0 +1,44 @@
+{
+  "uid": "sections.serie-atual",
+  "nome": "Série atual",
+  "resumo": "Mostra a série de mensagens do momento: nome da série, a mensagem mais recente com player e as outras partes do mês. Tudo vem sozinho do YouTube da ADAI — não é preciso cadastrar mensagens, vídeos ou pregadores aqui.",
+  "ondeAparece": "Na Home, depois de \"Pastores Líderes\". Quando o culto está ao vivo, aparece \"Ao vivo agora\" automaticamente.",
+  "boasPraticas": [
+    "Deixe tudo vazio para o site escolher sozinho a série mais recente do canal. Não é preciso entrar aqui todo mês.",
+    "Use \"Playlist personalizada\" só para fixar uma série específica (ex.: repetir uma série antiga). Depois, apague o campo para voltar ao automático.",
+    "O título, o tema e o pregador vêm do título do vídeo no YouTube: \"Série | Tema | Pr. Nome\". Mantenha esse padrão ao publicar.",
+    "A live do domingo precisa estar na playlist da série (como já é feito hoje). Quando o corte da pregação é publicado, ele substitui a live na mesma parte."
+  ],
+  "campos": [
+    {
+      "campo": "exibir",
+      "label": "Exibir seção",
+      "descricao": "Desligue para esconder a seção sem apagá-la.",
+      "placeholder": "",
+      "ondeAparece": "Mostra ou esconde a seção inteira.",
+      "obrigatorio": true,
+      "limite": "Sim ou Não",
+      "exemplo": "Sim"
+    },
+    {
+      "campo": "titulo_personalizado",
+      "label": "Título personalizado",
+      "descricao": "Opcional. Deixe vazio para utilizar automaticamente o nome identificado no YouTube.",
+      "placeholder": "Ex.: Não Compre Essa Briga",
+      "ondeAparece": "Título grande da série, abaixo de \"Série atual\".",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Não Compre Essa Briga"
+    },
+    {
+      "campo": "playlist_url",
+      "label": "Playlist personalizada",
+      "descricao": "Opcional. Deixe vazio para utilizar automaticamente a série mais recente do canal da ADAI.",
+      "placeholder": "https://www.youtube.com/playlist?list=...",
+      "ondeAparece": "Define de qual playlist do YouTube vêm as mensagens.",
+      "obrigatorio": false,
+      "limite": "Link de playlist do YouTube",
+      "exemplo": "https://www.youtube.com/playlist?list=PLVW0JDZGWu3Q"
+    }
+  ]
+}

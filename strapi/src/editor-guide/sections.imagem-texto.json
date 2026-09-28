@@ -1,0 +1,107 @@
+{
+  "uid": "sections.imagem-texto",
+  "nome": "Imagem e texto",
+  "resumo": "Uma foto grande de um lado e o texto do outro: rótulo pequeno, título grande, texto, lista de destaques, botão e link. Use a mesma seção para apresentar temas diferentes (Primeira vez na ADAI, liderança, ministérios, projetos).",
+  "ondeAparece": "No meio da página. Alterne a foto entre esquerda e direita em seções seguidas para criar ritmo.",
+  "boasPraticas": [
+    "Título grande e curto; use Enter para quebrar em até 2 linhas.",
+    "Foto vertical (4:5) com pessoas reais. Por padrão ela fica em preto e branco; desligue a opção para mostrá-la colorida.",
+    "A lista é ótima para explicar \"o que esperar\" em até 5 itens curtos.",
+    "Botão para a ação principal, link para uma alternativa."
+  ],
+  "campos": [
+    {
+      "campo": "imagem",
+      "label": "Foto",
+      "descricao": "Foto vertical (4:5), mín. 1200 px de altura. Preencha o texto alternativo na Biblioteca de Mídia.",
+      "placeholder": "",
+      "ondeAparece": "Metade da seção, com cantos arredondados (no celular, acima do texto).",
+      "obrigatorio": true,
+      "limite": "Uma imagem vertical",
+      "exemplo": "Pastores Rodrigo e Tati Soeiro"
+    },
+    {
+      "campo": "posicao_imagem",
+      "label": "Lado da foto",
+      "descricao": "Esquerda ou direita no computador. No celular a foto fica sempre em cima.",
+      "placeholder": "",
+      "ondeAparece": "Muda o lado da foto.",
+      "obrigatorio": true,
+      "limite": "Esquerda ou Direita",
+      "exemplo": "Direita"
+    },
+    {
+      "campo": "preto_e_branco",
+      "label": "Foto em preto e branco",
+      "descricao": "Ligado: a foto aparece em preto e branco (padrão da identidade). Desligue para mostrar colorida, como na foto da liderança.",
+      "placeholder": "",
+      "ondeAparece": "Muda as cores da foto.",
+      "obrigatorio": false,
+      "limite": "Sim ou Não",
+      "exemplo": "Sim"
+    },
+    {
+      "campo": "rotulo",
+      "label": "Rótulo",
+      "descricao": "Opcional. Palavra ou frase curta acima do título.",
+      "placeholder": "Ex.: Pastores Líderes",
+      "ondeAparece": "Letras pequenas acima do título.",
+      "obrigatorio": false,
+      "limite": "Até 40 caracteres",
+      "exemplo": "Pastores Líderes"
+    },
+    {
+      "campo": "titulo",
+      "label": "Título",
+      "descricao": "Título grande. Aperte Enter para quebrar a linha onde quiser.",
+      "placeholder": "Ex.: Primeira vez na ADAI?",
+      "ondeAparece": "Letras grandes, ao lado da foto.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Rodrigo & Tati Soeiro"
+    },
+    {
+      "campo": "texto",
+      "label": "Texto",
+      "descricao": "Parágrafo de apoio. Aperte Enter para começar outro parágrafo.",
+      "placeholder": "Ex.: Rodrigo Soeiro é pastor líder da ADAI…",
+      "ondeAparece": "Abaixo do título.",
+      "obrigatorio": false,
+      "limite": "Até 400 caracteres",
+      "exemplo": "Rodrigo Soeiro é pastor líder da ADAI e lidera a igreja com uma visão apaixonada por pessoas."
+    },
+    {
+      "campo": "lista",
+      "label": "Lista de destaques",
+      "descricao": "Opcional. Até 5 itens, cada um com título curto e explicação.",
+      "placeholder": "",
+      "ondeAparece": "Caixas cinza abaixo do texto.",
+      "obrigatorio": false,
+      "limite": "Até 5 itens",
+      "exemplo": "Como é o culto · Louvor, uma mensagem da Bíblia pra vida real",
+      "componente": "items.destaque"
+    },
+    {
+      "campo": "botao",
+      "label": "Botão",
+      "descricao": "Opcional. Ação principal da seção.",
+      "placeholder": "",
+      "ondeAparece": "Abaixo do texto (ou da lista).",
+      "obrigatorio": false,
+      "limite": "1 botão",
+      "exemplo": "Planeje sua visita (Sólido)",
+      "componente": "shared.botao"
+    },
+    {
+      "campo": "link",
+      "label": "Link",
+      "descricao": "Opcional. Ação secundária, ao lado do botão.",
+      "placeholder": "",
+      "ondeAparece": "Ao lado do botão, sublinhado.",
+      "obrigatorio": false,
+      "limite": "1 link",
+      "exemplo": "Conheça nossa história → /nossa-historia",
+      "componente": "shared.link"
+    }
+  ]
+}

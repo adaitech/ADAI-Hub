@@ -2,3 +2,6 @@ node_modules
 .DS_Store
 .vscode
 .env
+
+# Artefatos locais de agentes/validação (PR.md, relatórios, Lighthouse, planos)
+documents/

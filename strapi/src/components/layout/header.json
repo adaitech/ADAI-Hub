@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_layout_headers",
+  "info": {
+    "displayName": "Cabeçalho",
+    "icon": "layout",
+    "description": "Menu principal e botões de destaque no topo de todas as páginas."
+  },
+  "options": {},
+  "attributes": {
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link",
+      "max": 6
+    },
+    "botoes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.botao",
+      "max": 2
+    }
+  }
+}
