@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import naoCompre from './__fixtures__/nao-compre-essa-briga.json';
 import { youtubeFetch } from './client';
-import { __limparUltimoValido, getSerieAtual, precisaCacheCurto } from './serie-atual';
+import { __limparUltimoValido, getSerieAtual, precisaCacheCurto, urlAoVivoConfirmada } from './serie-atual';
 import type { SerieYoutube } from './serie';
 
 // `next/cache` é substituído por chamada direta em jest.setup.ts.
@@ -91,5 +91,24 @@ describe('precisaCacheCurto (4h × 5 min)', () => {
     expect(precisaCacheCurto(agendada, new Date('2026-09-27T13:30:00Z'))).toBe(false);
     expect(precisaCacheCurto(agendada, new Date('2026-09-27T13:50:00Z'))).toBe(true);
     expect(precisaCacheCurto(agendada, new Date('2026-09-27T21:00:00Z'))).toBe(false);
+  });
+});
+
+describe('urlAoVivoConfirmada', () => {
+  const agora = new Date('2026-09-27T13:00:00Z');
+  const serie: SerieYoutube = {
+    playlistId: 'P', playlistUrl: '', titulo: 'S', tituloFonte: 'video',
+    aoVivo: true, proximaTransmissao: null, atualizadoEm: '2026-09-27T12:56:00Z',
+    conteudos: [{
+      domingo: '2026-09-27', status: 'live', culto: true, tema: null, pregador: null,
+      video: { videoId: 'abc123def45', youtubeUrl: 'https://www.youtube.com/watch?v=abc123def45', embedUrl: '', thumbnail: null, embeddable: true },
+    }],
+  };
+
+  it('usa só a live recente', () => {
+    expect(urlAoVivoConfirmada(serie, agora)).toBe(serie.conteudos[0].video.youtubeUrl);
+    expect(urlAoVivoConfirmada({ ...serie, aoVivo: false }, agora)).toBeNull();
+    expect(urlAoVivoConfirmada({ ...serie, atualizadoEm: '2026-09-27T12:49:00Z' }, agora)).toBeNull();
+    expect(urlAoVivoConfirmada({ ...serie, conteudos: [] }, agora)).toBeNull();
   });
 });

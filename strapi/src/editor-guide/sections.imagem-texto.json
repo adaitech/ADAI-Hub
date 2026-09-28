@@ -93,6 +93,17 @@
       "componente": "shared.botao"
     },
     {
+      "campo": "botoes_secundarios",
+      "label": "Botões secundários",
+      "descricao": "Até dois botões menores abaixo do principal. Use para alternativas de ação, como em Contribua.",
+      "placeholder": "",
+      "ondeAparece": "Abaixo do botão principal, lado a lado quando houver espaço.",
+      "obrigatorio": false,
+      "limite": "Até 2 botões",
+      "exemplo": "Projeto Nossa Casa · Outras formas de contribuir",
+      "componente": "shared.botao"
+    },
+    {
       "campo": "link",
       "label": "Link",
       "descricao": "Opcional. Ação secundária, ao lado do botão.",

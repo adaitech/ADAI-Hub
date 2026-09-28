@@ -109,7 +109,7 @@
   "com_imagem": {
     "__component": "sections.carrossel-cards",
     "id": 52,
-    "titulo": "Encontre seu lugar",
+    "titulo": "Cards de ministérios (exemplo)",
     "texto_apoio": "Exemplo com fotos, cores, botão e link de contato. Com mais cards do que cabem na tela, as setas aparecem.",
     "posicao_imagem": "acima",
     "estilo_imagem": "foto",

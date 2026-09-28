@@ -24,6 +24,7 @@ export interface ImagemTextoData {
   texto?: string | null;
   lista?: DestaqueData[] | null;
   botao?: StrapiBotao | null;
+  botoes_secundarios?: StrapiBotao[] | null;
   link?: StrapiLink | null;
 }
 
@@ -36,5 +37,6 @@ export interface ImagemTextoView {
   paragrafos: string[];
   lista: { titulo: string; texto?: string }[];
   botao: BotaoView | null;
+  botoesSecundarios: BotaoView[];
   link: LinkView | null;
 }

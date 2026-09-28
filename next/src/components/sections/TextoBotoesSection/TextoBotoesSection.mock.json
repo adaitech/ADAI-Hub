@@ -1,0 +1,29 @@
+{
+  "completo": {
+    "__component": "sections.texto-botoes",
+    "id": 296,
+    "titulo": "A igreja no seu bolso",
+    "texto_apoio": "Bíblia, planos de leitura, agenda, inscrições, pedidos de oração e cultos ao vivo no app da ADAI.",
+    "botoes": [
+      { "id": 297, "texto": "Baixar na App Store", "url": "https://apps.apple.com/mw/app/igreja-adai/id6736497082", "estilo": "solido", "nova_aba": true },
+      { "id": 298, "texto": "Baixar no Google Play", "url": "https://play.google.com/store/apps/details?id=br.com.inchurch.adaltoipiranga&hl=pt_BR&pli=1", "estilo": "contorno", "nova_aba": true }
+    ]
+  },
+  "minimo": {
+    "__component": "sections.texto-botoes",
+    "id": 299,
+    "titulo": "A igreja no seu bolso",
+    "texto_apoio": null,
+    "botoes": []
+  },
+  "texto_longo": {
+    "__component": "sections.texto-botoes",
+    "id": 300,
+    "titulo": "A igreja no seu bolso, onde você estiver",
+    "texto_apoio": "Acompanhe a agenda, inscreva-se nos encontros, envie pedidos de oração, siga planos de leitura e participe dos cultos ao vivo pelo aplicativo da ADAI.",
+    "botoes": [
+      { "id": 301, "texto": "Baixar na App Store", "url": "https://apps.apple.com/mw/app/igreja-adai/id6736497082", "estilo": "solido", "nova_aba": true },
+      { "id": 302, "texto": "Baixar no Google Play", "url": "https://play.google.com/store/apps/details?id=br.com.inchurch.adaltoipiranga&hl=pt_BR&pli=1", "estilo": "contorno", "nova_aba": true }
+    ]
+  }
+}

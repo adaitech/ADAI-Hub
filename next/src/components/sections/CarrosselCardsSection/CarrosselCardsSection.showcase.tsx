@@ -23,7 +23,7 @@ export const carrosselCardsShowcase = defineShowcase<CarrosselCardsData>({
   descricao:
     'Título, texto de apoio e uma fileira de cards que passa para o lado com setas. No último card a seta volta ao primeiro. Cards com foto (acima ou abaixo) ou sem, com botão e/ou link, em 7 cores; 2 ou 3 destaques (horários) ficam alinhados.',
   quandoUsar:
-    'Listas de opções lado a lado: unidades (Neste domingo), ministérios, eventos. As setas aparecem sozinhas quando os cards não cabem.',
+    'Listas de cards lado a lado, como unidades (Neste domingo) e eventos. A seção “Encontre seu lugar” da Home usa a Lista de ministérios.',
   doc: 'docs/componentes/carrossel-cards.md',
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-51',
   render: (data) => <CarrosselCardsSection data={data} index={1} />,

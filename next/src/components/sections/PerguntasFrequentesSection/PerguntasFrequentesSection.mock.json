@@ -1,0 +1,33 @@
+{
+  "completo": {
+    "__component": "sections.perguntas-frequentes",
+    "id": 167,
+    "titulo": "Perguntas frequentes",
+    "texto_apoio": "Separamos algumas dúvidas comuns de quem está chegando pela primeira vez à ADAI.",
+    "perguntas": [
+      { "id": 168, "pergunta": "Posso ir sozinho(a)?", "resposta": "Claro. Muitas pessoas vêm pela primeira vez sozinhas e são recebidas com muita naturalidade. Se quiser, avise antes e alguém te espera na entrada." },
+      { "id": 169, "pergunta": "Como funciona o ADAI Kids?", "resposta": "O ADAI Kids cuida das crianças com segurança e carinho, com atividades pensadas por faixa etária. Você participa do culto tranquilo(a) sabendo que elas estão sendo bem acompanhadas." },
+      { "id": 170, "pergunta": "Tem estacionamento?", "resposta": "Sim, a unidade possui espaço pra estacionamento e acesso facilitado. Também é possível chegar por transporte público, dependendo da sua região." },
+      { "id": 171, "pergunta": "Como me conectar com a igreja depois do culto?", "resposta": "Você pode conversar com a equipe, participar de grupos, eventos e ministérios. O importante é começar, e a gente te ajuda a encontrar o melhor caminho." }
+    ]
+  },
+  "minimo": {
+    "__component": "sections.perguntas-frequentes",
+    "id": 172,
+    "titulo": "Perguntas frequentes",
+    "texto_apoio": null,
+    "perguntas": [
+      { "id": 173, "pergunta": "Posso ir sozinho(a)?", "resposta": "Claro. Você é bem-vindo(a)." }
+    ]
+  },
+  "texto_longo": {
+    "__component": "sections.perguntas-frequentes",
+    "id": 174,
+    "titulo": "Perguntas frequentes de quem está chegando",
+    "texto_apoio": "Separamos respostas para ajudar você a conhecer a ADAI e planejar sua primeira visita com tranquilidade, sozinho(a) ou com sua família.",
+    "perguntas": [
+      { "id": 175, "pergunta": "Como posso encontrar uma equipe e começar a participar das atividades da igreja?", "resposta": "Você pode conversar com a equipe ao fim do culto, conhecer os grupos, eventos e ministérios e escolher por onde começar. Há espaço para pessoas em diferentes fases da vida, e alguém vai ajudar você a encontrar o caminho mais adequado." },
+      { "id": 176, "pergunta": "Como funciona o ADAI Kids?", "resposta": "O ADAI Kids cuida das crianças com segurança e carinho, com atividades pensadas por faixa etária." }
+    ]
+  }
+}

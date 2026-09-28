@@ -7,8 +7,8 @@ import type { ImagemTextoData } from './types';
 import styles from './ImagemTextoSection.module.css';
 
 /**
- * Figma: "Primeira vez" (node 1:107, foto à esquerda) e "Nossa Liderança" (node 6:4, foto à direita).
- * Foto grande de um lado; rótulo, título grande, texto, lista, botão e link do outro.
+ * Figma: "Primeira vez" (1:107), "Nossa Liderança" (6:4) e "Contribua" (1:279).
+ * Foto grande de um lado; rótulo, título, texto, lista e ações do outro.
  */
 export function ImagemTextoSection({ data, index }: SectionProps<ImagemTextoData>) {
   const view = normalizeImagemTexto(data);
@@ -67,12 +67,21 @@ export function ImagemTextoSection({ data, index }: SectionProps<ImagemTextoData
           </ul>
         )}
 
-        {(view.botao || view.link) && (
-          <div className={styles.acoes}>
+        {(view.botao || view.botoesSecundarios.length > 0 || view.link) && (
+          <div className={styles.acoes} data-multiplos={view.botoesSecundarios.length > 0 ? 'true' : undefined}>
             {view.botao && (
-              <ButtonLink href={view.botao.href} estilo={view.botao.estilo} tamanho="md" novaAba={view.botao.novaAba}>
+              <ButtonLink href={view.botao.href} estilo={view.botao.estilo} tamanho="md" novaAba={view.botao.novaAba} className={styles.botaoPrincipal}>
                 {view.botao.label}
               </ButtonLink>
+            )}
+            {view.botoesSecundarios.length > 0 && (
+              <div className={styles.secundarios}>
+                {view.botoesSecundarios.map((botao, i) => (
+                  <ButtonLink key={`${botao.href}-${i}`} href={botao.href} estilo={botao.estilo} tamanho="sm" novaAba={botao.novaAba}>
+                    {botao.label}
+                  </ButtonLink>
+                ))}
+              </div>
             )}
             {view.link && (
               <TextLink href={view.link.href} novaAba={view.link.novaAba}>

@@ -75,6 +75,51 @@ export interface ItemsDestaque extends Struct.ComponentSchema {
   };
 }
 
+export interface ItemsMinisterio extends Struct.ComponentSchema {
+  collectionName: 'components_items_ministerios';
+  info: {
+    description: 'Nome, p\u00FAblico e destino opcional de uma linha da lista de minist\u00E9rios.';
+    displayName: 'Minist\u00E9rio da lista';
+    icon: 'bulletList';
+  };
+  attributes: {
+    nome: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    publico: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    url: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+  };
+}
+
+export interface ItemsPerguntaFrequente extends Struct.ComponentSchema {
+  collectionName: 'components_items_perguntas_frequentes';
+  info: {
+    description: 'Pergunta e resposta do FAQ.';
+    displayName: 'Pergunta frequente';
+    icon: 'question';
+  };
+  attributes: {
+    pergunta: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+    resposta: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+  };
+}
+
 export interface LayoutFooter extends Struct.ComponentSchema {
   collectionName: 'components_layout_footers';
   info: {
@@ -202,6 +247,13 @@ export interface SectionsImagemTexto extends Struct.ComponentSchema {
   };
   attributes: {
     botao: Schema.Attribute.Component<'shared.botao', false>;
+    botoes_secundarios: Schema.Attribute.Component<'shared.botao', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2;
+        },
+        number
+      >;
     imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     link: Schema.Attribute.Component<'shared.link', false>;
     lista: Schema.Attribute.Component<'items.destaque', true> &
@@ -224,6 +276,66 @@ export interface SectionsImagemTexto extends Struct.ComponentSchema {
         maxLength: 400;
       }>;
     titulo: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+  };
+}
+
+export interface SectionsMinisterios extends Struct.ComponentSchema {
+  collectionName: 'components_sections_ministerios';
+  info: {
+    description: 'T\u00EDtulo e convite ao lado de uma lista de minist\u00E9rios com seu p\u00FAblico.';
+    displayName: 'Lista de minist\u00E9rios';
+    icon: 'bulletList';
+  };
+  attributes: {
+    botao: Schema.Attribute.Component<'shared.botao', false>;
+    ministerios: Schema.Attribute.Component<'items.ministerio', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      >;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }> &
+      Schema.Attribute.DefaultTo<'Encontre seu lugar'>;
+  };
+}
+
+export interface SectionsPerguntasFrequentes extends Struct.ComponentSchema {
+  collectionName: 'components_sections_perguntas_frequentes';
+  info: {
+    description: 'Lista de perguntas com respostas expans\u00EDveis.';
+    displayName: 'Perguntas frequentes';
+    icon: 'question';
+  };
+  attributes: {
+    perguntas: Schema.Attribute.Component<'items.pergunta-frequente', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      >;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    titulo: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
@@ -286,6 +398,33 @@ export interface SectionsSerieAtual extends Struct.ComponentSchema {
     titulo_personalizado: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 60;
+      }>;
+  };
+}
+
+export interface SectionsTextoBotoes extends Struct.ComponentSchema {
+  collectionName: 'components_sections_textos_botoes';
+  info: {
+    description: 'Chamada centralizada com t\u00EDtulo, texto de apoio e at\u00E9 dois bot\u00F5es.';
+    displayName: 'Texto e bot\u00F5es';
+    icon: 'bulletList';
+  };
+  attributes: {
+    botoes: Schema.Attribute.Component<'shared.botao', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2;
+        },
+        number
+      >;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
       }>;
   };
 }
@@ -369,13 +508,18 @@ declare module '@strapi/strapi' {
       'items.card': ItemsCard;
       'items.coluna-links': ItemsColunaLinks;
       'items.destaque': ItemsDestaque;
+      'items.ministerio': ItemsMinisterio;
+      'items.pergunta-frequente': ItemsPerguntaFrequente;
       'layout.footer': LayoutFooter;
       'layout.header': LayoutHeader;
       'sections.carrossel-cards': SectionsCarrosselCards;
       'sections.hero': SectionsHero;
       'sections.imagem-texto': SectionsImagemTexto;
+      'sections.ministerios': SectionsMinisterios;
+      'sections.perguntas-frequentes': SectionsPerguntasFrequentes;
       'sections.proximos-eventos': SectionsProximosEventos;
       'sections.serie-atual': SectionsSerieAtual;
+      'sections.texto-botoes': SectionsTextoBotoes;
       'shared.botao': SharedBotao;
       'shared.link': SharedLink;
       'shared.seo': SharedSeo;

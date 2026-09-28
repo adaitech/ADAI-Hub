@@ -430,6 +430,9 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.imagem-texto',
         'sections.serie-atual',
         'sections.proximos-eventos',
+        'sections.ministerios',
+        'sections.texto-botoes',
+        'sections.perguntas-frequentes',
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;

@@ -2,8 +2,11 @@ import type { ComponentType } from 'react';
 import { CarrosselCardsSection, carrosselCardsPopulate } from '@/components/sections/CarrosselCardsSection';
 import { HeroSection, heroPopulate } from '@/components/sections/HeroSection';
 import { ImagemTextoSection, imagemTextoPopulate } from '@/components/sections/ImagemTextoSection';
+import { MinisteriosSection, ministeriosPopulate } from '@/components/sections/MinisteriosSection';
+import { PerguntasFrequentesSection, perguntasFrequentesPopulate } from '@/components/sections/PerguntasFrequentesSection';
 import { ProximosEventosSection, proximosEventosPopulate } from '@/components/sections/ProximosEventosSection';
 import { SerieAtualSection, serieAtualPopulate } from '@/components/sections/SerieAtualSection';
+import { TextoBotoesSection, textoBotoesPopulate } from '@/components/sections/TextoBotoesSection';
 import type { StrapiSection, StrapiSectionPopulate } from '@/lib/strapi/types';
 import type { SectionProps } from '@/types/sections';
 
@@ -27,6 +30,9 @@ export const sectionRegistry: Record<string, SectionRegistryEntry> = {
   'sections.hero': defineSection(HeroSection, heroPopulate),
   'sections.carrossel-cards': defineSection(CarrosselCardsSection, carrosselCardsPopulate),
   'sections.imagem-texto': defineSection(ImagemTextoSection, imagemTextoPopulate),
+  'sections.ministerios': defineSection(MinisteriosSection, ministeriosPopulate),
+  'sections.texto-botoes': defineSection(TextoBotoesSection, textoBotoesPopulate),
+  'sections.perguntas-frequentes': defineSection(PerguntasFrequentesSection, perguntasFrequentesPopulate),
   'sections.serie-atual': defineSection(SerieAtualSection, serieAtualPopulate),
   'sections.proximos-eventos': defineSection(ProximosEventosSection, proximosEventosPopulate),
 };

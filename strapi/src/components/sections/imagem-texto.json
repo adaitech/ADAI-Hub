@@ -47,6 +47,12 @@
       "repeatable": false,
       "component": "shared.botao"
     },
+    "botoes_secundarios": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.botao",
+      "max": 2
+    },
     "link": {
       "type": "component",
       "repeatable": false,

@@ -1,0 +1,52 @@
+/* Figma App 1:296: chamada central em branco, com 129,6px de respiro vertical no desktop. */
+.secao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-section) var(--space-gutter);
+  text-align: center;
+}
+
+.titulo {
+  max-width: var(--intro-max);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-chamada);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-chamada);
+  letter-spacing: var(--letter-spacing-chamada);
+}
+
+.apoio {
+  max-width: var(--texto-max);
+  margin-top: var(--space-16);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-chamada-apoio);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-text);
+  white-space: pre-line;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-12);
+  width: 100%;
+  margin-top: var(--space-32);
+}
+
+.acoes a {
+  flex: 1 1 auto;
+  white-space: normal;
+}
+
+@media (min-width: 769px) {
+  .acoes {
+    width: auto;
+  }
+
+  .acoes a {
+    flex: none;
+    white-space: nowrap;
+  }
+}

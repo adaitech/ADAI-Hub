@@ -70,11 +70,13 @@ Home (ISR 60s) → SectionRenderer → SerieAtualSection (Server Component, asyn
 | Playlist resolvida | 4h | playlistId do CMS ou `auto` | mudar a playlist no CMS muda a chave → efeito na próxima renderização |
 | Série (normal) | **4h** (14400 s) | playlistId | resultado **normalizado** (`SerieYoutube`), não o JSON do Google |
 | Série (live) | **5 min** (300 s) | playlistId | usado quando o cache de 4h mostra live no ar, ou live agendada entre 15 min antes e 6h depois do horário |
+| Botão “Ao vivo” do cabeçalho | **5 min** (300 s) | playlist automática atual + vídeos | checagem independente da série normal de 4h; só aparece com `liveBroadcastContent: live` e resultado de até 10 min |
 | Stale-if-error | — | — | `unstable_cache` devolve a entrada anterior se a revalidação falhar (conferido em `next/dist/server/web/spec-extension/unstable-cache.js`); sem entrada → `ultimoValido` em memória; sem nada → seção oculta |
 
 - **Revalidation do CMS:** o webhook atual (`/api/revalidate` → tag `strapi`) atualiza a Home; `exibir`, `titulo_personalizado` e `playlist_url` são lidos a cada renderização (título aplicado fora do cache do YouTube), então **não** esperam 4h. O cache do YouTube tem tag própria (`youtube`) e não é apagado pelo webhook do Strapi.
 - **Quota:** cada atualização custa 2–3 unidades (`playlistItems` + `videos`; `playlists` a cada 4h, até 5 `playlistItems` para validar). Com live, ~30 unidades/h. Limite diário padrão: 10.000.
 - **Limitação conhecida:** a live só é percebida quando a série é atualizada. Se a live for adicionada à playlist depois da última atualização de 4h, o "Ao vivo agora" pode atrasar até 4h. Se isso incomodar, a evolução simples é usar o cache de 5 min também na janela do culto de domingo (ex.: 8h–14h).
+- O botão do cabeçalho usa consulta própria de 5 minutos e some se o YouTube não confirmar uma live recente; a limitação de 4h acima vale apenas para o destaque da seção de mensagens.
 
 ## 6. Segurança e erros
 

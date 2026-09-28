@@ -1,62 +1,15 @@
-# 🚀 Getting started with Strapi
+# CMS da ADAI (Strapi 5)
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+O Strapi mantém o conteúdo editorial da Home e das demais páginas. A estrutura de cada seção fica em `src/components/`, é liberada na dynamic zone de `src/api/page/content-types/page/schema.json` e tem instruções de edição em `src/editor-guide/`. O site Next.js lê essas seções pelo registry e mostra exemplos na vitrine `/componentes`.
 
+## Começar
 
-### `develop`
+Na raiz do repositório, rode `yarn setup` e preencha `strapi/.env` conforme o [README principal](../README.md). Depois use `yarn dev`, que inicia Strapi e Next. O painel está em http://localhost:1337/admin. Não versione `.env`, `strapi/.tmp/` nem uma exportação com usuários ou tokens.
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+## Conteúdo reproduzível
 
-```
-npm run develop
-# or
-yarn develop
-```
+O bootstrap em `src/bootstrap/seed.ts` cria as configurações globais, publica a Home e a página `/exemplos`. A versão atual do seed é **v14** e inclui “Encontre seu lugar”, “Contribua”, “A igreja no seu bolso” e o FAQ. Um novo ambiente consegue continuar a partir do seed e das imagens de `seed/`.
 
-### `start`
+O arquivo versionado `data/adai-conteudo.tar.gz` guarda o conteúdo e as mídias atuais, inclusive edições feitas no painel. Para restaurá-lo em um banco local de desenvolvimento, pare o Strapi e execute `yarn data:import` na pasta `strapi/`. A importação substitui o conteúdo existente. Para atualizar o snapshot depois de uma mudança editorial, execute `yarn data:export`, confira que a exportação contém apenas `content,files` e nenhum segredo, e versione o arquivo resultante.
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
-
-```
-npm run start
-# or
-yarn start
-```
-
-### `build`
-
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
-
-```
-npm run build
-# or
-yarn build
-```
-
-## ⚙️ Deployment
-
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
-
-```
-yarn strapi deploy
-```
-
-## 📚 Learn more
-
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+Os contratos de cada seção estão em [`docs/componentes/`](../docs/componentes/README.md). Eventos vêm da inChurch e mensagens do YouTube; o CMS guarda só a apresentação/configuração dessas fontes.

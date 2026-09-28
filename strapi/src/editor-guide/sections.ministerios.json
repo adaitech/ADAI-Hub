@@ -1,0 +1,55 @@
+{
+  "uid": "sections.ministerios",
+  "nome": "Lista de ministérios",
+  "resumo": "Convite para servir ao lado de uma lista de ministérios e seus públicos, sem carrossel.",
+  "ondeAparece": "Na Home, depois de Próximos eventos; também pode ser usada em outras páginas.",
+  "boasPraticas": [
+    "O título pode mudar sem alterar a estrutura da seção.",
+    "Cadastre os ministérios na ordem em que devem aparecer.",
+    "Confira se o botão e as URLs dos itens levam a páginas públicas antes de preenchê-los."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da seção",
+      "descricao": "Convite curto. Aperte Enter apenas se precisar definir a quebra de linha.",
+      "placeholder": "Ex.: Encontre seu lugar",
+      "ondeAparece": "Letras grandes na coluna esquerda.",
+      "obrigatorio": true,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Encontre seu lugar"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Explique em até duas frases como a pessoa pode participar.",
+      "placeholder": "Ex.: Tem espaço pra todas as idades e fases da vida.",
+      "ondeAparece": "Abaixo do título.",
+      "obrigatorio": false,
+      "limite": "Até 200 caracteres",
+      "exemplo": "Tem espaço pra todas as idades e fases da vida. Escolha por onde começar."
+    },
+    {
+      "campo": "botao",
+      "label": "Botão principal",
+      "descricao": "Ação de participação abaixo do texto. Sem texto ou URL, o botão não aparece.",
+      "placeholder": "",
+      "ondeAparece": "Abaixo do texto de apoio.",
+      "obrigatorio": false,
+      "limite": "Um botão",
+      "exemplo": "Quero servir",
+      "componente": "shared.botao"
+    },
+    {
+      "campo": "ministerios",
+      "label": "Ministérios",
+      "descricao": "Adicione de 1 a 12 ministérios na ordem desejada.",
+      "placeholder": "",
+      "ondeAparece": "Lista na coluna direita (abaixo do convite no celular).",
+      "obrigatorio": true,
+      "limite": "De 1 a 12 itens",
+      "exemplo": "KIDS · Crianças",
+      "componente": "items.ministerio"
+    }
+  ]
+}

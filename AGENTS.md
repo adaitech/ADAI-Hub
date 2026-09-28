@@ -35,9 +35,9 @@ Nenhum componente está pronto enquanto não estiver **funcionando nos três lug
 
 O repositório nasceu do template **Strapi Launchpad**; a fundação (2026-09-27) removeu todo o legado (Next 14, Tailwind, demos, i18n, content types demo do Strapi). Hoje existem:
 
-- **Strapi:** `page` (dynamic zone `sections`), `global` (cabeçalho, rodapé, SEO), seções `sections.hero`, `sections.carrossel-cards`, `sections.imagem-texto`, `sections.serie-atual` (só configuração editorial; conteúdo vem do YouTube), `sections.proximos-eventos` (eventos vêm da inChurch), `layout.header`, `layout.footer`, `shared.*`, `items.*`; bootstrap que aplica o guia do editor, libera leitura pública e semeia o conteúdo de dev (Home + página `/exemplos` com variações).
-- **Next:** Home vinda do Strapi (Header, Hero, Neste domingo, Primeira vez, Pastores Líderes, Série atual, Próximos eventos, Footer); integração inChurch Public API em `src/lib/inchurch/` (eventos, cache 30 min; ver `docs/componentes/proximos-eventos.md`); integração YouTube Data API em `src/lib/youtube/` (cache 4h / 5 min na live; ver `docs/componentes/serie-atual.md`); `/exemplos`; vitrine `/componentes`; preview de rascunho; webhook de revalidação.
-- **Dados de dev do Strapi:** criados pelo seed (`strapi/src/bootstrap/seed.ts`, versionado por `SEED_VERSION`) ou importados do snapshot `strapi/data/adai-conteudo.tar.gz` (`yarn data:import`). O banco SQLite (`strapi/.tmp/`) nunca vai para o Git.
+- **Strapi:** `page` (dynamic zone `sections`), `global` (cabeçalho, rodapé, SEO), seções `hero`, `carrossel-cards`, `imagem-texto`, `serie-atual`, `proximos-eventos`, `ministerios`, `texto-botoes` e `perguntas-frequentes` em `strapi/src/components/sections/`; bootstrap que aplica o guia do editor, libera leitura pública e semeia a Home e `/exemplos`.
+- **Next:** Home vinda do Strapi (Header, Hero, Neste domingo, Primeira vez, Pastores Líderes, Série atual, Próximos eventos, Encontre seu lugar, Contribua, A igreja no seu bolso, FAQ, Footer); integração inChurch Public API em `src/lib/inchurch/` (eventos, cache 30 min); integração YouTube Data API em `src/lib/youtube/` (série com cache 4h/5 min; botão “Ao vivo” no Header só com live confirmada recentemente); favicon em `src/app/icon.svg`; `/exemplos`; vitrine `/componentes`; preview de rascunho; webhook de revalidação.
+- **Dados de dev do Strapi:** criados pelo seed v14 (`strapi/src/bootstrap/seed.ts`, versionado por `SEED_VERSION`) ou importados do snapshot `strapi/data/adai-conteudo.tar.gz` (`yarn data:import`, com Strapi parado). O snapshot contém conteúdo, mídias e papéis/permissões públicos, sem contas administrativas e tokens; o banco SQLite (`strapi/.tmp/`) nunca vai para o Git. O seed reconstrói as seções da Home quando sua versão aumenta; para preservar edições feitas no painel, exportar um novo snapshot e revisar seu conteúdo antes de versioná-lo.
 - **Pendentes conhecidos:** ver "Como continuar" no fim deste arquivo.
 
 ## Leitura direcionada
@@ -129,20 +129,20 @@ Ler o `SKILL.md` integralmente quando uma skill for selecionada.
 
 ## Como continuar (handoff — atualizado em 2026-09-28)
 
-**Pronto e verificado** (tripé Strapi + página + vitrine; `yarn quality` e `yarn build` passando): Header, Hero, Carrossel de cards ("Neste domingo"; cores por card; foto acima/abaixo; foto P&B ou arte 16:9), Imagem e texto (Primeira vez, Pastores Líderes), Série atual (YouTube), Próximos eventos (inChurch), Footer. Vitrine com abas e controles.
+**Pronto e verificado localmente** (tripé Strapi + página + vitrine; quality e builds executados): Header, Hero, Carrossel de cards ("Neste domingo"; cores por card; foto acima/abaixo; foto P&B ou arte 16:9), Imagem e texto (Primeira vez, Pastores Líderes e Contribua), Série atual (YouTube), Próximos eventos (inChurch), Lista de ministérios (Encontre seu lugar), Texto e botões (app), Perguntas frequentes, Footer e favicon. Vitrine com abas e controles. A exibição do Header durante uma live foi coberta por teste automatizado; uma transmissão real ainda precisa ser observada para validação ponta a ponta.
 
 **Próximos passos sugeridos**, na ordem do Figma (`Home / Desktop`, node 1:3):
 
-1. **Encontre seu lugar (Ministérios)** — node 1:230. Avaliar se os ministérios vêm da inChurch (`/v1/group/`, categorias) antes de criar conteúdo no Strapi.
-2. **Contribua** — node 1:279. Só link para a página de doação da inChurch (o site não lê dados financeiros).
-3. **App** — node 1:296 · **Perguntas frequentes** — node 31:167 (`<details>`/`<summary>`) · **Top bar** — node 1:4.
-4. **Células/GCs perto de você** (se o time quiser): `GET /v1/cell/` com `lat`/`lng`.
+1. **Top bar** — node 1:4; ainda não extraída.
+2. **Página de contribuição** — criar o destino `/contribua` quando o link público de doação estiver definido. O botão da Home já aponta para essa rota, que pode responder 404 até lá.
+3. **Destinos dos ministérios** — cadastrar URLs próprias no Strapi quando existirem; a lista da Home já está pronta e fica como texto sem URL.
+4. **Células/GCs perto de você** (se o time quiser): avaliar `GET /v1/cell/` com `lat`/`lng`.
 
 **Decisões pendentes com o time/design:**
 
 - Link público da página do evento na inChurch (formato não documentado; a API traz `short_url_code`) e destino do "Agenda completa".
 - Aprovação visual: layouts mobile, carrossel, paleta de cores dos cards, foto abaixo, cards de evento com arte (Figma usa bloco de data), dialog do player, selo "Ao vivo agora", cinza `#6B6B6B`.
-- Série atual: usar cache de 5 min na janela do culto de domingo? (hoje só com live detectada).
+- Série atual: o destaque de mensagens ainda pode atrasar até 4h para perceber uma live adicionada à playlist; o botão “Ao vivo” do Header faz uma checagem independente a cada 5 min. Validar o comportamento ponta a ponta durante uma transmissão real.
 - Produção: restringir a chave do YouTube à Data API v3; cliente de API da inChurch só leitura (`event:GET`, `event_categories:GET`).
 
 **Como o time mantém o conteúdo sem dev:** eventos → marcar "Mostrar no site" na inChurch (GC nunca aparece); mensagens → publicar no YouTube no padrão `Série | Tema | Pr. Nome` e manter a live na playlist da série; textos e seções → Strapi (guia do editor em cada campo e na vitrine).

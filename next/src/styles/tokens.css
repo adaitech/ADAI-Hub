@@ -51,6 +51,9 @@
   --font-size-display: clamp(48px, 9vw, 129.6px);
   --font-size-h2: clamp(40px, 5vw, 72px); /* 🟡 linha de 74px no Figma (Neste domingo, Primeira vez) */
   --font-size-h3: 1.75rem; /* 🟡 linha de 32px no Figma (nome da unidade) */
+  --font-size-ministerio: clamp(1.75rem, 3vw, 2.625rem); /* ✅ Figma 1:230: nome de 42px */
+  --font-size-chamada: clamp(2.5rem, 5.4vw, 4.8625rem); /* ✅ Figma 1:298: 77,8px no desktop */
+  --font-size-chamada-apoio: 1.25rem; /* ✅ Figma 1:300: 20px */
   --font-size-destaque: 2rem; /* 🟡 horários: 3 linhas em 109px no Figma */
   --font-size-lead: 1.125rem;
   --font-size-body-lg: 1.0625rem;
@@ -63,11 +66,13 @@
   --line-height-text: 1.5;
   --line-height-h2: 1.03;
   --line-height-h3: 1.15;
+  --line-height-chamada: 0.95; /* ✅ Figma 1:298: 73,87 / 77,8 */
   --line-height-destaque: 1.1;
 
   --letter-spacing-mega: -0.07em;
   --letter-spacing-display: -0.055em;
   --letter-spacing-h2: -0.04em;
+  --letter-spacing-chamada: -0.045em; /* ✅ Figma 1:298: -3,5px */
 
   /* ---------- Espaçamento ---------- */
   --space-4: 0.25rem;
@@ -116,6 +121,10 @@
   --serie-caixa-padding: clamp(24px, 5vw, 72px); /* 72px no Figma (Mensagens 1:133) */
   --serie-play: 60px; /* botão play sobre a thumbnail (1:149) */
   --serie-parte-min: 180px; /* altura mínima do card de parte (1:152) */
+  --ministerios-padding: clamp(24px, 5vw, 72px); /* ✅ Figma 1:230: 72px no desktop */
+  --ministerios-linha-altura: 78px; /* ✅ Figma 1:239 */
+  --ministerios-linha-raio: 14px; /* ✅ Figma 1:239 */
+  --faq-pergunta-altura: 4.5rem; /* 🟡 altura mínima proposta para o acordeão */
 
   /* ---------- Movimento ---------- */
   --duration-fast: 150ms;

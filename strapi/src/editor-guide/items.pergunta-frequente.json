@@ -1,0 +1,32 @@
+{
+  "uid": "items.pergunta-frequente",
+  "nome": "Pergunta frequente",
+  "resumo": "Uma dúvida comum e sua resposta dentro da seção Perguntas frequentes.",
+  "ondeAparece": "Cada caixa cinza do FAQ.",
+  "boasPraticas": [
+    "Escreva a pergunta como alguém visitante a faria.",
+    "Responda de forma acolhedora e objetiva, sem depender de links externos."
+  ],
+  "campos": [
+    {
+      "campo": "pergunta",
+      "label": "Pergunta",
+      "descricao": "Dúvida curta que fica sempre visível na lista.",
+      "placeholder": "Ex.: Posso ir sozinho(a)?",
+      "ondeAparece": "Linha clicável da caixa cinza.",
+      "obrigatorio": true,
+      "limite": "Até 120 caracteres",
+      "exemplo": "Posso ir sozinho(a)?"
+    },
+    {
+      "campo": "resposta",
+      "label": "Resposta",
+      "descricao": "Explique a resposta em linguagem simples. Ela aparece quando a pessoa abre a pergunta.",
+      "placeholder": "Ex.: Claro. Muitas pessoas vêm pela primeira vez sozinhas...",
+      "ondeAparece": "Abaixo da pergunta, ao expandir a caixa.",
+      "obrigatorio": true,
+      "limite": "Até 500 caracteres",
+      "exemplo": "Claro. Muitas pessoas vêm pela primeira vez sozinhas e são recebidas com muita naturalidade."
+    }
+  ]
+}

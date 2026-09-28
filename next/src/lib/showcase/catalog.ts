@@ -3,8 +3,11 @@ import { headerShowcase } from '@/components/layout/Header/Header.showcase';
 import { carrosselCardsShowcase } from '@/components/sections/CarrosselCardsSection/CarrosselCardsSection.showcase';
 import { heroShowcase } from '@/components/sections/HeroSection/HeroSection.showcase';
 import { imagemTextoShowcase } from '@/components/sections/ImagemTextoSection/ImagemTextoSection.showcase';
+import { ministeriosShowcase } from '@/components/sections/MinisteriosSection/MinisteriosSection.showcase';
+import { perguntasFrequentesShowcase } from '@/components/sections/PerguntasFrequentesSection/PerguntasFrequentesSection.showcase';
 import { proximosEventosShowcase } from '@/components/sections/ProximosEventosSection/ProximosEventosSection.showcase';
 import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/SerieAtualSection.showcase';
+import { textoBotoesShowcase } from '@/components/sections/TextoBotoesSection/TextoBotoesSection.showcase';
 import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
 import type { ShowcaseCategoria, ShowcaseEntry } from './types';
@@ -15,6 +18,9 @@ export const showcaseCatalog: ShowcaseEntry[] = [
   heroShowcase,
   carrosselCardsShowcase,
   imagemTextoShowcase,
+  ministeriosShowcase,
+  textoBotoesShowcase,
+  perguntasFrequentesShowcase,
   serieAtualShowcase,
   proximosEventosShowcase,
   footerShowcase,

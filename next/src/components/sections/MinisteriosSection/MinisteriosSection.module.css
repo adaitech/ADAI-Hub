@@ -1,0 +1,108 @@
+/* Figma 1:230: caixa cinza de 1354 × 748 px em desktop, com duas colunas e lista de 8 linhas. */
+.secao {
+  padding: var(--space-section) var(--space-gutter) 0;
+}
+
+.caixa {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-40);
+  padding: var(--ministerios-padding);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-subtle);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-24);
+}
+
+.titulo {
+  max-width: var(--texto-max);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h2);
+  letter-spacing: var(--letter-spacing-h2);
+  white-space: pre-line;
+}
+
+.apoio {
+  max-width: var(--texto-max);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lead);
+  line-height: var(--line-height-text);
+  white-space: pre-line;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.item {
+  min-width: 0;
+}
+
+.linha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: var(--ministerios-linha-altura);
+  padding: var(--space-16) var(--space-20);
+  border-radius: var(--ministerios-linha-raio);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+a.linha:hover {
+  background: var(--color-bg-page);
+}
+
+a.linha:focus-visible {
+  outline: var(--border-width) solid var(--color-focus-ring);
+  outline-offset: 0;
+  background: var(--color-bg-page);
+}
+
+.nome {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-ministerio);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h3);
+  letter-spacing: var(--letter-spacing-h2);
+  overflow-wrap: anywhere;
+}
+
+.publico {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-text);
+}
+
+/* tier: tablet — nome e público passam a dividir a mesma linha. */
+@media (min-width: 769px) {
+  .linha {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+  }
+
+  .publico {
+    text-align: right;
+  }
+}
+
+/* tier: desktop — a lista ocupa a coluna maior, como no Figma. */
+@media (min-width: 1024px) {
+  .caixa {
+    grid-template-columns: minmax(0, 0.77fr) minmax(0, 1fr);
+    gap: var(--space-coluna);
+  }
+}

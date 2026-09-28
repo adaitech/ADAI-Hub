@@ -103,6 +103,8 @@ Famílias: `--font-body` (Inter) e `--font-display` (Inter Tight) — ver `Stack
 | --- | --- | --- | --- | --- | --- | --- |
 | `--font-size-mega` | 432px | `clamp(96px, 30vw, 432px)` | 0.72 | `-0.07em` | ✅ desktop / 🟡 mínimo | "ADAI" gigante do footer (opacidade 18%) |
 | `--font-size-display` | 129,6px | `clamp(48px, 9vw, 129.6px)` | 0.88 | `-0.055em` | ✅ desktop / 🟡 mínimo | "Amar. Servir. Influenciar." |
+| `--font-size-chamada` | 77,8px | `clamp(40px, 5.4vw, 77.8px)` | 0.95 | `-0.045em` | ✅ Figma App 1:296 / 🟡 mínimo | "A igreja no seu bolso" |
+| `--font-size-chamada-apoio` | 20px | `1.25rem` | 1.5 | 0 | ✅ Figma App 1:296 | Apoio da chamada |
 | `--font-size-h2` | ~72px (linha de 74px) | `clamp(40px, 5vw, 72px)` | 1.03 | `-0.04em` | 🟡 inferido | Títulos de seção ("Neste domingo", "Primeira vez na ADAI?") |
 | `--font-size-h3` | ~28px (linha de 32px) | `1.75rem` | 1.15 | 0 | 🟡 inferido | Título de card (nome da unidade) |
 | `--font-size-destaque` | ~32px (3 linhas em 109px) | `2rem` | 1.1 | 0 | 🟡 inferido | Destaques do card (horários) |
@@ -192,6 +194,11 @@ Mapeamento de estilos:
 | `--serie-caixa-padding` | `clamp(24px, 5vw, 72px)` (padding e gap texto × thumbnail) | ✅ 1440 · 🟡 mobile |
 | `--serie-play` | `60px` (botão play branco sobre a thumbnail) | ✅ 1:149 |
 | `--serie-parte-min` | `180px` (altura mínima do card de parte) | ✅ 1:152 |
+| `--font-size-ministerio` | `clamp(1.75rem, 3vw, 2.625rem)` (42px no desktop) | ✅ Figma 1:230 |
+| `--ministerios-padding` | `clamp(24px, 5vw, 72px)` (padding da caixa cinza) | ✅ Figma 1:230 · 🟡 mobile |
+| `--ministerios-linha-altura` | `78px` | ✅ Figma 1:239 |
+| `--ministerios-linha-raio` | `14px` | ✅ Figma 1:239 |
+| `--faq-pergunta-altura` | `4.5rem` (72px) | ✅ Figma 31:167 |
 
 ## 7. Movimento (proposta)
 
@@ -207,4 +214,4 @@ Toda animação é desligada em `@media (prefers-reduced-motion: reduce)`.
 
 ## 8. Pendências de extração
 
-Seções do Figma ainda **não** inspecionadas para tokens (atualizar este arquivo ao extrair cada uma): Top bar, Neste domingo (Unidades), Primeira vez, Nossa Liderança, Mensagens, Próximos eventos, Encontre seu lugar (Ministérios), Contribua, App, Perguntas frequentes. O Figma **não tem versão mobile** — valores mínimos dos `clamp()` são propostas até existir referência.
+Seções do Figma ainda **não** inspecionadas para tokens (atualizar este arquivo ao extrair cada uma): Top bar, Neste domingo (Unidades), Primeira vez, Nossa Liderança, Mensagens e Próximos eventos. “Encontre seu lugar”, “Contribua”, “App” e “Perguntas frequentes” foram inspecionadas. O Figma **não tem versão mobile** — valores mínimos dos `clamp()` são propostas até existir referência.

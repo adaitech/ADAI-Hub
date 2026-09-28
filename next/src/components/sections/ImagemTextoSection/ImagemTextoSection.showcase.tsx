@@ -12,7 +12,7 @@ export const imagemTextoShowcase = defineShowcase<ImagemTextoData>({
   categoria: 'secao',
   cmsKey: 'sections.imagem-texto',
   descricao:
-    'Foto grande (P&B) de um lado e texto do outro: rótulo, título grande, parágrafos, lista de destaques, botão e link. A foto pode ficar à esquerda ou à direita.',
+    'Foto grande (P&B) de um lado e texto do outro: rótulo, título, parágrafos, lista de destaques e ações. Pode ter um botão principal e dois secundários, como em Contribua.',
   quandoUsar:
     'Apresentar um tema com imagem: Primeira vez na ADAI, liderança, ministério, projeto. Alterne o lado da foto em seções seguidas.',
   doc: 'docs/componentes/imagem-texto.md',
@@ -20,6 +20,7 @@ export const imagemTextoShowcase = defineShowcase<ImagemTextoData>({
   render: (data) => <ImagemTextoSection data={data} index={1} />,
   variantes: [
     { nome: 'completo', titulo: 'Primeira vez na ADAI (foto à esquerda, lista e botão)', descricao: 'Figma node 1:107.', data: mocks.completo as ImagemTextoData },
+    { nome: 'contribua', titulo: 'Contribua (três botões)', descricao: 'Figma node 1:279: ação principal larga e duas alternativas.', data: mocks.contribua as ImagemTextoData },
     { nome: 'direita', titulo: 'Pastores Líderes (foto à direita, rótulo e botão)', descricao: 'Figma node 6:4.', data: mocks.direita as ImagemTextoData },
     { nome: 'com_link', titulo: 'Botão + link', descricao: 'Ação principal e secundária lado a lado.', data: mocks.com_link as ImagemTextoData },
     { nome: 'minimo', titulo: 'Mínimo', descricao: 'Só foto e título.', data: mocks.minimo as ImagemTextoData },
@@ -49,6 +50,7 @@ export const imagemTextoShowcase = defineShowcase<ImagemTextoData>({
     alternarCampo<ImagemTextoData, 'rotulo'>('rotulo', 'Rótulo acima do título', 'Rótulo'),
     alternarCampo<ImagemTextoData, 'texto'>('texto', 'Texto', completo.texto ?? 'Texto de exemplo.'),
     alternarCampo<ImagemTextoData, 'lista'>('lista', 'Lista de destaques', completo.lista ?? null),
+    alternarCampo<ImagemTextoData, 'botoes_secundarios'>('botoes_secundarios', 'Botões secundários', (mocks.contribua as ImagemTextoData).botoes_secundarios ?? []),
     {
       id: 'acao',
       tipo: 'opcoes',

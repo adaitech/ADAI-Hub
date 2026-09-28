@@ -1,13 +1,13 @@
 # Imagem e texto — componente `sections.imagem-texto`
 
-> **Status:** `IMPLEMENTADO` · `PUBLICADO NO STRAPI` (dev local: Home e `/exemplos`, via seed v2) · validação humana pendente
-> **Figma:** [Primeira vez — node 1:107](https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-107) · [Nossa Liderança — node 6:4](https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=6-4)
+> **Status:** `IMPLEMENTADO` · `PUBLICADO NO STRAPI` (dev local: Home e `/exemplos`, seed atual v14) · validação humana pendente
+> **Figma:** [Primeira vez — node 1:107](https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-107) · [Nossa Liderança — node 6:4](https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=6-4) · [Contribua — node 1:279](https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-279)
 > **Vitrine:** `/componentes/imagem-texto`
 > **Guia do editor:** `strapi/src/editor-guide/sections.imagem-texto.json` + `items.destaque.json`
 
 ## 1. O que é
 
-Foto grande (preto e branco, 4:5) de um lado e texto do outro: rótulo, título grande, parágrafos, lista de destaques, botão e link. **Um único componente** atende "Primeira vez na ADAI?" (foto à esquerda + lista + botão) e "Pastores Líderes — Rodrigo & Tati Soeiro" (foto à direita + rótulo + botão).
+Foto grande (preto e branco, 4:5) de um lado e texto do outro: rótulo, título grande, parágrafos, lista de destaques, botão e link. **Um único componente** atende "Primeira vez na ADAI?" (foto à esquerda + lista + botão), "Pastores Líderes — Rodrigo & Tati Soeiro" (foto à direita + rótulo + botão) e "Contribua" (foto à esquerda + três botões).
 
 ## 2. Contrato no Strapi
 
@@ -22,6 +22,7 @@ sections.imagem-texto
 │   ├── titulo      Text (short) · obrigatório · máx. 30
 │   └── texto       Text (long) · máx. 160
 ├── botao           Component (shared.botao) · opcional
+├── botoes_secundarios[] Component repeatable (shared.botao) · máx. 2 · opcional
 └── link            Component (shared.link) · opcional
 ```
 
@@ -32,6 +33,7 @@ sections.imagem-texto
 | Primeira vez: foto à esquerda, lista de 3, botão | Home · vitrine `completo` |
 | Pastores Líderes: foto à direita, rótulo, texto, botão | Home · vitrine `direita` |
 | Botão + link | `/exemplos` · vitrine `com_link` |
+| Contribua: foto à esquerda, botão principal largo e dois botões menores | Home · vitrine `contribua` |
 | Mínimo (foto + título) | vitrine `minimo` |
 | Texto longo | vitrine `texto_longo` |
 
@@ -54,6 +56,8 @@ sections.imagem-texto
 | Desktop ≥1024 | ✅ Duas colunas iguais, 86px entre elas, texto centralizado na vertical; foto à esquerda ou direita |
 
 A ordem no HTML é sempre foto → texto (leitura e teclado previsíveis); a troca de lado no desktop é só visual (CSS grid).
+
+Em “Contribua”, `botoes_secundarios` cria uma segunda linha de ações e o botão principal ocupa toda a largura do grupo. O componente normaliza e limita a dois botões secundários. “Contribuir agora” e “Outras formas de contribuir” apontam por enquanto a `/contribua`, que pode retornar 404 até essa página ser criada; “Projeto Nossa Casa” aponta ao site público da ADAI.
 
 ## 6. Fotos e textos (conferidos no Figma pelo navegador em 2026-09-27)
 
