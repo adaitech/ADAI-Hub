@@ -5,8 +5,8 @@ Tema dividido em 4 entregas, cada uma com spec, plano e testes (método: [`Metod
 | # | Entrega | Situação |
 | --- | --- | --- |
 | 1 | **Atualizações urgentes de dependências** (Strapi, Next, sharp) | ✅ 2026-10-03 — esta página |
-| 2 | Cabeçalhos HTTP e CSP com nonce no site (HSTS, frame-ancestors, Referrer/Permissions-Policy, relatórios de violação) | ⏳ próxima |
-| 3 | Endurecimento do Strapi (chaves sem valor de reserva, CORS restrito, cabeçalhos, limite de login, permissões públicas) | ⏳ |
+| 2 | **Padrão de cabeçalhos HTTP, CSP com nonce e CORS** (site e Strapi) | ✅ 2026-10-03 — §7 |
+| 3 | Endurecimento do Strapi (chaves sem valor de reserva, limite de login, permissões públicas). *CORS restrito e cabeçalhos já entraram na entrega 2* | ⏳ |
 | 4 | Processo e código (comparação de segredo em tempo constante, `security.txt`, `yarn audit` no checklist de PR, regra de segurança nos MDs) | ⏳ |
 
 Spec e plano da entrega 1: `docs/superpowers/specs/2026-10-03-seguranca-1-atualizacoes-design.md` e `docs/superpowers/plans/2026-10-03-seguranca-1-atualizacoes.md`.
@@ -77,3 +77,38 @@ O teste `dependencias-seguras.test.ts` falha se alguém voltar o Strapi para ant
 
 - **Security Guidance** (plugin da Anthropic, ativo na conta): alerta padrões perigosos durante a edição, revisa o diff e os commits (injeção, XSS, SSRF, segredos no código e outras classes). **Alerta dele é achado de revisão**: corrigir ou registrar por que não se aplica, nunca ignorar em silêncio. Instalação: claude.ai → Plugins → "Security Guidance".
 - `yarn audit` nos dois apps e o teste de versões seguras (§4).
+
+## 7. Cabeçalhos, CSP e CORS (entrega 2 — 2026-10-03)
+
+Spec com cada decisão e o motivo: `docs/superpowers/specs/2026-10-03-seguranca-2-cabecalhos-csp-cors-design.md`. Fontes: [MDN — guias práticos](https://developer.mozilla.org/pt-BR/docs/Web/Security/Practical_implementation_guides), [#LocalizaLabs — Cabeçalhos de Segurança](https://medium.com/localizalabs/cabe%C3%A7alhos-de-seguran%C3%A7a-2d75407083f5) e o guia de CSP do Next 16.
+
+### 7.1 Onde mora
+
+| O quê | Arquivo |
+| --- | --- |
+| Política inteira do site (fonte única, testada) | `next/src/lib/seguranca/cabecalhos.ts` |
+| CSP com nonce por requisição + COOP | `next/src/proxy.ts` |
+| Cabeçalhos fixos (toda resposta) e padrão *Web API* em `/api/*` | `next/next.config.ts` → `headers()` |
+| Relatórios de violação (`[csp] violação` no log) | `next/src/app/api/csp-report/route.ts` |
+| CORS, X-Powered-By e Referrer do CMS | `strapi/config/middlewares.ts` |
+| Permissions-Policy do CMS | `strapi/src/middlewares/permissions-policy.ts` |
+| Trava contra regressão | `next/src/__tests__/caracteristicas/cabecalhos-seguranca.test.ts` |
+
+### 7.2 Padrão
+
+- **Site:** CSP estrita (`script-src 'nonce-…' 'strict-dynamic'`, sem `unsafe-inline` em script; `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'self'` + Strapi), HSTS (só em https), `nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` restritiva, `CORP: same-origin`, `COOP: same-origin`, `X-XSS-Protection: 0`, sem `X-Powered-By`, `X-Robots-Tag: noindex` fora da produção.
+- **CORS do site:** nenhuma resposta libera outra origem.
+- **CMS:** CORS só para `CORS_ORIGINS` (ou `CLIENT_URL`), sem credenciais, só leitura; sem `X-Powered-By`; mesma `Permissions-Policy`. Antes, o Strapi liberava **qualquer origem com credenciais**.
+
+### 7.3 Como mexer sem quebrar
+
+- **Nova origem externa** (script, imagem, iframe, API chamada pelo navegador): incluir na diretiva certa em `cabecalhos.ts` + teste. Script de terceiro entra pelo GTM (herda o nonce) ou com `nonce` do `x-nonce` (ver `GoogleTagManager.tsx`). Nunca `unsafe-inline` em script.
+- **Toda página é dinâmica** (o layout raiz chama `connection()`): exigência do nonce. Os dados seguem em cache (`fetch` com `revalidate`/tags).
+- **Ambiente novo:** `CSP_SOMENTE_RELATORIO=true` na primeira semana, acompanhar `[csp] violação` no log, depois remover.
+- **Tag Assistant do GTM:** abrir com `?gtm_debug=` na URL (o proxy afrouxa o COOP só nesse caso).
+
+### 7.4 Conferência (2026-10-03)
+
+`yarn quality` (713 testes) e `yarn build` verdes; `yarn smoke` 31/31. No navegador, em `next dev` e em `next start` (produção), **zero violação de CSP**: Home hidrata, aviso de cookies → GTM e GA4 (`g/collect`) carregam com o nonce herdado, player do YouTube toca, vitrine renderiza os iframes. Strapi: origem estranha não recebe `Access-Control-Allow-Origin`; o site recebe; painel abre.
+
+**Falta conferir (humano):** pré-visualização do rascunho dentro do painel do Strapi (exige login) e Lighthouse mobile ≥ 80 com a renderização dinâmica.

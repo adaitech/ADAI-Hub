@@ -19,7 +19,7 @@ import { auditarAcessibilidade, auditarTitulos } from '@/test-utils/auditoria';
 import { fixarRelogio, renderizarServidor } from '@/test-utils/servidor';
 import { criarStrapiFake } from '@/test-utils/strapi-fake';
 
-jest.mock('next/headers', () => ({ draftMode: jest.fn() }));
+jest.mock('next/headers', () => ({ draftMode: jest.fn(), headers: jest.fn(async () => new Headers({ 'x-nonce': 'nonce-de-teste' })) }));
 jest.mock('@/lib/youtube/serie-atual', () => ({ getSerieAtual: jest.fn(), getAoVivoAtual: jest.fn() }));
 jest.mock('@/lib/inchurch/eventos-cache', () => ({ getEventosInchurch: jest.fn() }));
 
