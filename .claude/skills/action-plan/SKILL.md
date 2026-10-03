@@ -5,6 +5,10 @@ description: Cria e executa planos de ação estruturados com os documentos PLAN
 
 # Plano de Ação
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver `.agents/rules/Testes.md` e o checklist `.agents/rules/Pull-Request.md` (antes de subir e antes de abrir o PR).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — `.agents/rules/Metodo-Superpowers.md`. Esta skill é um complemento do método, não um substituto. **Plano padrão = `writing-plans` do superpowers** (em `docs/superpowers/plans/`); use esta skill só quando o usuário pedir explicitamente este formato de plano de ação.
+
 Adaptada da skill `action-plan` do vitru-portal. Gera dois documentos com **timestamp** no nome (nunca sobrescrever planos existentes) e fecha com o **Definition of Done**.
 
 ## 1. Gerar timestamp
@@ -41,7 +45,7 @@ Usar o **mesmo** valor nos dois arquivos.
 - **Considerações de segurança**.
 - **Dependências** — justificar qualquer lib nova (`Stack-Fontes-e-Bibliotecas.md` §5).
 - **Próximos passos**.
-- **Plano de testes** — unitários (normalize, componentes), vitrine (variantes), manuais (teclado, mobile), Lighthouse (Performance/A11y/Best Practices/SEO).
+- **Plano de testes** (obrigatório — nenhum PR sem teste, `.agents/rules/Testes.md`) — funcionalidade (normalize, componentes, `lib/`), característica (o que as regras do projeto já pegam), integração (página/rota), smoke (`yarn smoke`), vitrine (variantes), manuais (teclado, mobile), Lighthouse (Performance/A11y/Best Practices/SEO).
 
 Apresentar o plano e **aguardar aprovação** antes de executar.
 
@@ -72,7 +76,7 @@ Apresentar o plano e **aguardar aprovação** antes de executar.
    - Sugerir ao humano: teclado, leitor de tela, Lighthouse, dispositivo real, página montada no Strapi.
 3. Documentar pendências.
 4. Atualizar docs do projeto.
-5. **Resumo para PR** (template do DoD §8).
+5. **Checklist de Pull Request** (`.agents/rules/Pull-Request.md`) e **resumo para PR** (template do DoD §8 / `.github/pull_request_template.md`).
 
 ## 6. Checklist de qualidade do plano (antes de apresentar)
 

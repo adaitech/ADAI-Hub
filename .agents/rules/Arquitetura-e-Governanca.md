@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Arquitetura e Governança Frontend — ADAI Hub
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 **Stack oficial:** Next.js 16 (App Router) + React 19 + TypeScript + CSS Modules + Strapi 5
 **Adaptado de:** Guia de Governança Frontend do vitru-portal (mesmos princípios, sem multi-marca e sem BFF).
 
@@ -114,11 +118,14 @@ next/
    │  ├─ (site)/                # grupo do site público
    │  │  ├─ layout.tsx          # skip link, aviso de rascunho, Header/Footer (global do Strapi), <main>
    │  │  ├─ page.tsx            # Home → page slug "home"
-   │  │  └─ [slug]/page.tsx     # páginas montadas no Strapi
+   │  │  ├─ [slug]/page.tsx     # páginas montadas no Strapi (slug inexistente → 404 com título próprio e noindex)
+   │  │  └─ not-found.tsx       # 404 dentro do layout do site (cabeçalho/rodapé; sem <main> próprio)
    │  ├─ componentes/           # vitrine (ver Vitrine-de-Componentes.md)
    │  ├─ api/
    │  │  ├─ preview/route.ts    # draft mode
    │  │  └─ revalidate/route.ts # webhook do Strapi
+   │  ├─ sitemap.ts             # /sitemap.xml (páginas publicadas no Strapi) — §9
+   │  ├─ robots.ts              # /robots.txt (só produção libera o Google) — §9
    │  ├─ not-found.tsx
    │  └─ error.tsx
    ├─ components/
@@ -133,11 +140,16 @@ next/
    │  ├─ inchurch/              # integração inChurch Public API (eventos) — fonte prioritária, ver §4.1
    │  ├─ analytics/             # DataLayer: catálogo de eventos, regras de clique, GTM, consentimento (docs/analytics)
    │  ├─ registry/              # sectionRegistry.ts
+   │  ├─ seo/                   # regras puras de robots.txt e sitemap (ambiente indexável, URLs) — §9
    │  └─ showcase/              # catálogo da vitrine
    ├─ hooks/                    # hooks reutilizáveis (client)
    ├─ types/                    # tipos globais (SectionProps etc.)
    ├─ utils/                    # funções puras
-   └─ styles/                   # tokens.css, globals.css
+   ├─ styles/                   # tokens.css, globals.css
+   ├─ __tests__/                # testes que cruzam camadas (ver Testes.md)
+   │  ├─ caracteristicas/       # 5 pilares, a11y/SEO, CSS, segurança, cache, testes obrigatórios
+   │  └─ integracao/            # página → Strapi → registry → seções; rotas da API; vitrine
+   └─ test-utils/               # renderizarServidor, strapi-fake, auditoria (só testes)
 ```
 
 ❌ É proibido criar:
@@ -208,7 +220,7 @@ Proibido: layout sem `<main>`, múltiplos `<main>`, navegação com `<div>` clic
 
 ### 7.6 Testes de a11y
 
-Lighthouse (a11y ≥ 95), axe (skill `playwright-mcp-a11y`), teste manual de teclado e smoke com leitor de tela (NVDA/VoiceOver).
+No `yarn test`: `src/__tests__/caracteristicas/acessibilidade-e-seo.test.tsx` audita **toda variante de todo componente** e as páginas montadas (alt, nome de link/botão, nova aba, ids, ARIA, um `h1`, hierarquia de títulos). No navegador: Lighthouse (a11y ≥ 95), axe (skill `playwright-mcp-a11y`), teste manual de teclado e smoke com leitor de tela (NVDA/VoiceOver). Detalhes: `Testes.md`.
 
 ---
 
@@ -216,7 +228,7 @@ Lighthouse (a11y ≥ 95), axe (skill `playwright-mcp-a11y`), teste manual de tec
 
 Obrigatório:
 
-- `next/image` para toda imagem (com `sizes` correto; hero com `priority`).
+- `next/image` para toda imagem (com `sizes` correto; hero com `loading="eager"` + `fetchPriority="high"`; `priority` está deprecado no Next 16).
 - `next/font` para fontes (ver `Stack-Fontes-e-Bibliotecas.md`).
 - Lazy loading consciente; nada de bibliotecas de efeito pesado.
 - Evitar hydration desnecessária (Client Components pequenos).
@@ -228,6 +240,9 @@ Obrigatório:
 
 - `generateMetadata` em toda rota, a partir do componente `seo` da página no Strapi (title, description, og image, canonical).
 - `NEXT_PUBLIC_SITE_URL` resolve URLs absolutas.
+- **`/robots.txt`** (`src/app/robots.ts` + `src/lib/seo/robots.ts`): só com `SITE_INDEXAVEL=true` **e** `NEXT_PUBLIC_SITE_URL` válida o site é liberado — bloqueando `/api/`, `/componentes` e `/exemplos` — e o sitemap é divulgado. Qualquer outro ambiente: `Disallow: /`. Na dúvida, fora do Google.
+- **`/sitemap.xml`** (`src/app/sitemap.ts` + `src/lib/seo/sitemap.ts` + `src/lib/strapi/queries/paginas.ts`): páginas **publicadas** no Strapi (Home = `/`, prioridade 1; demais `/<slug>`, 0,8; `lastModified` = atualização no Strapi). Ficam de fora `exemplos`, páginas com `noindex` no "Meta robots" e páginas com canonical para outra URL. Segue o cache do Strapi (60 s + webhook). Página nova publicada entra sozinha; rota nova que **não** vem do Strapi (ex.: futura página de evento) precisa ser somada em `app/sitemap.ts` com teste.
+- **"Meta robots"** do SEO da página no Strapi vira `<meta name="robots">` (o mesmo critério do sitemap). O SEO padrão do site (global) nunca aplica `noindex`.
 - Slugs vêm do Strapi; nunca hardcoded.
 - Dados estruturados (JSON-LD: `Church`, `Event`) gerados a partir do conteúdo do Strapi quando a página tiver esse conteúdo.
 

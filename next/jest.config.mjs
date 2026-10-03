@@ -44,7 +44,12 @@ const config = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
-  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/generated/**', '!src/app/**'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/generated/**', '!src/app/**', '!src/test-utils/**', '!src/**/types.ts'],
+  // Piso de cobertura (yarn test:ci / yarn quality): PR que baixa a cobertura abaixo disso falha.
+  // Em 2026-10-03: linhas 98,3% · branches 87,1% · funções 95,5%. Só subir; nunca baixar para passar.
+  coverageThreshold: {
+    global: { statements: 95, lines: 95, functions: 92, branches: 85 },
+  },
 };
 
 export default async function jestConfig() {

@@ -22,10 +22,12 @@ export default async function PreviewPage({ params, searchParams }: PreviewProps
   const dados = aplicarControles(entry, variante.data, lerValores(entry, query));
 
   return (
-    <main id="conteudo" style={{ background: entry.fundo === 'escuro' ? 'var(--color-bg-inverse)' : undefined }}>
-      <h1 className="visually-hidden">
-        Pré-visualização: {entry.nome} — {variante.titulo}
-      </h1>
+    // Rótulo no <main> em vez de um <h1> oculto: seções como Hero e Texto já trazem o próprio h1.
+    <main
+      id="conteudo"
+      aria-label={`Pré-visualização: ${entry.nome} — ${variante.titulo}`}
+      style={{ background: entry.fundo === 'escuro' ? 'var(--color-bg-inverse)' : undefined }}
+    >
       {entry.render(dados)}
       <PreviewHeight dados={dados} />
     </main>

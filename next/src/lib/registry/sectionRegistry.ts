@@ -40,7 +40,8 @@ export const sectionRegistry: Record<string, SectionRegistryEntry> = {
 };
 
 export function getSection(key: string): SectionRegistryEntry | null {
-  return sectionRegistry[key] ?? null;
+  // `hasOwn`: nomes como `constructor`/`__proto__` não podem cair no protótipo do objeto.
+  return Object.hasOwn(sectionRegistry, key) ? sectionRegistry[key] : null;
 }
 
 /** Fragmentos `on` do populate da dynamic zone, montados a partir do registry. */

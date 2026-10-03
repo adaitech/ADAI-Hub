@@ -7,6 +7,26 @@
 >
 > Visão completa: [`.agents/rules/Visao-do-Projeto.md`](.agents/rules/Visao-do-Projeto.md)
 
+## ⚠️ Método de trabalho: superpowers (sempre)
+
+Todo trabalho segue o modelo e o método do **[superpowers](https://github.com/obra/superpowers)** — agente com o plugin usa as skills; quem não tem (ou é dev) segue as mesmas etapas. Detalhes, instalação por ferramenta e onde as regras do ADAI prevalecem: [`.agents/rules/Metodo-Superpowers.md`](.agents/rules/Metodo-Superpowers.md).
+
+1. **Checar skills** antes de qualquer resposta e anunciar qual está usando (`using-superpowers`).
+2. **Desenhar antes de codar** (`brainstorming`): classificar em spike/bounded/architectural; bounded → desenho curto aprovado no chat; architectural → spec em `docs/superpowers/specs/` aprovada.
+3. **Planejar** (`writing-plans`) em `docs/superpowers/plans/` e **executar** (`subagent-driven-development` ou `executing-plans`).
+4. **TDD** (`test-driven-development`): teste falhando primeiro, depois o código. Bug → `systematic-debugging`.
+5. **Verificar com evidência** (`verification-before-completion`) → **revisar** (`requesting-code-review`) → **finalizar** (`finishing-a-development-branch`) seguindo `Pull-Request.md`.
+
+Commit, push e PR **só com pedido explícito**; merge nunca sem o usuário — mesmo que uma skill sugira.
+
+## ⚠️ Nenhum Pull Request sem teste (obrigatório)
+
+Todo código novo ou alterado — componente, função de `lib/`, rota, integração, correção de bug — chega ao PR com **teste unitário escrito e passando**. Vale para dev e para agente de IA, sem exceção:
+
+1. **Escrever o teste** junto com o código (o que cada mudança exige: [`.agents/rules/Testes.md`](.agents/rules/Testes.md) §2). Bug corrigido → primeiro o teste que reproduz o bug.
+2. **Antes de cada `git push` e antes de abrir o PR**, rodar o checklist [`.agents/rules/Pull-Request.md`](.agents/rules/Pull-Request.md): `yarn quality` → `yarn build` (+ Strapi) → `yarn smoke` com os servidores rodando → navegador em 375/768/1440 → 5 pilares → sem segredo → docs.
+3. O `yarn test` **falha sozinho** se um componente, módulo de `lib/` ou rota não tiver teste, se a cobertura cair abaixo do piso, ou se uma regra do projeto for quebrada (testes de característica em `next/src/__tests__/caracteristicas/`). Corrigir o código — nunca o teste para "passar".
+
 ## ⚠️ Regra dos 5 pilares — todo componente (obrigatório)
 
 Nenhum componente está pronto enquanto os **cinco pilares** não estiverem verificados, com o Strapi e o Next rodando. Os três primeiros são o antigo "tripé"; SEO e Medição valem para **toda** criação ou alteração:
@@ -48,6 +68,7 @@ Antes de alterar código, ler as referências materiais para a tarefa:
 
 | Contexto | Referência |
 | --- | --- |
+| **Método de trabalho (sempre): superpowers** — etapas, instalação, precedência das regras do ADAI | `.agents/rules/Metodo-Superpowers.md` |
 | Propósito, visão e filtro de decisões | `.agents/rules/Visao-do-Projeto.md` |
 | Dados da igreja (eventos, células, grupos, doações, pessoas) — **inChurch Public API é a fonte prioritária** | `.agents/rules/Stack-Fontes-e-Bibliotecas.md` §3.6 · contexto para IA: `https://docs.inchurch.com.br/llms.txt` e `https://docs.inchurch.com.br/openapi.json` |
 | Camadas (Strapi/Next/React), SSR, a11y, pastas | `.agents/rules/Arquitetura-e-Governanca.md` |
@@ -59,6 +80,8 @@ Antes de alterar código, ler as referências materiais para a tarefa:
 | CSS, layout e responsividade | `.agents/rules/CSS-Mobile-First.md` |
 | Alterar código compartilhado | `.agents/rules/Extensao-Sem-Sobreposicao.md` |
 | Critérios para considerar trabalho concluído | `.agents/rules/Definition-of-Done.md` |
+| **Testes** — tipos (funcionalidade, característica, integração, smoke), onde ficam, o que cada mudança exige | `.agents/rules/Testes.md` |
+| **Antes de subir e antes de abrir um Pull Request** (checklist) | `.agents/rules/Pull-Request.md` · modelo `.github/pull_request_template.md` |
 | Documentação de um componente específico | `docs/componentes/<nome>.md` |
 
 Os documentos em `.agents/rules` são referências condicionais: não presumir que foram carregados. Ler integralmente as regras curtas que governam o escopo atual.
@@ -84,13 +107,16 @@ Padrão obrigatório para qualquer nova integração: `Arquitetura-e-Governanca.
 7. **Acessibilidade WCAG 2.2 AA** desde o primeiro componente.
 8. **Antes de criar** componente, hook ou token, procurar equivalente existente.
 9. **Não afirmar** que testes, build, Lighthouse, axe ou validação humana passaram sem execução ou evidência explícita.
+10. **Método superpowers sempre** (`Metodo-Superpowers.md`): desenho antes de código, TDD, verificação com evidência.
+11. **Teste junto com o código.** Nada vai para PR sem teste unitário do que mudou (`Testes.md`); antes de push/PR, checklist `Pull-Request.md`.
 
 ## Validação (proporcional ao diff)
 
 Na pasta `next/`:
 
-- Gate estático: `yarn quality` (lint + typecheck + testes).
+- Gate estático: `yarn quality` (lint + typecheck + testes de funcionalidade, característica e integração + piso de cobertura).
 - Build: `yarn build`.
+- Site no ar (Strapi + Next rodando): `yarn smoke`.
 - Performance mobile, quando tocar página/LCP: skill `lighthouse-performance-mcp`.
 - A11y no browser, quando tocar UI interativa: skill `playwright-mcp-a11y`.
 
@@ -101,6 +127,7 @@ Se um gate não puder ser executado, registrar o motivo e o que permanece penden
 ## Git e ações externas
 
 - Não executar commit, push, merge, criação de PR ou outra ação remota sem pedido explícito.
+- Antes de **qualquer** push ou PR: checklist [`.agents/rules/Pull-Request.md`](.agents/rules/Pull-Request.md) (Parte A antes de subir, Parte B antes de abrir o PR).
 - Ao adicionar arquivos, usar caminhos explícitos ou `git add -p`; nunca `git add .` ou `git add --all`.
 - Não descartar, sobrescrever ou incluir alterações do usuário fora do escopo.
 - `documents/` guarda artefatos locais (PR.md, relatórios) e está no `.gitignore`; não forçar sua inclusão.
@@ -123,6 +150,8 @@ Ficam em `.agents/skills/` e são espelhadas em `.claude/skills/` (carregadas au
 
 Ler o `SKILL.md` integralmente quando uma skill for selecionada.
 
+Além delas, **sempre** as skills do **superpowers** (plugin, não ficam no repositório): `brainstorming`, `writing-plans`, `executing-plans` / `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `requesting-code-review` / `receiving-code-review`, `finishing-a-development-branch`, `using-git-worktrees`. As skills do projeto complementam o método (ex.: `pre-merge` e `push-changes` na finalização). Ver `.agents/rules/Metodo-Superpowers.md`.
+
 ## MCPs sob demanda
 
 - **Figma:** usar só com pedido de design, link do Figma ou sincronização design↔código. O arquivo de referência é `adai.com.br` (fileKey `cN5RwPRMA6zw5oLoeXidk7`). Há **limite de chamadas** por seat: extrair uma seção por vez e reaproveitar o resultado (não repetir chamadas).
@@ -134,7 +163,9 @@ Ler o `SKILL.md` integralmente quando uma skill for selecionada.
 
 **Pronto e verificado localmente** (Strapi + página + vitrine; quality e builds executados): Header, Hero, Carrossel de cards ("Neste domingo"; cores por card; foto acima/abaixo; foto P&B ou arte 16:9), Imagem e texto (Primeira vez, Pastores Líderes e Contribua), Série atual (YouTube), Próximos eventos (inChurch), Lista de ministérios (Encontre seu lugar), Texto e botões (app), Perguntas frequentes, Footer e favicon. Vitrine com abas e controles. A exibição do Header durante uma live foi coberta por teste automatizado; uma transmissão real ainda precisa ser observada para validação ponta a ponta.
 
-**Medição (2026-10-02):** DataLayer com 13 eventos, GTM por ambiente (homologação `GTM-5945V9DQ`, produção `GTM-5MGM7CK2`), GA4 `G-SCG09PWV8B` configurado no GTM, Consent Mode v2 e aviso de cookies próprio. Container de **homologação publicado** e verificado (GA4 recebendo); **produção importado e não publicado** de propósito — ver `README.md` → "Antes de subir para produção". Faltam as dimensões personalizadas no GA4 e a página de Política de Privacidade (`docs/analytics/README.md`).
+**Testes (2026-10-03):** quatro tipos — funcionalidade (ao lado do código), característica (`next/src/__tests__/caracteristicas/`: 5 pilares, a11y/SEO de toda variante, CSS, segurança, cache versionado, testes obrigatórios), integração (`next/src/__tests__/integracao/`: página → Strapi → seções, rotas da API, vitrine) e smoke (`yarn smoke`). Cobertura com piso no `jest.config.mjs`. A revisão do site que originou esses testes corrigiu: scroll lateral no celular (carrossel), cache do YouTube sem versão (player fora do youtube-nocookie), `priority` deprecado no Next 16 e `getSection('constructor')`; a 404 passou a aparecer dentro do site (cabeçalho e rodapé). Pendente: o conteúdo da 404 vem do RSC e só aparece com JavaScript (status 404 correto; comportamento de streaming do Next 16) — avaliar checar o slug no `proxy` se for preciso HTML sem JS.
+
+**Medição (2026-10-02):** DataLayer com 13 eventos, GTM por ambiente (homologação `GTM-5945V9DQ`, produção `GTM-5MGM7CK2`), GA4 `G-SCG09PWV8B` configurado no GTM, Consent Mode v2 e aviso de cookies próprio. Container de **homologação publicado** e verificado (GA4 recebendo); **produção importado e não publicado** de propósito — ver `README.md` → "Antes de subir para produção". Dimensões personalizadas criadas no GA4 e Política de Privacidade publicada em `/politica-de-privacidade`; falta marcar `planejar_visita` e `contribuir` como eventos-chave e a revisão jurídica da política (`docs/analytics/README.md` §7).
 
 **Próximos passos sugeridos**, na ordem do Figma (`Home / Desktop`, node 1:3):
 

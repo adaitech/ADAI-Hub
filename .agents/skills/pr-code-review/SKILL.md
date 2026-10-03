@@ -5,6 +5,10 @@ description: Revisa uma Pull Request ou branch contra a base, cruza descrição,
 
 # Code review de Pull Request
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver `.agents/rules/Testes.md` e o checklist `.agents/rules/Pull-Request.md` (antes de subir e antes de abrir o PR).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — `.agents/rules/Metodo-Superpowers.md`. Esta skill é um complemento do método, não um substituto.
+
 Adaptada (versão condensada) da skill `pr-code-review` do vitru-portal.
 
 ## Papel
@@ -47,7 +51,8 @@ Diff vazio → confirmar branch/base antes de escrever.
 | **Performance** | `next/image` com `sizes`/`priority`; `next/font`; JS no cliente mínimo | `Arquitetura-e-Governanca.md` §8 |
 | **Dependências** | Lib nova justificada e documentada | `Stack-Fontes-e-Bibliotecas.md` §5 |
 | **Visão** | A mudança serve a Amar/Servir/Influenciar, ou é efeito sem propósito? | `Visao-do-Projeto.md` |
-| **Gates** | `yarn quality`, `yarn build` (next), `yarn build` (strapi se tocado) | `Definition-of-Done.md` |
+| **Testes** | Todo código novo/alterado tem teste no diff; bug corrigido tem teste que o reproduz; nada de `it.skip`/`it.only`; piso de cobertura não baixou; teste não foi "ajustado para passar" | `Testes.md` |
+| **Gates** | `yarn quality`, `yarn build` (next), `yarn build` (strapi se tocado), `yarn smoke` | `Definition-of-Done.md`, `Pull-Request.md` |
 
 ## 3. Proporcionalidade
 

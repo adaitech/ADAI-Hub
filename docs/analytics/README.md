@@ -1,5 +1,9 @@
 # Medição (DataLayer, GTM e GA4)
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver [`Testes.md`](../../.agents/rules/Testes.md) e o checklist [`Pull-Request.md`](../../.agents/rules/Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** — [`Metodo-Superpowers.md`](../../.agents/rules/Metodo-Superpowers.md).
+
 > **Dono do código:** dev/IA. **Não vem do Strapi**: o time de conteúdo não cria nem altera eventos (decisão de 2026-10-02).
 > **Código:** `next/src/lib/analytics/` · `next/src/components/analytics/` · aviso de cookies em `next/src/components/layout/BannerCookies/`
 > **Importação do GTM:** [`gtm-container-adai.json`](gtm-container-adai.json)

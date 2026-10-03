@@ -19,3 +19,17 @@ No desktop, o título usa a tipografia da chamada no Figma (77,8px em 1440px), t
 ## Medição (DataLayer)
 
 Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `baixar_app` (`loja` = app_store ou google_play); `clique_cta`; `ver_secao`.
+
+## Testes
+
+Na pasta `next/` (`yarn test` ou `yarn test <caminho>`):
+
+- `next/src/components/sections/TextoBotoesSection/TextoBotoesSection.test.tsx`
+
+Também cobrem este componente, sem precisar editar nada:
+
+- `src/lib/showcase/catalog.test.tsx` — todas as variantes e controles da vitrine renderizam; guia do editor × mock.
+- `src/__tests__/caracteristicas/` — 5 pilares (Strapi ↔ registry ↔ vitrine ↔ doc), acessibilidade/SEO de cada variante, CSS, segurança.
+- `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
+
+**Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).

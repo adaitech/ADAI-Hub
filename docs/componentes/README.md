@@ -1,5 +1,9 @@
 # Componentes — contratos Strapi ↔ front
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver [`Testes.md`](../../.agents/rules/Testes.md) e o checklist [`Pull-Request.md`](../../.agents/rules/Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** — [`Metodo-Superpowers.md`](../../.agents/rules/Metodo-Superpowers.md).
+
 Um documento por componente alimentado pelo Strapi, gerado com a skill `create-strapi-doc` (template em `.agents/skills/create-strapi-doc/assets/strapi-doc-template.md`).
 
 Cada componente tem três artefatos coerentes entre si:

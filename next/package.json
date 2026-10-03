@@ -16,7 +16,8 @@
     "test": "jest",
     "pretest:ci": "yarn sync:editor-guide",
     "test:ci": "jest --ci --coverage",
-    "quality": "yarn lint && yarn typecheck && yarn test:ci"
+    "quality": "yarn lint && yarn typecheck && yarn test:ci",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@strapi/blocks-react-renderer": "^1.0.2",

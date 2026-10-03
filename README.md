@@ -28,6 +28,7 @@ Depois do `yarn setup`, preencha os `.env` (nunca commitar; os `.env.example` t�
 | `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_IMAGE_ALLOW_LOCAL_IP` | `next/.env` | URLs e imagens locais |
 | `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_HANDLE` | `next/.env` (só servidor) | Série atual (YouTube Data API v3) |
 | `INCHURCH_API_BASE_PUBLIC`, `INCHURCH_API_KEY`, `INCHURCH_API_SECRET` | `next/.env` (só servidor) | Próximos eventos (inChurch Public API) |
+| `SITE_INDEXAVEL` | `next/.env` | `true` **só em produção** (lido no build): libera o Google no `robots.txt` e gera o `sitemap.xml`. Ausente = tudo bloqueado (homologação/dev). Ver `.agents/rules/Arquitetura-e-Governanca.md` §9 |
 | `NEXT_PUBLIC_GTM_ID` | `next/.env` (público) | Google Tag Manager: `GTM-5945V9DQ` em dev/homologação, `GTM-5MGM7CK2` só em produção. Vazio = sem tags. Ver `docs/analytics/README.md` |
 
 Peça os valores reais ao responsável do projeto (cofre da equipe). Sem as chaves do YouTube/inChurch o site funciona, só sem as seções Série atual e Próximos eventos.
@@ -57,12 +58,22 @@ O estado atual da Home inclui “Encontre seu lugar”, “Contribua”, “A ig
 | http://localhost:3000/componentes | **Vitrine de componentes**: variações em 375/768/1440 px e o guia de como preencher cada componente no Strapi (só em dev/homologação) |
 | http://localhost:1337/admin | Painel do Strapi |
 
-## Qualidade
+## Qualidade, testes e Pull Request
+
+**Nenhum Pull Request sem teste:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando.
 
 ```bash
-yarn quality   # em next/: lint + typecheck + testes (inclui a checagem da vitrine e do guia do editor)
+yarn quality   # em next/: lint + typecheck + testes (funcionalidade, característica, integração) + piso de cobertura
 yarn build     # build do Strapi e do Next
+yarn smoke     # em next/, com Strapi e Next rodando: confere o site no ar (páginas, SEO, imagens, APIs)
 ```
+
+| Documento | Para quê |
+| --- | --- |
+| [`.agents/rules/Metodo-Superpowers.md`](.agents/rules/Metodo-Superpowers.md) | **Método de trabalho (sempre):** superpowers — desenho antes de código, plano, TDD, verificação com evidência, revisão e finalização |
+| [`.agents/rules/Testes.md`](.agents/rules/Testes.md) | Tipos de teste (funcionalidade, característica, integração, smoke), onde ficam e o que cada mudança exige |
+| [`.agents/rules/Pull-Request.md`](.agents/rules/Pull-Request.md) | **Checklist antes de subir (`git push`) e antes de abrir o PR** — vale para dev e agente de IA |
+| [`.github/pull_request_template.md`](.github/pull_request_template.md) | Corpo do PR que o GitHub preenche |
 
 ## Antes de subir para produção
 
@@ -72,7 +83,7 @@ Checklist do que **muda** entre homologação e produção (detalhes de mediçã
 | --- | --- | --- | --- |
 | 1 | Container do GTM | `next/.env` do servidor de produção | `NEXT_PUBLIC_GTM_ID=GTM-5MGM7CK2` (homologação usa `GTM-5945V9DQ`). É `NEXT_PUBLIC_`: vale no **build** — rebuildar depois de trocar |
 | 2 | Publicar o container de produção | tagmanager.google.com → ADAI Produção → **Enviar** → versão "Eventos ADAI v1" → **Publicar** | As tags já estão importadas no espaço de trabalho (24 alterações), só falta publicar |
-| 3 | URL do site | `next/.env` | `NEXT_PUBLIC_SITE_URL=https://<domínio de produção>` (canonical e Open Graph) |
+| 3 | URL do site e Google | `next/.env` | `NEXT_PUBLIC_SITE_URL=https://<domínio de produção>` (canonical, Open Graph, sitemap) **e** `SITE_INDEXAVEL=true`, antes do build. Depois: `yarn smoke https://<domínio>` deve mostrar "robots.txt de produção" e o sitemap com URLs 200; enviar `https://<domínio>/sitemap.xml` no Google Search Console |
 | 4 | Strapi | `next/.env` | `NEXT_PUBLIC_STRAPI_URL` do Strapi de produção; `STRAPI_API_TOKEN` (somente leitura); `NEXT_IMAGE_ALLOW_LOCAL_IP` **removido** |
 | 5 | Segredos | `next/.env` e `strapi/.env` | `PREVIEW_SECRET` e `REVALIDATE_SECRET` novos (não reaproveitar os de dev); webhook do Strapi apontando para `https://<domínio>/api/revalidate` |
 | 6 | Integrações | `next/.env` | `YOUTUBE_*` e `INCHURCH_*` do cofre (chave do YouTube restrita à YouTube Data API v3; cliente inChurch só leitura) |

@@ -5,6 +5,12 @@ alwaysApply: true
 
 # Design Tokens — ADAI Hub
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
+> Verificado no `yarn test` (`src/__tests__/caracteristicas/css.test.ts`): nenhuma cor (hex/rgb/hsl) fora de `tokens.css` e todo `var(--token)` usado existe.
+
 **Arquivo de código:** `next/src/styles/tokens.css` (importado uma vez em `src/styles/globals.css`).
 **Origem:** Figma `adai.com.br` (fileKey `cN5RwPRMA6zw5oLoeXidk7`), frame `Home / Desktop` (1440px). O arquivo **não tem variáveis/tokens no Figma**; os valores abaixo foram extraídos dos layers.
 

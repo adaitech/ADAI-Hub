@@ -58,6 +58,9 @@
 }
 
 .trilha {
+  /* Contêiner de scroll posicionado: prende elementos absolutos (ex.: `.visually-hidden` de
+     "abre em nova aba") que, sem isso, escapam do recorte e alargam a página no celular. */
+  position: relative;
   grid-area: trilha;
   display: grid;
   grid-auto-flow: column;

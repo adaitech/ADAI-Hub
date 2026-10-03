@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getEditorGuide } from '@/lib/editor-guide';
@@ -13,6 +14,13 @@ interface PageProps {
 
 export function generateStaticParams() {
   return showcaseCatalog.map((entry) => ({ slug: entry.slug }));
+}
+
+/** Título próprio por componente (aba do navegador e histórico), sempre fora do Google. */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const entry = getShowcase(slug);
+  return { title: entry ? `${entry.nome} · Vitrine de componentes` : 'Vitrine de componentes · ADAI Hub' };
 }
 
 export default async function ComponentePage({ params }: PageProps) {

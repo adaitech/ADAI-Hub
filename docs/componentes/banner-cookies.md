@@ -45,3 +45,23 @@ Fundo `--color-bg-inverse`, texto branco, raio `--radius-lg`, botões pílula (`
 - Página de **Política de Privacidade** e link no aviso.
 - Revisão do texto pelo jurídico/liderança.
 - Aprovação visual do design.
+
+## Medição (DataLayer)
+
+Evento próprio `consentimento_cookies` com `escolha: 'aceito' | 'recusado'`, disparado pelo `BannerCookies` ao aceitar ou recusar (no aviso ou ao rever em "Preferências de cookies"). Só chega ao GA4 depois do aceite. Plano: `docs/analytics/README.md`.
+
+## Testes
+
+Na pasta `next/` (`yarn test` ou `yarn test <caminho>`):
+
+- `next/src/components/layout/BannerCookies/BannerCookies.test.tsx`
+- `next/src/lib/analytics/consentimento.test.ts`
+- `next/src/lib/analytics/gtm.test.ts`
+
+Também cobrem este componente, sem precisar editar nada:
+
+- `src/lib/showcase/catalog.test.tsx` — todas as variantes e controles da vitrine renderizam; guia do editor × mock.
+- `src/__tests__/caracteristicas/` — 5 pilares (Strapi ↔ registry ↔ vitrine ↔ doc), acessibilidade/SEO de cada variante, CSS, segurança.
+- `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
+
+**Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).

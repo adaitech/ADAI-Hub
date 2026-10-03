@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Componentes alimentados pelo CMS (Strapi → JSON → React)
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 ## Por que este padrão existe
 
 A visão do projeto exige que ministérios e o time Criativo **criem páginas, campanhas e espaços de ministério sem depender de dev**, e que a identidade da ADAI se mantenha **mesmo com muita gente publicando**.
@@ -180,7 +184,8 @@ export function HeroSection({ data, index }: SectionProps<HeroData>) {
           alt={view.imagem.alt}
           fill
           sizes="100vw"
-          priority={index === 0}
+          loading={index === 0 ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 ? 'high' : undefined}
           className={styles.imagem}
         />
       )}
@@ -195,7 +200,7 @@ export function HeroSection({ data, index }: SectionProps<HeroData>) {
 
 Regras do componente:
 
-- Recebe **somente** `SectionProps<TData>` = `{ data: TData; index: number }`. `index` serve para `priority` de imagem nos primeiros blocos.
+- Recebe **somente** `SectionProps<TData>` = `{ data: TData; index: number }`. `index` serve para `loading="eager"` + `fetchPriority="high"` da imagem no primeiro bloco (LCP).
 - Raiz é `<section>` com `aria-labelledby` apontando para o título e `data-section="<nome>"` (âncora estável para testes/QA).
 - Só **uma** `<h1>` por página: somente a seção de abertura (`index === 0`) usa `h1`; as demais usam `h2`.
 - Nada de `any`, nada de fetch, nada de valor visual solto (usar tokens).
@@ -307,7 +312,7 @@ Não basta o teste passar: **abrir e conferir**. Se algum pilar não puder ser e
 5. **Código:** `types.ts` → `normalize.ts` (+ `normalize.test.ts`) → componente + CSS → `populate.ts` → `index.ts`.
 6. **Registry:** adicionar a linha no `sectionRegistry`.
 7. **Vitrine:** criar `<Nome>Section.showcase.ts` e registrar no catálogo (ver `Vitrine-de-Componentes.md`).
-8. **Testes:** render das variantes + normalize com casos de borda.
+8. **Testes (obrigatórios antes do PR):** render das variantes + normalize com casos de borda. Os testes de característica (5 pilares, a11y/SEO, CSS) já incluem o componente novo pelo catálogo da vitrine — se falharem, corrigir o componente/doc. Ver `Testes.md` §2.
 9. **Medição:** decidir se precisa de evento novo de `data_layer` (`docs/analytics/README.md` §5) e registrar no doc.
 10. **Validar:** `yarn quality`, conferir em `/componentes/<slug>` nos três tamanhos (375/768/1440) e numa página real montada no Strapi.
 11. **DoD:** `Definition-of-Done.md`.

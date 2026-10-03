@@ -12,7 +12,8 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const [page, global] = await Promise.all([getPageBySlug(slug), getGlobal()]);
-  return buildMetadata(page?.seo, global?.seo, `/${slug}`);
+  if (!page) return { title: 'Página não encontrada | ADAI', robots: { index: false } };
+  return buildMetadata(page.seo, global?.seo, `/${slug}`);
 }
 
 /** Qualquer página montada no Strapi (ex.: /kids). */

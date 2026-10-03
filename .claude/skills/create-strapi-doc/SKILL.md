@@ -5,6 +5,10 @@ description: Cria ou revisa o contrato de um componente no Strapi (schema, campo
 
 # Criar documentação de componente no Strapi
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver `.agents/rules/Testes.md` e o checklist `.agents/rules/Pull-Request.md` (antes de subir e antes de abrir o PR).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — `.agents/rules/Metodo-Superpowers.md`. Esta skill é um complemento do método, não um substituto.
+
 Produzir um contrato que uma pessoa consiga executar no Strapi **sem deduzir** nomes técnicos, ordem, validações ou textos de ajuda — e que o editor final (ministérios, time Criativo) entenda **sem saber programar**.
 
 Adaptada da skill `create-contentstack-doc` do vitru-portal.
@@ -160,13 +164,14 @@ O doc só vale quando o componente existe e foi **verificado com Strapi e Next r
 2. **Página:** a seção aparece numa página real vinda do Strapi (Home ou `/exemplos`).
 3. **Vitrine:** `/componentes/<slug>` com as variações em abas, os `controles` de cada opção do Strapi e o guia do editor.
 4. **SEO:** `h1` único/hierarquia de títulos, `alt`, texto de link descritivo, conteúdo no HTML do servidor.
-5. **Medição:** o doc tem uma linha **"Medição"** dizendo se o componente usa evento existente (`clique_cta`, `ver_secao`…) ou se foi criado evento novo de `data_layer` (`docs/analytics/README.md` §5). Eventos não ficam no Strapi.
+5. **Medição:** o doc tem a seção **`## Medição (DataLayer)`** (linha **"Medição"**) dizendo se o componente usa evento existente (`clique_cta`, `ver_secao`…) ou se foi criado evento novo de `data_layer` (`docs/analytics/README.md` §5). Eventos não ficam no Strapi.
+6. **Testes:** o doc tem a seção **`## Testes`** listando os arquivos de teste do componente (verificado por `cinco-pilares.test.ts`); nenhum PR sem eles (`.agents/rules/Testes.md`).
 
 ## 8. Validar e entregar
 
 ```bash
 git diff --check
-cd next && yarn test   # inclui a checagem do guia do editor na vitrine, quando o código existir
+cd next && yarn quality   # inclui guia do editor × schema, 5 pilares, a11y/SEO e testes obrigatórios
 ```
 
 Informar ao usuário: caminhos criados, contrato e campos cobertos, divergências/decisões pendentes, validações realmente executadas e que nada foi commitado.

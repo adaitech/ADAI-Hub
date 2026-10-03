@@ -33,6 +33,7 @@
 }
 
 .moldura {
+  position: relative;
   overflow-x: auto;
   padding: var(--space-16);
   border-radius: var(--radius-lg);
@@ -80,6 +81,7 @@
 }
 
 .tabelaWrapper {
+  position: relative;
   overflow-x: auto;
 }
 
@@ -135,6 +137,7 @@
 }
 
 .listaAbas {
+  position: relative;
   display: flex;
   gap: var(--space-8);
   overflow-x: auto;
@@ -325,6 +328,7 @@
 }
 
 .json pre {
+  position: relative;
   max-height: 24rem;
   overflow: auto;
   margin-top: var(--space-8);

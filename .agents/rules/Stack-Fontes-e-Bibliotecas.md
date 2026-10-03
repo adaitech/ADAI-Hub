@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Stack, Fontes e Bibliotecas — ADAI Hub
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 Formato de cada item: **Qual** → **Como** → **Por quê**. Se algo não está aqui, **não use sem aprovação** (ver §5).
 
 ---
@@ -96,6 +100,7 @@ export const interTight = Inter_Tight({
 | `typescript` | `yarn typecheck` (`tsc --noEmit`) | Pega contrato quebrado entre CMS e UI |
 | `eslint` 9 + `eslint-config-next` | `yarn lint` (flat config) | Regras do Next/React/a11y |
 | `jest` + `@testing-library/react` + `@testing-library/jest-dom` + `jest-environment-jsdom` | `yarn test` / `yarn test:ci`; config `jest.config.mjs` com `next/jest` (SWC, mocks de CSS Modules e `next/font`) | Mesmo stack do vitru-portal (skills reaproveitadas) |
+| Utilitários próprios de teste (sem lib nova) | `src/test-utils/`: `renderizarServidor` (Server Components `async` via `react-dom/static`), `strapi-fake`, `auditoria`; `scripts/smoke.mjs` (`yarn smoke`, `fetch` nativo do Node) | Testar página inteira, a11y estrutural e o site no ar sem adicionar dependência — ver `Testes.md` |
 | `@playwright/test` + `@axe-core/playwright` | Quando os E2E forem criados (hoje a11y é validada pela skill `playwright-mcp-a11y`) | Validação real no browser |
 | `lighthouse` | via `npx` na skill `lighthouse-performance-mcp` (não instalado) | Performance mobile |
 
