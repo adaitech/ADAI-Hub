@@ -42,6 +42,8 @@ Se o agente não tiver o plugin: ler este arquivo e seguir as etapas da §3 manu
 
 Etapas que podem ser puladas: só as que o próprio superpowers dispensa para o caminho escolhido (ex.: *bounded* não tem spec nem plano escrito). **TDD (5) e verificação (7) nunca são puladas.**
 
+**Segurança no método:** o plugin **Security Guidance** (Anthropic) fica ativo junto do superpowers: alerta durante a edição, revisa o diff ao fim de cada resposta e os commits. Alerta é achado de revisão da etapa 8 — corrigir ou registrar por que não se aplica, nunca ignorar em silêncio. Instalação: claude.ai → Plugins → "Security Guidance". Ver `docs/seguranca/README.md`.
+
 Outras skills úteis: `dispatching-parallel-agents` (tarefas independentes em paralelo), `writing-skills` (criar skill nova para o projeto — salvar em `.agents/skills/` **e** `.claude/skills/`), `diagnosing-superpowers` (quando o método se comportou mal numa sessão).
 
 ## 4. Onde as regras do ADAI Hub prevalecem

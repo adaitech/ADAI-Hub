@@ -24,6 +24,8 @@ Formato de cada item: **Qual** → **Como** → **Por quê**. Se algo não está
 | **TypeScript** | 5.x | `strict: true` | Contrato entre Strapi (JSON) e componentes |
 | **Strapi** | 5.x | `strapi/` | CMS: autonomia para ministérios e Criativo |
 
+> **Versões mínimas seguras** (2026-10-03): Next **16.3.8**, Strapi **5.56.0** (piso 5.37.0), `@strapi/plugin-seo` **2.0.9 fixo**, `sharp` **0.35.4** — travadas por `next/src/__tests__/caracteristicas/dependencias-seguras.test.ts`; `resolutions` do Strapi e riscos aceitos em `docs/seguranca/README.md`.
+
 > **Next 16 tem mudanças incompatíveis com versões anteriores** (APIs assíncronas como `params`, `cookies()`, `draftMode()`; convenções de cache). Antes de escrever código de rota/cache, consultar a documentação da versão instalada em `next/node_modules/next/dist/docs/` — não confiar em exemplos do Next 13/14.
 
 ---
@@ -90,7 +92,7 @@ export const interTight = Inter_Tight({
 | `next`, `react`, `react-dom` | — | Base |
 | `qs` | Só em `src/lib/strapi/` para montar `filters`/`populate` | Formato de query exigido pela API REST do Strapi |
 | `clsx` | Compor classes de CSS Modules condicionais | Pequena, legível; evita concatenação manual |
-| `sharp` | Dependência de produção | Otimização de imagens do `next/image` em produção |
+| `sharp` | Dependência de produção (`^0.35.4`; mínimo seguro testado em `dependencias-seguras.test.ts`) | Otimização de imagens do `next/image` em produção |
 | `react-markdown` + `remark-gfm` | Só em `TextoRicoSection` (`sections.texto-rico`), no servidor, com `skipHtml` e links por `sanitizeHref` | O campo `richtext` do Strapi é Markdown; documentos longos (Política de Privacidade) precisam de títulos, listas e **tabelas** (GFM). Renderiza sem `dangerouslySetInnerHTML` e não vai para o bundle do cliente (Server Component). São só ESM: o Jest os transforma via `transformIgnorePatterns` em `jest.config.mjs` |
 
 ### 3.2 Qualidade e testes (devDependencies)

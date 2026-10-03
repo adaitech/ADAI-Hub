@@ -70,6 +70,7 @@ Antes de alterar código, ler as referências materiais para a tarefa:
 | --- | --- |
 | **Método de trabalho (sempre): superpowers** — etapas, instalação, precedência das regras do ADAI | `.agents/rules/Metodo-Superpowers.md` |
 | Propósito, visão e filtro de decisões | `.agents/rules/Visao-do-Projeto.md` |
+| **Segurança** — diagnóstico, versões mínimas, riscos aceitos, como auditar, plugin Security Guidance | `docs/seguranca/README.md` |
 | Dados da igreja (eventos, células, grupos, doações, pessoas) — **inChurch Public API é a fonte prioritária** | `.agents/rules/Stack-Fontes-e-Bibliotecas.md` §3.6 · contexto para IA: `https://docs.inchurch.com.br/llms.txt` e `https://docs.inchurch.com.br/openapi.json` |
 | Camadas (Strapi/Next/React), SSR, a11y, pastas | `.agents/rules/Arquitetura-e-Governanca.md` |
 | **Medição** (DataLayer, GTM, GA4, aviso de cookies) — criar ou não um evento | `docs/analytics/README.md` |
@@ -131,6 +132,7 @@ Se um gate não puder ser executado, registrar o motivo e o que permanece penden
 - Ao adicionar arquivos, usar caminhos explícitos ou `git add -p`; nunca `git add .` ou `git add --all`.
 - Não descartar, sobrescrever ou incluir alterações do usuário fora do escopo.
 - `documents/` guarda artefatos locais (PR.md, relatórios) e está no `.gitignore`; não forçar sua inclusão.
+- **Nunca trocar de branch, fazer `git pull` ou `checkout` com o `strapi develop` rodando:** o Strapi sincroniza o banco com o schema do código naquele instante e apaga os dados de componentes que a branch não tem. Parar o Strapi antes (`docs/seguranca/README.md` §5).
 
 ## Skills do repositório
 
@@ -151,6 +153,8 @@ Ficam em `.agents/skills/` e são espelhadas em `.claude/skills/` (carregadas au
 Ler o `SKILL.md` integralmente quando uma skill for selecionada.
 
 Além delas, **sempre** as skills do **superpowers** (plugin, não ficam no repositório): `brainstorming`, `writing-plans`, `executing-plans` / `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `requesting-code-review` / `receiving-code-review`, `finishing-a-development-branch`, `using-git-worktrees`. As skills do projeto complementam o método (ex.: `pre-merge` e `push-changes` na finalização). Ver `.agents/rules/Metodo-Superpowers.md`.
+
+**Plugin Security Guidance** (Anthropic, ativo na conta): alerta padrões perigosos na edição e revisa diffs e commits. Alerta dele é achado de revisão — corrigir ou registrar por que não se aplica; nunca ignorar em silêncio (`docs/seguranca/README.md` §6).
 
 ## MCPs sob demanda
 

@@ -73,6 +73,8 @@ cd next && yarn smoke
   ```
   (o `.env` nunca entra; o `.env.example` só tem valores vazios ou `tobemodified` — testado em `seguranca-e-privacidade.test.ts`).
 - [ ] Nenhuma variável `NEXT_PUBLIC_` com segredo.
+- [ ] Nenhum alerta do plugin **Security Guidance** pendente (corrigido ou com o motivo registrado no PR).
+- [ ] Mexeu em dependências? `yarn audit --groups dependencies` nos dois apps sem crítica nova e `dependencias-seguras.test.ts` verde (`docs/seguranca/README.md` §4).
 - [ ] Snapshot do Strapi (`strapi/data/adai-conteudo.tar.gz`), se atualizado com `yarn data:export`, revisado: só conteúdo, mídias e papéis públicos — sem admins nem tokens.
 
 ### A6. Documentação junto com o código
