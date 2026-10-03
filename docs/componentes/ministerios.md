@@ -20,3 +20,7 @@ Os grupos da API inChurch não trazem os públicos e destinos desta lista; a cur
 ## Layout e validação
 
 No desktop, padding interno de 72px, vão entre colunas de 86px e linhas de 78px seguem o nó do Figma. O layout responsivo empilha colunas e põe o público abaixo do nome em telas menores. A vitrine inclui estados completo, mínimo e texto longo.
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `selecionar_ministerio` (`ministerio` = nome); `clique_cta`; `ver_secao`.

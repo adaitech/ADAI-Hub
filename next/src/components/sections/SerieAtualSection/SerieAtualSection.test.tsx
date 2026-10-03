@@ -39,7 +39,7 @@ describe('SerieAtual (apresentação)', () => {
     const iframes = document.querySelectorAll('iframe');
     expect(iframes).toHaveLength(1);
     expect(document.querySelector('dialog')).toHaveAttribute('open');
-    expect(iframes[0].getAttribute('src')).toMatch(/^https:\/\/www\.youtube\.com\/embed\/[\w-]+\?autoplay=1/);
+    expect(iframes[0].getAttribute('src')).toMatch(/^https:\/\/www\.youtube-nocookie\.com\/embed\/[\w-]+\?autoplay=1/);
     expect(screen.getAllByRole('link', { name: /Assistir no YouTube/, hidden: true })[0]).toHaveAttribute('target', '_blank');
   });
 

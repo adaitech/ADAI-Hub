@@ -15,3 +15,7 @@ Seção de perguntas e respostas. A Home traz quatro dúvidas de primeira visita
 | `resposta` | Texto obrigatório, até 500 caracteres. |
 
 O Next descarta pares incompletos e oculta a seção se não restar nenhuma pergunta válida. Cada resposta usa `<details>` e `<summary>` nativos: abre por clique ou teclado, sem JavaScript. O sinal de mais muda para menos quando o painel abre. A vitrine cobre conteúdo completo, mínimo e texto longo.
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `ver_faq` ao abrir uma pergunta (`pergunta`); `ver_secao`.

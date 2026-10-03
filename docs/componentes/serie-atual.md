@@ -121,3 +121,7 @@ Controles: parte mais recente (publicada / ao vivo / aguardando corte), título 
 - ⏳ Validação humana: design do dialog e do selo "Ao vivo agora", layout mobile, leitor de tela.
 - Página própria de mensagens: quando existir, trocar o link "Todas as mensagens".
 - Produção: restringir a `YOUTUBE_API_KEY` à YouTube Data API v3 no Google Cloud (a chave é server-side, então restrição por referer não se aplica; por IP, se o provedor permitir).
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `assistir_mensagem` (disparo manual no `AssistirVideo`: `serie`, `parte`, `status`, `origem`, `player`); `ver_todas_mensagens`; `ver_secao`.

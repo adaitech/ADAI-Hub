@@ -108,3 +108,7 @@ Tokens novos: `--font-size-h2`, `--font-size-h3`, `--font-size-destaque`, `--rad
 - Fundo e raio do card: proposta (cinza `--color-bg-subtle`, raio 20).
 - Paleta de cores dos cards (azul, verde, laranja, vinho) e foto abaixo: propostas, sem Figma — aguardam o design.
 - ⏳ Validação humana: leitor de tela, celular real, aprovação do design para o carrossel.
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `como_chegar` (link do Google Maps, `unidade` = título do card); `clique_cta`; `ver_secao`. Quando reaproveitado por Próximos eventos, `data-section="proximos-eventos"` e `selecionar_evento`.

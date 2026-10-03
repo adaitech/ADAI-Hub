@@ -283,15 +283,20 @@ Vêm do single type `global` e seguem o **mesmo padrão** (types, normalize, moc
 
 ---
 
-## 7. Regra do tripé (obrigatória): Strapi + página + vitrine
+## 7. Regra dos 5 pilares (obrigatória): CMS + página + vitrine + SEO + medição
 
-Todo componente novo ou alterado precisa estar **funcionando e verificado nos três lugares**, sempre com **Strapi e Next rodando** (`cd strapi && yarn develop` e `cd next && yarn dev`):
+Todo componente novo ou alterado precisa estar **funcionando e verificado nos cinco pilares** (`AGENTS.md`), sempre com **Strapi e Next rodando** (`cd strapi && yarn develop` e `cd next && yarn dev`). Os três primeiros (o antigo tripé):
 
 1. **Strapi** — schema, guia do editor aplicado no painel, componente na dynamic zone e **conteúdo cadastrado** (em dev, pelo seed `strapi/src/bootstrap/seed.ts`; subir a `SEED_VERSION` quando a Home ganhar seções novas).
 2. **Página** — seção registrada no `sectionRegistry` e visível numa página real (Home ou outra) vinda do Strapi.
 3. **Vitrine** — `/componentes/<slug>` com as variações e o guia do editor.
 
-Não basta o teste passar: **abrir os três e conferir**. Se algum não puder ser executado, declarar como ⏳ pendente — nunca como pronto.
+E sempre:
+
+4. **SEO** — conteúdo no HTML do servidor, `h1` único (seção na posição 0 vira `h1`), hierarquia de títulos, `alt` correto, texto de link descritivo.
+5. **Medição** — analisar se o componente precisa de **evento novo de `data_layer`** ou se `clique_cta`/`ver_secao`/um evento existente já cobre; registrar a decisão no doc do componente. Evento novo segue `docs/analytics/README.md` §5 (catálogo → regra → teste → plano → GTM). Eventos não ficam no Strapi.
+
+Não basta o teste passar: **abrir e conferir**. Se algum pilar não puder ser executado, declarar como ⏳ pendente — nunca como pronto.
 
 ## 7.1 Passo a passo — criar uma nova seção
 
@@ -303,8 +308,9 @@ Não basta o teste passar: **abrir os três e conferir**. Se algum não puder se
 6. **Registry:** adicionar a linha no `sectionRegistry`.
 7. **Vitrine:** criar `<Nome>Section.showcase.ts` e registrar no catálogo (ver `Vitrine-de-Componentes.md`).
 8. **Testes:** render das variantes + normalize com casos de borda.
-9. **Validar:** `yarn quality`, conferir em `/componentes/<slug>` nos três tamanhos (375/768/1440) e numa página real montada no Strapi.
-10. **DoD:** `Definition-of-Done.md`.
+9. **Medição:** decidir se precisa de evento novo de `data_layer` (`docs/analytics/README.md` §5) e registrar no doc.
+10. **Validar:** `yarn quality`, conferir em `/componentes/<slug>` nos três tamanhos (375/768/1440) e numa página real montada no Strapi.
+11. **DoD:** `Definition-of-Done.md`.
 
 ## 8. Anti-padrões
 

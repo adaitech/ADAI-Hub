@@ -72,3 +72,7 @@ layout.footer
 - [x] Normalize, mock (JSON real da API), testes, vitrine
 - [ ] ⏳ Decisões pendentes acima (logo, contraste, links de contato)
 - [ ] ⏳ Validação humana
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links; `contribuir` quando aplicável; botão "Preferências de cookies" reabre o aviso.

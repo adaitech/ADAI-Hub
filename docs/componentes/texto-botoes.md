@@ -15,3 +15,7 @@ Chamada central reutilizável com título, texto de apoio e até dois botões, s
 O Next ignora URLs inseguras e botões sem texto, limita a dois itens e mantém o título quando não há ações. A vitrine cobre conteúdo completo, mínimo e texto longo.
 
 No desktop, o título usa a tipografia da chamada no Figma (77,8px em 1440px), texto de 20px e respiro vertical de 129,6px. Os botões ocupam a largura disponível em telas pequenas.
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `baixar_app` (`loja` = app_store ou google_play); `clique_cta`; `ver_secao`.

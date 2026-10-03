@@ -76,3 +76,7 @@ Controles na vitrine: quantidade, cor dos cards, texto de apoio, link. Dados: fi
 - Link público da página do evento na inChurch: a API traz `public_url`/`short_url_code`, mas a documentação não informa o formato do endereço. Quando confirmado, vira o link padrão do card.
 - Link "Agenda completa": definir o destino (app ou página de eventos da ADAI).
 - ⏳ Validação do design (cards com arte 16:9 no lugar do bloco de data do Figma).
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `selecionar_evento` (`evento` = nome, `acao` = texto do link); `clique_cta`; `ver_secao`.

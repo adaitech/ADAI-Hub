@@ -74,3 +74,7 @@ Textos completos no guia do editor. Resumo:
 - [x] Normalize, mock (JSON real da API), testes, vitrine
 - [ ] ⏳ Top bar (Figma 1:4)
 - [ ] ⏳ Validação humana (teclado, leitor de tela, celular real, menu mobile aprovado pelo design)
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` em todos os links; `planejar_visita` no botão "Planeje sua visita"; `contribuir` em "Contribua".

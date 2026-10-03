@@ -1,0 +1,71 @@
+/* Sem Figma: proposta 🟡 seguindo os tokens do site (fundo escuro, botões pílula). */
+.banner {
+  position: fixed;
+  right: var(--space-gutter);
+  bottom: var(--space-16);
+  left: var(--space-gutter);
+  z-index: var(--z-banner-cookies);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: var(--banner-cookies-max);
+  padding: var(--space-20);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.banner:focus-visible,
+.banner :focus-visible {
+  outline-color: var(--color-focus-ring-inverse);
+}
+
+.estatico {
+  position: static;
+}
+
+.titulo {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+}
+
+.texto {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-text);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.botao {
+  cursor: pointer;
+}
+
+.linkPolitica {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.preferencias {
+  min-height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* tier: tablet — canto inferior direito, sem ocupar a largura toda */
+@media (min-width: 769px) {
+  .banner {
+    left: auto;
+  }
+}

@@ -28,6 +28,7 @@ Depois do `yarn setup`, preencha os `.env` (nunca commitar; os `.env.example` t�
 | `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_IMAGE_ALLOW_LOCAL_IP` | `next/.env` | URLs e imagens locais |
 | `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_HANDLE` | `next/.env` (só servidor) | Série atual (YouTube Data API v3) |
 | `INCHURCH_API_BASE_PUBLIC`, `INCHURCH_API_KEY`, `INCHURCH_API_SECRET` | `next/.env` (só servidor) | Próximos eventos (inChurch Public API) |
+| `NEXT_PUBLIC_GTM_ID` | `next/.env` (público) | Google Tag Manager: `GTM-5945V9DQ` em dev/homologação, `GTM-5MGM7CK2` só em produção. Vazio = sem tags. Ver `docs/analytics/README.md` |
 
 Peça os valores reais ao responsável do projeto (cofre da equipe). Sem as chaves do YouTube/inChurch o site funciona, só sem as seções Série atual e Próximos eventos.
 
@@ -35,7 +36,7 @@ Peça os valores reais ao responsável do projeto (cofre da equipe). Sem as chav
 
 O banco local (SQLite em `strapi/.tmp/`) **não** vai para o Git (tem usuários e tokens). Há dois caminhos para reproduzir o conteúdo de dev:
 
-1. **Automático (padrão):** na primeira vez que o Strapi sobe, o bootstrap aplica os **guias do editor** ao painel, libera leitura pública de páginas e configurações e cria o conteúdo (cabeçalho, rodapé, Home e `/exemplos`) a partir do seed v14 em `strapi/src/bootstrap/seed.ts` + imagens em `strapi/seed/`. Quando a versão do seed sobe, ele reconstrói as seções da Home.
+1. **Automático (padrão):** na primeira vez que o Strapi sobe, o bootstrap aplica os **guias do editor** ao painel, libera leitura pública de páginas e configurações e cria o conteúdo (cabeçalho, rodapé, Home, `/exemplos` e `/politica-de-privacidade`) a partir do seed v15 em `strapi/src/bootstrap/seed.ts` + imagens em `strapi/seed/`. Quando a versão do seed sobe, ele reconstrói as seções da Home.
 2. **Snapshot versionado:** `strapi/data/adai-conteudo.tar.gz` (conteúdo + mídias, **sem** admins ou tokens; inclui os papéis e permissões públicos exportados pelo Strapi). Use quando precisar reproduzir também edições feitas no painel. A importação substitui o conteúdo local, então execute-a com o Strapi parado e num banco de desenvolvimento:
 
 ```bash
@@ -62,6 +63,21 @@ O estado atual da Home inclui “Encontre seu lugar”, “Contribua”, “A ig
 yarn quality   # em next/: lint + typecheck + testes (inclui a checagem da vitrine e do guia do editor)
 yarn build     # build do Strapi e do Next
 ```
+
+## Antes de subir para produção
+
+Checklist do que **muda** entre homologação e produção (detalhes de medição em `docs/analytics/README.md` §6):
+
+| # | O quê | Onde | Valor de produção |
+| --- | --- | --- | --- |
+| 1 | Container do GTM | `next/.env` do servidor de produção | `NEXT_PUBLIC_GTM_ID=GTM-5MGM7CK2` (homologação usa `GTM-5945V9DQ`). É `NEXT_PUBLIC_`: vale no **build** — rebuildar depois de trocar |
+| 2 | Publicar o container de produção | tagmanager.google.com → ADAI Produção → **Enviar** → versão "Eventos ADAI v1" → **Publicar** | As tags já estão importadas no espaço de trabalho (24 alterações), só falta publicar |
+| 3 | URL do site | `next/.env` | `NEXT_PUBLIC_SITE_URL=https://<domínio de produção>` (canonical e Open Graph) |
+| 4 | Strapi | `next/.env` | `NEXT_PUBLIC_STRAPI_URL` do Strapi de produção; `STRAPI_API_TOKEN` (somente leitura); `NEXT_IMAGE_ALLOW_LOCAL_IP` **removido** |
+| 5 | Segredos | `next/.env` e `strapi/.env` | `PREVIEW_SECRET` e `REVALIDATE_SECRET` novos (não reaproveitar os de dev); webhook do Strapi apontando para `https://<domínio>/api/revalidate` |
+| 6 | Integrações | `next/.env` | `YOUTUBE_*` e `INCHURCH_*` do cofre (chave do YouTube restrita à YouTube Data API v3; cliente inChurch só leitura) |
+| 7 | GA4 | analytics.google.com → Administrador | Dimensões personalizadas e eventos-chave (`planejar_visita`, `contribuir`) — `docs/analytics/README.md` §4.2; filtrar `site_ambiente = homologacao` nos relatórios |
+| 8 | LGPD | site | Página de **Política de Privacidade** publicada e link no aviso de cookies |
 
 ## Fontes de dados
 

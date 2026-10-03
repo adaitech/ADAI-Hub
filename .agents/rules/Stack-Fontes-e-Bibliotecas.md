@@ -87,6 +87,7 @@ export const interTight = Inter_Tight({
 | `qs` | Só em `src/lib/strapi/` para montar `filters`/`populate` | Formato de query exigido pela API REST do Strapi |
 | `clsx` | Compor classes de CSS Modules condicionais | Pequena, legível; evita concatenação manual |
 | `sharp` | Dependência de produção | Otimização de imagens do `next/image` em produção |
+| `react-markdown` + `remark-gfm` | Só em `TextoRicoSection` (`sections.texto-rico`), no servidor, com `skipHtml` e links por `sanitizeHref` | O campo `richtext` do Strapi é Markdown; documentos longos (Política de Privacidade) precisam de títulos, listas e **tabelas** (GFM). Renderiza sem `dangerouslySetInnerHTML` e não vai para o bundle do cliente (Server Component). São só ESM: o Jest os transforma via `transformIgnorePatterns` em `jest.config.mjs` |
 
 ### 3.2 Qualidade e testes (devDependencies)
 
@@ -103,7 +104,7 @@ export const interTight = Inter_Tight({
 | Qual | Gatilho | Por quê |
 | --- | --- | --- |
 | `react-hook-form` + `zod` + `@hookform/resolvers` | Primeiro formulário (ex.: "Planeje sua visita") | Validação acessível e tipada; padrão do vitru |
-| `@strapi/blocks-react-renderer` | Primeiro campo de rich text (Blocks). Criar `<RichText>` em `src/components/ui/RichText/` com mapa de elementos permitidos | Renderiza o rich text do Strapi 5 sem `dangerouslySetInnerHTML` |
+| `@strapi/blocks-react-renderer` | Primeiro campo de rich text **Blocks** (o Markdown já usa `react-markdown`, §3.1). Criar `<RichText>` em `src/components/ui/RichText/` com mapa de elementos permitidos | Renderiza o rich text do Strapi 5 sem `dangerouslySetInnerHTML` |
 | `date-fns` + locale `ptBR` | Primeira data exibida (Agenda/Próximos eventos), em `src/utils/datas.ts` | Datas em pt-BR corretas; tree-shakeable |
 
 ### 3.4 Soluções sem biblioteca (padrão)
@@ -119,6 +120,8 @@ export const interTight = Inter_Tight({
 | **YouTube** (Série atual) | YouTube Data API v3 via `fetch` em `src/lib/youtube/client.ts` (`YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_HANDLE`, só servidor) | Sem SDK do Google: 4 endpoints GET; nunca scraping |
 | **Player de vídeo** | `<dialog>` nativo + `<iframe>` do YouTube criado só no clique | Sem lib de modal/player; nada carrega antes da interação |
 | **Cache de dados externos** | `unstable_cache` do Next (resultado normalizado) | Sem Redis/infra nova |
+| **Analytics** (GTM/GA4) | Snippet oficial do GTM via `next/script` + `window.dataLayer` (`src/lib/analytics/`) | Sem `@next/third-parties` nem SDK: o GA4 é configurado no GTM; ver `docs/analytics/README.md` |
+| **Aviso de cookies** | Componente próprio `BannerCookies` + Consent Mode v2 | Sem CMP paga; simples e acessível |
 
 ### 3.5 Removidas do template (não reinstalar)
 

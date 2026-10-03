@@ -152,13 +152,15 @@ Confirmar:
 
 Doc bonito mas incompatível com o código **não está concluído**.
 
-## 7. Regra do tripé (obrigatória)
+## 7. Regra dos 5 pilares (obrigatória)
 
-O doc só vale quando o componente existe e foi **verificado com Strapi e Next rodando** nos três lugares (`AGENTS.md` → Regra do tripé):
+O doc só vale quando o componente existe e foi **verificado com Strapi e Next rodando** nos cinco pilares (`AGENTS.md` → Regra dos 5 pilares):
 
 1. **Strapi:** schema + guia do editor aplicado no painel + conteúdo cadastrado (seed de dev; subir `SEED_VERSION` em `strapi/src/bootstrap/seed.ts` quando a Home ganhar seção nova — variações extras vão para a página `exemplos`).
 2. **Página:** a seção aparece numa página real vinda do Strapi (Home ou `/exemplos`).
 3. **Vitrine:** `/componentes/<slug>` com as variações em abas, os `controles` de cada opção do Strapi e o guia do editor.
+4. **SEO:** `h1` único/hierarquia de títulos, `alt`, texto de link descritivo, conteúdo no HTML do servidor.
+5. **Medição:** o doc tem uma linha **"Medição"** dizendo se o componente usa evento existente (`clique_cta`, `ver_secao`…) ou se foi criado evento novo de `data_layer` (`docs/analytics/README.md` §5). Eventos não ficam no Strapi.
 
 ## 8. Validar e entregar
 

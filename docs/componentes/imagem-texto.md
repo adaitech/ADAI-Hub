@@ -74,3 +74,7 @@ Em “Contribua”, `botoes_secundarios` cria uma segunda linha de ações e o b
 ## 7. Pendências
 
 - ⏳ Validação humana: leitor de tela, celular real, aprovação do design para o mobile.
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `planejar_visita` (Primeira vez) e `contribuir` (Contribua) pelo destino do botão; `clique_cta`; `ver_secao`.

@@ -105,3 +105,7 @@ Igual à variante `completo` de `HeroSection.mock.json` (capturado da API real e
 
 ### Qualidade
 - [ ] ⏳ Validação humana: leitor de tela, celular real, layout mobile aprovado pelo design
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `planejar_visita` (conversão) no botão para `/planeje-sua-visita`; `clique_cta` nos demais; `ver_secao`.

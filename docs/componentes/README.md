@@ -24,5 +24,7 @@ Cada componente tem três artefatos coerentes entre si:
 | [texto-botoes.md](./texto-botoes.md) | A igreja no seu bolso | `sections.texto-botoes` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [perguntas-frequentes.md](./perguntas-frequentes.md) | Perguntas frequentes | `sections.perguntas-frequentes` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [footer.md](./footer.md) | Footer | `layout.footer` | single type `global` | implementado · publicado (dev) |
+| [texto-rico.md](./texto-rico.md) | Texto (documento) — Política de Privacidade | `sections.texto-rico` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
+| [banner-cookies.md](./banner-cookies.md) | Aviso de cookies (LGPD) | — (código; não vem do Strapi) | layout do site | implementado |
 
 Status possíveis: **proposto → implementado → publicado no Strapi → validado**.

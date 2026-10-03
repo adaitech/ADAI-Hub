@@ -94,6 +94,9 @@
   --space-coluna: clamp(32px, 6vw, 86.4px); /* 86,4px entre foto e texto no Figma (6%) */
   --space-section: clamp(64px, 9vw, 172.8px);
   --container-max: 90rem;
+  --z-banner-cookies: 50; /* acima do conteúdo e do header fixo; abaixo do dialog do player (top layer) */
+  --texto-rico-max: 46rem; /* 🟡 coluna de leitura de documentos (~75 caracteres por linha) */
+  --banner-cookies-max: 40rem; /* 🟡 proposta: largura máxima do aviso de cookies (sem Figma) */
 
   /* ---------- Raios, bordas, opacidade ---------- */
   --radius-lg: 28px;

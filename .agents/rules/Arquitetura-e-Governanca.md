@@ -123,13 +123,15 @@ next/
    │  └─ error.tsx
    ├─ components/
    │  ├─ ui/                    # átomos: Button, Heading, Card, Container… (sem Strapi)
-   │  ├─ layout/                # Header, Footer, SkipLink
+   │  ├─ analytics/             # GoogleTagManager, RastreadorAnalytics (único client de medição)
+   │  ├─ layout/                # Header, Footer, SkipLink, BannerCookies
    │  ├─ sections/              # seções do CMS (ver Componentes-e-CMS.md)
    │  └─ icons/                 # SVGs do Figma como componentes
    ├─ lib/
    │  ├─ strapi/                # client, queries, tipos crus, helpers de imagem
    │  ├─ youtube/               # integração YouTube Data API (client, regras, cache) — ver §4.1
    │  ├─ inchurch/              # integração inChurch Public API (eventos) — fonte prioritária, ver §4.1
+   │  ├─ analytics/             # DataLayer: catálogo de eventos, regras de clique, GTM, consentimento (docs/analytics)
    │  ├─ registry/              # sectionRegistry.ts
    │  └─ showcase/              # catálogo da vitrine
    ├─ hooks/                    # hooks reutilizáveis (client)

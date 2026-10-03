@@ -7,17 +7,19 @@
 >
 > Visão completa: [`.agents/rules/Visao-do-Projeto.md`](.agents/rules/Visao-do-Projeto.md)
 
-## ⚠️ Regra do tripé — todo componente existe em 3 lugares (obrigatório)
+## ⚠️ Regra dos 5 pilares — todo componente (obrigatório)
 
-Nenhum componente está pronto enquanto não estiver **funcionando nos três lugares**, verificado com o Strapi e o Next rodando:
+Nenhum componente está pronto enquanto os **cinco pilares** não estiverem verificados, com o Strapi e o Next rodando. Os três primeiros são o antigo "tripé"; SEO e Medição valem para **toda** criação ou alteração:
 
-| # | Onde | O que precisa existir | Como verificar |
+| # | Pilar | O que precisa existir | Como verificar |
 | --- | --- | --- | --- |
-| 1 | **Strapi** | Schema do componente, guia do editor (`strapi/src/editor-guide/*.json`), componente liberado na dynamic zone e **conteúdo real cadastrado** (seed de dev em `strapi/src/bootstrap/seed.ts`) | `cd strapi && yarn develop` → painel mostra os campos com descrição; API devolve o JSON |
-| 2 | **Página** | Componente registrado no `sectionRegistry` e aparecendo numa página real montada no Strapi (ex.: Home) | `cd next && yarn dev` → abrir a página e ver a seção com o conteúdo do Strapi |
-| 3 | **Vitrine** | `.showcase.tsx` (variações + `controles`) + `.mock.json` (JSON real da API) + guia do editor exibido em `/componentes/<slug>` | abrir `/componentes/<slug>`, conferir as abas de exemplo e os **controles** (liga/desliga de cada opção do Strapi) em 375 / 768 / 1440 |
+| 1 | **Dados no CMS (Strapi)** | Schema do componente, guia do editor (`strapi/src/editor-guide/*.json`), componente liberado na dynamic zone e **conteúdo real cadastrado** (seed de dev em `strapi/src/bootstrap/seed.ts`). Componente sem dado editorial (ex.: aviso de cookies) registra no doc **por que** não está no Strapi | `cd strapi && yarn develop` → painel mostra os campos com descrição; API devolve o JSON |
+| 2 | **Página (Next)** | Componente registrado no `sectionRegistry` e aparecendo numa página real montada no Strapi (ex.: Home) | `cd next && yarn dev` → abrir a página e ver a seção com o conteúdo do Strapi |
+| 3 | **Componente (vitrine)** | `.showcase.tsx` (variações + `controles`) + `.mock.json` (JSON real da API) + guia do editor exibido em `/componentes/<slug>` | abrir `/componentes/<slug>`, conferir as abas de exemplo e os **controles** em 375 / 768 / 1440 |
+| 4 | **SEO** | Conteúdo renderizado no servidor; um único `h1` por página e hierarquia de títulos correta; `alt` em imagem informativa (vazio em decorativa); links com texto que faz sentido sozinho; metadados da página (`seo` do Strapi) | `Arquitetura-e-Governanca.md` §9; Lighthouse SEO ≥ 90 quando tocar página |
+| 5 | **Medição (DataLayer)** | **Dev e IA analisam se o componente precisa de um evento novo de `data_layer`** ou se um existente já cobre (`clique_cta`, `ver_secao`…). A decisão fica registrada no doc do componente ("Medição: coberto por `…`" ou o evento novo). Eventos **nunca** vêm do Strapi: só dev/IA criam | `docs/analytics/README.md` §5; `next/src/lib/analytics/eventos.test.ts` |
 
-**Sempre executar** `strapi develop` + `next dev` e conferir os três antes de dizer que terminou. Detalhes: `.agents/rules/Componentes-e-CMS.md` §7 e `.agents/rules/Definition-of-Done.md` §2.
+**Sempre executar** `strapi develop` + `next dev` e conferir os pilares antes de dizer que terminou. Detalhes: `.agents/rules/Componentes-e-CMS.md` §7, `.agents/rules/Definition-of-Done.md` §2 e `docs/analytics/README.md`.
 
 ## Escopo do projeto
 
@@ -35,9 +37,9 @@ Nenhum componente está pronto enquanto não estiver **funcionando nos três lug
 
 O repositório nasceu do template **Strapi Launchpad**; a fundação (2026-09-27) removeu todo o legado (Next 14, Tailwind, demos, i18n, content types demo do Strapi). Hoje existem:
 
-- **Strapi:** `page` (dynamic zone `sections`), `global` (cabeçalho, rodapé, SEO), seções `hero`, `carrossel-cards`, `imagem-texto`, `serie-atual`, `proximos-eventos`, `ministerios`, `texto-botoes` e `perguntas-frequentes` em `strapi/src/components/sections/`; bootstrap que aplica o guia do editor, libera leitura pública e semeia a Home e `/exemplos`.
-- **Next:** Home vinda do Strapi (Header, Hero, Neste domingo, Primeira vez, Pastores Líderes, Série atual, Próximos eventos, Encontre seu lugar, Contribua, A igreja no seu bolso, FAQ, Footer); integração inChurch Public API em `src/lib/inchurch/` (eventos, cache 30 min); integração YouTube Data API em `src/lib/youtube/` (série com cache 4h/5 min; botão “Ao vivo” no Header só com live confirmada recentemente); favicon em `src/app/icon.svg`; `/exemplos`; vitrine `/componentes`; preview de rascunho; webhook de revalidação.
-- **Dados de dev do Strapi:** criados pelo seed v14 (`strapi/src/bootstrap/seed.ts`, versionado por `SEED_VERSION`) ou importados do snapshot `strapi/data/adai-conteudo.tar.gz` (`yarn data:import`, com Strapi parado). O snapshot contém conteúdo, mídias e papéis/permissões públicos, sem contas administrativas e tokens; o banco SQLite (`strapi/.tmp/`) nunca vai para o Git. O seed reconstrói as seções da Home quando sua versão aumenta; para preservar edições feitas no painel, exportar um novo snapshot e revisar seu conteúdo antes de versioná-lo.
+- **Strapi:** `page` (dynamic zone `sections`), `global` (cabeçalho, rodapé, SEO), seções `hero`, `carrossel-cards`, `imagem-texto`, `serie-atual`, `proximos-eventos`, `ministerios`, `texto-botoes`, `perguntas-frequentes` e `texto-rico` (Markdown) em `strapi/src/components/sections/`; bootstrap que aplica o guia do editor, libera leitura pública e semeia a Home, `/exemplos` e `/politica-de-privacidade`.
+- **Next:** Home vinda do Strapi (Header, Hero, Neste domingo, Primeira vez, Pastores Líderes, Série atual, Próximos eventos, Encontre seu lugar, Contribua, A igreja no seu bolso, FAQ, Footer); integração inChurch Public API em `src/lib/inchurch/` (eventos, cache 30 min); integração YouTube Data API em `src/lib/youtube/` (série com cache 4h/5 min; botão “Ao vivo” no Header só com live confirmada recentemente); medição em `src/lib/analytics/` (DataLayer → GTM → GA4, só depois do aceite no `BannerCookies`; ver `docs/analytics/README.md`); Política de Privacidade e Cookies em `/politica-de-privacidade`; favicon em `src/app/icon.svg`; `/exemplos`; vitrine `/componentes`; preview de rascunho; webhook de revalidação.
+- **Dados de dev do Strapi:** criados pelo seed v15 (`strapi/src/bootstrap/seed.ts`, versionado por `SEED_VERSION`) ou importados do snapshot `strapi/data/adai-conteudo.tar.gz` (`yarn data:import`, com Strapi parado). O snapshot contém conteúdo, mídias e papéis/permissões públicos, sem contas administrativas e tokens; o banco SQLite (`strapi/.tmp/`) nunca vai para o Git. O seed reconstrói as seções da Home quando sua versão aumenta; para preservar edições feitas no painel, exportar um novo snapshot e revisar seu conteúdo antes de versioná-lo.
 - **Pendentes conhecidos:** ver "Como continuar" no fim deste arquivo.
 
 ## Leitura direcionada
@@ -49,6 +51,7 @@ Antes de alterar código, ler as referências materiais para a tarefa:
 | Propósito, visão e filtro de decisões | `.agents/rules/Visao-do-Projeto.md` |
 | Dados da igreja (eventos, células, grupos, doações, pessoas) — **inChurch Public API é a fonte prioritária** | `.agents/rules/Stack-Fontes-e-Bibliotecas.md` §3.6 · contexto para IA: `https://docs.inchurch.com.br/llms.txt` e `https://docs.inchurch.com.br/openapi.json` |
 | Camadas (Strapi/Next/React), SSR, a11y, pastas | `.agents/rules/Arquitetura-e-Governanca.md` |
+| **Medição** (DataLayer, GTM, GA4, aviso de cookies) — criar ou não um evento | `docs/analytics/README.md` |
 | **Componentes alimentados pelo CMS** (registry, normalize, mock) | `.agents/rules/Componentes-e-CMS.md` |
 | **Vitrine `/componentes`** (obrigatória a cada componente) | `.agents/rules/Vitrine-de-Componentes.md` |
 | Fontes e bibliotecas — qual usar, como e por quê | `.agents/rules/Stack-Fontes-e-Bibliotecas.md` |
@@ -129,7 +132,9 @@ Ler o `SKILL.md` integralmente quando uma skill for selecionada.
 
 ## Como continuar (handoff — atualizado em 2026-09-28)
 
-**Pronto e verificado localmente** (tripé Strapi + página + vitrine; quality e builds executados): Header, Hero, Carrossel de cards ("Neste domingo"; cores por card; foto acima/abaixo; foto P&B ou arte 16:9), Imagem e texto (Primeira vez, Pastores Líderes e Contribua), Série atual (YouTube), Próximos eventos (inChurch), Lista de ministérios (Encontre seu lugar), Texto e botões (app), Perguntas frequentes, Footer e favicon. Vitrine com abas e controles. A exibição do Header durante uma live foi coberta por teste automatizado; uma transmissão real ainda precisa ser observada para validação ponta a ponta.
+**Pronto e verificado localmente** (Strapi + página + vitrine; quality e builds executados): Header, Hero, Carrossel de cards ("Neste domingo"; cores por card; foto acima/abaixo; foto P&B ou arte 16:9), Imagem e texto (Primeira vez, Pastores Líderes e Contribua), Série atual (YouTube), Próximos eventos (inChurch), Lista de ministérios (Encontre seu lugar), Texto e botões (app), Perguntas frequentes, Footer e favicon. Vitrine com abas e controles. A exibição do Header durante uma live foi coberta por teste automatizado; uma transmissão real ainda precisa ser observada para validação ponta a ponta.
+
+**Medição (2026-10-02):** DataLayer com 13 eventos, GTM por ambiente (homologação `GTM-5945V9DQ`, produção `GTM-5MGM7CK2`), GA4 `G-SCG09PWV8B` configurado no GTM, Consent Mode v2 e aviso de cookies próprio. Container de **homologação publicado** e verificado (GA4 recebendo); **produção importado e não publicado** de propósito — ver `README.md` → "Antes de subir para produção". Faltam as dimensões personalizadas no GA4 e a página de Política de Privacidade (`docs/analytics/README.md`).
 
 **Próximos passos sugeridos**, na ordem do Figma (`Home / Desktop`, node 1:3):
 

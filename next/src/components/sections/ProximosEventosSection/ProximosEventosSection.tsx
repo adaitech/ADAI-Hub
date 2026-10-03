@@ -17,5 +17,5 @@ export async function ProximosEventosSection({ data, index }: SectionProps<Proxi
   const eventos = proximosEventos(dados, { limite: quantidadeDe(data) });
   if (eventos.length === 0) return null;
 
-  return <CarrosselCardsSection data={paraCarrossel(data, eventos)} index={index} />;
+  return <CarrosselCardsSection data={paraCarrossel(data, eventos)} index={index} secao="proximos-eventos" />;
 }

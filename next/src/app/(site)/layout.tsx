@@ -1,4 +1,7 @@
 import type { ReactNode } from 'react';
+import { GoogleTagManager } from '@/components/analytics/GoogleTagManager';
+import { RastreadorAnalytics } from '@/components/analytics/RastreadorAnalytics';
+import { BannerCookies } from '@/components/layout/BannerCookies';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
 import { PreviewBanner } from '@/components/layout/PreviewBanner/PreviewBanner';
@@ -18,6 +21,9 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
         {children}
       </main>
       <Footer data={global?.footer} />
+      <BannerCookies />
+      <GoogleTagManager />
+      <RastreadorAnalytics />
     </>
   );
 }
