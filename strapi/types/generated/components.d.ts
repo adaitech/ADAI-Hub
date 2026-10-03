@@ -429,6 +429,24 @@ export interface SectionsTextoBotoes extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsTextoRico extends Struct.ComponentSchema {
+  collectionName: 'components_sections_textos_ricos';
+  info: {
+    description: 'Texto longo com t\u00EDtulos, listas, tabelas e links (ex.: Pol\u00EDtica de Privacidade, termos, regulamentos).';
+    displayName: 'Texto (documento)';
+    icon: 'file';
+  };
+  attributes: {
+    atualizado_em: Schema.Attribute.Date;
+    conteudo: Schema.Attribute.RichText & Schema.Attribute.Required;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+  };
+}
+
 export interface SharedBotao extends Struct.ComponentSchema {
   collectionName: 'components_shared_botoes';
   info: {
@@ -520,6 +538,7 @@ declare module '@strapi/strapi' {
       'sections.proximos-eventos': SectionsProximosEventos;
       'sections.serie-atual': SectionsSerieAtual;
       'sections.texto-botoes': SectionsTextoBotoes;
+      'sections.texto-rico': SectionsTextoRico;
       'shared.botao': SharedBotao;
       'shared.link': SharedLink;
       'shared.seo': SharedSeo;

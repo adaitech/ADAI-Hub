@@ -5,6 +5,10 @@ description: Executa os gates locais do ADAI Hub antes de um merge — quality (
 
 # Pré-merge — validação local antes do merge
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver `.agents/rules/Testes.md` e o checklist `.agents/rules/Pull-Request.md` (antes de subir e antes de abrir o PR).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — `.agents/rules/Metodo-Superpowers.md`. Esta skill é um complemento do método, não um substituto.
+
 Adaptada da skill `pre-merge` do vitru-portal.
 
 **Objetivo:** rodar o pacote mínimo que o projeto exige **antes do merge**, sem substituir code review nem CI. É o último check na máquina de quem vai mergear.
@@ -24,6 +28,7 @@ Adaptada da skill `pre-merge` do vitru-portal.
 | ⏭️ | Não rodado / não aplicável nesta execução |
 | ⏳ | Pendente (usuário, outro comando, CI) |
 | 🧪 | Lint + typecheck + testes (`yarn quality`) |
+| 🌐 | Smoke do site no ar (`yarn smoke`) |
 | 🏗️ | Build (`yarn build`) |
 | 🗄️ | Build do Strapi |
 | 📊 | Lighthouse / performance |
@@ -41,6 +46,7 @@ Tom claro e caloroso: o usuário deve sentir progresso, não só ver uma lista d
 | 🧪 1 | `yarn quality` | `next/` |
 | 🏗️ 2 | `yarn build` | `next/` |
 | 🗄️ 3 | `yarn build` — **só se o diff tocar `strapi/`** | `strapi/` |
+| 🌐 4 | `yarn smoke` — com Strapi e Next rodando (`yarn dev` ou `yarn start`) | `next/` |
 
 Opcional: 📦 `yarn install` só se pedido ou erro de módulo; 📊 Lighthouse só com "completo", URL ou rota na mensagem.
 
@@ -55,9 +61,11 @@ Opcional: 📦 `yarn install` só se pedido ou erro de módulo; 📊 Lighthouse 
 ## Fluxo
 
 0. **Contexto:** `git status` e `git diff --stat` contra a base (`main`, salvo indicação). Se o diff toca `next/src/components/`, lembrar da vitrine (`catalog.test.ts` roda dentro do `yarn quality`).
+   **Testes escritos?** Todo arquivo de código novo/alterado no diff tem teste novo ou ajustado no mesmo diff (`.agents/rules/Testes.md` §2). Código sem teste → ❌, não sugerir merge.
 1. **🧪** `cd next && yarn quality` → ❌ para aqui, resumir erros por arquivo.
 2. **🏗️** `cd next && yarn build` → ❌ para aqui.
 3. **🗄️** se o diff tocar `strapi/`: `cd strapi && yarn build`.
+3.1 **🌐** com os servidores rodando (ou se o usuário pedir): `cd next && yarn smoke`; senão ⏳ "smoke pendente: subir Strapi e Next".
 4. **📊 (opcional)** skill `lighthouse-performance-mcp` na rota indicada.
 5. Montar a resposta.
 

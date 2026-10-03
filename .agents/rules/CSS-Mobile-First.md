@@ -5,6 +5,10 @@ alwaysApply: true
 
 # CSS Mobile-First — Prioridade Obrigatória
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 **Adaptado de:** vitru-portal (`CSS-Mobile-First.md` + `docs/desenvolvimento/css-mobile-first.md`).
 
 ## Princípio
@@ -55,6 +59,9 @@ A IA deve **começar pelo layout mobile** antes de tablet/desktop — em CSS, JS
 - Comentar os tiers: `/* tier: tablet */`, `/* tier: desktop */`.
 - Preferir medidas fluidas dos tokens (`clamp()`) a novos breakpoints.
 - Breakpoints fora de 769/1024 são proibidos, salvo exceção documentada abaixo.
+- **Contêiner com scroll próprio** (`overflow-x: auto`, `overflow: auto`) leva `position: relative`. Sem isso, um elemento `position: absolute` lá dentro (ex.: o `.visually-hidden` de "abre em nova aba" num card do carrossel) escapa do recorte e **alarga a página inteira no celular** — bug real de 2026-10-03.
+
+Estas regras são verificadas no `yarn test` por `src/__tests__/caracteristicas/css.test.ts`.
 
 ## Proibido
 
@@ -96,7 +103,8 @@ Preferir resolver visibilidade e layout em **CSS**; JS de viewport só quando CS
 - [ ] Base = mobile (≤768px), escrita primeiro
 - [ ] Apenas `min-width` 769 / 1024
 - [ ] Nenhum valor solto: cores, espaços e fontes via tokens (`Design-Tokens.md`)
-- [ ] Sem scroll horizontal em **375px**
+- [ ] Sem scroll horizontal em **375px** — no console do navegador: `document.documentElement.scrollWidth <= innerWidth` → `true`
+- [ ] Contêiner com scroll próprio tem `position: relative`
 - [ ] Smoke visual em **375, 768, 820, 1024, 1280, 1440** (a vitrine `/componentes` tem os botões 375/768/1440)
 - [ ] Touch targets ≥ **44×44px** em controles interativos no mobile
 - [ ] Textos grandes (display/mega) conferidos em 375px

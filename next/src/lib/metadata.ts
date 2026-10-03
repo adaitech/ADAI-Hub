@@ -9,8 +9,11 @@ export function buildMetadata(seo?: StrapiSeo | null, fallback?: StrapiSeo | nul
   const title = seo?.metaTitle ?? fallback?.metaTitle ?? 'ADAI';
   const description = seo?.metaDescription ?? fallback?.metaDescription ?? undefined;
   const image = resolveStrapiMedia(seo?.metaImage ?? fallback?.metaImage);
+  // Só o "Meta robots" da própria página (nunca o padrão do site): o mesmo critério do sitemap.
+  const metaRobots = seo?.metaRobots?.trim();
 
   return {
+    ...(metaRobots ? { robots: { index: !/noindex/i.test(metaRobots), follow: !/nofollow/i.test(metaRobots) } } : {}),
     metadataBase: new URL(SITE_URL),
     title,
     description,

@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Visão do Projeto — ADAI Hub
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 **Documento oficial de referência funcional.** Toda página, componente, integração ou conteúdo deve ser justificável por este documento.
 
 ---

@@ -80,7 +80,8 @@ function videoSerie(videoId: string, video: YoutubeVideo, item: YoutubePlaylistI
   return {
     videoId,
     youtubeUrl: `https://www.youtube.com/watch?v=${id}`,
-    embedUrl: `https://www.youtube.com/embed/${id}`,
+    // Domínio sem cookies do YouTube (Política de Privacidade §7.5): o player só grava cookies se a pessoa interagir.
+    embedUrl: `https://www.youtube-nocookie.com/embed/${id}`,
     thumbnail: getBestYoutubeThumbnail(video.snippet?.thumbnails) ?? getBestYoutubeThumbnail(item.snippet?.thumbnails),
     embeddable: video.status?.embeddable !== false,
   };

@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Vitrine de Componentes (`/componentes`)
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 ## Por que existe
 
 A vitrine é o "Storybook" do ADAI Hub, só que dentro do próprio Next. Ela mostra **todos os componentes reais**, renderizados a partir do **mesmo JSON que o Strapi entrega**, para que:
@@ -151,6 +155,8 @@ export const showcaseCatalog: ShowcaseEntry[] = [heroShowcase, buttonShowcase /*
 - um componente com `cmsKey` não tem guia do editor, ou o guia não cobre todos os campos do mock `completo`.
 
 Assim, esquecer a vitrine quebra o `yarn test`.
+
+Além disso, `src/__tests__/caracteristicas/acessibilidade-e-seo.test.tsx` audita **cada variante** de cada entrada do catálogo (alt, nome de link/botão, nova aba, ids, ARIA, texto quebrado), e `__tests__/integracao/vitrine.test.tsx` renderiza a página e o preview de cada componente.
 
 ## 5. Checklist ao criar/alterar componente
 

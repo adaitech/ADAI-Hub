@@ -433,6 +433,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.ministerios',
         'sections.texto-botoes',
         'sections.perguntas-frequentes',
+        'sections.texto-rico',
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;

@@ -76,3 +76,24 @@ Controles na vitrine: quantidade, cor dos cards, texto de apoio, link. Dados: fi
 - Link público da página do evento na inChurch: a API traz `public_url`/`short_url_code`, mas a documentação não informa o formato do endereço. Quando confirmado, vira o link padrão do card.
 - Link "Agenda completa": definir o destino (app ou página de eventos da ADAI).
 - ⏳ Validação do design (cards com arte 16:9 no lugar do bloco de data do Figma).
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `selecionar_evento` (`evento` = nome, `acao` = texto do link); `clique_cta`; `ver_secao`.
+
+## Testes
+
+Na pasta `next/` (`yarn test` ou `yarn test <caminho>`):
+
+- `next/src/components/sections/ProximosEventosSection/ProximosEventosSection.test.tsx`
+- `next/src/lib/inchurch/eventos.test.ts`
+- `next/src/lib/inchurch/eventos-cache.test.ts`
+- `next/src/lib/inchurch/client.test.ts`
+
+Também cobrem este componente, sem precisar editar nada:
+
+- `src/lib/showcase/catalog.test.tsx` — todas as variantes e controles da vitrine renderizam; guia do editor × mock.
+- `src/__tests__/caracteristicas/` — 5 pilares (Strapi ↔ registry ↔ vitrine ↔ doc), acessibilidade/SEO de cada variante, CSS, segurança.
+- `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
+
+**Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).

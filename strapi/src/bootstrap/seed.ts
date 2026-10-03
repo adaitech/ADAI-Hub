@@ -6,7 +6,7 @@ import type { Core } from '@strapi/strapi';
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 14;
+const SEED_VERSION = 15;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
@@ -313,6 +313,33 @@ async function exemplosSections(strapi: Core.Strapi) {
       quantidade: 4,
       cor_cards: 'preto',
     },
+    {
+      // Texto (documento) no meio da página: o título vira h2 e os "##" do texto viram h3.
+      __component: 'sections.texto-rico',
+      titulo: 'Exemplo de texto (documento)',
+      conteudo: [
+        'Parágrafo com **negrito** e um [link para Contribua](/contribua).',
+        '## Subtítulo',
+        '- Primeiro item\n- Segundo item',
+        '| Coluna | Descrição |\n| --- | --- |\n| A | Tabela curta, rola para o lado no celular |',
+      ].join('\n\n'),
+    },
+  ];
+}
+
+/**
+ * Política de Privacidade e Cookies. Texto público de `docs/conteudo/politica-de-privacidade.md`
+ * (entre INICIO/FIM_CONTEUDO_PUBLICO), copiado para `seed/politica-de-privacidade.md`.
+ * Minuta: revisar com o jurídico antes de publicar em produção.
+ */
+function politicaSections() {
+  return [
+    {
+      __component: 'sections.texto-rico',
+      titulo: 'Política de Privacidade e Cookies',
+      atualizado_em: '2026-10-02',
+      conteudo: fs.readFileSync(path.join(SEED_DIR, 'politica-de-privacidade.md'), 'utf8'),
+    },
   ];
 }
 
@@ -373,6 +400,24 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     });
     await publishPage(strapi, created.documentId);
     strapi.log.info('[seed] Página "exemplos" criada e publicada.');
+  }
+
+  const politica = await pages.findFirst({ filters: { slug: 'politica-de-privacidade' } });
+  if (!politica) {
+    const created = await pages.create({
+      data: {
+        titulo: 'Política de Privacidade e Cookies',
+        slug: 'politica-de-privacidade',
+        seo: {
+          metaTitle: 'Política de Privacidade e Cookies | ADAI',
+          metaDescription:
+            'Saiba como a ADAI trata seus dados pessoais, utiliza cookies e respeita suas escolhas. Conheça seus direitos e nossos canais de contato.',
+        },
+        sections: politicaSections(),
+      } as never,
+    });
+    await publishPage(strapi, created.documentId);
+    strapi.log.info('[seed] Página "politica-de-privacidade" criada e publicada.');
   }
 
   if (storedVersion < SEED_VERSION) await strapi.store.set({ ...STORE, value: SEED_VERSION });

@@ -15,6 +15,7 @@ import sectionsPerguntasFrequentes from './sections.perguntas-frequentes.json';
 import sectionsTextoBotoes from './sections.texto-botoes.json';
 import sectionsProximosEventos from './sections.proximos-eventos.json';
 import sectionsSerieAtual from './sections.serie-atual.json';
+import sectionsTextoRico from './sections.texto-rico.json';
 import sharedBotao from './shared.botao.json';
 import sharedLink from './shared.link.json';
 import sharedSeo from './shared.seo.json';
@@ -51,6 +52,7 @@ export const editorGuides: EditorGuide[] = [
   sectionsMinisterios,
   sectionsTextoBotoes,
   sectionsPerguntasFrequentes,
+  sectionsTextoRico,
   layoutHeader,
   layoutFooter,
   itemsCard,

@@ -5,6 +5,10 @@ description: Valida UI e acessibilidade no browser (Playwright MCP ou browser in
 
 # Validação de UI e Acessibilidade no browser
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver `.agents/rules/Testes.md` e o checklist `.agents/rules/Pull-Request.md` (antes de subir e antes de abrir o PR).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — `.agents/rules/Metodo-Superpowers.md`. Esta skill é um complemento do método, não um substituto.
+
 Adaptada da skill `playwright-mcp-a11y` do vitru-portal. Mesmo espírito do `action-plan`: relatório com **timestamp**, checklist **Teste/Validação** e fechamento pelo **DoD**.
 
 ## Pré-requisitos

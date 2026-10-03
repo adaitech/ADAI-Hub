@@ -1,0 +1,44 @@
+{
+  "uid": "sections.texto-rico",
+  "nome": "Texto (documento)",
+  "resumo": "Texto longo e formatado: títulos, parágrafos, listas, tabelas e links. Use para páginas institucionais como Política de Privacidade, termos e regulamentos.",
+  "ondeAparece": "Ocupa a página inteira, em uma coluna confortável de leitura. Normalmente é a única seção da página.",
+  "boasPraticas": [
+    "Comece as seções com \"## \" (título) e as subseções com \"### \". O título principal da página vem do campo \"Título\", não do texto.",
+    "Use tabelas só para comparações curtas; no celular elas rolam para o lado.",
+    "Links: [texto do link](https://endereço). Para e-mail: [contato@adai.com.br](mailto:contato@adai.com.br).",
+    "Atualize a \"Data de atualização\" sempre que o texto mudar (em documentos legais, ela aparece no topo)."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título",
+      "descricao": "Título principal do documento.",
+      "placeholder": "Ex.: Política de Privacidade e Cookies",
+      "ondeAparece": "Topo da página, em destaque.",
+      "obrigatorio": true,
+      "limite": "Até 100 caracteres",
+      "exemplo": "Política de Privacidade e Cookies"
+    },
+    {
+      "campo": "atualizado_em",
+      "label": "Data de atualização",
+      "descricao": "Opcional. Aparece como \"Última atualização: …\" abaixo do título.",
+      "placeholder": "",
+      "ondeAparece": "Abaixo do título.",
+      "obrigatorio": false,
+      "limite": "Uma data",
+      "exemplo": "02/10/2026"
+    },
+    {
+      "campo": "conteudo",
+      "label": "Conteúdo",
+      "descricao": "Texto em Markdown: ## título, ### subtítulo, **negrito**, listas com -, tabelas e [links](https://...).",
+      "placeholder": "## 1. Primeira seção (depois, o texto da seção)",
+      "ondeAparece": "Corpo da página.",
+      "obrigatorio": true,
+      "limite": "Sem limite (texto longo)",
+      "exemplo": "## 1. Quem é responsável pelos seus dados — seguido do texto da seção"
+    }
+  ]
+}

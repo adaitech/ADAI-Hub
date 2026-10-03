@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_sections_textos_ricos",
+  "info": {
+    "displayName": "Texto (documento)",
+    "icon": "file",
+    "description": "Texto longo com títulos, listas, tabelas e links (ex.: Política de Privacidade, termos, regulamentos)."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "atualizado_em": {
+      "type": "date"
+    },
+    "conteudo": {
+      "type": "richtext",
+      "required": true
+    }
+  }
+}

@@ -5,11 +5,16 @@ alwaysApply: true
 
 # Definition of Done (DoD) — ADAI Hub
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 **Adaptado de:** vitru-portal (sem multi-marca, com Strapi e vitrine de componentes).
 
 Uma atividade só está **DONE** quando:
 
-- ✅ Código compila, lint e testes passam
+- ✅ Feito pelo **método superpowers** (`Metodo-Superpowers.md`): desenho/spec aprovados, TDD, verificação com evidência
+- ✅ **Testes unitários escritos** para todo código novo ou alterado (`Testes.md` §2) — e lint, typecheck, testes e build passam
 - ✅ Acessibilidade verificada (WCAG 2.2 AA)
 - ✅ Performance adequada (mobile primeiro)
 - ✅ Validado em mobile e desktop
@@ -23,13 +28,17 @@ Uma atividade só está **DONE** quando:
 Na pasta `next/`:
 
 ```bash
-yarn quality      # lint + typecheck + testes (gate estático)
+yarn quality      # lint + typecheck + testes (funcionalidade, característica, integração) + piso de cobertura
 yarn build        # build de produção
+yarn smoke        # site no ar: com Strapi e Next rodando
 ```
 
 - [ ] TypeScript sem erros (sem `any` novo)
 - [ ] Lint sem erros
-- [ ] Testes passando (inclui `catalog.test.ts` da vitrine)
+- [ ] **Teste novo ou ajustado para cada mudança** (`Testes.md` §2); bug corrigido tem teste que o reproduz
+- [ ] Testes passando (inclui `catalog.test.ts` da vitrine e os de característica em `src/__tests__/caracteristicas/`)
+- [ ] Cobertura acima do piso (`coverageThreshold` em `jest.config.mjs`) — nunca baixar o piso para passar
+- [ ] `yarn smoke` com os dois servidores rodando
 - [ ] Build de produção sem erros
 
 Se alterou `strapi/` (schemas/componentes/config): `yarn build` em `strapi/`.
@@ -38,10 +47,12 @@ Se alterou `strapi/` (schemas/componentes/config): `yarn build` em `strapi/`.
 
 Para **cada componente criado ou alterado**:
 
-- [ ] **Tripé verificado com Strapi e Next rodando** (`AGENTS.md` → Regra do tripé):
-  - [ ] **Strapi:** schema + guia do editor no painel + conteúdo cadastrado (seed de dev atualizado)
+- [ ] **5 pilares verificados com Strapi e Next rodando** (`AGENTS.md` → Regra dos 5 pilares):
+  - [ ] **Dados no CMS:** schema + guia do editor no painel + conteúdo cadastrado (seed de dev atualizado) — ou o motivo de não estar no Strapi no doc
   - [ ] **Página:** seção aparece numa página real vinda do Strapi (ex.: Home)
-  - [ ] **Vitrine:** `/componentes/<slug>` com variações e guia do editor
+  - [ ] **Componente:** `/componentes/<slug>` com variações e guia do editor
+  - [ ] **SEO:** conteúdo no HTML do servidor, `h1` único, hierarquia de títulos, `alt` e textos de link corretos
+  - [ ] **Medição:** analisado se precisa de evento novo de `data_layer`; decisão registrada no doc; evento novo no catálogo + teste + plano (`docs/analytics/README.md`) + GTM
 - [ ] Segue a anatomia de `Componentes-e-CMS.md` (types, normalize, populate, mock, showcase, teste, index)
 - [ ] `normalize` cobre CMS incompleto (campo vazio, lista vazia, imagem sem alt) — com teste
 - [ ] `.mock.json` idêntico ao JSON real do Strapi, com variantes `completo`, `minimo` (e `texto_longo` quando couber)
@@ -75,7 +86,7 @@ Validação no browser (quando houver UI interativa): skill `playwright-mcp-a11y
 
 Quando o PR tocar página, imagem acima da dobra ou bundle:
 
-- [ ] `next/image` com `sizes`; hero com `priority`
+- [ ] `next/image` com `sizes`; hero com `loading="eager"` + `fetchPriority="high"` (`priority` está deprecado no Next 16)
 - [ ] `next/font` (sem fontes externas)
 - [ ] Client Components mínimos
 - [ ] Lighthouse **mobile ≥ 80** (skill `lighthouse-performance-mcp`), LCP < 2,5 s, CLS < 0,1
@@ -95,8 +106,11 @@ A IA **não** executa estes testes completos; deve sugeri-los:
 Uma atividade **NÃO** está pronta se:
 
 - ❌ Erro de TypeScript, lint, teste ou build
+- ❌ **Código novo ou alterado sem teste unitário** (o `testes-obrigatorios.test.ts` já falha para componente, `lib/` e rota sem teste)
+- ❌ Piso de cobertura reduzido, `it.skip`/`it.only` ou teste comentado
 - ❌ Componente novo/alterado **sem vitrine, mock ou doc**
-- ❌ Componente que não está **no Strapi (com conteúdo), numa página e na vitrine** — o tripé não foi verificado com os dois servidores rodando
+- ❌ Componente que não está **no Strapi (com conteúdo), numa página e na vitrine** — os pilares não foram verificados com os dois servidores rodando
+- ❌ Componente sem a decisão de **Medição** registrada no doc (evento existente ou novo de `data_layer`)
 - ❌ Componente que faz fetch ou usa `ssr: false`
 - ❌ Valor visual solto (hex/px) fora dos tokens
 - ❌ CSS desktop-first (`max-width`) em código novo
@@ -104,6 +118,8 @@ Uma atividade **NÃO** está pronta se:
 - ❌ Console do browser com erros
 
 ## 8. Resumo para PR (template)
+
+Antes de subir e de abrir o PR: checklist completo em [`Pull-Request.md`](./Pull-Request.md). O GitHub preenche o corpo com `.github/pull_request_template.md`; o resumo abaixo é a versão curta.
 
 ```markdown
 ## O que mudou
@@ -113,8 +129,12 @@ Uma atividade **NÃO** está pronta se:
 - `next/src/components/sections/HeroSection/` — novo (vitrine: /componentes/hero)
 - `strapi/src/components/sections/hero.json` — novo schema
 
+## Testes
+- `HeroSection.test.tsx` — variantes e campos vazios (funcionalidade)
+- características e integração passando sem alteração
+
 ## Como validar
-- `cd next && yarn quality && yarn build`
+- `cd next && yarn quality && yarn build && yarn smoke`
 - Abrir `/componentes/hero` e conferir 375 / 768 / 1440
 - Página `/` montada no Strapi com a seção
 

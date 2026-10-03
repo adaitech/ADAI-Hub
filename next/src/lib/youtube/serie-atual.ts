@@ -39,6 +39,13 @@ async function carregarSerie(playlistId: string, playlistTitulo: string | null):
   return serie;
 }
 
+/**
+ * Versão do formato guardado no cache. O `unstable_cache` guarda o resultado **normalizado** e pode
+ * sobreviver a um deploy: ao mudar o formato de `SerieYoutube` (campo novo, URL de embed…), suba
+ * este número para não servir dados no formato antigo. Guardado por `cache-versionado.test.ts`.
+ */
+export const VERSAO_CACHE_YOUTUBE = 2;
+
 const channelIdCache = unstable_cache(buscarChannelId, ['youtube', 'channel-id'], {
   revalidate: TTL_CANAL_S,
   tags: [YOUTUBE_CACHE_TAG],
@@ -61,12 +68,12 @@ const livePlaylistCache = unstable_cache(
   { revalidate: TTL_AO_VIVO_S, tags: [YOUTUBE_CACHE_TAG] },
 );
 
-const serieNormalCache = unstable_cache(carregarSerie, ['youtube', 'serie', 'normal'], {
+const serieNormalCache = unstable_cache(carregarSerie, ['youtube', 'serie', 'normal', `v${VERSAO_CACHE_YOUTUBE}`], {
   revalidate: TTL_NORMAL_S,
   tags: [YOUTUBE_CACHE_TAG],
 });
 
-const serieAoVivoCache = unstable_cache(carregarSerie, ['youtube', 'serie', 'ao-vivo'], {
+const serieAoVivoCache = unstable_cache(carregarSerie, ['youtube', 'serie', 'ao-vivo', `v${VERSAO_CACHE_YOUTUBE}`], {
   revalidate: TTL_AO_VIVO_S,
   tags: [YOUTUBE_CACHE_TAG],
 });

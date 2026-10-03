@@ -23,7 +23,8 @@ export function HeroSection({ data, index }: SectionProps<HeroData>) {
             alt={view.imagem.alt}
             fill
             sizes="100vw"
-            priority={index === 0}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : undefined}
             className={styles.imagem}
           />
         )}

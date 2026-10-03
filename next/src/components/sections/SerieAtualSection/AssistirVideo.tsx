@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { registrarEvento } from '@/lib/analytics/datalayer';
+import type { EventosAnalytics } from '@/lib/analytics/eventos';
 import type { VideoSerie } from '@/lib/youtube/serie';
 import styles from './AssistirVideo.module.css';
 
@@ -12,6 +14,8 @@ interface AssistirVideoProps {
   /** Nome acessível do gatilho, quando o conteúdo visível não basta (ex.: só a thumbnail). */
   rotulo?: string;
   className?: string;
+  /** Dados do evento `assistir_mensagem` (DataLayer). `player` é definido aqui: site ou YouTube. */
+  medicao?: Omit<EventosAnalytics['assistir_mensagem'], 'player'>;
   children: ReactNode;
 }
 
@@ -21,7 +25,7 @@ interface AssistirVideoProps {
  * permite usar o gatilho dentro de um título) e removidos ao fechar.
  * Vídeo que não permite incorporação (`embeddable: false`) vira link direto para o YouTube.
  */
-export function AssistirVideo({ video, titulo, rotulo, className, children }: AssistirVideoProps) {
+export function AssistirVideo({ video, titulo, rotulo, className, medicao, children }: AssistirVideoProps) {
   const gatilhoRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [aberto, setAberto] = useState(false);
@@ -30,6 +34,10 @@ export function AssistirVideo({ video, titulo, rotulo, className, children }: As
     if (aberto && dialogRef.current && !dialogRef.current.open) dialogRef.current.showModal();
   }, [aberto]);
 
+  const medir = (player: 'site' | 'youtube') => {
+    if (medicao) registrarEvento('assistir_mensagem', { ...medicao, player });
+  };
+
   if (!video.embeddable) {
     return (
       <a
@@ -37,6 +45,8 @@ export function AssistirVideo({ video, titulo, rotulo, className, children }: As
         target="_blank"
         rel="noopener noreferrer"
         className={className}
+        data-analytics="manual"
+        onClick={() => medir('youtube')}
         aria-label={rotulo && `${rotulo} (abre no YouTube)`}
       >
         {children}
@@ -58,7 +68,11 @@ export function AssistirVideo({ video, titulo, rotulo, className, children }: As
         className={className}
         aria-haspopup="dialog"
         aria-label={rotulo}
-        onClick={() => setAberto(true)}
+        data-analytics="manual"
+        onClick={() => {
+          medir('site');
+          setAberto(true);
+        }}
       >
         {children}
       </button>

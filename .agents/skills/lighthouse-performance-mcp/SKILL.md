@@ -5,6 +5,10 @@ description: Audita performance (e opcionalmente acessibilidade, SEO e boas prá
 
 # Lighthouse — Performance
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`cd next && yarn quality`). Ver `.agents/rules/Testes.md` e o checklist `.agents/rules/Pull-Request.md` (antes de subir e antes de abrir o PR).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — `.agents/rules/Metodo-Superpowers.md`. Esta skill é um complemento do método, não um substituto.
+
 Adaptada da skill `lighthouse-performance-mcp` do vitru-portal (sem os scripts shell do vitru; usa a CLI do Lighthouse diretamente).
 
 ## Pré-requisitos

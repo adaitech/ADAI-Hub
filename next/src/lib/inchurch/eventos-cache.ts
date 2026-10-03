@@ -35,7 +35,13 @@ async function carregarEventos(): Promise<EventosInchurch> {
   return dados;
 }
 
-const eventosCache = unstable_cache(carregarEventos, ['inchurch', 'eventos'], {
+/**
+ * Versão do formato guardado no cache (resultado normalizado, pode sobreviver a um deploy).
+ * Ao mudar `EventosInchurch`, suba este número. Guardado por `cache-versionado.test.ts`.
+ */
+export const VERSAO_CACHE_INCHURCH = 1;
+
+const eventosCache = unstable_cache(carregarEventos, ['inchurch', 'eventos', `v${VERSAO_CACHE_INCHURCH}`], {
   revalidate: TTL_EVENTOS_S,
   tags: [INCHURCH_CACHE_TAG],
 });

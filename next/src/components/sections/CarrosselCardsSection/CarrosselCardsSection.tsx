@@ -68,7 +68,12 @@ function Card({ card, nivelTitulo }: { card: CardView; nivelTitulo: 'h2' | 'h3' 
  * Figma: "Neste domingo (Unidades)" (node 1:51). Título + texto de apoio + fileira de cards
  * com setas (carrossel com retorno). Cards com 2 ou 3 destaques ficam alinhados (subgrid).
  */
-export function CarrosselCardsSection({ data, index }: SectionProps<CarrosselCardsData>) {
+interface CarrosselCardsSectionProps extends SectionProps<CarrosselCardsData> {
+  /** `data-section` (medição e testes). Seções que reaproveitam o carrossel passam o próprio nome. */
+  secao?: string;
+}
+
+export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards' }: CarrosselCardsSectionProps) {
   const view = normalizeCarrosselCards(data);
   if (!view) return null;
 
@@ -76,7 +81,7 @@ export function CarrosselCardsSection({ data, index }: SectionProps<CarrosselCar
   const tituloId = `carrossel-${data.id}-titulo`;
 
   return (
-    <section className={styles.secao} aria-labelledby={tituloId} data-section="carrossel-cards">
+    <section className={styles.secao} aria-labelledby={tituloId} data-section={secao}>
       <div className={styles.intro}>
         <Titulo id={tituloId} className={styles.tituloSecao}>
           {view.titulo}

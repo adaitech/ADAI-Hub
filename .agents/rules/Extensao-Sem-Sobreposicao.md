@@ -5,6 +5,10 @@ alwaysApply: true
 
 # Extensão sem sobreposição (Open/Closed, SOLID)
 
+> **Testes obrigatórios antes de qualquer Pull Request:** todo código novo ou alterado chega ao PR com teste unitário escrito e passando (`yarn quality`). Tipos e exigências: [`Testes.md`](./Testes.md) · checklist antes de subir e de abrir o PR: [`Pull-Request.md`](./Pull-Request.md).
+>
+> **Método de trabalho:** sempre o do **superpowers** (brainstorming → plano → TDD → verificação → revisão → finalização) — [`Metodo-Superpowers.md`](./Metodo-Superpowers.md).
+
 **Adaptado de:** vitru-portal.
 
 Princípio inegociável: **aberto para extensão, fechado para modificação**. Para atender uma necessidade de uma seção ou página, **estenda** ou crie um **override escopado**; **nunca** reescreva um componente compartilhado para servir a um único caso.

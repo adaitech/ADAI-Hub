@@ -114,10 +114,22 @@ Controles: parte mais recente (publicada / ao vivo / aguardando corte), título 
 
 ## 9. Testes
 
-`src/lib/youtube/*.test.ts` e `SerieAtualSection.test.tsx` cobrem os 14 cenários do pedido: 4 mensagens; parte futura; live ativa sem Parte 5; live encerrada (`waiting-sermon-cut`); live + corte sem Parte 5 (inclusive corte na segunda de madrugada e live renomeada); 5 domingos; título fora do padrão; YouTube fora com cache anterior; thumbnail sem maxres; `embeddable: false`; playlist vazia/válida/inválida no CMS; título personalizado. Mais: chave só no header, erros 403/429/timeout/JSON, chave ausente, `videos.list` em uma chamada, TTL 4h × 5 min, fuso de São Paulo e dados reais do canal.
+`next/src/lib/youtube/*.test.ts`, `next/src/components/sections/SerieAtualSection/SerieAtualSection.test.tsx` e `next/src/__tests__/caracteristicas/cache-versionado.test.ts` (formato guardado em cache × `VERSAO_CACHE_YOUTUBE`; player em youtube-nocookie.com) cobrem os 14 cenários do pedido: 4 mensagens; parte futura; live ativa sem Parte 5; live encerrada (`waiting-sermon-cut`); live + corte sem Parte 5 (inclusive corte na segunda de madrugada e live renomeada); 5 domingos; título fora do padrão; YouTube fora com cache anterior; thumbnail sem maxres; `embeddable: false`; playlist vazia/válida/inválida no CMS; título personalizado. Mais: chave só no header, erros 403/429/timeout/JSON, chave ausente, `videos.list` em uma chamada, TTL 4h × 5 min, fuso de São Paulo e dados reais do canal.
+
+Também cobrem este componente, sem precisar editar nada:
+
+- `src/lib/showcase/catalog.test.tsx` — todas as variantes e controles da vitrine renderizam; guia do editor × mock.
+- `src/__tests__/caracteristicas/` — 5 pilares (Strapi ↔ registry ↔ vitrine ↔ doc), acessibilidade/SEO de cada variante, CSS, segurança.
+- `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
+
+**Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).
 
 ## 10. Pendências
 
 - ⏳ Validação humana: design do dialog e do selo "Ao vivo agora", layout mobile, leitor de tela.
 - Página própria de mensagens: quando existir, trocar o link "Todas as mensagens".
 - Produção: restringir a `YOUTUBE_API_KEY` à YouTube Data API v3 no Google Cloud (a chave é server-side, então restrição por referer não se aplica; por IP, se o provedor permitir).
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `assistir_mensagem` (disparo manual no `AssistirVideo`: `serie`, `parte`, `status`, `origem`, `player`); `ver_todas_mensagens`; `ver_secao`.

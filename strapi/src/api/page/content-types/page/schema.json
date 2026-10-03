@@ -28,7 +28,7 @@
     },
     "sections": {
       "type": "dynamiczone",
-      "components": ["sections.hero", "sections.carrossel-cards", "sections.imagem-texto", "sections.serie-atual", "sections.proximos-eventos", "sections.ministerios", "sections.texto-botoes", "sections.perguntas-frequentes"]
+      "components": ["sections.hero", "sections.carrossel-cards", "sections.imagem-texto", "sections.serie-atual", "sections.proximos-eventos", "sections.ministerios", "sections.texto-botoes", "sections.perguntas-frequentes", "sections.texto-rico"]
     }
   }
 }

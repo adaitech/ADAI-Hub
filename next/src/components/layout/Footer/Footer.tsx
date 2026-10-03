@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Logo } from '@/components/icons/Logo';
+import { BotaoPreferenciasCookies } from '@/components/layout/BannerCookies';
+import { ROTA_POLITICA } from '@/lib/analytics/consentimento';
 import { SmartLink } from '@/components/ui/SmartLink';
 import { normalizeFooter } from './normalize';
 import type { FooterData } from './types';
@@ -44,12 +46,16 @@ export function Footer({ data }: FooterProps) {
           )}
         </div>
 
-        {(copyright || assinatura) && (
-          <div className={styles.linhaFinal}>
-            {copyright && <p>{copyright}</p>}
-            {assinatura && <p>{assinatura}</p>}
+        <div className={styles.linhaFinal}>
+          {copyright && <p>{copyright}</p>}
+          <div className={styles.privacidade}>
+            <SmartLink href={ROTA_POLITICA} className={styles.link}>
+              Política de Privacidade e Cookies
+            </SmartLink>
+            <BotaoPreferenciasCookies />
           </div>
-        )}
+          {assinatura && <p>{assinatura}</p>}
+        </div>
 
         <p className={styles.mega} aria-hidden="true">
           ADAI

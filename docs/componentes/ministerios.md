@@ -20,3 +20,21 @@ Os grupos da API inChurch não trazem os públicos e destinos desta lista; a cur
 ## Layout e validação
 
 No desktop, padding interno de 72px, vão entre colunas de 86px e linhas de 78px seguem o nó do Figma. O layout responsivo empilha colunas e põe o público abaixo do nome em telas menores. A vitrine inclui estados completo, mínimo e texto longo.
+
+## Medição (DataLayer)
+
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `selecionar_ministerio` (`ministerio` = nome); `clique_cta`; `ver_secao`.
+
+## Testes
+
+Na pasta `next/` (`yarn test` ou `yarn test <caminho>`):
+
+- `next/src/components/sections/MinisteriosSection/MinisteriosSection.test.tsx`
+
+Também cobrem este componente, sem precisar editar nada:
+
+- `src/lib/showcase/catalog.test.tsx` — todas as variantes e controles da vitrine renderizam; guia do editor × mock.
+- `src/__tests__/caracteristicas/` — 5 pilares (Strapi ↔ registry ↔ vitrine ↔ doc), acessibilidade/SEO de cada variante, CSS, segurança.
+- `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
+
+**Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).

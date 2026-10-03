@@ -32,7 +32,8 @@ export function ImagemTextoSection({ data, index }: SectionProps<ImagemTextoData
             alt={view.imagem.alt}
             fill
             sizes="(min-width: 1024px) 44vw, 100vw"
-            priority={index === 0}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : undefined}
             className={styles.imagem}
           />
         </div>

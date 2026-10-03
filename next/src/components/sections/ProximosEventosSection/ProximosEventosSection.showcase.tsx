@@ -26,7 +26,7 @@ export const proximosEventosShowcase = defineShowcase<ProximosEventosExemplo>({
   render: ({ strapi, inchurch: dados, agora }) => {
     const eventos = proximosEventos(dados, { agora: new Date(agora), limite: quantidadeDe(strapi) });
     if (eventos.length === 0) return null;
-    return <CarrosselCardsSection data={paraCarrossel(strapi, eventos)} index={1} />;
+    return <CarrosselCardsSection data={paraCarrossel(strapi, eventos)} index={1} secao="proximos-eventos" />;
   },
   variantes: [
     {

@@ -42,7 +42,12 @@ function IconePlay() {
   );
 }
 
-function CardParte({ parte, nivel }: { parte: ParteSerie; nivel: 'h2' | 'h3' }) {
+/** Parâmetros do evento `assistir_mensagem` (DataLayer) para um gatilho do player. */
+function medicaoDe(parte: ParteSerie, serie: string, origem: 'botao' | 'thumbnail' | 'card') {
+  return { origem, serie, parte: parte.parte, status: parte.status as Exclude<ParteSerie['status'], 'upcoming'> };
+}
+
+function CardParte({ parte, nivel, serie }: { parte: ParteSerie; nivel: 'h2' | 'h3'; serie: string }) {
   const Titulo = nivel;
   if (!parte.video) {
     return (
@@ -56,7 +61,7 @@ function CardParte({ parte, nivel }: { parte: ParteSerie; nivel: 'h2' | 'h3' }) 
     <li className={styles.parte} data-status={parte.status}>
       {parte.data && <p className={styles.parteMeta}>{formatarDia(parte.data)}</p>}
       <Titulo className={styles.parteTitulo}>
-        <AssistirVideo video={parte.video} titulo={nomeDaParte(parte)} className={styles.parteGatilho}>
+        <AssistirVideo video={parte.video} titulo={nomeDaParte(parte)} className={styles.parteGatilho} medicao={medicaoDe(parte, serie, 'card')}>
           {nomeDaParte(parte)}
         </AssistirVideo>
       </Titulo>
@@ -98,7 +103,7 @@ export function SerieAtual({ view, index, id }: SerieAtualProps) {
             {detalhe && <span className={styles.linha}>{detalhe}</span>}
           </p>
           <div className={styles.acoes}>
-            <AssistirVideo video={atual.video} titulo={nomeAtual} className={buttonClassName({ className: styles.botao })}>
+            <AssistirVideo video={atual.video} titulo={nomeAtual} className={buttonClassName({ className: styles.botao })} medicao={medicaoDe(atual, serie.titulo, 'botao')}>
               {ROTULO_BOTAO[atual.status]}
             </AssistirVideo>
             <ButtonLink href={serie.playlistUrl} estilo="contorno" novaAba>
@@ -108,7 +113,7 @@ export function SerieAtual({ view, index, id }: SerieAtualProps) {
         </div>
 
         <div className={styles.midia}>
-          <AssistirVideo video={atual.video} titulo={nomeAtual} rotulo={`${ROTULO_BOTAO[atual.status]}: ${nomeDaParte(atual)}`} className={styles.thumbGatilho}>
+          <AssistirVideo video={atual.video} titulo={nomeAtual} rotulo={`${ROTULO_BOTAO[atual.status]}: ${nomeDaParte(atual)}`} className={styles.thumbGatilho} medicao={medicaoDe(atual, serie.titulo, 'thumbnail')}>
             {atual.video.thumbnail && (
               <Image
                 src={atual.video.thumbnail.url}
@@ -128,7 +133,7 @@ export function SerieAtual({ view, index, id }: SerieAtualProps) {
       {outras.length > 0 && (
         <ul role="list" className={styles.partes} aria-label={`Partes da série ${serie.titulo}`} data-colunas={Math.min(outras.length, 4)}>
           {outras.map((parte) => (
-            <CardParte key={parte.parte} parte={parte} nivel={Titulo === 'h1' ? 'h2' : 'h3'} />
+            <CardParte key={parte.parte} parte={parte} nivel={Titulo === 'h1' ? 'h2' : 'h3'} serie={serie.titulo} />
           ))}
         </ul>
       )}

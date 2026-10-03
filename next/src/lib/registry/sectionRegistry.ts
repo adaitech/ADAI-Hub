@@ -7,6 +7,7 @@ import { PerguntasFrequentesSection, perguntasFrequentesPopulate } from '@/compo
 import { ProximosEventosSection, proximosEventosPopulate } from '@/components/sections/ProximosEventosSection';
 import { SerieAtualSection, serieAtualPopulate } from '@/components/sections/SerieAtualSection';
 import { TextoBotoesSection, textoBotoesPopulate } from '@/components/sections/TextoBotoesSection';
+import { TextoRicoSection, textoRicoPopulate } from '@/components/sections/TextoRicoSection';
 import type { StrapiSection, StrapiSectionPopulate } from '@/lib/strapi/types';
 import type { SectionProps } from '@/types/sections';
 
@@ -35,10 +36,12 @@ export const sectionRegistry: Record<string, SectionRegistryEntry> = {
   'sections.perguntas-frequentes': defineSection(PerguntasFrequentesSection, perguntasFrequentesPopulate),
   'sections.serie-atual': defineSection(SerieAtualSection, serieAtualPopulate),
   'sections.proximos-eventos': defineSection(ProximosEventosSection, proximosEventosPopulate),
+  'sections.texto-rico': defineSection(TextoRicoSection, textoRicoPopulate),
 };
 
 export function getSection(key: string): SectionRegistryEntry | null {
-  return sectionRegistry[key] ?? null;
+  // `hasOwn`: nomes como `constructor`/`__proto__` não podem cair no protótipo do objeto.
+  return Object.hasOwn(sectionRegistry, key) ? sectionRegistry[key] : null;
 }
 
 /** Fragmentos `on` do populate da dynamic zone, montados a partir do registry. */

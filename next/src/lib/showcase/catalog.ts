@@ -1,3 +1,4 @@
+import { bannerCookiesShowcase } from '@/components/layout/BannerCookies/BannerCookies.showcase';
 import { footerShowcase } from '@/components/layout/Footer/Footer.showcase';
 import { headerShowcase } from '@/components/layout/Header/Header.showcase';
 import { carrosselCardsShowcase } from '@/components/sections/CarrosselCardsSection/CarrosselCardsSection.showcase';
@@ -8,6 +9,7 @@ import { perguntasFrequentesShowcase } from '@/components/sections/PerguntasFreq
 import { proximosEventosShowcase } from '@/components/sections/ProximosEventosSection/ProximosEventosSection.showcase';
 import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/SerieAtualSection.showcase';
 import { textoBotoesShowcase } from '@/components/sections/TextoBotoesSection/TextoBotoesSection.showcase';
+import { textoRicoShowcase } from '@/components/sections/TextoRicoSection/TextoRicoSection.showcase';
 import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
 import type { ShowcaseCategoria, ShowcaseEntry } from './types';
@@ -23,7 +25,9 @@ export const showcaseCatalog: ShowcaseEntry[] = [
   perguntasFrequentesShowcase,
   serieAtualShowcase,
   proximosEventosShowcase,
+  textoRicoShowcase,
   footerShowcase,
+  bannerCookiesShowcase,
   buttonLinkShowcase,
   textLinkShowcase,
 ];
