@@ -18,14 +18,17 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@strapi/plugin-seo": "^2.0.4",
-    "@strapi/plugin-users-permissions": "5.17.0",
-    "@strapi/strapi": "5.17.0",
+    "@strapi/plugin-seo": "2.0.9",
+    "@strapi/plugin-users-permissions": "5.56.0",
+    "@strapi/strapi": "5.56.0",
     "better-sqlite3": "11.7.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
+    "react-router-dom": "^6.30.3",
     "styled-components": "^6.0.0"
+  },
+  "resolutions": {
+    "@swc/core": "1.15.47"
   },
   "strapi": {
     "telemetryDisabled": true
