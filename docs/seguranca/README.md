@@ -39,7 +39,7 @@ A API do Strapi foi comparada antes e depois (Home, Política, exemplos e config
 | --- | --- | --- |
 | `axios` | `^1.20.0` | Redirecionamento/DoS (painel) |
 | `lodash` | `^4.18.1` | Injeção de código via `_.template` |
-| `nodemailer` | `^9.1.1` | Parte das falhas do parser de endereço |
+| `nodemailer` | `^9.1.1` | Troca de falhas, com saldo menor: corrige 1 alta e 3 moderadas da 9.0.1, mas a linha 9.1–10.0.4 tem 1 alta própria (endereços juntados por comentários) e 1 moderada. Ver §3 |
 | `postcss` | `^8.5.28` | Leitura de arquivo via source map |
 | `@remix-run/router` | `^1.23.4` | XSS por redirecionamento aberto (painel) |
 | `@swc/core` | `1.15.47` | **Não é falha de segurança:** a 1.16 recusa o cache nativo quando `C:\Users\<usuário>\AppData\Local` herda permissão de uma identidade de sandbox (`S-1-15-3-…`), o que quebra o build do painel no Windows. Só ferramenta de build. Rever quando o ambiente mudar |
@@ -48,12 +48,14 @@ A API do Strapi foi comparada antes e depois (Home, Política, exemplos e config
 
 ## 3. Riscos aceitos (altas restantes)
 
+> ⚠️ **Desvio da spec:** a spec só aceitava sobra em ferramenta de build/CLI. `braces` e `nodemailer` **rodam no servidor de produção** do Strapi. Ficam abertos até decisão do responsável pelo projeto; a entrega 3 (endurecimento do Strapi) remove o caminho de ataque do `nodemailer`.
+
 | Pacote | Por que fica | Mitigação / quando rever |
 | --- | --- | --- |
-| `braces` (8 avisos) | Não há versão corrigida publicada | Os padrões vêm da configuração do Strapi, não do visitante. Rever a cada `yarn audit` |
+| `braces` (8 avisos) | **Roda em produção** (content-type-builder → micromatch; @strapi/utils → preferred-pm). Não há versão corrigida publicada | Falha de negação de serviço com padrão de glob muito aninhado; os padrões vêm da configuração do Strapi, não do visitante. Rever a cada `yarn audit` |
 | `vite` 5 | Só no `strapi develop` (servidor de desenvolvimento do painel); correção exige vite 6 | Nunca rodar `develop` em produção (produção usa `strapi start`). Some quando o Strapi adotar vite 6 |
 | `webpack-dev-middleware` 6 | Só desenvolvimento; correção exige major 7 | Igual ao vite |
-| `nodemailer` < 10.0.6 | Só é usado se o Strapi enviar e-mail (hoje não há provedor configurado); correção exige major 10 | **Antes de configurar e-mail no Strapi**, atualizar o provedor/nodemailer |
+| `nodemailer` < 10.0.6 | **Roda em produção:** sem `config/plugins.ts` de e-mail vale o provedor padrão `sendmail`, que usa o nodemailer e é carregado no bootstrap; "esqueci a senha" (admin e users-permissions) já envia e-mail por ele. Correção exige major 10 | Falha de negação de serviço no parser de endereços. **Entrega 3:** desligar os endpoints públicos que o site não usa (cadastro e esqueci a senha do users-permissions) e configurar um provedor de e-mail atual antes de qualquer envio exposto ao público |
 
 ## 4. Como auditar
 
