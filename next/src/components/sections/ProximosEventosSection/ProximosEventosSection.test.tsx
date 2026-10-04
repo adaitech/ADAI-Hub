@@ -2,13 +2,16 @@ import { render, screen, within } from '@testing-library/react';
 import type { EventoSite } from '@/lib/inchurch/eventos';
 import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
 import mocks from './ProximosEventosSection.mock.json';
-import { datasDoEvento, paraCarrossel, quantidadeDe } from './normalize';
+import { getIgrejasInchurch } from '@/lib/strapi/queries/unidades';
+import { datasDoEvento, igrejaDe, paraCarrossel, quantidadeDe } from './normalize';
 import { ProximosEventosSection } from './ProximosEventosSection';
 import { proximosEventosShowcase } from './ProximosEventosSection.showcase';
 import type { ProximosEventosData, ProximosEventosExemplo } from './types';
 
 jest.mock('@/lib/inchurch/eventos-cache', () => ({ getEventosInchurch: jest.fn() }));
 const getEventos = getEventosInchurch as jest.MockedFunction<typeof getEventosInchurch>;
+jest.mock('@/lib/strapi/queries/unidades', () => ({ getIgrejasInchurch: jest.fn(async () => []) }));
+const getIgrejas = getIgrejasInchurch as jest.MockedFunction<typeof getIgrejasInchurch>;
 
 const exemplo = (nome: string) => proximosEventosShowcase.variantes.find((v) => v.nome === nome)!.data as ProximosEventosExemplo;
 const minimo = mocks.minimo as ProximosEventosData;
@@ -21,6 +24,7 @@ const ev = (ocorrencias: [string, string][], extra: Partial<EventoSite> = {}): E
   descricao: null,
   link: null,
   destaque: false,
+  igrejaId: null,
   ...extra,
 });
 
@@ -54,7 +58,7 @@ describe('paraCarrossel', () => {
         link: { url: 'https://zoom.us/j/1', texto: 'Participar online' },
       }),
     ]);
-    expect(data).toMatchObject({ titulo: 'Próximos eventos', estilo_imagem: 'arte', posicao_imagem: 'acima' });
+    expect(data).toMatchObject({ titulo: 'Próximos eventos', estilo_imagem: 'arte', posicao_imagem: 'apos_titulo' });
     expect(data.cards?.[0]).toMatchObject({
       titulo: 'The Chosen',
       cor: 'azul',
@@ -62,6 +66,13 @@ describe('paraCarrossel', () => {
       imagem: { url: 'https://storage.googleapis.com/media_files_prod/x.webp', alternativeText: '' },
       link: { texto: 'Participar online', url: 'https://zoom.us/j/1', nova_aba: true },
     });
+  });
+
+  it('igrejaDe: ID da Unidade escolhida; vazio ou inválido → sem filtro', () => {
+    expect(igrejaDe({ ...minimo, unidade: { id: 1, nome: 'ADAI Campestre', igreja_inchurch_id: 30146 } })).toBe(30146);
+    expect(igrejaDe({ ...minimo, unidade: null })).toBeNull();
+    expect(igrejaDe(minimo)).toBeNull();
+    expect(igrejaDe({ ...minimo, unidade: { id: 1, igreja_inchurch_id: 0 } })).toBeNull();
   });
 
   it('quantidade: padrão 8, limitada a 1..12', () => {
@@ -93,5 +104,47 @@ describe('ProximosEventosSection', () => {
     expect(await ProximosEventosSection({ data: minimo, index: 1 })).toBeNull();
     getEventos.mockResolvedValue({ eventos: [], atualizadoEm: '' });
     expect(await ProximosEventosSection({ data: minimo, index: 1 })).toBeNull();
+  });
+
+  describe('página de unidade', () => {
+    const tres = {
+      atualizadoEm: '',
+      eventos: [
+        ev([['2027-01-10T09:00:00', '2027-01-10T10:00:00']], { id: 1, nome: 'Café Campestre', igrejaId: 30146 }),
+        ev([['2027-01-11T09:00:00', '2027-01-11T10:00:00']], { id: 2, nome: 'Conferência geral' }),
+        ev([['2027-01-12T09:00:00', '2027-01-12T10:00:00']], { id: 3, nome: 'Culto Santos', igrejaId: 31876 }),
+      ],
+    };
+    const titulos = () => screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
+
+    it('mostra eventos da unidade + gerais e busca a igreja da seção mesmo fora da lista', async () => {
+      getIgrejas.mockResolvedValueOnce([31876]);
+      getEventos.mockResolvedValue(tres);
+      const ui = await ProximosEventosSection({ data: { ...minimo, unidade: { id: 1, nome: 'ADAI Campestre', igreja_inchurch_id: 30146 } }, index: 1 });
+      render(<>{ui}</>);
+      expect(getEventos).toHaveBeenLastCalledWith([30146, 31876]);
+      expect(titulos()).toEqual(['Café Campestre', 'Conferência geral']);
+    });
+
+    it('sem unidade (Home) → todos os eventos', async () => {
+      getEventos.mockResolvedValue(tres);
+      render(<>{await ProximosEventosSection({ data: minimo, index: 1 })}</>);
+      expect(titulos()).toEqual(['Café Campestre', 'Conferência geral', 'Culto Santos']);
+    });
+
+    it('Unidade com ID inválido → não esconde a agenda (mostra todos)', async () => {
+      getEventos.mockResolvedValue(tres);
+      render(<>{await ProximosEventosSection({ data: { ...minimo, unidade: { id: 1, igreja_inchurch_id: -3 } }, index: 1 })}</>);
+      expect(titulos()).toHaveLength(3);
+    });
+  });
+});
+
+describe('vitrine', () => {
+  it('variante unidade: o evento de outra unidade fica de fora', () => {
+    render(<>{proximosEventosShowcase.render(exemplo('unidade'))}</>);
+    expect(screen.queryByRole('heading', { name: 'The Chosen' })).not.toBeInTheDocument();
+    render(<>{proximosEventosShowcase.render(exemplo('minimo'))}</>);
+    expect(screen.getByRole('heading', { name: 'The Chosen' })).toBeInTheDocument();
   });
 });

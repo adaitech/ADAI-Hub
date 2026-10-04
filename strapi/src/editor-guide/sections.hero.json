@@ -1,11 +1,11 @@
 {
   "uid": "sections.hero",
   "nome": "Hero (abertura da página)",
-  "resumo": "Primeira faixa da página: uma foto grande em preto e branco com a frase principal em letras enormes, um texto de apoio e até dois botões.",
+  "resumo": "Primeira faixa da página: uma foto grande (em preto e branco, ou colorida nas páginas das unidades) com a frase principal em letras enormes, um texto abaixo dela, um texto de apoio e até dois botões.",
   "ondeAparece": "Topo da página, logo abaixo do cabeçalho. Use apenas um Hero por página, sempre como primeira seção.",
   "boasPraticas": [
     "Frase principal curta: uma ideia por linha (ex.: Amar. / Servir. / Influenciar.).",
-    "Foto horizontal com pessoas reais da ADAI, bem iluminada. Ela fica em preto e branco automaticamente — suba a foto colorida.",
+    "Foto horizontal com pessoas reais da ADAI, bem iluminada. Ela fica em preto e branco automaticamente — suba a foto colorida. Para mostrar colorida (ex.: páginas das unidades), desligue \"Foto em preto e branco\".",
     "Preencha o \"Texto alternativo\" da foto na Biblioteca de Mídia descrevendo a cena para quem não enxerga (ex.: \"Voluntária sorri segurando placa com as palavras Amar, Servir, Influenciar\").",
     "O primeiro botão é a ação principal (estilo Sólido); o segundo, uma alternativa (estilo Contorno)."
   ],
@@ -19,6 +19,16 @@
       "obrigatorio": true,
       "limite": "Até 3 linhas · 60 caracteres no total",
       "exemplo": "Amar.\nServir.\nInfluenciar."
+    },
+    {
+      "campo": "subtitulo",
+      "label": "Texto abaixo da frase principal",
+      "descricao": "Frase logo abaixo do título grande (ex.: apresentação da unidade). Enter começa nova linha.",
+      "placeholder": "Ex.: A unidade Campestre reúne cultos, ministérios e momentos de conexão em Santo André.",
+      "ondeAparece": "Texto branco abaixo da frase principal, à esquerda.",
+      "obrigatorio": false,
+      "limite": "Até 220 caracteres",
+      "exemplo": "A unidade Campestre reúne cultos, ministérios e momentos de conexão em Santo André, com uma presença acolhedora e familiar."
     },
     {
       "campo": "texto_apoio",
@@ -50,6 +60,16 @@
       "limite": "Até 2 botões",
       "exemplo": "Planeje sua visita (Sólido) · Unidades (Contorno)",
       "componente": "shared.botao"
+    },
+    {
+      "campo": "preto_e_branco",
+      "label": "Foto em preto e branco",
+      "descricao": "Ligado (padrão): foto em preto e branco, como na Home. Desligado: foto colorida, como nas unidades.",
+      "placeholder": "",
+      "ondeAparece": "Na foto de fundo.",
+      "obrigatorio": false,
+      "limite": "Ligado ou desligado",
+      "exemplo": "Desligado (Campestre)"
     }
   ]
 }

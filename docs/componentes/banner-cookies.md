@@ -24,7 +24,7 @@ Texto legal e regra de consentimento são responsabilidade de dev (mudar o texto
 | Aceitar | Salva `{ analytics: true, versao, data }` em `localStorage` (`adai-consentimento-cookies`), envia `consent update` (analytics granted), **carrega o GTM** e registra `consentimento_cookies: aceito` |
 | Recusar | Salva `analytics: false`; o GTM não carrega (nada vai ao Google) |
 | Visita seguinte | Aviso não aparece; com aceite salvo (mesma versão do aviso) o GTM carrega direto; com recusa, não carrega |
-| "Preferências de cookies" (rodapé) | Reabre o aviso e leva o foco até ele |
+| "Preferências de cookies" (botão na Política de Privacidade: link `#preferencias-cookies` no Markdown) | Reabre o aviso e leva o foco até ele |
 | Texto do aviso mudou | Subir `VERSAO_CONSENTIMENTO` (`lib/analytics/consentimento.ts`) → todos veem o aviso de novo |
 | `localStorage` bloqueado | A escolha vale só na página atual |
 

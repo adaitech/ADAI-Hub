@@ -85,24 +85,70 @@ a.linha:focus-visible {
   line-height: var(--line-height-text);
 }
 
+/*
+ * Exibição "cards" (Figma 28:462, páginas das unidades): sem caixa cinza; título e apoio acima
+ * de uma grade de cards cinza (nome em fonte de display, público abaixo).
+ */
+[data-exibicao='cards'] .caixa {
+  gap: var(--space-40);
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+/* Mesma introdução das outras seções da página da unidade (Carrossel de cards). */
+[data-exibicao='cards'] .intro {
+  gap: var(--space-16);
+  max-width: var(--intro-max);
+}
+
+[data-exibicao='cards'] :is(.titulo, .apoio) {
+  max-width: none;
+}
+
+[data-exibicao='cards'] .lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+[data-exibicao='cards'] .linha {
+  justify-content: flex-start;
+  height: 100%;
+  min-height: var(--ministerios-card-altura);
+  gap: var(--space-8);
+  padding: var(--space-24);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+[data-exibicao='cards'] a.linha:is(:hover, :focus-visible) {
+  background: var(--color-bg-subtle);
+  text-decoration: underline;
+}
+
 /* tier: tablet — nome e público passam a dividir a mesma linha. */
 @media (min-width: 769px) {
-  .linha {
+  [data-exibicao='lista'] .linha {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-16);
   }
 
-  .publico {
+  [data-exibicao='lista'] .publico {
     text-align: right;
   }
 }
 
 /* tier: desktop — a lista ocupa a coluna maior, como no Figma. */
 @media (min-width: 1024px) {
-  .caixa {
+  [data-exibicao='lista'] .caixa {
     grid-template-columns: minmax(0, 0.77fr) minmax(0, 1fr);
     gap: var(--space-coluna);
+  }
+
+  [data-exibicao='cards'] .lista {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

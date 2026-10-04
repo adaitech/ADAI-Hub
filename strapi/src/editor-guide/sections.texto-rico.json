@@ -13,10 +13,10 @@
     {
       "campo": "titulo",
       "label": "Título",
-      "descricao": "Título principal do documento.",
+      "descricao": "Título do documento. Deixe vazio quando a página já começa com um Hero (o título do Hero é o da página).",
       "placeholder": "Ex.: Política de Privacidade e Cookies",
       "ondeAparece": "Topo da página, em destaque.",
-      "obrigatorio": true,
+      "obrigatorio": false,
       "limite": "Até 100 caracteres",
       "exemplo": "Política de Privacidade e Cookies"
     },

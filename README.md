@@ -90,6 +90,7 @@ Checklist do que **muda** entre homologação e produção (detalhes de mediçã
 | 7 | GA4 | analytics.google.com → Administrador | Dimensões personalizadas e eventos-chave (`planejar_visita`, `contribuir`) — `docs/analytics/README.md` §4.2; filtrar `site_ambiente = homologacao` nos relatórios |
 | 8 | LGPD | site | Página de **Política de Privacidade** publicada e link no aviso de cookies |
 | 9 | Cabeçalhos e CORS | `next/.env` e `strapi/.env` | Site em `https://` (liga HSTS e `upgrade-insecure-requests`); `CLIENT_URL`/`CORS_ORIGINS` do Strapi com o domínio real. Primeira semana: `CSP_SOMENTE_RELATORIO=true` e acompanhar `[csp] violação` no log; depois remover. `curl -I https://<domínio>` deve mostrar o padrão de `docs/seguranca/README.md` §7 |
+| 10 | Unidades, páginas das unidades e institucionais | Painel do Strapi de produção (o seed só roda em dev) | Cadastrar as 5 **Unidades** (ADAI Campestre 30146, Anália Franco 31875, São Bernardo do Campo 31874, Santos 31876, ADAI On 31879); criar as páginas `campestre`, `analia-franco`, `sao-bernardo`, `santos`, `adai-on` (modelo em `strapi/src/bootstrap/seed.ts` → `unidadeSections`) com a Unidade escolhida na seção Próximos eventos; preencher "Página do card" nos cards de "Neste domingo" da Home; criar `sobre-nos-nossa-historia`, `sobre-nos-a-igreja-que-vemos`, `sobre-nos-no-que-acreditamos` e `jesus` (textos em `strapi/seed/paginas/`) e conferir os links do rodapé. Ou importar um snapshot novo gerado com o seed v17 (`yarn data:import`) |
 
 ## Fontes de dados
 

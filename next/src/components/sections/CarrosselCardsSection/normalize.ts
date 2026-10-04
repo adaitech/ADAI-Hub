@@ -1,4 +1,4 @@
-import { normalizeBotoes, normalizeLink } from '@/lib/strapi/links';
+import { normalizeBotoes, normalizeLink, sanitizeHref } from '@/lib/strapi/links';
 import { resolveStrapiMedia } from '@/lib/strapi/media';
 import { splitLines } from '@/utils/text';
 import { CORES_CARD, type CardData, type CardView, type CarrosselCardsData, type CarrosselCardsView, type CorCard } from './types';
@@ -24,6 +24,7 @@ function normalizeCard(card: CardData): CardView | null {
     texto: splitLines(card.texto),
     botao: normalizeBotoes(card.botao ? [card.botao] : [])[0] ?? null,
     link: normalizeLink(card.link),
+    href: sanitizeHref(card.url),
   };
 }
 
@@ -42,7 +43,8 @@ export function normalizeCarrosselCards(data: CarrosselCardsData): CarrosselCard
     cards,
     link: normalizeLink(data.link),
     temImagem: cards.some((card) => card.imagem !== null),
-    posicaoImagem: data.posicao_imagem === 'abaixo' ? 'abaixo' : 'acima',
+    posicaoImagem: data.posicao_imagem === 'abaixo' || data.posicao_imagem === 'apos_titulo' ? data.posicao_imagem : 'acima',
+    pretoEBranco: data.preto_e_branco !== false,
     estiloImagem: data.estilo_imagem === 'arte' ? 'arte' : 'foto',
   };
 }

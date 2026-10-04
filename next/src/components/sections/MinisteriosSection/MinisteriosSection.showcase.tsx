@@ -10,13 +10,20 @@ export const ministeriosShowcase = defineShowcase<MinisteriosData>({
   nome: 'Lista de ministérios',
   categoria: 'secao',
   cmsKey: 'sections.ministerios',
-  descricao: 'Convite para servir ao lado de uma lista vertical de ministérios e seus públicos. Os itens não deslizam: esta seção não é um carrossel.',
-  quandoUsar: 'Na Home, para mostrar de uma vez todas as áreas em que alguém pode encontrar seu lugar e servir.',
+  descricao:
+    'Convite para servir ao lado de uma lista vertical de ministérios e seus públicos, ou (exibição "Cards") uma grade de cards cinza. Os itens não deslizam: esta seção não é um carrossel.',
+  quandoUsar: 'Na Home (lista), para mostrar todas as áreas em que alguém pode servir; nas páginas das unidades (cards), em "Pra todas as idades".',
   doc: 'docs/componentes/ministerios.md',
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-230',
   render: (data) => <MinisteriosSection data={data} index={1} />,
   variantes: [
     { nome: 'completo', titulo: 'Encontre seu lugar', descricao: 'Oito ministérios, como no Figma.', data: completo },
+    {
+      nome: 'cards',
+      titulo: 'Pra todas as idades (unidade)',
+      descricao: 'Exibição "Cards" (Figma 28:462): grade de cards cinza, sem a caixa; usada nas páginas das unidades.',
+      data: mocks.cards as MinisteriosData,
+    },
     { nome: 'minimo', titulo: 'Mínimo', descricao: 'Um ministério sem público nem ação.', data: mocks.minimo as MinisteriosData },
     { nome: 'texto_longo', titulo: 'Texto longo', descricao: 'Verifica nomes e públicos extensos.', data: mocks.texto_longo as MinisteriosData },
   ],

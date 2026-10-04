@@ -30,7 +30,9 @@ describe('/sitemap.xml', () => {
     producao();
     expect(await sitemap()).toEqual([
       { url: 'https://adai.com.br', lastModified: '2026-10-02', priority: 1 },
+      { url: 'https://adai.com.br/campestre', lastModified: '2026-10-02', priority: 0.8 },
       { url: 'https://adai.com.br/politica-de-privacidade', lastModified: '2026-10-02', priority: 0.8 },
+      { url: 'https://adai.com.br/sobre-nos/nossa-historia', lastModified: '2026-10-02', priority: 0.8 },
     ]);
   });
 
@@ -41,7 +43,7 @@ describe('/sitemap.xml', () => {
     strapi.paginas.exemplos = { ...base, id: 4, slug: 'exemplos' };
     strapi.paginas.rascunho = { ...base, id: 5, slug: 'teste-interno', seo: { ...base.seo!, metaRobots: 'noindex' } as never };
     const urls = (await sitemap()).map((e) => e.url);
-    expect(urls).toEqual(['https://adai.com.br', 'https://adai.com.br/kids', 'https://adai.com.br/politica-de-privacidade']);
+    expect(urls).toEqual(['https://adai.com.br', 'https://adai.com.br/campestre', 'https://adai.com.br/kids', 'https://adai.com.br/politica-de-privacidade', 'https://adai.com.br/sobre-nos/nossa-historia']);
   });
 
   it('fora de produção: sitemap vazio e nenhuma consulta ao Strapi', async () => {

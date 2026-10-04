@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "unidades",
+  "info": {
+    "singularName": "unidade",
+    "pluralName": "unidades",
+    "displayName": "Unidades",
+    "description": "Unidades da ADAI e o ID da igreja de cada uma na inChurch (separa a agenda por unidade)."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "nome": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "igreja_inchurch_id": {
+      "type": "integer",
+      "required": true,
+      "unique": true,
+      "min": 1
+    }
+  }
+}

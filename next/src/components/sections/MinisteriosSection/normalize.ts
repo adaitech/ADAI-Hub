@@ -24,5 +24,6 @@ export function normalizeMinisterios(data: MinisteriosData): MinisteriosView | n
     textoApoio: data.texto_apoio?.trim() || null,
     botao: normalizeBotoes(data.botao ? [data.botao] : [])[0] ?? null,
     ministerios,
+    exibicao: data.exibicao === 'cards' ? 'cards' : 'lista',
   };
 }

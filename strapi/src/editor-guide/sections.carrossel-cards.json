@@ -54,11 +54,11 @@
     {
       "campo": "posicao_imagem",
       "label": "Posição da foto nos cards",
-      "descricao": "Foto acima do título (padrão) ou abaixo das ações. Vale para todos os cards da fileira.",
+      "descricao": "Acima do título (padrão), logo após o título (ex.: agenda) ou abaixo do link, em todos os cards.",
       "placeholder": "",
       "ondeAparece": "Dentro de cada card que tem foto.",
       "obrigatorio": true,
-      "limite": "acima ou abaixo",
+      "limite": "Acima, após o título ou abaixo",
       "exemplo": "acima"
     },
     {
@@ -71,6 +71,16 @@
       "limite": "1 link",
       "exemplo": "Ver todas as unidades → /unidades",
       "componente": "shared.link"
+    },
+    {
+      "campo": "preto_e_branco",
+      "label": "Fotos em preto e branco",
+      "descricao": "Ligado (padrão): fotos dos cards em preto e branco. Desligado: coloridas. Artes de divulgação são sempre coloridas.",
+      "placeholder": "",
+      "ondeAparece": "Nas fotos de todos os cards da seção.",
+      "obrigatorio": false,
+      "limite": "Ligado ou desligado",
+      "exemplo": "Desligado"
     }
   ]
 }

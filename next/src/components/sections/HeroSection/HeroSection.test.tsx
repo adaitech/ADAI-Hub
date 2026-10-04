@@ -37,4 +37,20 @@ describe('HeroSection', () => {
     const { container } = render(<HeroSection data={{ ...completo, titulo: '' }} index={0} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('unidade: subtítulo abaixo do título (coluna esquerda) e foto colorida', () => {
+    const { container } = render(
+      <HeroSection data={{ ...completo, titulo: 'Campestre', subtitulo: 'A unidade Campestre reúne cultos.', preto_e_branco: false }} index={0} />,
+    );
+    const titulo = screen.getByRole('heading', { level: 1, name: 'Campestre' });
+    const subtitulo = screen.getByText('A unidade Campestre reúne cultos.').closest('p')!;
+    expect(titulo.parentElement).toBe(subtitulo.parentElement);
+    expect(titulo.compareDocumentPosition(subtitulo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.querySelector('[data-foto]')).toHaveAttribute('data-foto', 'colorida');
+  });
+
+  it('Home: foto em preto e branco', () => {
+    const { container } = render(<HeroSection data={completo} index={0} />);
+    expect(container.querySelector('[data-foto]')).toHaveAttribute('data-foto', 'pb');
+  });
 });

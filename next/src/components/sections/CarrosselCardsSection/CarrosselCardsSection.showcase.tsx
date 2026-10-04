@@ -28,7 +28,7 @@ export const carrosselCardsShowcase = defineShowcase<CarrosselCardsData>({
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-51',
   render: (data) => <CarrosselCardsSection data={data} index={1} />,
   variantes: [
-    { nome: 'completo', titulo: 'Neste domingo (Home)', descricao: 'Figma: 5 unidades sem foto, link "Como chegar".', data: mocks.completo as CarrosselCardsData },
+    { nome: 'completo', titulo: 'Neste domingo (Home)', descricao: 'Figma: 5 unidades sem foto, link "Como chegar". "Página do card" preenchida: o card inteiro leva à página da unidade.', data: mocks.completo as CarrosselCardsData },
     {
       nome: 'com_imagem',
       titulo: 'Com foto e cores',
@@ -40,6 +40,12 @@ export const carrosselCardsShowcase = defineShowcase<CarrosselCardsData>({
       titulo: 'Foto abaixo',
       descricao: '"Posição da foto nos cards" = abaixo: a foto fica depois do link.',
       data: mocks.foto_abaixo as CarrosselCardsData,
+    },
+    {
+      nome: 'apos_titulo_colorida',
+      titulo: 'Foto após o título, colorida',
+      descricao: '"Posição da foto" = após o título (como na agenda) e "Fotos em preto e branco" desligado.',
+      data: mocks.apos_titulo_colorida as CarrosselCardsData,
     },
     { nome: 'so_botao', titulo: 'Sem foto, só botão', descricao: '3 cards com 2 e 3 horários alinhados + link "ver todas".', data: mocks.so_botao as CarrosselCardsData },
     { nome: 'minimo', titulo: 'Mínimo', descricao: 'Um card só com título: sem setas.', data: mocks.minimo as CarrosselCardsData },

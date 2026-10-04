@@ -29,6 +29,12 @@ export const textoRicoShowcase = defineShowcase<TextoRicoData>({
       descricao: 'Como em /exemplos: sem data, com negrito, link, lista e tabela.',
       data: mocks.minimo as unknown as TextoRicoData,
     },
+    {
+      nome: 'sem_titulo',
+      titulo: 'Sem título (abaixo de um Hero)',
+      descricao: 'Como em /sobre-nos/nossa-historia: o título da página é o do Hero; aqui só o texto.',
+      data: mocks.sem_titulo as unknown as TextoRicoData,
+    },
   ],
   controles: [
     alternarCampo<TextoRicoData, 'atualizado_em'>('atualizado_em', 'Data de atualização', '2026-10-02', 'Aparece como "Última atualização: …" abaixo do título.'),

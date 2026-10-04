@@ -3,7 +3,7 @@ import type { Schema, Struct } from '@strapi/strapi';
 export interface ItemsCard extends Struct.ComponentSchema {
   collectionName: 'components_items_cards';
   info: {
-    description: 'Card do carrossel: foto opcional, t\u00EDtulo, destaques (ex.: hor\u00E1rios), texto e a\u00E7\u00F5es.';
+    description: 'Card do carrossel: foto opcional, t\u00EDtulo, destaques (ex.: hor\u00E1rios), texto, a\u00E7\u00F5es e p\u00E1gina do card (card inteiro clic\u00E1vel).';
     displayName: 'Card';
     icon: 'dashboard';
   };
@@ -22,12 +22,16 @@ export interface ItemsCard extends Struct.ComponentSchema {
     link: Schema.Attribute.Component<'shared.link', false>;
     texto: Schema.Attribute.Text &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 160;
+        maxLength: 240;
       }>;
     titulo: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 40;
+      }>;
+    url: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
       }>;
   };
 }
@@ -195,9 +199,12 @@ export interface SectionsCarrosselCards extends Struct.ComponentSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'foto'>;
     link: Schema.Attribute.Component<'shared.link', false>;
-    posicao_imagem: Schema.Attribute.Enumeration<['acima', 'abaixo']> &
+    posicao_imagem: Schema.Attribute.Enumeration<
+      ['acima', 'apos_titulo', 'abaixo']
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'acima'>;
+    preto_e_branco: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     texto_apoio: Schema.Attribute.Text &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 200;
@@ -213,7 +220,7 @@ export interface SectionsCarrosselCards extends Struct.ComponentSchema {
 export interface SectionsHero extends Struct.ComponentSchema {
   collectionName: 'components_sections_heroes';
   info: {
-    description: 'Primeira faixa da p\u00E1gina: foto grande em preto e branco, frase principal e at\u00E9 dois bot\u00F5es.';
+    description: 'Primeira faixa da p\u00E1gina: foto grande (preto e branco ou colorida), frase principal, texto abaixo dela e at\u00E9 dois bot\u00F5es.';
     displayName: 'Hero (abertura)';
     icon: 'picture';
   };
@@ -226,6 +233,11 @@ export interface SectionsHero extends Struct.ComponentSchema {
         number
       >;
     imagem: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    preto_e_branco: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    subtitulo: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 220;
+      }>;
     texto_apoio: Schema.Attribute.Text &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 220;
@@ -292,6 +304,9 @@ export interface SectionsMinisterios extends Struct.ComponentSchema {
   };
   attributes: {
     botao: Schema.Attribute.Component<'shared.botao', false>;
+    exibicao: Schema.Attribute.Enumeration<['lista', 'cards']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'lista'>;
     ministerios: Schema.Attribute.Component<'items.ministerio', true> &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -346,7 +361,7 @@ export interface SectionsPerguntasFrequentes extends Struct.ComponentSchema {
 export interface SectionsProximosEventos extends Struct.ComponentSchema {
   collectionName: 'components_sections_proximos_eventos';
   info: {
-    description: 'Eventos da ADAI vindos automaticamente da inChurch, em cards que passam para o lado. Aqui s\u00F3 t\u00EDtulo, texto e quantidade.';
+    description: 'Eventos da ADAI vindos automaticamente da inChurch, em cards que passam para o lado. Aqui s\u00F3 t\u00EDtulo, texto, quantidade e (nas p\u00E1ginas de unidade) a unidade.';
     displayName: 'Pr\u00F3ximos eventos (inChurch)';
     icon: 'calendar';
   };
@@ -377,6 +392,7 @@ export interface SectionsProximosEventos extends Struct.ComponentSchema {
         maxLength: 60;
       }> &
       Schema.Attribute.DefaultTo<'Pr\u00F3ximos eventos'>;
+    unidade: Schema.Attribute.Relation<'oneToOne', 'api::unidade.unidade'>;
   };
 }
 
@@ -440,7 +456,6 @@ export interface SectionsTextoRico extends Struct.ComponentSchema {
     atualizado_em: Schema.Attribute.Date;
     conteudo: Schema.Attribute.RichText & Schema.Attribute.Required;
     titulo: Schema.Attribute.String &
-      Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;

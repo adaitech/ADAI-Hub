@@ -1,5 +1,5 @@
 import fixture from './__fixtures__/eventos.json';
-import { ehGrupoDeConexao, normalizeEventos, paraIsoSaoPaulo, proximosEventos } from './eventos';
+import { ehGrupoDeConexao, idIgrejaValido, normalizeEventos, paraIsoSaoPaulo, proximosEventos } from './eventos';
 import type { InchurchEvento } from './types';
 
 const reais = fixture.results as InchurchEvento[];
@@ -110,5 +110,72 @@ describe('proximosEventos (aplica "agora" e quantidade)', () => {
 
   it('sem datas futuras → lista vazia', () => {
     expect(proximosEventos(dados, { agora: em('2027-01-01T00:00') })).toEqual([]);
+  });
+});
+
+describe('unidade (igreja na inChurch)', () => {
+  const agora = em('2026-10-01T09:00');
+  const lista = [
+    evento({ id: 1, name: 'Café Campestre', start_datetime: '2026-10-10T09:00:00' }),
+    evento({ id: 2, name: 'Conferência geral', start_datetime: '2026-10-11T09:00:00' }),
+    evento({ id: 3, name: 'Culto Santos', start_datetime: '2026-10-12T09:00:00' }),
+    evento({ id: 4, name: 'Pulse', start_datetime: '2026-10-13T19:00:00' }),
+    evento({ id: 5, name: 'Pulse', start_datetime: '2026-10-20T19:00:00' }),
+  ];
+  const mapa = new Map([
+    [1, 30146],
+    [3, 31876],
+    [5, 30146],
+  ]);
+  const dados = normalizeEventos(lista, new Set(), agora, mapa);
+  const igrejaDe = (nome: string) => dados.eventos.find((e) => e.nome === nome)?.igrejaId;
+
+  it('grava a igreja do evento; quem não está em nenhuma igreja é geral (null)', () => {
+    expect(igrejaDe('Café Campestre')).toBe(30146);
+    expect(igrejaDe('Culto Santos')).toBe(31876);
+    expect(igrejaDe('Conferência geral')).toBeNull();
+  });
+
+  it('mesmo nome em igrejas diferentes: um card por igreja (não some de nenhuma unidade)', () => {
+    const batismos = normalizeEventos(
+      [
+        evento({ id: 10, name: 'Batismo', start_datetime: '2026-10-18T10:00:00' }),
+        evento({ id: 11, name: 'Batismo', start_datetime: '2026-10-25T10:00:00' }),
+        evento({ id: 12, name: 'Batismo', start_datetime: '2026-11-01T10:00:00' }),
+      ],
+      new Set(),
+      agora,
+      new Map([
+        [10, 30146],
+        [11, 31876],
+        [12, 30146],
+      ]),
+    );
+    expect(batismos.eventos.map((e) => [e.igrejaId, e.ocorrencias.length])).toEqual([
+      [30146, 2],
+      [31876, 1],
+    ]);
+    const santos = proximosEventos(batismos, { agora, limite: 12, igrejaId: 31876 });
+    expect(santos.map((e) => e.igrejaId)).toEqual([31876]);
+  });
+
+  it('sem mapa, todos são gerais', () => {
+    expect(normalizeEventos(lista, new Set(), agora).eventos.every((e) => e.igrejaId === null)).toBe(true);
+  });
+
+  it('filtro: eventos da unidade + gerais; os de outra unidade ficam de fora', () => {
+    const nomes = (igrejaId?: number | null) => proximosEventos(dados, { agora, limite: 12, igrejaId }).map((e) => e.nome);
+    expect(nomes(30146)).toEqual(['Café Campestre', 'Conferência geral', 'Pulse', 'Pulse']);
+    expect(nomes(31876)).toEqual(['Conferência geral', 'Culto Santos', 'Pulse']);
+    expect(nomes()).toEqual(['Café Campestre', 'Conferência geral', 'Culto Santos', 'Pulse', 'Pulse']);
+  });
+
+  it('idIgrejaValido: só inteiro positivo', () => {
+    expect(idIgrejaValido(30146)).toBe(30146);
+    expect(idIgrejaValido(0)).toBeNull();
+    expect(idIgrejaValido(-1)).toBeNull();
+    expect(idIgrejaValido(1.5)).toBeNull();
+    expect(idIgrejaValido('30146')).toBeNull();
+    expect(idIgrejaValido(null)).toBeNull();
   });
 });

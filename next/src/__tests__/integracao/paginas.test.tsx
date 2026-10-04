@@ -8,6 +8,7 @@ import { screen, within } from '@testing-library/react';
 import { draftMode } from 'next/headers';
 import HomePage, { generateMetadata as metadataHome } from '@/app/(site)/page';
 import SlugPage, { generateMetadata as metadataSlug } from '@/app/(site)/[slug]/page';
+import SobreNosPage, { generateMetadata as metadataSobreNos } from '@/app/(site)/sobre-nos/[slug]/page';
 import SiteLayout from '@/app/(site)/layout';
 import { proximosEventosShowcase } from '@/components/sections/ProximosEventosSection/ProximosEventosSection.showcase';
 import type { ProximosEventosExemplo } from '@/components/sections/ProximosEventosSection/types';
@@ -172,3 +173,47 @@ describe('Página por slug ([slug])', () => {
     expect(meta.title).toBe('ADAI');
   });
 });
+
+describe('Página de unidade (/campestre)', () => {
+  it('monta Hero colorido, O que esperar, ministérios em cards, agenda da unidade e Outras unidades', async () => {
+    const { container } = await renderizarServidor(<SiteLayout>{await SlugPage(params('campestre'))}</SiteLayout>);
+    expect(screen.getByRole('heading', { level: 1, name: 'Campestre' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(container.querySelector('[data-foto]')).toHaveAttribute('data-foto', 'colorida');
+    expect(container.querySelector('[data-section="ministerios"]')).toHaveAttribute('data-exibicao', 'cards');
+    // Agenda: busca os eventos de todas as Unidades cadastradas no Strapi.
+    expect(getEventosInchurch).toHaveBeenCalledWith([30146, 31876]);
+    const outras = screen.getByRole('region', { name: 'Outras unidades' });
+    const titulos = within(outras).getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
+    expect(titulos).toEqual(['Anália Franco', 'São Bernardo', 'Santos', 'ADAI On']);
+    expect(within(outras).getByRole('link', { name: 'Santos' })).toHaveAttribute('href', '/santos');
+  });
+
+  it('Home: card "Campestre" leva à página da unidade', async () => {
+    await renderizarHome();
+    const neste = screen.getByRole('region', { name: 'Neste domingo' });
+    expect(within(neste).getByRole('link', { name: 'Campestre' })).toHaveAttribute('href', '/campestre');
+  });
+});
+
+describe('Páginas "Sobre nós" (/sobre-nos/<slug>)', () => {
+  it('monta Hero + texto da página "sobre-nos-nossa-historia" do Strapi, com canonical aninhado', async () => {
+    await renderizarServidor(<SiteLayout>{await SobreNosPage(params('nossa-historia'))}</SiteLayout>);
+    expect(screen.getByRole('heading', { level: 1, name: 'Nossa história' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByText(/Tudo o que somos, somos em Cristo/)).toBeInTheDocument();
+    expect((await metadataSobreNos(params('nossa-historia'))).alternates?.canonical).toMatch(/\/sobre-nos\/nossa-historia$/);
+  });
+
+  it('inexistente → 404; segmento inválido → 404 sem consultar o Strapi', async () => {
+    expect((await erroDe(SobreNosPage(params('nao-existe')))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
+    strapi.fetch.mockClear();
+    expect((await erroDe(SobreNosPage(params('Não Existe')))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
+    expect(strapi.chamadaPagina()).toBeNull();
+  });
+
+  it('o endereço plano /sobre-nos-nossa-historia redireciona (308) para /sobre-nos/nossa-historia', async () => {
+    expect((await erroDe(SlugPage(params('sobre-nos-nossa-historia')))).digest).toMatch(/^NEXT_REDIRECT;replace;\/sobre-nos\/nossa-historia;308;/);
+  });
+});
+

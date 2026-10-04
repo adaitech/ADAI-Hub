@@ -5,12 +5,20 @@ import { normalizeEventos, proximosEventos } from '@/lib/inchurch/eventos';
 import type { InchurchEvento } from '@/lib/inchurch/types';
 import { defineShowcase } from '@/lib/showcase/types';
 import mocks from './ProximosEventosSection.mock.json';
-import { paraCarrossel, quantidadeDe } from './normalize';
+import { igrejaDe, paraCarrossel, quantidadeDe } from './normalize';
 import type { ProximosEventosData, ProximosEventosExemplo } from './types';
 
 /** Eventos REAIS da inChurch (lib/inchurch/__fixtures__, sem contatos nem credenciais). */
 const AGORA = '2026-09-28T09:00:00-03:00';
 const inchurch = normalizeEventos(fixture.results as InchurchEvento[], new Set(fixture.idsCategoriaGc), new Date(AGORA));
+/** Mesmos eventos, com "The Chosen" cadastrado na igreja do Santos (31876) para mostrar o filtro por unidade. */
+const idTheChosen = (fixture.results as InchurchEvento[]).find((e) => e.name === 'The Chosen')!.id;
+const inchurchComUnidade = normalizeEventos(
+  fixture.results as InchurchEvento[],
+  new Set(fixture.idsCategoriaGc),
+  new Date(AGORA),
+  new Map([[idTheChosen, 31876]]),
+);
 
 export const proximosEventosShowcase = defineShowcase<ProximosEventosExemplo>({
   slug: 'proximos-eventos',
@@ -19,12 +27,12 @@ export const proximosEventosShowcase = defineShowcase<ProximosEventosExemplo>({
   cmsKey: 'sections.proximos-eventos',
   descricao:
     'Eventos da ADAI vindos da inChurch no mesmo Carrossel de cards, com a arte do evento (16:9, colorida), datas e horário. Só aparecem eventos marcados "Mostrar no site"; GCs ficam de fora.',
-  quandoUsar: 'Na Home, depois da Série atual. No Strapi só se escolhe título, quantidade e cor; os eventos são da inChurch.',
+  quandoUsar: 'Na Home (todos os eventos) e nas páginas das unidades (escolhendo a Unidade). No Strapi só se escolhe título, quantidade, cor e unidade; os eventos são da inChurch.',
   doc: 'docs/componentes/proximos-eventos.md',
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-173',
   cms: (data) => data.strapi,
   render: ({ strapi, inchurch: dados, agora }) => {
-    const eventos = proximosEventos(dados, { agora: new Date(agora), limite: quantidadeDe(strapi) });
+    const eventos = proximosEventos(dados, { agora: new Date(agora), limite: quantidadeDe(strapi), igrejaId: igrejaDe(strapi) });
     if (eventos.length === 0) return null;
     return <CarrosselCardsSection data={paraCarrossel(strapi, eventos)} index={1} secao="proximos-eventos" />;
   },
@@ -40,6 +48,12 @@ export const proximosEventosShowcase = defineShowcase<ProximosEventosExemplo>({
       titulo: 'Home (padrão: 8 eventos, cinza)',
       descricao: 'Só o título: tudo o mais vem da inChurch. Recorrência (Semana de Jejum) vira "05 a 09 de Outubro".',
       data: { strapi: mocks.minimo as ProximosEventosData, inchurch, agora: AGORA },
+    },
+    {
+      nome: 'unidade',
+      titulo: 'Página da unidade (No Campestre)',
+      descricao: 'Unidade escolhida: eventos gerais + os da igreja do Campestre. "The Chosen" (cadastrado no Santos neste exemplo) fica de fora.',
+      data: { strapi: mocks.unidade as ProximosEventosData, inchurch: inchurchComUnidade, agora: AGORA },
     },
   ],
   controles: [

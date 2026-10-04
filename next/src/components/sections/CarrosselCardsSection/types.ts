@@ -17,6 +17,8 @@ export interface CardData {
   texto?: string | null;
   botao?: StrapiBotao | null;
   link?: StrapiLink | null;
+  /** Página que abre ao clicar em qualquer parte do card (ex.: /campestre). */
+  url?: string | null;
 }
 
 /** JSON cru de `sections.carrossel-cards`. */
@@ -28,8 +30,10 @@ export interface CarrosselCardsData {
   cards?: CardData[] | null;
   /** `foto` = 3:2 em preto e branco (padrão); `arte` = arte de divulgação 16:9 colorida (ex.: eventos). */
   estilo_imagem?: 'foto' | 'arte' | null;
-  /** Foto acima do título (padrão) ou abaixo das ações, em todos os cards. */
-  posicao_imagem?: 'acima' | 'abaixo' | null;
+  /** Foto acima do título (padrão), logo após o título ou abaixo das ações, em todos os cards. */
+  posicao_imagem?: 'acima' | 'apos_titulo' | 'abaixo' | null;
+  /** Fotos em preto e branco (padrão). `false` = coloridas. A arte (`estilo_imagem: arte`) é sempre colorida. */
+  preto_e_branco?: boolean | null;
   link?: StrapiLink | null;
 }
 
@@ -44,6 +48,8 @@ export interface CardView {
   texto: string[];
   botao: BotaoView | null;
   link: LinkView | null;
+  /** Destino do card inteiro (título vira link esticado); `null` = card sem link próprio. */
+  href: string | null;
 }
 
 export interface CarrosselCardsView {
@@ -53,6 +59,7 @@ export interface CarrosselCardsView {
   link: LinkView | null;
   /** Algum card tem foto: a grade reserva a linha da foto em todos para manter o alinhamento. */
   temImagem: boolean;
-  posicaoImagem: 'acima' | 'abaixo';
+  posicaoImagem: 'acima' | 'apos_titulo' | 'abaixo';
+  pretoEBranco: boolean;
   estiloImagem: 'foto' | 'arte';
 }

@@ -5,7 +5,10 @@ import { normalizeHero } from './normalize';
 import type { HeroData } from './types';
 import styles from './HeroSection.module.css';
 
-/** Figma: "Hero" (node 1:32). Abertura da página com foto em P&B, frase principal e CTAs. */
+/**
+ * Figma: "Hero" (node 1:32) e "Hero / Campestre" (28:414). Abertura da página com foto
+ * (P&B por padrão; colorida nas unidades), frase principal, subtítulo opcional e CTAs.
+ */
 export function HeroSection({ data, index }: SectionProps<HeroData>) {
   const view = normalizeHero(data);
   if (!view) return null;
@@ -16,7 +19,7 @@ export function HeroSection({ data, index }: SectionProps<HeroData>) {
 
   return (
     <section className={styles.hero} aria-labelledby={tituloId} data-section="hero">
-      <div className={styles.cartao}>
+      <div className={styles.cartao} data-foto={view.pretoEBranco ? 'pb' : 'colorida'}>
         {view.imagem && (
           <Image
             src={view.imagem.url}
@@ -31,13 +34,24 @@ export function HeroSection({ data, index }: SectionProps<HeroData>) {
         <div className={styles.degrade} aria-hidden="true" />
 
         <div className={styles.conteudo}>
-          <Titulo id={tituloId} className={styles.titulo}>
-            {view.linhas.map((linha, i) => (
-              <span key={i} className={styles.linha}>
-                {linha}
-              </span>
-            ))}
-          </Titulo>
+          <div className={styles.principal}>
+            <Titulo id={tituloId} className={styles.titulo}>
+              {view.linhas.map((linha, i) => (
+                <span key={i} className={styles.linha}>
+                  {linha}
+                </span>
+              ))}
+            </Titulo>
+            {view.subtitulo.length > 0 && (
+              <p className={styles.subtitulo}>
+                {view.subtitulo.map((linha, i) => (
+                  <span key={i} className={styles.linha}>
+                    {linha}
+                  </span>
+                ))}
+              </p>
+            )}
+          </div>
 
           {temApoio && (
             <div className={styles.apoio}>

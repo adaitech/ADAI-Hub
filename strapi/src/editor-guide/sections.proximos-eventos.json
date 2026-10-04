@@ -2,12 +2,13 @@
   "uid": "sections.proximos-eventos",
   "nome": "Próximos eventos",
   "resumo": "Cards com os próximos eventos da ADAI, com a arte, a data e o horário. Os eventos vêm sozinhos da inChurch — não é preciso cadastrar nada aqui além do título.",
-  "ondeAparece": "Na Home, depois da Série atual. Os cards passam para o lado com as setas.",
+  "ondeAparece": "Na Home, depois da Série atual, e nas páginas das unidades (\"No Campestre\"). Os cards passam para o lado com as setas.",
   "boasPraticas": [
     "Para um evento aparecer no site, marque \"Mostrar no site\" no evento da inChurch. Para esconder, desmarque — o site obedece.",
     "Eventos de GC (Grupos de Conexão) nunca aparecem aqui: use a categoria \"Grupo de Conexão\" ou comece o nome com \"GC\".",
     "A arte do evento (16:9) é a imagem cadastrada na inChurch. Evite texto encostado nas bordas.",
-    "Eventos com várias datas (ex.: Semana de Jejum) aparecem uma vez só, com a próxima data."
+    "Eventos com várias datas (ex.: Semana de Jejum) aparecem uma vez só, com a próxima data.",
+    "Nas páginas das unidades, escolha a Unidade: aparecem os eventos gerais da ADAI e os cadastrados na igreja daquela unidade na inChurch. Na Home, deixe vazio para mostrar todos."
   ],
   "campos": [
     {
@@ -60,6 +61,16 @@
       "limite": "1 link",
       "exemplo": "Agenda completa → https://…",
       "componente": "shared.link"
+    },
+    {
+      "campo": "unidade",
+      "label": "Unidade",
+      "descricao": "Vazio = todos os eventos (Home). Com uma unidade: eventos gerais + os da igreja dela na inChurch; os de outras unidades saem.",
+      "placeholder": "",
+      "ondeAparece": "Não aparece escrito; define quais eventos entram nos cards.",
+      "obrigatorio": false,
+      "limite": "Uma unidade (cadastrada em Unidades)",
+      "exemplo": "ADAI Campestre"
     }
   ]
 }

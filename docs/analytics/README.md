@@ -22,7 +22,7 @@ site (Next)  ──registrarEvento()──▶  window.dataLayer  ──▶  GTM 
 | Regras de clique | `lib/analytics/cliques.ts` `eventosDoClique` | Decide os eventos de um clique pelo contexto (seção, texto, destino, card) — função pura, testada |
 | Rastreador | `components/analytics/RastreadorAnalytics.tsx` | **Único** Client Component de medição: ouve cliques e o abrir da FAQ, observa seções na tela, envia Web Vitals. As seções continuam Server Components |
 | GTM + Consent Mode | `lib/analytics/gtm.ts` + `components/analytics/GoogleTagManager.tsx` | Container por ambiente (`NEXT_PUBLIC_GTM_ID`). **O GTM só carrega depois do aceite** (Política de Privacidade: nada vai ao Google antes da escolha); consentimento negado por padrão e liberado no aceite |
-| Aviso de cookies | `components/layout/BannerCookies/` | Aceitar/Recusar; reabre pelo rodapé ("Preferências de cookies") |
+| Aviso de cookies | `components/layout/BannerCookies/` | Aceitar/Recusar; reabre pelo botão "Preferências de cookies" na Política de Privacidade |
 | Disparo manual | `data-analytics="manual"` | Elemento que dispara o próprio evento (player da Série atual, aviso de cookies) e é ignorado pelo rastreador |
 
 O GTM e o rastreador ficam no layout do **site** (`app/(site)/layout.tsx`): a vitrine `/componentes` e o preview não enviam dados.

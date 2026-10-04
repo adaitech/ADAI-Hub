@@ -115,6 +115,7 @@
   --hero-min-height-mobile: 600px; /* 🟡 proposta: sem Figma mobile */
   --hero-min-height: clamp(600px, 48.75vw, 702px); /* 702px no Figma (1440) */
   --hero-apoio-max: 22.5rem; /* 360px no Figma */
+  --hero-subtitulo-max: 39.125rem; /* 626px no Figma (Hero / Campestre, 28:419) */
   --footer-texto-max: 18.75rem; /* 300px no Figma */
   --carrossel-botao: 52px; /* setas: 52 × 52 no Figma (Próximos eventos) */
   --lista-rotulo: 10.625rem; /* 170px: coluna do título na lista (Primeira vez) */
@@ -127,6 +128,7 @@
   --ministerios-padding: clamp(24px, 5vw, 72px); /* ✅ Figma 1:230: 72px no desktop */
   --ministerios-linha-altura: 78px; /* ✅ Figma 1:239 */
   --ministerios-linha-raio: 14px; /* ✅ Figma 1:239 */
+  --ministerios-card-altura: 180px; /* ✅ Figma 28:467 (Pra todas as idades, páginas das unidades) */
   --faq-pergunta-altura: 4.5rem; /* 🟡 altura mínima proposta para o acordeão */
 
   /* ---------- Movimento ---------- */

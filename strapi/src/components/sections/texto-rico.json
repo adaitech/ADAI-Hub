@@ -9,7 +9,6 @@
   "attributes": {
     "titulo": {
       "type": "string",
-      "required": true,
       "maxLength": 100
     },
     "atualizado_em": {

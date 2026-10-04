@@ -24,7 +24,12 @@ describe('getEventosInchurch', () => {
   function inchurchOk() {
     api.mockImplementation(async (_endpoint, params = []) => {
       const gc = params.some(([k]) => k === 'category_id');
-      const results = gc ? fixture.results.filter((e) => fixture.idsCategoriaGc.includes(e.id)) : fixture.results;
+      const igreja = params.find(([k]) => k === 'church_id')?.[1];
+      const results = igreja
+        ? fixture.results.filter((e) => igreja === 31876 && e.name === 'The Chosen')
+        : gc
+          ? fixture.results.filter((e) => fixture.idsCategoriaGc.includes(e.id))
+          : fixture.results;
       return { count: results.length, next: null, results } as never;
     });
   }
@@ -44,5 +49,30 @@ describe('getEventosInchurch', () => {
     api.mockRejectedValue(new Error('[inchurch] v1/event/: timeout'));
     await expect(getEventosInchurch()).resolves.toEqual(bom);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('último resultado válido'));
+  });
+
+  it('busca os eventos de cada igreja cadastrada e grava a igreja no evento', async () => {
+    inchurchOk();
+    const dados = await getEventosInchurch([30146, 31876]);
+    expect(api).toHaveBeenCalledWith('v1/event/', expect.arrayContaining([['church_id', 30146]]));
+    expect(api).toHaveBeenCalledWith('v1/event/', expect.arrayContaining([['church_id', 31876]]));
+    expect(dados?.eventos.find((e) => e.nome === 'The Chosen')?.igrejaId).toBe(31876);
+    expect(dados?.eventos.filter((e) => e.igrejaId === null).length).toBe((dados?.eventos.length ?? 0) - 1);
+  });
+
+  it('sem igrejas cadastradas, nenhuma busca por church_id', async () => {
+    inchurchOk();
+    await getEventosInchurch();
+    expect(api.mock.calls.some(([, params = []]) => params.some(([k]) => k === 'church_id'))).toBe(false);
+  });
+
+  it('falha na busca de uma igreja → nada de resultado parcial: usa o último válido', async () => {
+    inchurchOk();
+    const bom = await getEventosInchurch([31876]);
+    api.mockImplementation(async (_e, params = []) => {
+      if (params.some(([k]) => k === 'church_id')) throw new Error('[inchurch] v1/event/: timeout');
+      return { count: 0, next: null, results: fixture.results } as never;
+    });
+    await expect(getEventosInchurch([31876])).resolves.toEqual(bom);
   });
 });

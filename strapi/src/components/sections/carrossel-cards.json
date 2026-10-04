@@ -31,7 +31,7 @@
     },
     "posicao_imagem": {
       "type": "enumeration",
-      "enum": ["acima", "abaixo"],
+      "enum": ["acima", "apos_titulo", "abaixo"],
       "default": "acima",
       "required": true
     },
@@ -39,6 +39,10 @@
       "type": "component",
       "repeatable": false,
       "component": "shared.link"
+    },
+    "preto_e_branco": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

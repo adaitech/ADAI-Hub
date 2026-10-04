@@ -16,6 +16,8 @@ export interface MinisteriosData {
   texto_apoio?: string | null;
   botao?: StrapiBotao | null;
   ministerios?: MinisterioData[] | null;
+  /** `lista` (Home: linhas ao lado do convite) ou `cards` (unidades: grade de cards cinza). */
+  exibicao?: 'lista' | 'cards' | null;
 }
 
 export interface MinisteriosView {
@@ -23,4 +25,5 @@ export interface MinisteriosView {
   textoApoio: string | null;
   botao: BotaoView | null;
   ministerios: { id: number; nome: string; publico: string | null; href: string | null }[];
+  exibicao: 'lista' | 'cards';
 }

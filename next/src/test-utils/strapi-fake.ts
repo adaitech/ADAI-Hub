@@ -34,6 +34,24 @@ export function secoesHome() {
   ];
 }
 
+/** Página de unidade (seed `unidadeSections`), com o JSON dos `.mock.json`. */
+export function secoesUnidade() {
+  const outras = carrossel.completo.cards.filter((card) => card.titulo !== 'Campestre').map((card) => ({ ...card, destaques: null }));
+  return [
+    comId(hero.unidade, 11),
+    comId({ ...carrossel.so_botao, titulo: 'O que esperar' }, 12),
+    comId(ministerios.cards, 13),
+    comId(proximosEventos.unidade, 14),
+    comId({ ...carrossel.completo, titulo: 'Outras unidades', cards: outras }, 15),
+  ];
+}
+
+/** Tipo Unidades (nome + ID da igreja na inChurch), como o seed cadastra. */
+export const unidadesFake = [
+  { id: 1, documentId: 'u1', nome: 'ADAI Campestre', igreja_inchurch_id: 30146 },
+  { id: 2, documentId: 'u2', nome: 'ADAI Santos', igreja_inchurch_id: 31876 },
+];
+
 export interface PaginaFake {
   id: number;
   documentId: string;
@@ -54,6 +72,15 @@ export function criarStrapiFake() {
       seo: seo('Política de Privacidade e Cookies | ADAI'),
       sections: [comId(textoRico.completo, 9)],
     },
+    'sobre-nos-nossa-historia': {
+      id: 4,
+      documentId: 'nossa-historia',
+      titulo: 'Nossa história',
+      slug: 'sobre-nos-nossa-historia',
+      seo: seo('Nossa história | ADAI'),
+      sections: [comId({ ...hero.unidade, titulo: 'Nossa história', subtitulo: null }, 16), comId(textoRico.sem_titulo, 17)],
+    },
+    campestre: { id: 3, documentId: 'campestre', titulo: 'Campestre', slug: 'campestre', seo: seo('Campestre | ADAI'), sections: secoesUnidade() },
   };
   const global = { status: 200, corpo: { data: { header: header.completo, footer: footer.completo, seo: seo('ADAI') } } as unknown };
 
@@ -63,6 +90,7 @@ export function criarStrapiFake() {
   const fetch = jest.fn((url: string) => {
     const endereco = decodeURIComponent(url);
     if (endereco.includes('/api/global')) return responder(global.status, global.corpo);
+    if (endereco.includes('/api/unidades')) return responder(200, { data: unidadesFake, meta: {} });
     const slug = /filters\[slug\]\[\$eq\]=([^&]+)/.exec(endereco)?.[1];
     // Sem filtro de slug = listagem (sitemap): todas as páginas, em uma página da paginação.
     if (slug === undefined) {

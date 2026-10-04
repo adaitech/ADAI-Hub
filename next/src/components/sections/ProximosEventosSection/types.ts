@@ -12,6 +12,8 @@ export interface ProximosEventosData {
   quantidade?: number | null;
   cor_cards?: CorCard | null;
   link?: StrapiLink | null;
+  /** Unidade (tipo Unidades do Strapi): filtra a agenda para os eventos dela + os gerais. Vazio = todos. */
+  unidade?: { id: number; nome?: string | null; igreja_inchurch_id?: number | null } | null;
 }
 
 /** Exemplo da vitrine: configuração do Strapi + eventos normalizados da inChurch + "agora". */

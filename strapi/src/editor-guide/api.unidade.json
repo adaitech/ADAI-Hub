@@ -1,0 +1,33 @@
+{
+  "uid": "api::unidade.unidade",
+  "nome": "Unidade",
+  "resumo": "Cada unidade da ADAI (Campestre, Anália Franco…) e o ID da igreja dela na inChurch. É o que liga a agenda da página da unidade aos eventos daquela igreja.",
+  "ondeAparece": "Não aparece sozinha no site: é escolhida no campo \"Unidade\" da seção Próximos eventos.",
+  "boasPraticas": [
+    "Cadastre uma Unidade para cada igreja da ADAI na inChurch (inclusive a ADAI On).",
+    "Copie o ID exatamente como aparece no painel da inChurch. ID errado faz os eventos dessa unidade aparecerem como gerais, em todas as páginas.",
+    "Unidade nova: cadastre aqui, crie a página dela e escolha a unidade na seção Próximos eventos da página."
+  ],
+  "campos": [
+    {
+      "campo": "nome",
+      "label": "Nome da unidade",
+      "descricao": "Nome como o time reconhece a unidade.",
+      "placeholder": "Ex.: ADAI Campestre",
+      "ondeAparece": "Só no painel (na lista de Unidades e no seletor da agenda).",
+      "obrigatorio": true,
+      "limite": "Até 60 caracteres",
+      "exemplo": "ADAI Campestre"
+    },
+    {
+      "campo": "igreja_inchurch_id",
+      "label": "ID da igreja na inChurch",
+      "descricao": "Coluna ID da lista de igrejas no painel da inChurch. Eventos dessa igreja aparecem só na página desta unidade.",
+      "placeholder": "Ex.: 30146",
+      "ondeAparece": "Não aparece no site; usado para buscar os eventos da unidade.",
+      "obrigatorio": true,
+      "limite": "Número inteiro, um por unidade",
+      "exemplo": "30146"
+    }
+  ]
+}

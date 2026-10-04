@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Logo } from '@/components/icons/Logo';
-import { BotaoPreferenciasCookies } from '@/components/layout/BannerCookies';
 import { ROTA_POLITICA } from '@/lib/analytics/consentimento';
 import { SmartLink } from '@/components/ui/SmartLink';
 import { normalizeFooter } from './normalize';
@@ -52,7 +51,6 @@ export function Footer({ data }: FooterProps) {
             <SmartLink href={ROTA_POLITICA} className={styles.link}>
               Política de Privacidade e Cookies
             </SmartLink>
-            <BotaoPreferenciasCookies />
           </div>
           {assinatura && <p>{assinatura}</p>}
         </div>

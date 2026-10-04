@@ -3,7 +3,7 @@
   "info": {
     "displayName": "Próximos eventos (inChurch)",
     "icon": "calendar",
-    "description": "Eventos da ADAI vindos automaticamente da inChurch, em cards que passam para o lado. Aqui só título, texto e quantidade."
+    "description": "Eventos da ADAI vindos automaticamente da inChurch, em cards que passam para o lado. Aqui só título, texto, quantidade e (nas páginas de unidade) a unidade."
   },
   "options": {},
   "attributes": {
@@ -34,6 +34,11 @@
       "type": "component",
       "repeatable": false,
       "component": "shared.link"
+    },
+    "unidade": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::unidade.unidade"
     }
   }
 }

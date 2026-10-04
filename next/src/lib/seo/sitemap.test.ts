@@ -51,4 +51,10 @@ describe('montarSitemap', () => {
   it('nenhuma página publicada → sitemap vazio', () => {
     expect(montarSitemap([], SITE)).toEqual([]);
   });
+
+  it('páginas "sobre-nos-…" aparecem em /sobre-nos/… (endereço do site atual)', () => {
+    const [pagina] = montarSitemap([{ slug: 'sobre-nos-nossa-historia', updatedAt: '2026-10-04T10:00:00.000Z' }], SITE);
+    expect(pagina.url).toBe(`${SITE}/sobre-nos/nossa-historia`);
+  });
 });
+

@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 import { ButtonLink } from '@/components/ui/ButtonLink';
+import { SmartLink } from '@/components/ui/SmartLink';
 import { TextLink } from '@/components/ui/TextLink';
 import type { SectionProps } from '@/types/sections';
 import { Carrossel } from './Carrossel';
@@ -11,7 +12,7 @@ import styles from './CarrosselCardsSection.module.css';
 function Card({ card, nivelTitulo }: { card: CardView; nivelTitulo: 'h2' | 'h3' }) {
   const TituloCard = nivelTitulo;
   return (
-    <li className={styles.card} data-cor={card.cor}>
+    <li className={clsx(styles.card, card.href && styles.clicavel)} data-cor={card.cor}>
       {card.imagem && (
         <div className={styles.midia}>
           <Image
@@ -23,7 +24,16 @@ function Card({ card, nivelTitulo }: { card: CardView; nivelTitulo: 'h2' | 'h3' 
           />
         </div>
       )}
-      <TituloCard className={styles.titulo}>{card.titulo}</TituloCard>
+      <TituloCard className={styles.titulo}>
+        {card.href ? (
+          // Link esticado: o ::after cobre o card inteiro; botão e link do card ficam por cima.
+          <SmartLink href={card.href} className={styles.linkCard}>
+            {card.titulo}
+          </SmartLink>
+        ) : (
+          card.titulo
+        )}
+      </TituloCard>
       {card.destaques.length > 0 && (
         <ul role="list" className={styles.destaques}>
           {card.destaques.map((destaque, i) => (
@@ -96,6 +106,8 @@ export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards' }
           styles.trilha,
           view.temImagem && styles.comImagem,
           view.temImagem && view.posicaoImagem === 'abaixo' && styles.imagemAbaixo,
+          view.temImagem && view.posicaoImagem === 'apos_titulo' && styles.imagemAposTitulo,
+          view.temImagem && !view.pretoEBranco && styles.colorida,
           view.temImagem && view.estiloImagem === 'arte' && styles.arte,
         )}
         acessorio={

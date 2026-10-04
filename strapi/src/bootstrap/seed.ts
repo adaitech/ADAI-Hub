@@ -6,7 +6,7 @@ import type { Core } from '@strapi/strapi';
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 15;
+const SEED_VERSION = 17;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
@@ -31,6 +31,8 @@ async function image(strapi: Core.Strapi, fileName: string, alternativeText: str
 const ALT_CULTO = 'Culto na ADAI: pessoas sentadas diante do palco, com o telão exibindo "Bem-vindos, voluntários"';
 const ALT_LIDERANCA = 'Pastores Rodrigo e Tati Soeiro sorrindo, abraçados, em frente a uma parede de mármore';
 
+const YOUTUBE_ADAI = 'https://www.youtube.com/@ADAIOficial';
+
 const mapa = (endereco: string) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}`;
 
@@ -54,9 +56,9 @@ const footer = {
     {
       titulo: 'Igreja',
       links: [
-        { texto: 'Nossa história', url: '/nossa-historia' },
-        { texto: 'A igreja que vemos', url: '/a-igreja-que-vemos' },
-        { texto: 'No que acreditamos', url: '/no-que-acreditamos' },
+        { texto: 'Nossa história', url: '/sobre-nos/nossa-historia' },
+        { texto: 'A igreja que vemos', url: '/sobre-nos/a-igreja-que-vemos' },
+        { texto: 'No que acreditamos', url: '/sobre-nos/no-que-acreditamos' },
         { texto: 'Jesus', url: '/jesus' },
       ],
     },
@@ -72,10 +74,10 @@ const footer = {
     {
       titulo: 'Contato',
       links: [
-        { texto: 'E-mail', url: '/contato' },
-        { texto: 'WhatsApp', url: '/contato' },
+        { texto: 'E-mail', url: 'mailto:contato@adai.com.br' },
+        { texto: 'WhatsApp', url: 'https://api.whatsapp.com/send?phone=5511959879085', nova_aba: true },
         { texto: 'Instagram', url: 'https://www.instagram.com/', nova_aba: true },
-        { texto: 'YouTube', url: 'https://www.youtube.com/', nova_aba: true },
+        { texto: 'YouTube', url: YOUTUBE_ADAI, nova_aba: true },
       ],
     },
   ],
@@ -89,6 +91,258 @@ const seo = {
     'Uma igreja que ama, serve e influencia em cinco localidades, com as portas abertas todo domingo. Tem um lugar pra você aqui.',
 };
 
+interface UnidadeSite {
+  /** Nome no site (título do card e do Hero). */
+  nome: string;
+  /** Nome no tipo Unidades (como na inChurch). */
+  nomeInchurch: string;
+  slug: string;
+  /** "No Campestre", "Em Santos"… */
+  em: string;
+  igrejaInchurchId: number;
+  horarios: string;
+  /** Linhas do endereço (ou, na ADAI On, onde assistir). */
+  endereco: string;
+  /** Endereço para o Google Maps; `null` na ADAI On. */
+  mapa: string | null;
+  cidade: string;
+}
+
+/** Unidades da ADAI (IDs da lista de igrejas da inChurch, 03/10/2026). */
+const UNIDADES_SITE: UnidadeSite[] = [
+  {
+    nome: 'Campestre',
+    nomeInchurch: 'ADAI Campestre',
+    slug: 'campestre',
+    em: 'No Campestre',
+    igrejaInchurchId: 30146,
+    horarios: '9h\n11h\n18h',
+    endereco: 'Av. Dom Pedro II, 3405\nSanto André',
+    mapa: 'Av. Dom Pedro II, 3405, Santo André',
+    cidade: 'Santo André',
+  },
+  {
+    nome: 'Anália Franco',
+    nomeInchurch: 'ADAI Anália Franco',
+    slug: 'analia-franco',
+    em: 'Na Anália Franco',
+    igrejaInchurchId: 31875,
+    horarios: '9h\n11h',
+    endereco: 'R. Eleonora Cintra, 960\nJardim Anália Franco, São Paulo',
+    mapa: 'R. Eleonora Cintra, 960, São Paulo',
+    cidade: 'São Paulo',
+  },
+  {
+    nome: 'São Bernardo',
+    nomeInchurch: 'ADAI São Bernardo do Campo',
+    slug: 'sao-bernardo',
+    em: 'Em São Bernardo',
+    igrejaInchurchId: 31874,
+    horarios: '9h\n11h\n18h',
+    endereco: 'R. Cabral da Câmara, 315\nPlanalto, São Bernardo do Campo',
+    mapa: 'R. Cabral da Câmara, 315, São Bernardo do Campo',
+    cidade: 'São Bernardo do Campo',
+  },
+  {
+    nome: 'Santos',
+    nomeInchurch: 'ADAI Santos',
+    slug: 'santos',
+    em: 'Em Santos',
+    igrejaInchurchId: 31876,
+    horarios: '9h30\n11h30',
+    endereco: 'R. Campos Mello, 197\nVila Matias, Santos',
+    mapa: 'R. Campos Mello, 197, Santos',
+    cidade: 'Santos',
+  },
+  {
+    nome: 'ADAI On',
+    nomeInchurch: 'ADAI On',
+    slug: 'adai-on',
+    em: 'Na ADAI On',
+    igrejaInchurchId: 31879,
+    horarios: '11h\n15h',
+    endereco: '11h no YouTube\n15h no Zoom',
+    mapa: null,
+    cidade: '',
+  },
+];
+
+
+/** Ação principal do card da unidade: mapa nas presenciais, YouTube na ADAI On. */
+const acaoUnidade = (u: UnidadeSite) =>
+  u.mapa
+    ? { texto: 'Como chegar', url: mapa(u.mapa), nova_aba: true }
+    : { texto: 'Assistir', url: YOUTUBE_ADAI, nova_aba: true };
+
+/** Card de unidade: o card inteiro leva à página da unidade (Home com horários; "Outras unidades" sem). */
+function cardUnidade(u: UnidadeSite, comHorarios: boolean) {
+  return {
+    titulo: u.nome,
+    ...(comHorarios ? { destaques: u.horarios } : {}),
+    texto: u.endereco,
+    url: `/${u.slug}`,
+    link: acaoUnidade(u),
+  };
+}
+
+/**
+ * Página da unidade — Figma "Unidade / Campestre / Desktop" (4:270). Campestre com os textos do
+ * Figma; as outras unidades seguem o mesmo modelo (🟡 rascunho para o time revisar no Strapi).
+ */
+function unidadeSections(u: UnidadeSite, foto: number, unidadeDocumentId: string) {
+  const online = u.mapa === null;
+  const campestre = u.slug === 'campestre';
+  const subtitulo = online
+    ? 'A ADAI On leva o culto até você: participe ao vivo pelo YouTube ou pelo Zoom, de onde estiver.'
+    : `A unidade ${u.nome} reúne cultos, ministérios e momentos de conexão em ${u.cidade}, com uma presença acolhedora e familiar.`;
+
+  const oQueEsperar = online
+    ? [
+        {
+          titulo: 'Como participar',
+          texto: `${u.endereco}\nAcompanhe ao vivo e participe com a gente, de casa ou de onde estiver.`,
+          link: { texto: 'Assistir', url: YOUTUBE_ADAI, nova_aba: true },
+        },
+        {
+          titulo: 'Como é o culto',
+          texto:
+            'Louvor, mensagem da Bíblia pra vida real e uma comunidade que te recebe bem, mesmo à distância.\nO ritmo é acolhedor, familiar e fácil de acompanhar, mesmo que seja sua primeira vez.',
+          link: { texto: 'Planeje sua visita', url: '/planeje-sua-visita' },
+        },
+      ]
+    : [
+        {
+          titulo: 'Como chegar',
+          texto: campestre
+            ? `${u.endereco}\nTerreno plano, acesso fácil e espaço pra estacionar. Se quiser, avise que vem e alguém te ajuda na chegada.`
+            : `${u.endereco}\nSe quiser, avise que vem e alguém te ajuda na chegada.`,
+          link: { texto: 'Ver no mapa', url: mapa(u.mapa!), nova_aba: true },
+        },
+        {
+          titulo: 'Como é o culto',
+          texto:
+            'Louvor, mensagem da Bíblia pra vida real e uma recepção calorosa desde a entrada.\nO ritmo é acolhedor, familiar e fácil de acompanhar, mesmo que seja sua primeira vez.',
+          link: { texto: 'Planeje sua visita', url: '/planeje-sua-visita' },
+        },
+        {
+          titulo: 'Seus filhos',
+          texto:
+            'O ADAI Kids cuida das crianças com segurança, carinho e atividades pensadas pra cada faixa etária.\nVocê participa do culto tranquilo(a) sabendo que seus filhos estão em boas mãos.',
+          link: { texto: 'Conheça o ADAI Kids', url: '/kids' },
+        },
+      ];
+
+  return [
+    {
+      __component: 'sections.hero',
+      titulo: u.nome,
+      subtitulo,
+      texto_apoio: online
+        ? 'Participe do culto ao vivo e encontre pessoas prontas para caminhar com você.\nTem lugar pra você e sua família aqui.'
+        : 'Venha conhecer a unidade, participar do culto e encontrar pessoas prontas para te receber bem.\nTem lugar pra você e sua família aqui.',
+      imagem: foto,
+      preto_e_branco: false,
+      botoes: [
+        { texto: 'Planeje sua visita', url: '/planeje-sua-visita', estilo: 'solido' },
+        { ...acaoUnidade(u), estilo: 'contorno' },
+      ],
+    },
+    {
+      __component: 'sections.carrossel-cards',
+      titulo: 'O que esperar',
+      texto_apoio: online
+        ? 'Antes de participar, veja como acompanhar o culto e como a ADAI On funciona.'
+        : `Antes de vir, dá pra já se organizar. Veja como chegar, como é o culto e como seus filhos vão ser bem cuidados ${u.em.replace(/^(No|Na|Em) /, (p) => p.toLowerCase())}.`,
+      cards: oQueEsperar,
+    },
+    ...(online
+      ? []
+      : [
+          {
+            __component: 'sections.ministerios',
+            titulo: 'Pra todas as idades',
+            texto_apoio: `${u.em}, tem espaço pra família inteira. Veja alguns dos ministérios que fazem parte da rotina da unidade.`,
+            exibicao: 'cards',
+            ministerios: [
+              { nome: 'ADAI KIDS', publico: 'Crianças' },
+              { nome: 'INPULSE', publico: 'Adolescentes' },
+              { nome: 'PULSE', publico: 'Jovens' },
+              { nome: '50+', publico: '50 anos ou mais' },
+            ],
+          },
+        ]),
+    {
+      __component: 'sections.carrossel-cards',
+      titulo: 'Seu próximo passo',
+      texto_apoio: 'Cada pessoa chega em um momento diferente. Escolha por onde você quer começar e a gente te acompanha.',
+      cards: [
+        { titulo: 'Sou novo na fé', texto: 'Quer entender melhor sobre Deus, a Bíblia e a igreja? Comece por aqui.' },
+        { titulo: 'Quero me batizar', texto: 'Se você quer dar esse passo público, conversamos sobre significado, processo e data.' },
+        { titulo: 'Quero me conectar', texto: 'Busca comunidade, amizade e um lugar pra pertencer? A gente te apresenta o caminho.' },
+        { titulo: 'Quero servir', texto: 'Quer usar seus dons pra fazer parte do time? Temos áreas e ministérios pra você.' },
+        { titulo: 'Quero crescer na fé', texto: 'Procura aprofundamento, grupos, leitura e acompanhamento? Vamos indicar o próximo passo.' },
+      ],
+    },
+    {
+      __component: 'sections.proximos-eventos',
+      titulo: u.em,
+      texto_apoio: 'Confira alguns dos momentos e encontros que fazem parte da vida da unidade.',
+      quantidade: 8,
+      cor_cards: 'cinza',
+      unidade: unidadeDocumentId,
+    },
+    {
+      __component: 'sections.carrossel-cards',
+      titulo: 'Outras unidades',
+      texto_apoio: 'Se você mora em outra região, confira as demais unidades da ADAI e participe perto de você.',
+      cards: UNIDADES_SITE.filter((outra) => outra.slug !== u.slug).map((outra) => cardUnidade(outra, false)),
+    },
+  ];
+}
+
+/**
+ * Páginas institucionais com o conteúdo do site atual (adai.com.br), no mesmo endereço:
+ * Hero (foto do site atual, colorida) + Texto sem título. "sobre-nos-…" vira /sobre-nos/… no Next.
+ */
+const PAGINAS_INSTITUCIONAIS = [
+  { slug: 'sobre-nos-nossa-historia', titulo: 'Nossa história', alt: 'Pastores Rodrigo e Tati Soeiro no palco durante a ceia, com a igreja reunida' },
+  { slug: 'sobre-nos-a-igreja-que-vemos', titulo: 'A igreja que vemos', alt: 'Igreja reunida no auditório, com o telão exibindo "Bem-vindos"' },
+  { slug: 'sobre-nos-no-que-acreditamos', titulo: 'No que acreditamos', alt: 'Pastor pregando no palco diante da igreja reunida no auditório' },
+  { slug: 'jesus', titulo: 'Jesus', alt: 'Mão estendida, com manga de túnica de linho, diante de um lago' },
+];
+
+/** Primeiro parágrafo, até ~155 caracteres, sem cortar palavra (descrição do Google). */
+function resumoSeo(markdown: string): string {
+  const primeiro = markdown.split(/\n\s*\n/)[0].trim();
+  return primeiro.length <= 155 ? primeiro : `${primeiro.slice(0, 152).replace(/\s+\S*$/, '')}…`;
+}
+
+async function paginaInstitucional(strapi: Core.Strapi, p: (typeof PAGINAS_INSTITUCIONAIS)[number]) {
+  const conteudo = fs.readFileSync(path.join(SEED_DIR, 'paginas', `${p.slug}.md`), 'utf8');
+  const foto = await image(strapi, `${p.slug}.jpg`, p.alt);
+  return {
+    seo: { metaTitle: `${p.titulo} | ADAI`, metaDescription: resumoSeo(conteudo) },
+    sections: [
+      { __component: 'sections.hero', titulo: p.titulo, imagem: foto, preto_e_branco: false },
+      { __component: 'sections.texto-rico', conteudo },
+    ],
+  };
+}
+
+/** Garante as Unidades (por ID da inChurch) e devolve o documentId de cada uma. */
+async function ensureUnidades(strapi: Core.Strapi): Promise<Map<number, string>> {
+  const unidades = strapi.documents('api::unidade.unidade');
+  const ids = new Map<number, string>();
+  for (const u of UNIDADES_SITE) {
+    const existente = await unidades.findFirst({ filters: { igreja_inchurch_id: u.igrejaInchurchId } });
+    const doc =
+      existente ?? (await unidades.create({ data: { nome: u.nomeInchurch, igreja_inchurch_id: u.igrejaInchurchId } as never }));
+    if (!existente) strapi.log.info(`[seed] Unidade "${u.nomeInchurch}" (inChurch ${u.igrejaInchurchId}) criada.`);
+    ids.set(u.igrejaInchurchId, doc.documentId);
+  }
+  return ids;
+}
+
 /** Home conforme o Figma `adai.com.br`, incluindo a lista de ministérios e Contribua. */
 async function homeSections(strapi: Core.Strapi) {
   const hero = await image(
@@ -99,13 +353,6 @@ async function homeSections(strapi: Core.Strapi) {
   const primeiraVez = await image(strapi, 'primeira-vez-culto.jpg', ALT_CULTO);
   const lideranca = await image(strapi, 'lideranca-rodrigo-tati-soeiro.jpg', ALT_LIDERANCA);
 
-  const unidade = (titulo: string, destaques: string, texto: string, endereco: string) => ({
-    titulo,
-    destaques,
-    texto,
-    link: { texto: 'Como chegar', url: mapa(endereco), nova_aba: true },
-  });
-
   return [
     {
       __component: 'sections.hero',
@@ -113,6 +360,7 @@ async function homeSections(strapi: Core.Strapi) {
       texto_apoio:
         'Uma igreja que ama, serve e influencia em cinco localidades, com as portas abertas todo domingo.\nTem um lugar pra você aqui.',
       imagem: hero,
+      preto_e_branco: false,
       botoes: [
         { texto: 'Planeje sua visita', url: '/planeje-sua-visita', estilo: 'solido' },
         { texto: 'Unidades', url: '/unidades', estilo: 'contorno' },
@@ -123,33 +371,13 @@ async function homeSections(strapi: Core.Strapi) {
       titulo: 'Neste domingo',
       texto_apoio: 'Escolha a unidade mais perto de você ou participe de casa pela ADAI On.',
       posicao_imagem: 'acima',
-      cards: [
-        unidade('Campestre', '9h\n11h\n18h', 'Av. Dom Pedro II, 3405\nSanto André', 'Av. Dom Pedro II, 3405, Santo André'),
-        unidade(
-          'Anália Franco',
-          '9h\n11h',
-          'R. Eleonora Cintra, 960\nJardim Anália Franco, São Paulo',
-          'R. Eleonora Cintra, 960, São Paulo',
-        ),
-        unidade(
-          'São Bernardo',
-          '9h\n11h\n18h',
-          'R. Cabral da Câmara, 315\nPlanalto, São Bernardo do Campo',
-          'R. Cabral da Câmara, 315, São Bernardo do Campo',
-        ),
-        unidade('Santos', '9h30\n11h30', 'R. Campos Mello, 197\nVila Matias, Santos', 'R. Campos Mello, 197, Santos'),
-        {
-          titulo: 'ADAI On',
-          destaques: '11h\n15h',
-          texto: '11h no YouTube\n15h no Zoom',
-          link: { texto: 'Assistir', url: 'https://www.youtube.com/', nova_aba: true },
-        },
-      ],
+      cards: UNIDADES_SITE.map((u) => cardUnidade(u, true)),
     },
     {
       __component: 'sections.imagem-texto',
       imagem: primeiraVez,
       posicao_imagem: 'esquerda',
+      preto_e_branco: false,
       titulo: 'Primeira vez na\nADAI?',
       texto: 'Chegar num lugar novo pode ser estranho. Por isso, vale saber um pouco antes de ir.',
       lista: [
@@ -204,7 +432,7 @@ async function homeSections(strapi: Core.Strapi) {
       __component: 'sections.imagem-texto',
       imagem: hero,
       posicao_imagem: 'esquerda',
-      preto_e_branco: true,
+      preto_e_branco: false,
       titulo: 'Contribua',
       texto: 'Dizimar e ofertar não é obrigação. É um ato de fidelidade e gratidão, e o privilégio de participar do que Deus está fazendo aqui na terra.',
       botao: { texto: 'Contribuir agora', url: '/contribua', estilo: 'solido' },
@@ -361,9 +589,13 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   const storedVersion = ((await strapi.store.get(STORE)) as number | null) ?? 1;
   const pages = strapi.documents('api::page.page');
 
-  if (!(await strapi.documents('api::global.global').findFirst())) {
+  const global = await strapi.documents('api::global.global').findFirst();
+  if (!global) {
     await strapi.documents('api::global.global').create({ data: { header, footer, seo } as never });
     strapi.log.info('[seed] Configurações do site (cabeçalho e rodapé) criadas.');
+  } else if (storedVersion < SEED_VERSION) {
+    await strapi.documents('api::global.global').update({ documentId: global.documentId, data: { footer } as never });
+    strapi.log.warn(`[seed] Rodapé reconstruído (seed v${storedVersion} → v${SEED_VERSION}).`);
   }
 
   const home = await pages.findFirst({ filters: { slug: 'home' } });
@@ -418,6 +650,52 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     });
     await publishPage(strapi, created.documentId);
     strapi.log.info('[seed] Página "politica-de-privacidade" criada e publicada.');
+  } else if (storedVersion < SEED_VERSION) {
+    await pages.update({ documentId: politica.documentId, data: { sections: politicaSections() } as never });
+    await publishPage(strapi, politica.documentId);
+    strapi.log.warn(`[seed] Política de Privacidade reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
+  }
+
+  for (const p of PAGINAS_INSTITUCIONAIS) {
+    const existente = await pages.findFirst({ filters: { slug: p.slug } });
+    if (!existente) {
+      const created = await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...(await paginaInstitucional(strapi, p)) } as never });
+      await publishPage(strapi, created.documentId);
+      strapi.log.info(`[seed] Página "${p.slug}" criada e publicada.`);
+    } else if (storedVersion < SEED_VERSION) {
+      await pages.update({ documentId: existente.documentId, data: await paginaInstitucional(strapi, p) } as never);
+      await publishPage(strapi, existente.documentId);
+      strapi.log.warn(`[seed] Página "${p.slug}" reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
+    }
+  }
+
+  const idsUnidades = await ensureUnidades(strapi);
+  const fotoCampestre = await image(strapi, 'unidade-campestre.jpg', 'Fachada da ADAI Campestre: prédio de tijolos com o logo da ADAI no alto, sob céu azul');
+  // 🟡 Foto provisória das outras unidades até o time enviar as reais.
+  const fotoProvisoria = await image(
+    strapi,
+    'hero-adai.jpg',
+    'Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar',
+  );
+  for (const u of UNIDADES_SITE) {
+    const sections = unidadeSections(u, u.slug === 'campestre' ? fotoCampestre : fotoProvisoria, idsUnidades.get(u.igrejaInchurchId)!);
+    const pagina = await pages.findFirst({ filters: { slug: u.slug } });
+    if (!pagina) {
+      const created = await pages.create({
+        data: {
+          titulo: u.nome,
+          slug: u.slug,
+          seo: { metaTitle: `${u.nome} | ADAI`, metaDescription: (sections[0] as { subtitulo: string }).subtitulo },
+          sections,
+        } as never,
+      });
+      await publishPage(strapi, created.documentId);
+      strapi.log.info(`[seed] Página "${u.slug}" criada e publicada.`);
+    } else if (storedVersion < SEED_VERSION) {
+      await pages.update({ documentId: pagina.documentId, data: { sections } as never });
+      await publishPage(strapi, pagina.documentId);
+      strapi.log.warn(`[seed] Seções de "${u.slug}" reconstruídas (seed v${storedVersion} → v${SEED_VERSION}).`);
+    }
   }
 
   if (storedVersion < SEED_VERSION) await strapi.store.set({ ...STORE, value: SEED_VERSION });

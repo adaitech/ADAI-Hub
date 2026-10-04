@@ -28,7 +28,10 @@ function MinisterioLinha({ item }: { item: Item }) {
   );
 }
 
-/** Figma: Encontre seu lugar (1:230). Lista de ministérios à direita do convite. */
+/**
+ * Figma: Encontre seu lugar (1:230) — lista à direita do convite — e "Pra todas as idades"
+ * (28:462, páginas das unidades) — `exibicao: 'cards'`: mesma lista, em grade de cards cinza.
+ */
 export function MinisteriosSection({ data, index }: SectionProps<MinisteriosData>) {
   const view = normalizeMinisterios(data);
   if (!view) return null;
@@ -37,7 +40,7 @@ export function MinisteriosSection({ data, index }: SectionProps<MinisteriosData
   const tituloId = `ministerios-${data.id}-titulo`;
 
   return (
-    <section className={styles.secao} aria-labelledby={tituloId} data-section="ministerios">
+    <section className={styles.secao} aria-labelledby={tituloId} data-section="ministerios" data-exibicao={view.exibicao}>
       <div className={styles.caixa}>
         <div className={styles.intro}>
           <Titulo id={tituloId} className={styles.titulo}>{view.titulo}</Titulo>

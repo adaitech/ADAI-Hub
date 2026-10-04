@@ -75,7 +75,7 @@ layout.footer
 
 ## Medição (DataLayer)
 
-Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links; `contribuir` quando aplicável; botão "Preferências de cookies" reabre o aviso.
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links; `contribuir` quando aplicável. O botão "Preferências de cookies" saiu do rodapé (04/10/2026) e fica na Política de Privacidade. O "ADAI" gigante decorativo tem `pointer-events: none` (cobria o link da Política e bloqueava o clique).
 
 ## Testes
 
