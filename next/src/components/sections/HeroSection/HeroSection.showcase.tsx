@@ -20,6 +20,12 @@ export const heroShowcase = defineShowcase<HeroData>({
   render: (data) => <HeroSection data={data} index={0} />,
   variantes: [
     { nome: 'completo', titulo: 'Completo', descricao: 'Como está na Home (Figma).', data: mocks.completo as HeroData },
+    {
+      nome: 'unidade',
+      titulo: 'Página da unidade',
+      descricao: 'Figma "Hero / Campestre" (28:414): foto colorida ("Foto em preto e branco" desligado) e texto abaixo da frase principal.',
+      data: mocks.unidade as HeroData,
+    },
     { nome: 'minimo', titulo: 'Mínimo', descricao: 'Só frase principal e foto.', data: mocks.minimo as HeroData },
     { nome: 'texto_longo', titulo: 'Texto longo', descricao: 'Frases e botões longos.', data: mocks.texto_longo as HeroData },
     { nome: 'sem_imagem', titulo: 'Sem foto', descricao: 'Estado incompleto: foto não enviada.', data: mocks.sem_imagem as HeroData },

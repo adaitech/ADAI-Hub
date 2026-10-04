@@ -46,7 +46,8 @@ export function RastreadorAnalytics() {
       const el = (event.target as Element | null)?.closest('a[href], button');
       if (!el || el.closest('[data-analytics="manual"]')) return;
       const href = el instanceof HTMLAnchorElement ? el.href : '';
-      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el) })) {
+      const pagina = document.querySelector('main h1')?.textContent?.replace(/\s+/g, ' ').trim() || null;
+      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina })) {
         registrarEvento(nome, parametros as never);
       }
     };
@@ -75,14 +76,16 @@ export function RastreadorAnalytics() {
     const observer = new IntersectionObserver(
       (entradas) => {
         for (const entrada of entradas) {
-          if (!entrada.isIntersecting || vistas.has(entrada.target)) continue;
+          // 25% da seção visível, ou metade da tela ocupada por ela (texto longo nunca chega a 25%).
+          const vista = entrada.intersectionRatio >= 0.25 || entrada.intersectionRect.height >= window.innerHeight * 0.5;
+          if (!entrada.isIntersecting || !vista || vistas.has(entrada.target)) continue;
           vistas.add(entrada.target);
           observer.unobserve(entrada.target);
           const el = entrada.target as HTMLElement;
           registrarEvento('ver_secao', { secao: el.dataset.section ?? 'desconhecida', posicao: secoes.indexOf(el) + 1 });
         }
       },
-      { threshold: 0.25 },
+      { threshold: [0, 0.01, 0.02, 0.05, 0.1, 0.15, 0.2, 0.25] },
     );
     secoes.forEach((secao) => observer.observe(secao));
     return () => observer.disconnect();

@@ -1,5 +1,6 @@
 import apiGlobal from './api.global.json';
 import apiPage from './api.page.json';
+import apiUnidade from './api.unidade.json';
 import itemsCard from './items.card.json';
 import itemsColunaLinks from './items.coluna-links.json';
 import itemsDestaque from './items.destaque.json';
@@ -44,6 +45,7 @@ export interface EditorGuide {
 export const editorGuides: EditorGuide[] = [
   apiPage,
   apiGlobal,
+  apiUnidade,
   sectionsHero,
   sectionsCarrosselCards,
   sectionsSerieAtual,
@@ -68,6 +70,7 @@ export const editorGuides: EditorGuide[] = [
 /** Campo principal (título de itens repetíveis e da listagem) por UID. */
 export const mainFields: Record<string, string> = {
   'api::page.page': 'titulo',
+  'api::unidade.unidade': 'nome',
   'shared.botao': 'texto',
   'shared.link': 'texto',
   'items.coluna-links': 'titulo',

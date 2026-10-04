@@ -3,7 +3,7 @@
   "info": {
     "displayName": "Hero (abertura)",
     "icon": "picture",
-    "description": "Primeira faixa da página: foto grande em preto e branco, frase principal e até dois botões."
+    "description": "Primeira faixa da página: foto grande (preto e branco ou colorida), frase principal, texto abaixo dela e até dois botões."
   },
   "options": {},
   "attributes": {
@@ -27,6 +27,14 @@
       "repeatable": true,
       "component": "shared.botao",
       "max": 2
+    },
+    "subtitulo": {
+      "type": "text",
+      "maxLength": 220
+    },
+    "preto_e_branco": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

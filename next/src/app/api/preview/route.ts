@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { caminhoDaPagina } from '@/lib/paginas/caminho';
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
@@ -21,5 +22,5 @@ export async function GET(request: Request) {
   if (status === 'draft') draft.enable();
   else draft.disable();
 
-  redirect(slug === 'home' ? '/' : `/${slug}`);
+  redirect(caminhoDaPagina(slug));
 }

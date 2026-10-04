@@ -27,11 +27,24 @@ async function listarEventos(extra: [string, string | number][] = []): Promise<I
   return eventos;
 }
 
-async function carregarEventos(): Promise<EventosInchurch> {
-  const [todos, gcs] = await Promise.all([listarEventos(), listarEventos([['category_id', CATEGORIA_GRUPO_DE_CONEXAO]])]);
-  const dados = normalizeEventos(todos, new Set(gcs.map((e) => e.id)));
+/**
+ * `igrejas`: IDs das Unidades cadastradas no Strapi. O JSON do evento não diz a igreja
+ * (`responsible_church` vem null), mas o filtro `church_id` sim: uma busca por igreja.
+ * Se qualquer busca falhar, a recarga inteira falha (nunca um mapa parcial).
+ */
+async function carregarEventos(igrejas: readonly number[]): Promise<EventosInchurch> {
+  const [todos, gcs, ...porIgreja] = await Promise.all([
+    listarEventos(),
+    listarEventos([['category_id', CATEGORIA_GRUPO_DE_CONEXAO]]),
+    ...igrejas.map((id) => listarEventos([['church_id', id]])),
+  ]);
+  const igrejaPorEvento = new Map<number, number>();
+  porIgreja.forEach((eventos, i) => eventos.forEach((evento) => igrejaPorEvento.set(evento.id, igrejas[i])));
+
+  const dados = normalizeEventos(todos, new Set(gcs.map((e) => e.id)), new Date(), igrejaPorEvento);
   // Só roda em cache miss (no máximo 1x a cada 30 min).
-  console.info(`[inchurch] Eventos atualizados: ${todos.length} futuros → ${dados.eventos.length} no site.`);
+  const resumoIgrejas = igrejas.map((id, i) => `${id}: ${porIgreja[i].length}`).join(', ');
+  console.info(`[inchurch] Eventos atualizados: ${todos.length} futuros → ${dados.eventos.length} no site.${resumoIgrejas ? ` Por igreja: ${resumoIgrejas}.` : ''}`);
   return dados;
 }
 
@@ -39,7 +52,7 @@ async function carregarEventos(): Promise<EventosInchurch> {
  * Versão do formato guardado no cache (resultado normalizado, pode sobreviver a um deploy).
  * Ao mudar `EventosInchurch`, suba este número. Guardado por `cache-versionado.test.ts`.
  */
-export const VERSAO_CACHE_INCHURCH = 1;
+export const VERSAO_CACHE_INCHURCH = 2;
 
 const eventosCache = unstable_cache(carregarEventos, ['inchurch', 'eventos', `v${VERSAO_CACHE_INCHURCH}`], {
   revalidate: TTL_EVENTOS_S,
@@ -54,12 +67,13 @@ export function __limparUltimoValido(): void {
 }
 
 /**
- * Eventos do site vindos da inChurch. Nunca lança: com a inChurch fora, usa a versão anterior
+ * Eventos do site vindos da inChurch (`igrejas` = IDs das Unidades; entram na chave do cache).
+ * Nunca lança: com a inChurch fora, usa a versão anterior
  * (Data Cache do Next ou memória); sem nenhuma → `null` (a seção some, a página fica de pé).
  */
-export async function getEventosInchurch(): Promise<EventosInchurch | null> {
+export async function getEventosInchurch(igrejas: readonly number[] = []): Promise<EventosInchurch | null> {
   try {
-    const dados = await eventosCache();
+    const dados = await eventosCache([...new Set(igrejas)].sort((a, b) => a - b));
     ultimoValido = dados;
     return dados;
   } catch (error) {

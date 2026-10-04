@@ -6,7 +6,8 @@
     "texto_apoio": "Exemplo com 4 eventos e cards pretos. Os eventos vêm da inChurch.",
     "quantidade": 4,
     "cor_cards": "preto",
-    "link": null
+    "link": null,
+    "unidade": null
   },
   "minimo": {
     "__component": "sections.proximos-eventos",
@@ -16,5 +17,19 @@
     "quantidade": 8,
     "cor_cards": "cinza",
     "link": null
+  },
+  "unidade": {
+    "__component": "sections.proximos-eventos",
+    "id": 14,
+    "titulo": "No Campestre",
+    "texto_apoio": "Confira alguns dos momentos e encontros que fazem parte da vida da unidade.",
+    "quantidade": 8,
+    "cor_cards": "cinza",
+    "link": null,
+    "unidade": {
+      "id": 1,
+      "nome": "ADAI Campestre",
+      "igreja_inchurch_id": 30146
+    }
   }
 }

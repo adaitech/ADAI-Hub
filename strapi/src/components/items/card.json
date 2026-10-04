@@ -3,7 +3,7 @@
   "info": {
     "displayName": "Card",
     "icon": "dashboard",
-    "description": "Card do carrossel: foto opcional, título, destaques (ex.: horários), texto e ações."
+    "description": "Card do carrossel: foto opcional, título, destaques (ex.: horários), texto, ações e página do card (card inteiro clicável)."
   },
   "options": {},
   "attributes": {
@@ -30,7 +30,7 @@
     },
     "texto": {
       "type": "text",
-      "maxLength": 160
+      "maxLength": 240
     },
     "botao": {
       "type": "component",
@@ -41,6 +41,10 @@
       "type": "component",
       "repeatable": false,
       "component": "shared.link"
+    },
+    "url": {
+      "type": "string",
+      "maxLength": 255
     }
   }
 }

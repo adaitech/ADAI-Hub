@@ -20,7 +20,8 @@
           "texto": "Como chegar",
           "url": "https://www.google.com/maps/search/?api=1&query=Av.%20Dom%20Pedro%20II%2C%203405%2C%20Santo%20Andr%C3%A9",
           "nova_aba": true
-        }
+        },
+        "url": "/campestre"
       },
       {
         "id": 271,
@@ -35,7 +36,8 @@
           "texto": "Como chegar",
           "url": "https://www.google.com/maps/search/?api=1&query=R.%20Eleonora%20Cintra%2C%20960%2C%20S%C3%A3o%20Paulo",
           "nova_aba": true
-        }
+        },
+        "url": "/analia-franco"
       },
       {
         "id": 272,
@@ -50,7 +52,8 @@
           "texto": "Como chegar",
           "url": "https://www.google.com/maps/search/?api=1&query=R.%20Cabral%20da%20C%C3%A2mara%2C%20315%2C%20S%C3%A3o%20Bernardo%20do%20Campo",
           "nova_aba": true
-        }
+        },
+        "url": "/sao-bernardo"
       },
       {
         "id": 273,
@@ -65,7 +68,8 @@
           "texto": "Como chegar",
           "url": "https://www.google.com/maps/search/?api=1&query=R.%20Campos%20Mello%2C%20197%2C%20Santos",
           "nova_aba": true
-        }
+        },
+        "url": "/santos"
       },
       {
         "id": 274,
@@ -80,10 +84,12 @@
           "texto": "Assistir",
           "url": "https://www.youtube.com/",
           "nova_aba": true
-        }
+        },
+        "url": "/adai-on"
       }
     ],
-    "link": null
+    "link": null,
+    "preto_e_branco": true
   },
   "minimo": {
     "__component": "sections.carrossel-cards",
@@ -554,5 +560,86 @@
       }
     ],
     "link": null
+  },
+  "apos_titulo_colorida": {
+    "__component": "sections.carrossel-cards",
+    "id": 151,
+    "titulo": "Foto após o título, colorida",
+    "texto_apoio": "Exemplo com a foto abaixo do texto e só link em cada card.",
+    "posicao_imagem": "apos_titulo",
+    "estilo_imagem": "foto",
+    "cards": [
+      {
+        "id": 286,
+        "titulo": "Conferência de Mulheres",
+        "destaques": "12 e 13 de outubro",
+        "texto": "Campestre · Santo André",
+        "cor": "vinho",
+        "imagem": {
+          "id": 5,
+          "name": "card-2.jpg",
+          "alternativeText": "Voluntária segura placa com as palavras Amar, Servir e Influenciar",
+          "width": 1100,
+          "height": 733,
+          "mime": "image/jpeg",
+          "url": "/mocks/card-2.jpg"
+        },
+        "botao": null,
+        "link": {
+          "id": 343,
+          "texto": "Inscreva-se",
+          "url": "/eventos/mulheres",
+          "nova_aba": false
+        }
+      },
+      {
+        "id": 287,
+        "titulo": "Batismo",
+        "destaques": "26 de outubro",
+        "texto": "Todas as unidades",
+        "cor": "branco",
+        "imagem": {
+          "id": 4,
+          "name": "card-3.jpg",
+          "alternativeText": "Voluntária de camiseta verde sorri na entrada da igreja",
+          "width": 1100,
+          "height": 733,
+          "mime": "image/jpeg",
+          "url": "/mocks/card-3.jpg"
+        },
+        "botao": null,
+        "link": {
+          "id": 344,
+          "texto": "Quero me batizar",
+          "url": "/eventos/batismo",
+          "nova_aba": false
+        }
+      },
+      {
+        "id": 288,
+        "titulo": "Noite de louvor",
+        "destaques": "8 de novembro, 19h",
+        "texto": "São Bernardo do Campo",
+        "cor": "preto",
+        "imagem": {
+          "id": 6,
+          "name": "card-1.jpg",
+          "alternativeText": "Carros estacionados e pessoas chegando à igreja em um dia de sol",
+          "width": 1100,
+          "height": 733,
+          "mime": "image/jpeg",
+          "url": "/mocks/card-1.jpg"
+        },
+        "botao": null,
+        "link": {
+          "id": 345,
+          "texto": "Saiba mais",
+          "url": "/eventos/louvor",
+          "nova_aba": false
+        }
+      }
+    ],
+    "link": null,
+    "preto_e_branco": false
   }
 }

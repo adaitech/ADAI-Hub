@@ -59,6 +59,41 @@
   grid-row: span 5;
 }
 
+/* Card com "Página do card" (url): o título é um link esticado sobre o card inteiro. */
+.clicavel {
+  position: relative;
+}
+
+.linkCard {
+  color: inherit;
+  text-decoration: none;
+}
+
+.linkCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.linkCard:focus-visible {
+  outline: none;
+}
+
+.clicavel:has(.linkCard:focus-visible) {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.clicavel:hover .linkCard {
+  text-decoration: underline;
+}
+
+.clicavel .acoes {
+  position: relative;
+  z-index: 1;
+}
+
 /* Cores do card (Strapi "Cor do card"). Escuras: todo texto em branco puro (AA ≥ 5,4:1). */
 .card[data-cor='branco'] {
   background-color: var(--card-branco);
@@ -191,6 +226,20 @@
 
 .imagemAbaixo .midia {
   grid-row: 5;
+}
+
+/* Foto após o título (ex.: agenda): título, foto, destaques, texto e ações. */
+.imagemAposTitulo .titulo {
+  grid-row: 1;
+}
+
+.imagemAposTitulo .midia {
+  grid-row: 2;
+}
+
+/* Strapi "Fotos em preto e branco" desligado: fotos coloridas. */
+.colorida .imagem {
+  filter: none;
 }
 
 /* tier: tablet — 2 cards e meio visíveis */

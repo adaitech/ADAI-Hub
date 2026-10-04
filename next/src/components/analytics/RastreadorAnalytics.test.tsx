@@ -59,4 +59,41 @@ describe('RastreadorAnalytics', () => {
     fireEvent(detalhe, new Event('toggle'));
     expect(window.dataLayer![0]).toMatchObject({ event: 'ver_faq', pergunta: 'como faco para me batizar?' });
   });
+
+  it('ver_secao: seção alta (texto longo, mais de 4 telas) conta quando ocupa metade da tela', () => {
+    let callback: IntersectionObserverCallback = () => {};
+    const original = window.IntersectionObserver;
+    window.IntersectionObserver = jest.fn((cb: IntersectionObserverCallback) => {
+      callback = cb;
+      return { observe: jest.fn(), unobserve: jest.fn(), disconnect: jest.fn() };
+    }) as unknown as typeof IntersectionObserver;
+    const { container } = render(
+      <main>
+        <div data-section="texto-rico">Texto longo</div>
+        <RastreadorAnalytics />
+      </main>,
+    );
+    const alvo = container.querySelector('[data-section]')!;
+    const entrada = (ratio: number, altura: number) =>
+      ({ target: alvo, isIntersecting: true, intersectionRatio: ratio, intersectionRect: { height: altura } }) as unknown as IntersectionObserverEntry;
+    callback([entrada(0.1, window.innerHeight * 0.2)], {} as IntersectionObserver);
+    expect(eventos()).toEqual([]);
+    callback([entrada(0.15, window.innerHeight * 0.6)], {} as IntersectionObserver);
+    expect(window.dataLayer).toEqual([expect.objectContaining({ event: 'ver_secao', secao: 'texto-rico', posicao: 1 })]);
+    window.IntersectionObserver = original;
+  });
+
+  it('Como chegar no Hero da página da unidade usa o h1 como unidade', () => {
+    render(
+      <main>
+        <section data-section="hero">
+          <h1>Campestre</h1>
+          <a href="https://www.google.com/maps/search/?api=1&query=x">Como chegar</a>
+        </section>
+        <RastreadorAnalytics />
+      </main>,
+    );
+    fireEvent.click(screen.getByRole('link', { name: 'Como chegar' }));
+    expect(window.dataLayer![0]).toMatchObject({ event: 'como_chegar', unidade: 'campestre' });
+  });
 });

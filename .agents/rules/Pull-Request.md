@@ -64,6 +64,7 @@ cd next && yarn smoke
   - [ ] **sem scroll lateral** em 375 — no console: `document.documentElement.scrollWidth <= innerWidth` deve dar `true`;
   - [ ] interações do componente funcionando (teclado: Tab, Enter, Esc).
 - [ ] Se mudou componente: **5 pilares** conferidos com os dois servidores rodando (Dados no CMS, Página, Componente, SEO, Medição — `AGENTS.md`).
+- [ ] **Medição validada (obrigatório em toda página, botão ou link novo ou alterado):** com o site rodando, clicar em cada página/botão/link do PR e conferir no console que os eventos chegam ao `window.dataLayer` com os parâmetros certos, conforme o plano de `docs/analytics/README.md` §3 — no mínimo `clique_cta` (com `origem` = `data-section`, `texto` e `destino` sem dado pessoal) e o evento específico quando houver (`planejar_visita`, `como_chegar` com a `unidade` certa, `contribuir`, `selecionar_evento`…); `ver_secao` para cada seção nova. Toda seção tem `data-section`. O `dataLayer` recebe os eventos mesmo sem aceitar cookies (o GTM só carrega depois do aceite), então dá para validar sem enviar dados ao Google. Para não sair da página ao clicar: `document.querySelectorAll('a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); }))` e depois `window.dataLayer.filter(e => e.event)`. Comportamento novo de medição → teste em `lib/analytics/cliques.test.ts` ou no componente. Registrar no PR o que foi clicado e os eventos vistos.
 
 ### A5. Segurança
 
@@ -83,6 +84,7 @@ cd next && yarn smoke
 - [ ] Regra, README ou `AGENTS.md` atualizados se a mudança altera como o time trabalha (novo comando, nova variável de ambiente, nova integração).
 - [ ] Variável de ambiente nova → `next/.env.example` (ou `strapi/.env.example`) + tabela do `README.md`.
 - [ ] Mudou o seed do Strapi → subiu `SEED_VERSION`; mudou o formato de um resultado em cache → subiu `VERSAO_CACHE_*`.
+- [ ] **Snapshot do Strapi atualizado (obrigatório enquanto o projeto usar o Strapi local/SQLite):** mudou schema, componente, guia do editor, seed ou conteúdo do Strapi → com o Strapi **parado** e o seed já aplicado (`yarn develop` uma vez), rodar `cd strapi && yarn data:export`, revisar o arquivo (só conteúdo, mídias e papéis públicos — sem admins, tokens ou segredos; ver A5) e commitar `strapi/data/adai-conteudo.tar.gz` no mesmo PR. Assim quem fizer `yarn data:import` recebe o mesmo conteúdo do PR. Esta regra sai quando o projeto passar a usar um Strapi hospedado.
 
 ### A7. Commit e push
 

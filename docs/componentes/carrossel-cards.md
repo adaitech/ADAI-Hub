@@ -33,9 +33,10 @@ sections.carrossel-cards
 │   ├── imagem       Media (1 imagem) · opcional
 │   ├── titulo       Text (short) · obrigatório · máx. 40
 │   ├── destaques    Text (long) · máx. 80 · um por linha (ex.: horários)
-│   ├── texto        Text (long) · máx. 160 · linhas por Enter (ex.: endereço)
+│   ├── texto        Text (long) · máx. 240 · linhas por Enter (ex.: endereço)
 │   ├── botao        Component (shared.botao) · opcional
-│   └── link         Component (shared.link) · opcional
+│   ├── link         Component (shared.link) · opcional
+│   └── url          Text (short) · máx. 255 · opcional — "Página do card": o card inteiro leva a esse endereço
 ├── estilo_imagem Enumeration · obrigatório · padrão "foto" · foto | arte
 │                 foto = 3:2 em preto e branco; arte = arte de divulgação 16:9 colorida (Próximos eventos)
 ├── posicao_imagem Enumeration · obrigatório · padrão "acima" · acima | abaixo
@@ -60,7 +61,14 @@ Regras:
 - `normalize` troca cor vazia ou desconhecida por `cinza` e calcula `superficie` (`clara` para cinza e branco, `escura` para as demais), que é repassada ao `ButtonLink` e ao `TextLink`.
 - Fotos continuam em P&B em qualquer cor.
 
-### 3.2 Posição da foto
+### 3.2 Página do card (card clicável)
+
+Com `url` (sanitizado por `sanitizeHref`; `javascript:` e afins viram "sem link"), o título do card vira um link cujo `::after` cobre o card inteiro (link esticado). Botão e link do card ficam por cima (`z-index`), com destinos próprios — nunca link dentro de link. Foco: contorno no card inteiro. Uso: cards de "Neste domingo" (Home) e "Outras unidades" levam à página da unidade; "Como chegar" continua abrindo o mapa.
+
+### 3.3 Posição e cor da foto
+
+`posicao_imagem`: `acima` (padrão) · `apos_titulo` (título → foto → destaques; usada na agenda) · `abaixo`. `preto_e_branco` (Boolean, padrão `true`): desligado, as fotos dos cards ficam coloridas; arte (`estilo_imagem: arte`) é sempre colorida.
+
 
 `acima` (padrão): foto → título → destaques → texto → ações. `abaixo`: título → destaques → texto → ações → foto. As linhas continuam alinhadas entre os cards (`subgrid`); a classe `.imagemAbaixo` só é aplicada quando algum card tem foto.
 
@@ -111,7 +119,7 @@ Tokens novos: `--font-size-h2`, `--font-size-h3`, `--font-size-destaque`, `--rad
 
 ## Medição (DataLayer)
 
-Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `como_chegar` (link do Google Maps, `unidade` = título do card); `clique_cta`; `ver_secao`. Quando reaproveitado por Próximos eventos, `data-section="proximos-eventos"` e `selecionar_evento`.
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `como_chegar` (link do Google Maps, `unidade` = título do card); `clique_cta` (no card clicável: `texto` = título do card, `destino` = página, ex.: `/campestre`); `ver_secao`. Quando reaproveitado por Próximos eventos, `data-section="proximos-eventos"` e `selecionar_evento`.
 
 ## Testes
 

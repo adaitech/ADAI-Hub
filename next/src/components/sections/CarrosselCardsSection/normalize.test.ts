@@ -67,4 +67,22 @@ describe('normalizeCarrosselCards', () => {
     expect(view?.cards[0].botao).toBeNull();
     expect(view?.cards[0].link).toBeNull();
   });
+
+  it('url do card: destino seguro do card inteiro; perigoso ou vazio → sem link', () => {
+    const view = normalizeCarrosselCards({
+      ...completo,
+      cards: [
+        { id: 1, titulo: 'A', url: '/campestre' },
+        { id: 2, titulo: 'B', url: 'javascript:alert(1)' },
+        { id: 3, titulo: 'C' },
+      ],
+    });
+    expect(view?.cards.map((c) => c.href)).toEqual(['/campestre', null, null]);
+  });
+
+  it('foto após o título e foto colorida (padrão: P&B)', () => {
+    expect(normalizeCarrosselCards({ ...completo, posicao_imagem: 'apos_titulo' })?.posicaoImagem).toBe('apos_titulo');
+    expect(normalizeCarrosselCards(completo)?.pretoEBranco).toBe(true);
+    expect(normalizeCarrosselCards({ ...completo, preto_e_branco: false })?.pretoEBranco).toBe(false);
+  });
 });

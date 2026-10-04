@@ -12,6 +12,7 @@ Convite para participação e lista vertical de ministérios. É uma lista está
 | `texto_apoio` | Até 200 caracteres; Enter preserva a quebra de linha. |
 | `botao` | Ação opcional “Quero servir” via `shared.botao`. |
 | `ministerios[]` | De 1 a 12 itens na ordem de exibição. Cada `items.ministerio` tem `nome` obrigatório, `publico` e `url` opcionais. |
+| `exibicao` | `lista` (padrão, Home: linhas ao lado do convite, na caixa cinza) ou `cards` (páginas das unidades, Figma "Pra todas as idades" 28:462: título e apoio em cima, grade de cards cinza 2 colunas no celular e 4 no desktop, 180px de altura). Mesma marcação semântica (lista). |
 
 Na Home inicial, KIDS, INPULSE, PULSE, FLORES, ENRAIZADOS, ESPORTE, MUSIC e CRTV aparecem na ordem do Figma. Ainda não há destinos publicados para cada ministério, então suas linhas são texto, sem clique; ao cadastrar uma URL válida no Strapi, a linha vira link. O botão “Quero servir” usa o formulário público atualmente vinculado pelo site da ADAI.
 
@@ -19,7 +20,7 @@ Os grupos da API inChurch não trazem os públicos e destinos desta lista; a cur
 
 ## Layout e validação
 
-No desktop, padding interno de 72px, vão entre colunas de 86px e linhas de 78px seguem o nó do Figma. O layout responsivo empilha colunas e põe o público abaixo do nome em telas menores. A vitrine inclui estados completo, mínimo e texto longo.
+No desktop, padding interno de 72px, vão entre colunas de 86px e linhas de 78px seguem o nó do Figma. O layout responsivo empilha colunas e põe o público abaixo do nome em telas menores. A vitrine inclui estados completo, cards (unidade), mínimo e texto longo.
 
 ## Medição (DataLayer)
 

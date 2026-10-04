@@ -30,6 +30,8 @@ export interface EventoSite {
   /** Inscrição externa ou link online (Zoom aberto). Sem link público conhecido → null. */
   link: { url: string; texto: string } | null;
   destaque: boolean;
+  /** Igreja (unidade) da inChurch em que o evento foi cadastrado; `null` = evento geral da ADAI. */
+  igrejaId: number | null;
 }
 
 /** Resultado que vai para o cache (não depende de "agora"). */
@@ -43,6 +45,11 @@ export function paraIsoSaoPaulo(data: string | null | undefined): string | null 
   const texto = data?.trim();
   if (!texto || Number.isNaN(new Date(texto).getTime())) return null;
   return /(?:Z|[+-]\d{2}:?\d{2})$/.test(texto) ? texto : `${texto.slice(0, 19)}-03:00`;
+}
+
+/** ID de igreja da inChurch: inteiro positivo; qualquer outra coisa → null. */
+export function idIgrejaValido(valor: unknown): number | null {
+  return typeof valor === 'number' && Number.isInteger(valor) && valor > 0 ? valor : null;
 }
 
 export function ehGrupoDeConexao(evento: InchurchEvento, idsCategoriaGc: ReadonlySet<number>): boolean {
@@ -71,9 +78,19 @@ function linkDoEvento(evento: InchurchEvento): EventoSite['link'] {
 
 const chaveNome = (nome: string) => nome.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 
-/** Lista crua da API → eventos do site (um item por evento, com todas as datas). */
-export function normalizeEventos(eventos: InchurchEvento[], idsCategoriaGc: ReadonlySet<number>, agora = new Date()): EventosInchurch {
-  const porNome = new Map<string, { base: InchurchEvento; ocorrencias: Map<string, OcorrenciaEvento> }>();
+/**
+ * Lista crua da API → eventos do site (um item por evento, com todas as datas).
+ * `igrejaPorEvento`: id do evento → igreja da inChurch (vem das buscas por `church_id`;
+ * o JSON do evento não traz a igreja). O agrupamento é por nome **e** igreja: "Batismo" do
+ * Campestre e "Batismo" de Santos são cards separados (cada um aparece na sua unidade).
+ */
+export function normalizeEventos(
+  eventos: InchurchEvento[],
+  idsCategoriaGc: ReadonlySet<number>,
+  agora = new Date(),
+  igrejaPorEvento: ReadonlyMap<number, number> = new Map(),
+): EventosInchurch {
+  const porNome = new Map<string, { base: InchurchEvento; ocorrencias: Map<string, OcorrenciaEvento>; igrejaId: number | null }>();
 
   for (const evento of eventos) {
     const nome = evento.name?.trim();
@@ -81,13 +98,15 @@ export function normalizeEventos(eventos: InchurchEvento[], idsCategoriaGc: Read
     if (!nome || !inicio || !apareceNoSite(evento) || ehGrupoDeConexao(evento, idsCategoriaGc)) continue;
     const fim = paraIsoSaoPaulo(evento.end_datetime) ?? inicio;
 
-    const grupo = porNome.get(chaveNome(nome)) ?? { base: evento, ocorrencias: new Map() };
+    const igrejaId = igrejaPorEvento.get(evento.id) ?? null;
+    const chave = `${chaveNome(nome)}|${igrejaId ?? 'geral'}`;
+    const grupo = porNome.get(chave) ?? { base: evento, ocorrencias: new Map(), igrejaId };
     grupo.ocorrencias.set(inicio, { inicio, fim }); // mesma data = cópia
     if (!grupo.base.image && !grupo.base.image_webp && (evento.image || evento.image_webp)) grupo.base = evento;
-    porNome.set(chaveNome(nome), grupo);
+    porNome.set(chave, grupo);
   }
 
-  const lista: EventoSite[] = [...porNome.values()].map(({ base, ocorrencias }) => {
+  const lista: EventoSite[] = [...porNome.values()].map(({ base, ocorrencias, igrejaId }) => {
     const url = base.image_webp?.trim() || base.image?.trim();
     return {
       id: base.id,
@@ -98,6 +117,7 @@ export function normalizeEventos(eventos: InchurchEvento[], idsCategoriaGc: Read
       descricao: resumo(base.description),
       link: linkDoEvento(base),
       destaque: base.highlighted === true,
+      igrejaId,
     };
   });
 
@@ -110,10 +130,15 @@ export function normalizeEventos(eventos: InchurchEvento[], idsCategoriaGc: Read
 /**
  * Aplica "agora" ao resultado cacheado: tira datas que já acabaram, some com eventos sem
  * data futura e limita a quantidade. Destaques do painel vêm primeiro.
+ * Com `igrejaId` (página de unidade): eventos dessa igreja + gerais; os de outras igrejas saem.
  */
-export function proximosEventos(dados: EventosInchurch, { agora = new Date(), limite = 8 }: { agora?: Date; limite?: number } = {}): EventoSite[] {
+export function proximosEventos(
+  dados: EventosInchurch,
+  { agora = new Date(), limite = 8, igrejaId = null }: { agora?: Date; limite?: number; igrejaId?: number | null } = {},
+): EventoSite[] {
   const t = agora.getTime();
   return dados.eventos
+    .filter((evento) => igrejaId === null || evento.igrejaId === null || evento.igrejaId === igrejaId)
     .map((evento) => ({ ...evento, ocorrencias: evento.ocorrencias.filter((o) => new Date(o.fim).getTime() >= t) }))
     .filter((evento) => evento.ocorrencias.length > 0)
     .sort((a, b) => Number(b.destaque) - Number(a.destaque) || a.ocorrencias[0].inicio.localeCompare(b.ocorrencias[0].inicio))

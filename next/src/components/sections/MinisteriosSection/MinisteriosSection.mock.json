@@ -4,17 +4,64 @@
     "id": 230,
     "titulo": "Encontre seu lugar",
     "texto_apoio": "Tem espaço pra todas as idades e fases da vida.\nEscolha por onde começar.",
-    "botao": { "id": 230, "texto": "Quero servir", "url": "https://forms.gle/4wAWu99WyUVR8BcU7", "estilo": "solido", "nova_aba": true },
+    "botao": {
+      "id": 230,
+      "texto": "Quero servir",
+      "url": "https://forms.gle/4wAWu99WyUVR8BcU7",
+      "estilo": "solido",
+      "nova_aba": true
+    },
     "ministerios": [
-      { "id": 231, "nome": "KIDS", "publico": "Crianças", "url": null },
-      { "id": 232, "nome": "INPULSE", "publico": "Adolescentes", "url": null },
-      { "id": 233, "nome": "PULSE", "publico": "Jovens", "url": null },
-      { "id": 234, "nome": "FLORES", "publico": "Mulheres", "url": null },
-      { "id": 235, "nome": "ENRAIZADOS", "publico": "Homens", "url": null },
-      { "id": 236, "nome": "ESPORTE", "publico": "Esporte e comunidade", "url": null },
-      { "id": 237, "nome": "MUSIC", "publico": "Louvor e adoração", "url": null },
-      { "id": 238, "nome": "CRTV", "publico": "Criativo", "url": null }
-    ]
+      {
+        "id": 231,
+        "nome": "KIDS",
+        "publico": "Crianças",
+        "url": null
+      },
+      {
+        "id": 232,
+        "nome": "INPULSE",
+        "publico": "Adolescentes",
+        "url": null
+      },
+      {
+        "id": 233,
+        "nome": "PULSE",
+        "publico": "Jovens",
+        "url": null
+      },
+      {
+        "id": 234,
+        "nome": "FLORES",
+        "publico": "Mulheres",
+        "url": null
+      },
+      {
+        "id": 235,
+        "nome": "ENRAIZADOS",
+        "publico": "Homens",
+        "url": null
+      },
+      {
+        "id": 236,
+        "nome": "ESPORTE",
+        "publico": "Esporte e comunidade",
+        "url": null
+      },
+      {
+        "id": 237,
+        "nome": "MUSIC",
+        "publico": "Louvor e adoração",
+        "url": null
+      },
+      {
+        "id": 238,
+        "nome": "CRTV",
+        "publico": "Criativo",
+        "url": null
+      }
+    ],
+    "exibicao": "lista"
   },
   "minimo": {
     "__component": "sections.ministerios",
@@ -22,18 +69,80 @@
     "titulo": "Encontre seu lugar",
     "texto_apoio": null,
     "botao": null,
-    "ministerios": [{ "id": 241, "nome": "KIDS", "publico": null, "url": null }]
+    "ministerios": [
+      {
+        "id": 241,
+        "nome": "KIDS",
+        "publico": null,
+        "url": null
+      }
+    ]
   },
   "texto_longo": {
     "__component": "sections.ministerios",
     "id": 250,
     "titulo": "Encontre o seu lugar para participar",
     "texto_apoio": "Há uma forma de servir para cada idade e fase da vida. Conheça as equipes, converse com as lideranças e descubra por onde você pode começar.",
-    "botao": { "id": 251, "texto": "Quero servir", "url": "/ministerios", "estilo": "solido", "nova_aba": false },
+    "botao": {
+      "id": 251,
+      "texto": "Quero servir",
+      "url": "/ministerios",
+      "estilo": "solido",
+      "nova_aba": false
+    },
     "ministerios": [
-      { "id": 252, "nome": "ESPORTE E COMUNIDADE", "publico": "Encontros e atividades para toda a comunidade", "url": "/ministerios/esporte" },
-      { "id": 253, "nome": "MUSIC", "publico": "Louvor e adoração", "url": null },
-      { "id": 254, "nome": "CRTV", "publico": "Criativo", "url": null }
+      {
+        "id": 252,
+        "nome": "ESPORTE E COMUNIDADE",
+        "publico": "Encontros e atividades para toda a comunidade",
+        "url": "/ministerios/esporte"
+      },
+      {
+        "id": 253,
+        "nome": "MUSIC",
+        "publico": "Louvor e adoração",
+        "url": null
+      },
+      {
+        "id": 254,
+        "nome": "CRTV",
+        "publico": "Criativo",
+        "url": null
+      }
+    ]
+  },
+  "cards": {
+    "__component": "sections.ministerios",
+    "id": 21,
+    "titulo": "Pra todas as idades",
+    "texto_apoio": "No Campestre, tem espaço pra família inteira. Veja alguns dos ministérios que fazem parte da rotina da unidade.",
+    "botao": null,
+    "exibicao": "cards",
+    "ministerios": [
+      {
+        "id": 211,
+        "nome": "ADAI KIDS",
+        "publico": "Crianças",
+        "url": null
+      },
+      {
+        "id": 212,
+        "nome": "INPULSE",
+        "publico": "Adolescentes",
+        "url": null
+      },
+      {
+        "id": 213,
+        "nome": "PULSE",
+        "publico": "Jovens",
+        "url": null
+      },
+      {
+        "id": 214,
+        "nome": "50+",
+        "publico": "50 anos ou mais",
+        "url": null
+      }
     ]
   }
 }

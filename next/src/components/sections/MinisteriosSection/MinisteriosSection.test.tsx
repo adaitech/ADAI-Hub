@@ -36,4 +36,30 @@ describe('MinisteriosSection', () => {
     expect(normalizeMinisterios({ ...completo, titulo: '' })).toBeNull();
     expect(normalizeMinisterios({ ...completo, ministerios: [{ id: 1, nome: ' ' }, ...completo.ministerios!] })?.ministerios).toHaveLength(8);
   });
+
+  it('cards (páginas das unidades): mesma lista semântica, título e apoio acima da grade', () => {
+    const data: MinisteriosData = {
+      ...completo,
+      titulo: 'Pra todas as idades',
+      texto_apoio: 'No Campestre, tem espaço pra família inteira.',
+      botao: null,
+      exibicao: 'cards',
+      ministerios: [
+        { id: 1, nome: 'ADAI KIDS', publico: 'Crianças' },
+        { id: 2, nome: 'INPULSE', publico: 'Adolescentes' },
+        { id: 3, nome: 'PULSE', publico: 'Jovens' },
+        { id: 4, nome: '50+', publico: '50 anos ou mais' },
+      ],
+    };
+    render(<MinisteriosSection data={data} index={2} />);
+    const secao = screen.getByRole('region', { name: 'Pra todas as idades' });
+    expect(secao).toHaveAttribute('data-exibicao', 'cards');
+    expect(within(secao).getByRole('heading', { level: 2 })).toBeInTheDocument();
+    expect(within(within(secao).getByRole('list')).getAllByRole('listitem')).toHaveLength(4);
+  });
+
+  it('lista (Home) marca a exibição padrão', () => {
+    render(<MinisteriosSection data={completo} index={3} />);
+    expect(screen.getByRole('region', { name: 'Encontre seu lugar' })).toHaveAttribute('data-exibicao', 'lista');
+  });
 });

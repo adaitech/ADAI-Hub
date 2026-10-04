@@ -56,4 +56,9 @@ describe('BannerCookies', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Recusar' }));
     expect(lerConsentimento()?.analytics).toBe(true);
   });
+
+  it('aviso aponta onde rever a escolha: na Política de Privacidade (não mais no rodapé)', () => {
+    render(<BannerCookies />);
+    expect(screen.getByText(/rever sua escolha na página da/)).toBeInTheDocument();
+  });
 });

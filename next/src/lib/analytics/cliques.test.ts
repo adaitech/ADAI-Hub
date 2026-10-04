@@ -56,4 +56,21 @@ describe('eventosDoClique', () => {
   it('"Preguiça" ou "Ganância" não viram conversão por engano', () => {
     expect(nomes(eventosDoClique({ secao: 'serie-atual', texto: 'Parte 2: Ganância', destino: '', card: null }))).toEqual(['clique_cta']);
   });
+
+  it('Como chegar fora de um card de unidade (Hero ou card "Como chegar" da página da unidade) usa o título da página', () => {
+    const mapa = 'https://www.google.com/maps/search/?api=1&query=x';
+    const hero = eventosDoClique({ secao: 'hero', texto: 'Como chegar', destino: mapa, card: null, pagina: 'Campestre' });
+    expect(hero[0]).toEqual(['como_chegar', { origem: 'hero', unidade: 'Campestre' }]);
+    const verNoMapa = eventosDoClique({ secao: 'carrossel-cards', texto: 'Ver no mapa', destino: mapa, card: 'Como chegar', pagina: 'Campestre' });
+    expect(verNoMapa[0]).toEqual(['como_chegar', { origem: 'carrossel-cards', unidade: 'Campestre' }]);
+    const outraUnidade = eventosDoClique({ secao: 'carrossel-cards', texto: 'Como chegar', destino: mapa, card: 'Santos', pagina: 'Campestre' });
+    expect(outraUnidade[0]).toEqual(['como_chegar', { origem: 'carrossel-cards', unidade: 'Santos' }]);
+  });
+
+  it('e-mail e telefone: destino só com o tipo (mailto:, tel:), nunca o endereço ou o número', () => {
+    const email = eventosDoClique({ secao: 'footer', texto: 'E-mail', destino: 'mailto:contato@adai.com.br', card: null });
+    expect(email.at(-1)).toEqual(['clique_cta', { origem: 'footer', texto: 'E-mail', destino: 'mailto:' }]);
+    const tel = eventosDoClique({ secao: 'footer', texto: 'Ligar', destino: 'tel:+5511959879085', card: null });
+    expect(tel.at(-1)?.[1]).toMatchObject({ destino: 'tel:' });
+  });
 });

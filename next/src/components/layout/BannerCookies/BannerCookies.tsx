@@ -35,7 +35,7 @@ interface BannerCookiesProps {
 /**
  * Aviso de cookies próprio (LGPD). Aparece até a pessoa escolher; a escolha fica no navegador
  * e alimenta o Consent Mode do GTM (sem aceite, o GA4 não grava cookies). Reabre pelo botão
- * "Preferências de cookies" do rodapé. Não é modal: não bloqueia a página nem prende o foco.
+ * "Preferências de cookies" (botão na Política de Privacidade). Não é modal: não bloqueia a página nem prende o foco.
  */
 export function BannerCookies({ demonstracao = false }: BannerCookiesProps) {
   const temEscolha = useSyncExternalStore(assinarConsentimento, temEscolhaNoNavegador, temEscolhaNoServidor);
@@ -81,8 +81,7 @@ export function BannerCookies({ demonstracao = false }: BannerCookiesProps) {
       </h2>
       <p className={styles.texto}>
         Guardamos sua escolha de privacidade no navegador. Com sua autorização, usamos cookies de análise do Google
-        Analytics para entender a navegação e melhorar o site. Você pode aceitar, recusar ou rever sua escolha em
-        “Preferências de cookies”. Saiba mais na nossa{' '}
+        Analytics para entender a navegação e melhorar o site. Você pode aceitar, recusar ou rever sua escolha na página da{' '}
         <SmartLink href={ROTA_POLITICA} className={styles.linkPolitica}>
           Política de Privacidade e Cookies
         </SmartLink>

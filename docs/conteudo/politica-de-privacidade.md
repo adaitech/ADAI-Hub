@@ -122,7 +122,7 @@ A duração de um cookie no dispositivo é diferente do período de conservaçã
 
 ### 7.4. Como aceitar, recusar ou mudar de ideia
 
-No aviso de cookies, você pode selecionar **“Aceitar”** ou **“Recusar”** para a finalidade de análise. Para rever sua escolha, utilize **“Preferências de cookies”**, no rodapé do site.
+No aviso de cookies, você pode selecionar **“Aceitar”** ou **“Recusar”** para a finalidade de análise. Para rever sua escolha a qualquer momento, use o botão [Preferências de cookies](#preferencias-cookies), que reabre o aviso.
 
 A revogação interrompe os usos futuros que dependam desse consentimento, sem tornar ilegais os tratamentos realizados anteriormente de forma válida. Você também pode solicitar a eliminação de dados, observadas as situações de conservação permitidas por lei.
 
@@ -223,7 +223,7 @@ Para dúvidas, solicitações e assuntos relacionados à proteção de dados pes
 
 **Título:** Sua privacidade
 
-**Mensagem:** Guardamos sua escolha de privacidade no navegador. Com sua autorização, usamos cookies de análise do Google Analytics para entender a navegação e melhorar o site. Você pode aceitar, recusar ou rever sua escolha em “Preferências de cookies”. Saiba mais na nossa Política de Privacidade e Cookies.
+**Mensagem:** Guardamos sua escolha de privacidade no navegador. Com sua autorização, usamos cookies de análise do Google Analytics para entender a navegação e melhorar o site. Você pode aceitar, recusar ou rever sua escolha na página da Política de Privacidade e Cookies.
 
 | Elemento | Texto ou destino |
 | --- | --- |
@@ -231,7 +231,7 @@ Para dúvidas, solicitações e assuntos relacionados à proteção de dados pes
 | Botão de recusa | Recusar |
 | Link da política | Política de Privacidade e Cookies |
 | Destino do link | `/politica-de-privacidade` |
-| Controle no rodapé | Preferências de cookies |
+| Controle para rever a escolha | Botão "Preferências de cookies" na Política de Privacidade |
 
 Aceitar e recusar devem ser igualmente acessíveis. O link para a política não deve registrar consentimento. Como há apenas uma finalidade opcional prevista neste texto, os dois botões se referem exclusivamente à análise. Caso outras finalidades sejam adicionadas, revisar o texto e oferecer escolhas específicas.
 

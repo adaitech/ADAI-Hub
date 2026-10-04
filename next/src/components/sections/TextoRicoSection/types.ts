@@ -10,7 +10,8 @@ export interface TextoRicoData {
 }
 
 export interface TextoRicoView {
-  titulo: string;
+  /** Opcional: abaixo de um Hero, o título da página já é o do Hero. */
+  titulo: string | null;
   /** "2 de outubro de 2026" ou null. */
   atualizadoEm: string | null;
   /** Data ISO para o `<time dateTime>`. */

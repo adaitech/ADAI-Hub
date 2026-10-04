@@ -50,6 +50,16 @@
       "limite": "De 1 a 12 itens",
       "exemplo": "KIDS · Crianças",
       "componente": "items.ministerio"
+    },
+    {
+      "campo": "exibicao",
+      "label": "Exibição",
+      "descricao": "Lista (Home): linhas ao lado do convite, na caixa cinza. Cards (unidades): um card cinza por ministério.",
+      "placeholder": "",
+      "ondeAparece": "Define o desenho da seção inteira.",
+      "obrigatorio": true,
+      "limite": "Lista ou Cards",
+      "exemplo": "Cards (Pra todas as idades)"
     }
   ]
 }

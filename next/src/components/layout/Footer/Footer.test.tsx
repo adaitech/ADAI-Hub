@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { render, screen, within } from '@testing-library/react';
 import { Footer } from './Footer';
 import mocks from './Footer.mock.json';
@@ -52,5 +54,13 @@ describe('normalizeFooter', () => {
 
   it('funciona sem dados do Strapi', () => {
     expect(normalizeFooter(null)).toEqual({ colunas: [], textoMarca: undefined, copyright: undefined, assinatura: undefined });
+  });
+
+  it('sem "Preferências de cookies" (fica na Política) e o "ADAI" gigante não bloqueia cliques', () => {
+    render(<Footer data={mocks.completo} />);
+    expect(screen.queryByRole('button', { name: /Preferências de cookies/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Política de Privacidade e Cookies' })).toHaveAttribute('href', '/politica-de-privacidade');
+    const css = readFileSync(join(__dirname, 'Footer.module.css'), 'utf8');
+    expect(css).toMatch(/\.mega\s*\{[^}]*pointer-events:\s*none/);
   });
 });

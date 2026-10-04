@@ -105,4 +105,29 @@ describe('CarrosselCardsSection', () => {
     const { container } = render(<CarrosselCardsSection data={{ ...completo, cards: [] }} index={1} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('card com url: o card inteiro leva à página e "Como chegar" continua independente', () => {
+    const data: CarrosselCardsData = {
+      ...completo,
+      cards: [completo.cards![0], ...completo.cards!.slice(1).map((card) => ({ ...card, url: null }))],
+    };
+    const { container } = render(<CarrosselCardsSection data={data} index={1} />);
+    const titulo = screen.getByRole('heading', { level: 3, name: 'Campestre' });
+    const link = within(titulo).getByRole('link', { name: 'Campestre' });
+    expect(link).toHaveAttribute('href', '/campestre');
+    expect(link.className).toMatch(/linkCard/);
+    const card = titulo.closest('li')!;
+    expect(within(card).getByRole('link', { name: /Como chegar/ }).getAttribute('href')).toMatch(/google\.com\/maps/);
+    expect(container.querySelectorAll('a a')).toHaveLength(0);
+    // Sem url, o título continua sem link.
+    expect(within(screen.getByRole('heading', { level: 3, name: 'Santos' })).queryByRole('link')).toBeNull();
+  });
+
+  it('foto após o título e colorida: a trilha recebe as classes de posição e cor', () => {
+    const comFoto = mocks.foto_abaixo as CarrosselCardsData;
+    render(<CarrosselCardsSection data={{ ...comFoto, posicao_imagem: 'apos_titulo', preto_e_branco: false }} index={1} />);
+    const trilha = screen.getAllByRole('list')[0];
+    expect(trilha.className).toMatch(/imagemAposTitulo/);
+    expect(trilha.className).toMatch(/colorida/);
+  });
 });

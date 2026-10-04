@@ -57,7 +57,7 @@
       "placeholder": "Ex.: Av. Dom Pedro II, 3405 (Enter) Santo André",
       "ondeAparece": "Abaixo dos destaques, em cinza.",
       "obrigatorio": false,
-      "limite": "Até 160 caracteres",
+      "limite": "Até 240 caracteres",
       "exemplo": "Av. Dom Pedro II, 3405\nSanto André"
     },
     {
@@ -81,6 +81,16 @@
       "limite": "1 link",
       "exemplo": "Como chegar → Google Maps",
       "componente": "shared.link"
+    },
+    {
+      "campo": "url",
+      "label": "Página do card",
+      "descricao": "Endereço que abre ao clicar no card (ex.: /campestre). Botão e link do card continuam separados.",
+      "placeholder": "Ex.: /campestre",
+      "ondeAparece": "Não aparece escrito: o card inteiro vira clicável e o título fica sublinhado ao passar o mouse.",
+      "obrigatorio": false,
+      "limite": "Até 255 caracteres · página do site (/...) ou endereço https://",
+      "exemplo": "/campestre"
     }
   ]
 }

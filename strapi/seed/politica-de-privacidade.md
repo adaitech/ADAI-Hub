@@ -100,7 +100,7 @@ A duração de um cookie no dispositivo é diferente do período de conservaçã
 
 ### 7.4. Como aceitar, recusar ou mudar de ideia
 
-No aviso de cookies, você pode selecionar **“Aceitar”** ou **“Recusar”** para a finalidade de análise. Para rever sua escolha, utilize **“Preferências de cookies”**, no rodapé do site.
+No aviso de cookies, você pode selecionar **“Aceitar”** ou **“Recusar”** para a finalidade de análise. Para rever sua escolha a qualquer momento, use o botão [Preferências de cookies](#preferencias-cookies), que reabre o aviso.
 
 A revogação interrompe os usos futuros que dependam desse consentimento, sem tornar ilegais os tratamentos realizados anteriormente de forma válida. Você também pode solicitar a eliminação de dados, observadas as situações de conservação permitidas por lei.
 

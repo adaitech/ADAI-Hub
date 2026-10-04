@@ -13,7 +13,7 @@ Documento longo editado no Strapi em **Markdown**: títulos, parágrafos, listas
 
 ```text
 sections.texto-rico                (dynamic zone `sections` de `page`)
-├── titulo         Text (short) · obrigatório · máx. 100     título do documento (h1 na 1ª seção)
+├── titulo         Text (short) · opcional · máx. 100        título do documento (h1 na 1ª seção). Vazio abaixo de um Hero (páginas Sobre nós e Jesus): sem cabeçalho próprio, wrapper vira <div> e "##" vira h2
 ├── atualizado_em  Date · opcional                           "Última atualização: 2 de outubro de 2026."
 └── conteudo       Rich text (Markdown) · obrigatório        corpo: ## seção, ### subseção, listas, tabelas, [links](https://…)
 ```
@@ -21,6 +21,9 @@ sections.texto-rico                (dynamic zone `sections` de `page`)
 Populate: `true` (só campos simples).
 
 ## 3. Renderização
+
+No Markdown, `[Preferências de cookies](#preferencias-cookies)` vira o botão que reabre o aviso de cookies (usado na Política de Privacidade; LGPD).
+
 
 - `react-markdown` + `remark-gfm` (tabelas) no **servidor** — justificativa em `Stack-Fontes-e-Bibliotecas.md`. HTML cru no Markdown é **ignorado** (`skipHtml`); links passam por `sanitizeHref` (bloqueia `javascript:`).
 - **Hierarquia de títulos (SEO/a11y):** na 1ª seção da página o título é `h1` e `##` vira `h2`; em outra posição o título é `h2` e `##` vira `h3`. `#` no texto vira o nível de `##` (só existe um `h1`).
@@ -44,7 +47,7 @@ Populate: `true` (só campos simples).
 
 ## Medição (DataLayer)
 
-Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links do texto; `ver_secao`.
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links do texto (e-mail sai só como `mailto:`) e no botão "Preferências de cookies" da Política; `ver_secao` (texto longo conta quando ocupa metade da tela). Nas páginas Sobre nós e Jesus, o Hero e o texto entram como `hero` e `texto-rico`.
 
 ## Testes
 

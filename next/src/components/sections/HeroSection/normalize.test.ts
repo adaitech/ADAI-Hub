@@ -54,4 +54,14 @@ describe('normalizeHero', () => {
     expect(view?.imagem?.alt).toBe('');
     expect(view?.imagem?.url).toBe('http://localhost:1337/uploads/x.jpg');
   });
+
+  it('subtítulo e foto: P&B por padrão; colorida só quando desligado no Strapi', () => {
+    const padrao = normalizeHero(completo);
+    expect(padrao?.subtitulo).toEqual([]);
+    expect(padrao?.pretoEBranco).toBe(true);
+    const unidade = normalizeHero({ ...completo, subtitulo: 'A unidade Campestre reúne cultos.\nEm Santo André.', preto_e_branco: false });
+    expect(unidade?.subtitulo).toEqual(['A unidade Campestre reúne cultos.', 'Em Santo André.']);
+    expect(unidade?.pretoEBranco).toBe(false);
+    expect(normalizeHero({ ...completo, preto_e_branco: null })?.pretoEBranco).toBe(true);
+  });
 });

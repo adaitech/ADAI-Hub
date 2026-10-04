@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { caminhoDaPagina } from '@/lib/paginas/caminho';
 
 /** Projeção mínima de uma página publicada no Strapi para o sitemap. */
 export interface PaginaSitemap {
@@ -14,7 +15,7 @@ const HOME = 'home';
 const SLUG_VALIDO = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 function urlDaPagina(slug: string, site: string): string {
-  return slug === HOME ? site : `${site}/${slug}`;
+  return slug === HOME ? site : `${site}${caminhoDaPagina(slug)}`;
 }
 
 /** Canonical do Strapi resolvido no domínio do site, sem barra final (null se vazio/inválido). */

@@ -12,11 +12,18 @@ export interface HeroData {
   texto_apoio?: string | null;
   imagem?: StrapiMedia | null;
   botoes?: StrapiBotao[] | null;
+  /** Texto abaixo da frase principal, à esquerda (ex.: apresentação da unidade). Linhas por "
+". */
+  subtitulo?: string | null;
+  /** Foto em preto e branco (padrão). `false` = colorida (páginas das unidades). */
+  preto_e_branco?: boolean | null;
 }
 
 export interface HeroView {
   linhas: string[];
+  subtitulo: string[];
   paragrafos: string[];
+  pretoEBranco: boolean;
   imagem: MediaView | null;
   botoes: BotaoView[];
 }

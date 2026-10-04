@@ -35,7 +35,9 @@ sections.hero
 ├── titulo        Text (long) · obrigatório · máx. 60 · uma linha por frase
 ├── texto_apoio   Text (long) · máx. 220 · parágrafos separados por Enter
 ├── imagem        Media (1 imagem) · obrigatório
-└── botoes[]      Component repeatable (shared.botao) · máx. 2
+├── botoes[]      Component repeatable (shared.botao) · máx. 2
+├── subtitulo     Text (long) · máx. 220 · opcional — texto abaixo da frase principal (coluna esquerda)
+└── preto_e_branco Boolean · padrão true — false = foto colorida (páginas das unidades)
     ├── texto     Text (short) · obrigatório · máx. 30
     ├── url       Text (short) · obrigatório · máx. 300
     ├── estilo    Enumeration · solido | contorno · default solido
@@ -58,6 +60,8 @@ Textos exatos (label, descrição, placeholder, onde aparece) estão no guia do 
 | `texto_apoio` | Texto de apoio | Texto menor à direita, acima dos botões (no celular, abaixo da frase) |
 | `imagem` | Foto de fundo | Fundo inteiro da faixa |
 | `botoes` | Botões | Abaixo do texto de apoio |
+| `subtitulo` | Texto abaixo da frase principal | Coluna esquerda, logo abaixo do título (Figma 28:421; largura máx. 626px, token `--hero-subtitulo-max`) |
+| `preto_e_branco` | Foto em preto e branco | Filtro P&B na foto (padrão ligado; Home). Desligado nas unidades (Figma "Hero / Campestre", 28:414) |
 
 ## 5. Exemplo de preenchimento
 

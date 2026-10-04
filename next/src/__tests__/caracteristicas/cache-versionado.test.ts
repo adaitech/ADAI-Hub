@@ -61,12 +61,13 @@ describe('formato guardado em cache × versão da chave', () => {
 
   it('inChurch (próximos eventos)', () => {
     expect({ versao: VERSAO_CACHE_INCHURCH, formato: formatoDe(eventos) }).toEqual({
-      versao: 1,
+      versao: 2,
       formato: [
         'atualizadoEm',
         'eventos[].descricao',
         'eventos[].destaque',
         'eventos[].id',
+        'eventos[].igrejaId',
         'eventos[].imagem.height',
         'eventos[].imagem.url',
         'eventos[].imagem.width',

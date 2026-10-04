@@ -93,6 +93,8 @@
   text-align: center;
   opacity: var(--opacity-ghost);
   user-select: none;
+  /* Decorativo: sobe por cima da linha final (margem negativa) e não pode bloquear o link da Política. */
+  pointer-events: none;
 }
 
 /* tier: tablet — colunas de links lado a lado */

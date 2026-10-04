@@ -13,7 +13,9 @@ export function normalizeHero(data: HeroData): HeroView | null {
 
   return {
     linhas,
+    subtitulo: splitLines(data.subtitulo),
     paragrafos: splitLines(data.texto_apoio),
+    pretoEBranco: data.preto_e_branco !== false,
     imagem: resolveStrapiMedia(data.imagem),
     botoes: normalizeBotoes(data.botoes).slice(0, HERO_MAX_BOTOES),
   };

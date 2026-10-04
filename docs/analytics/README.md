@@ -22,7 +22,7 @@ site (Next)  ──registrarEvento()──▶  window.dataLayer  ──▶  GTM 
 | Regras de clique | `lib/analytics/cliques.ts` `eventosDoClique` | Decide os eventos de um clique pelo contexto (seção, texto, destino, card) — função pura, testada |
 | Rastreador | `components/analytics/RastreadorAnalytics.tsx` | **Único** Client Component de medição: ouve cliques e o abrir da FAQ, observa seções na tela, envia Web Vitals. As seções continuam Server Components |
 | GTM + Consent Mode | `lib/analytics/gtm.ts` + `components/analytics/GoogleTagManager.tsx` | Container por ambiente (`NEXT_PUBLIC_GTM_ID`). **O GTM só carrega depois do aceite** (Política de Privacidade: nada vai ao Google antes da escolha); consentimento negado por padrão e liberado no aceite |
-| Aviso de cookies | `components/layout/BannerCookies/` | Aceitar/Recusar; reabre pelo rodapé ("Preferências de cookies") |
+| Aviso de cookies | `components/layout/BannerCookies/` | Aceitar/Recusar; reabre pelo botão "Preferências de cookies" na Política de Privacidade |
 | Disparo manual | `data-analytics="manual"` | Elemento que dispara o próprio evento (player da Série atual, aviso de cookies) e é ignorado pelo rastreador |
 
 O GTM e o rastreador ficam no layout do **site** (`app/(site)/layout.tsx`): a vitrine `/componentes` e o preview não enviam dados.
@@ -45,7 +45,7 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | Evento | Quando dispara | Parâmetros | Conversão? |
 | --- | --- | --- | --- |
 | `planejar_visita` | Clique em link para `/planeje-sua-visita` (ou texto "Planeje sua visita") | `origem`, `texto` | **Sim** |
-| `como_chegar` | Clique em link do Google Maps (ou texto "Como chegar") | `origem`, `unidade` (título do card) | — |
+| `como_chegar` | Clique em link do Google Maps (ou texto "Como chegar") | `origem`, `unidade` (título do card; fora de um card de unidade — Hero ou "Ver no mapa" da página da unidade — o `h1` da página) | — |
 | `assistir_mensagem` | Abrir o player (site) ou ir ao YouTube na Série atual | `origem` (botao, thumbnail, card), `serie`, `parte`, `status` (published, live, waiting-sermon-cut), `player` (site, youtube) | — |
 | `ver_todas_mensagens` | "Todas as mensagens" (playlist do YouTube) | `origem`, `serie` | — |
 | `selecionar_evento` | Link de um card em Próximos eventos | `evento` (nome), `acao` (Inscreva-se, Participar online) | — |
@@ -53,8 +53,8 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `selecionar_ministerio` | Clique em um ministério de "Encontre seu lugar" | `ministerio` | — |
 | `contribuir` | Link para `/contribua` ou texto com contribuir/dízimo/oferta/doação | `origem`, `texto` | **Sim** |
 | `baixar_app` | Link da App Store ou do Google Play | `origem`, `loja` (app_store, google_play) | — |
-| `clique_cta` | **Todo** clique em link/botão (inclusive os acima) | `origem`, `texto`, `destino` (sem query string) | — |
-| `ver_secao` | Seção 25% visível, uma vez por página | `secao`, `posicao` | — |
+| `clique_cta` | **Todo** clique em link/botão (inclusive os acima) | `origem`, `texto`, `destino` (sem query string; e-mail/telefone só `mailto:`/`tel:`) | — |
+| `ver_secao` | Seção 25% visível (ou ocupando metade da tela, para textos longos), uma vez por página | `secao`, `posicao` | — |
 | `web_vitals` | Core Web Vitals de usuários reais | `metrica` (LCP, CLS, INP, FCP, TTFB), `valor` (CLS × 1000), `avaliacao` | — |
 | `consentimento_cookies` | Escolha no aviso de cookies | `escolha` (aceito, recusado) | — |
 

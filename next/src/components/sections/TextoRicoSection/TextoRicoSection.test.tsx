@@ -15,8 +15,8 @@ describe('normalizeTextoRico', () => {
     });
   });
 
-  it('sem título ou conteúdo → não exibe; data inválida é ignorada', () => {
-    expect(normalizeTextoRico({ ...base, titulo: ' ' })).toBeNull();
+  it('sem conteúdo → não exibe; título é opcional; data inválida é ignorada', () => {
+    expect(normalizeTextoRico({ ...base, titulo: ' ' })).toMatchObject({ titulo: null });
     expect(normalizeTextoRico({ ...base, conteudo: '' })).toBeNull();
     expect(normalizeTextoRico({ ...base, atualizado_em: 'ontem' })?.atualizadoEm).toBeNull();
   });
@@ -56,5 +56,21 @@ describe('TextoRicoSection', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Termos' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Seção' })).toBeInTheDocument();
     expect(container.querySelector('script')).toBeNull();
+  });
+
+  it('sem título (abaixo do Hero): nenhum cabeçalho próprio e "##" vira h2', () => {
+    render(<TextoRicoSection data={{ ...base, titulo: null, conteudo: '## Parte\n\nTexto da página.' }} index={1} />);
+    expect(screen.getAllByRole('heading').map((h) => [h.tagName, h.textContent])).toEqual([['H2', 'Parte']]);
+    expect(screen.getByText('Texto da página.')).toBeInTheDocument();
+  });
+
+  it('link #preferencias-cookies vira o botão que reabre o aviso de cookies', () => {
+    const abrir = jest.fn();
+    window.addEventListener('adai:abrir-preferencias-cookies', abrir);
+    render(<TextoRicoSection data={{ ...base, conteudo: 'Mude quando quiser: [Preferências de cookies](#preferencias-cookies).' }} index={0} />);
+    expect(screen.queryByRole('link', { name: /Preferências/ })).not.toBeInTheDocument();
+    screen.getByRole('button', { name: 'Preferências de cookies' }).click();
+    expect(abrir).toHaveBeenCalledTimes(1);
+    window.removeEventListener('adai:abrir-preferencias-cookies', abrir);
   });
 });
