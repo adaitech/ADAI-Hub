@@ -6,9 +6,18 @@ import RootLayout, { metadata } from './layout';
 import NotFound from './not-found';
 import NaoEncontradaDoSite from './(site)/not-found';
 
+jest.mock('next/server', () => ({ connection: jest.fn() }));
+
 describe('layout raiz', () => {
-  it('documento em português do Brasil, com as fontes do site', () => {
-    const html = RootLayout({ children: null }) as ReactElement<{ lang: string; className: string }>;
+  it('renderiza a cada requisição: a CSP usa um nonce novo por requisição (proxy.ts)', async () => {
+    const { connection } = jest.requireMock('next/server') as { connection: jest.Mock };
+    connection.mockClear();
+    await RootLayout({ children: null });
+    expect(connection).toHaveBeenCalledTimes(1);
+  });
+
+  it('documento em português do Brasil, com as fontes do site', async () => {
+    const html = (await RootLayout({ children: null })) as ReactElement<{ lang: string; className: string }>;
     expect(html.type).toBe('html');
     expect(html.props.lang).toBe('pt-BR');
     expect(html.props.className).toMatch(/\S+ \S+/);

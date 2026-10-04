@@ -1,10 +1,20 @@
 import type { NextConfig } from 'next';
+import { cabecalhosDaApi, cabecalhosFixos, lerConfigSeguranca } from './src/lib/seguranca/cabecalhos';
 
 const strapiUrl = new URL(process.env.NEXT_PUBLIC_STRAPI_URL ?? 'http://localhost:1337');
 
 const nextConfig: NextConfig = {
   // O repositório tem yarn.lock na raiz (scripts de orquestração) e em next/; a raiz do app é next/.
   turbopack: { root: process.cwd() },
+  // Segurança (docs/seguranca/README.md): não anunciar a tecnologia; cabeçalhos fixos em toda
+  // resposta. A CSP com nonce das páginas fica no src/proxy.ts.
+  poweredByHeader: false,
+  async headers() {
+    return [
+      { source: '/:path*', headers: cabecalhosFixos(lerConfigSeguranca()) },
+      { source: '/api/:path*', headers: cabecalhosDaApi() },
+    ];
+  },
   images: {
     remotePatterns: [
       {

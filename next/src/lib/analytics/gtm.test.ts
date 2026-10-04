@@ -41,6 +41,13 @@ describe('gtm', () => {
       expect(update?.[2]).toEqual({ analytics_storage: 'granted' });
     });
 
+    it('CSP: o gtm.js herda o nonce do script do site (tags do GTM com nonce)', () => {
+      document.head.innerHTML = '<script nonce="abc123"></script>';
+      localStorage.setItem(CHAVE_CONSENTIMENTO, JSON.stringify({ analytics: true, versao: VERSAO_CONSENTIMENTO }));
+      executar();
+      expect(document.querySelector('script[src*="gtm.js"]')?.getAttribute('nonce')).toBe('abc123');
+    });
+
     it('aceite de uma versão antiga do aviso não carrega', () => {
       localStorage.setItem(CHAVE_CONSENTIMENTO, JSON.stringify({ analytics: true, versao: VERSAO_CONSENTIMENTO - 1 }));
       executar();
