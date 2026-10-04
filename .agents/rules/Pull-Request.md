@@ -64,6 +64,7 @@ cd next && yarn smoke
   - [ ] **sem scroll lateral** em 375 — no console: `document.documentElement.scrollWidth <= innerWidth` deve dar `true`;
   - [ ] interações do componente funcionando (teclado: Tab, Enter, Esc).
 - [ ] Se mudou componente: **5 pilares** conferidos com os dois servidores rodando (Dados no CMS, Página, Componente, SEO, Medição — `AGENTS.md`).
+- [ ] **Medição validada (obrigatório em toda página, botão ou link novo ou alterado):** com o site rodando, clicar em cada página/botão/link do PR e conferir no console que os eventos chegam ao `window.dataLayer` com os parâmetros certos, conforme o plano de `docs/analytics/README.md` §3 — no mínimo `clique_cta` (com `origem` = `data-section`, `texto` e `destino` sem dado pessoal) e o evento específico quando houver (`planejar_visita`, `como_chegar` com a `unidade` certa, `contribuir`, `selecionar_evento`…); `ver_secao` para cada seção nova. Toda seção tem `data-section`. O `dataLayer` recebe os eventos mesmo sem aceitar cookies (o GTM só carrega depois do aceite), então dá para validar sem enviar dados ao Google. Para não sair da página ao clicar: `document.querySelectorAll('a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); }))` e depois `window.dataLayer.filter(e => e.event)`. Comportamento novo de medição → teste em `lib/analytics/cliques.test.ts` ou no componente. Registrar no PR o que foi clicado e os eventos vistos.
 
 ### A5. Segurança
 

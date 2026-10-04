@@ -14,6 +14,8 @@ export interface ContextoClique {
   destino: string;
   /** Título do card/item da lista onde o clique aconteceu (ex.: nome da unidade, do evento). */
   card: string | null;
+  /** Título (h1) da página: nas páginas de unidade, o nome da unidade. */
+  pagina?: string | null;
 }
 
 export type EventoGerado = { [N in NomeEvento]: [N, EventosAnalytics[N]] }[NomeEvento];
@@ -33,7 +35,13 @@ function ehGoogleMaps(u: URL | null): boolean {
   return /(^|\.)google\.[a-z.]+$/.test(u.hostname) && u.pathname.startsWith('/maps');
 }
 
-export function eventosDoClique({ secao, texto, destino, card }: ContextoClique): EventoGerado[] {
+/** Destino sem dado pessoal: http(s) sem query string; e-mail/telefone só o tipo (`mailto:`, `tel:`). */
+function destinoSeguro(u: URL | null, destino: string): string {
+  if (!u) return destino;
+  return /^https?:$/.test(u.protocol) ? `${u.origin}${u.pathname}` : u.protocol;
+}
+
+export function eventosDoClique({ secao, texto, destino, card, pagina = null }: ContextoClique): EventoGerado[] {
   const u = url(destino);
   const caminho = u?.pathname ?? '';
   const eventos: EventoGerado[] = [];
@@ -42,7 +50,10 @@ export function eventosDoClique({ secao, texto, destino, card }: ContextoClique)
     eventos.push(['planejar_visita', { origem: secao, texto }]);
   }
   if (ehGoogleMaps(u) || /como chegar/i.test(texto)) {
-    eventos.push(['como_chegar', { origem: secao, unidade: card ?? texto }]);
+    // Card de unidade (Neste domingo, Outras unidades) → título do card. Fora dele (Hero ou o card
+    // "Como chegar" da página da unidade) → título da página, que é o nome da unidade.
+    const cardDeUnidade = card && !/^como chegar$/i.test(card) ? card : null;
+    eventos.push(['como_chegar', { origem: secao, unidade: cardDeUnidade ?? pagina ?? card ?? texto }]);
   }
   if (caminho.startsWith('/contribua') || /contribu|d[ií]zimo|ofert|doa[cç]/i.test(texto)) {
     eventos.push(['contribuir', { origem: secao, texto }]);
@@ -60,6 +71,6 @@ export function eventosDoClique({ secao, texto, destino, card }: ContextoClique)
   }
 
   // Base de todo clique (permite análises novas no GA4 sem deploy).
-  eventos.push(['clique_cta', { origem: secao, texto, destino: u ? `${u.origin}${u.pathname}` : destino }]);
+  eventos.push(['clique_cta', { origem: secao, texto, destino: destinoSeguro(u, destino) }]);
   return eventos;
 }

@@ -47,7 +47,7 @@ No Markdown, `[Preferências de cookies](#preferencias-cookies)` vira o botão q
 
 ## Medição (DataLayer)
 
-Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links do texto; `ver_secao`.
+Sem evento novo — coberto por eventos do catálogo (`docs/analytics/README.md`): `clique_cta` nos links do texto (e-mail sai só como `mailto:`) e no botão "Preferências de cookies" da Política; `ver_secao` (texto longo conta quando ocupa metade da tela). Nas páginas Sobre nós e Jesus, o Hero e o texto entram como `hero` e `texto-rico`.
 
 ## Testes
 
