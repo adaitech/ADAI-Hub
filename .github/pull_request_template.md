@@ -35,6 +35,7 @@ Rotas para abrir (375 / 768 / 1440):
 - [ ] `yarn smoke`
 - [ ] Navegador: console sem erros, sem scroll lateral em 375, teclado ok
 - [ ] 5 pilares (Dados no CMS, Página, Componente, SEO, Medição) — ou não se aplica
+- [ ] Snapshot do Strapi (`strapi/data/adai-conteudo.tar.gz`) exportado e revisado — obrigatório quando mexer no Strapi, enquanto o projeto usar o Strapi local; ou não se aplica
 - [ ] Sem segredos no diff
 - [ ] Docs atualizados (componente: Medição e Testes)
 - [ ] ⏳ Validação humana (leitor de tela, celular real) — quando houver UI

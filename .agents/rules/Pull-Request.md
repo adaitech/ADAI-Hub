@@ -83,6 +83,7 @@ cd next && yarn smoke
 - [ ] Regra, README ou `AGENTS.md` atualizados se a mudança altera como o time trabalha (novo comando, nova variável de ambiente, nova integração).
 - [ ] Variável de ambiente nova → `next/.env.example` (ou `strapi/.env.example`) + tabela do `README.md`.
 - [ ] Mudou o seed do Strapi → subiu `SEED_VERSION`; mudou o formato de um resultado em cache → subiu `VERSAO_CACHE_*`.
+- [ ] **Snapshot do Strapi atualizado (obrigatório enquanto o projeto usar o Strapi local/SQLite):** mudou schema, componente, guia do editor, seed ou conteúdo do Strapi → com o Strapi **parado** e o seed já aplicado (`yarn develop` uma vez), rodar `cd strapi && yarn data:export`, revisar o arquivo (só conteúdo, mídias e papéis públicos — sem admins, tokens ou segredos; ver A5) e commitar `strapi/data/adai-conteudo.tar.gz` no mesmo PR. Assim quem fizer `yarn data:import` recebe o mesmo conteúdo do PR. Esta regra sai quando o projeto passar a usar um Strapi hospedado.
 
 ### A7. Commit e push
 
