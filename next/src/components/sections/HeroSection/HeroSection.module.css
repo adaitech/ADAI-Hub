@@ -3,6 +3,16 @@
   padding-inline: var(--space-gutter);
 }
 
+.somenteImagem {
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+.somenteImagem .cartao {
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+}
+
 .cartao {
   position: relative;
   isolation: isolate;

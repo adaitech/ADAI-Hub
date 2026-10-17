@@ -81,9 +81,10 @@ function Card({ card, nivelTitulo }: { card: CardView; nivelTitulo: 'h2' | 'h3' 
 interface CarrosselCardsSectionProps extends SectionProps<CarrosselCardsData> {
   /** `data-section` (medição e testes). Seções que reaproveitam o carrossel passam o próprio nome. */
   secao?: string;
+  colunasDesktop?: 3;
 }
 
-export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards' }: CarrosselCardsSectionProps) {
+export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards', colunasDesktop }: CarrosselCardsSectionProps) {
   const view = normalizeCarrosselCards(data);
   if (!view) return null;
 
@@ -104,6 +105,7 @@ export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards' }
         total={view.cards.length}
         trilhaClassName={clsx(
           styles.trilha,
+          colunasDesktop === 3 && styles.tresColunas,
           view.temImagem && styles.comImagem,
           view.temImagem && view.posicaoImagem === 'abaixo' && styles.imagemAbaixo,
           view.temImagem && view.posicaoImagem === 'apos_titulo' && styles.imagemAposTitulo,

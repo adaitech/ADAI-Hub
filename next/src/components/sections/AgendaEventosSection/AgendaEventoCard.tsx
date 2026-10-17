@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import { SmartLink } from '@/components/ui/SmartLink';
+import { urlDoEvento } from '@/lib/inchurch/detalhes';
 import type { AgendaEventoCardView } from './types';
 import styles from './AgendaEventosSection.module.css';
 
@@ -7,8 +9,9 @@ interface AgendaEventoCardProps {
   tituloId: string;
 }
 
-/** Card somente informativo: inscrição e participação serão decididas em uma etapa futura. */
+/** O card navega aos detalhes; a inscrição permanece na página do evento. */
 export function AgendaEventoCard({ card, tituloId }: AgendaEventoCardProps) {
+  const badges = card.badges ?? (card.badge ? [card.badge] : []);
   return (
     <article className={styles.card} aria-labelledby={tituloId}>
       <div className={styles.midia}>
@@ -26,11 +29,11 @@ export function AgendaEventoCard({ card, tituloId }: AgendaEventoCardProps) {
             <span>{card.fallbackData?.mes}</span>
           </p>
         )}
-        {card.badge && <p className={styles.badge}>{card.badge}</p>}
+        {badges.length > 0 && <div className={styles.badges}>{badges.map((badge, i) => <p key={`${badge}-${i}`} className={styles.badge}>{badge}</p>)}</div>}
       </div>
       <div className={styles.conteudo}>
         <h3 id={tituloId} className={styles.titulo}>
-          {card.titulo}
+          <SmartLink className={styles.linkCard} href={urlDoEvento({ id: card.id, nome: card.titulo })}>{card.titulo}</SmartLink>
         </h3>
         <p className={styles.data}>
           {card.destaques.split('\n').map((linha) => (

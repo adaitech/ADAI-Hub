@@ -5,9 +5,14 @@
  */
 import robots from '@/app/robots';
 import sitemap from '@/app/sitemap';
+import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
+import { normalizeEventos } from '@/lib/inchurch/eventos';
+import { urlDoEvento } from '@/lib/inchurch/detalhes';
+import fixture from '@/lib/inchurch/__fixtures__/eventos.json';
 import { criarStrapiFake } from '@/test-utils/strapi-fake';
 
 const ambiente = process.env as Record<string, string | undefined>;
+jest.mock('@/lib/inchurch/eventos-cache', () => ({ getEventosInchurch: jest.fn(async () => null) }));
 const original = { SITE_INDEXAVEL: ambiente.SITE_INDEXAVEL, NEXT_PUBLIC_SITE_URL: ambiente.NEXT_PUBLIC_SITE_URL };
 let strapi: ReturnType<typeof criarStrapiFake>;
 
@@ -26,6 +31,13 @@ beforeEach(() => {
 afterAll(() => Object.assign(ambiente, original));
 
 describe('/sitemap.xml', () => {
+  it('inclui os eventos futuros com a mesma URL dos cards', async () => {
+    producao();
+    const dados = normalizeEventos(fixture.results, new Set(fixture.idsCategoriaGc));
+    dados.eventos = dados.eventos.slice(0, 1).map((evento) => ({ ...evento, ocorrencias: [{ inicio: '2099-01-01T09:00:00-03:00', fim: '2099-01-01T10:00:00-03:00' }] }));
+    jest.mocked(getEventosInchurch).mockResolvedValueOnce(dados);
+    expect(await sitemap()).toEqual(expect.arrayContaining([{ url: `https://adai.com.br${urlDoEvento(dados.eventos[0])}`, priority: 0.7 }]));
+  });
   it('produção: Home e páginas publicadas no Strapi, com URL absoluta do site', async () => {
     producao();
     expect(await sitemap()).toEqual([

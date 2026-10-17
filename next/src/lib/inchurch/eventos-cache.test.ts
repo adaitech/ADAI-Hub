@@ -1,11 +1,18 @@
 /** @jest-environment node */
 import fixture from './__fixtures__/eventos.json';
-import { inchurchFetch } from './client';
-import { __limparUltimoValido, getEventosInchurch } from './eventos-cache';
+import { inchurchFetch, InchurchError } from './client';
+import { __limparUltimoValido, getEventoDetalhe, getEventosInchurch } from './eventos-cache';
+import { getUnidadesInchurch } from '@/lib/strapi/queries/unidades';
+import { getEventoAdministrativo } from './admin-client';
+import administrativo from './__fixtures__/evento-admin.json';
 
 // `next/cache` vira chamada direta em jest.setup.ts.
 jest.mock('./client', () => ({ ...jest.requireActual('./client'), inchurchFetch: jest.fn() }));
 const api = inchurchFetch as jest.MockedFunction<typeof inchurchFetch>;
+jest.mock('@/lib/strapi/queries/unidades', () => ({ getUnidadesInchurch: jest.fn(async () => []) }));
+const getUnidades = jest.mocked(getUnidadesInchurch);
+jest.mock('./admin-client', () => ({ getEventoAdministrativo: jest.fn() }));
+const admin = jest.mocked(getEventoAdministrativo);
 
 describe('getEventosInchurch', () => {
   let warn: jest.SpyInstance;
@@ -13,10 +20,14 @@ describe('getEventosInchurch', () => {
   beforeEach(() => {
     __limparUltimoValido();
     api.mockReset();
+    getUnidades.mockResolvedValue([]);
+    admin.mockReset();
+    admin.mockImplementation(async (id) => ({ id }));
     warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     info = jest.spyOn(console, 'info').mockImplementation(() => {});
   });
   afterEach(() => {
+    jest.restoreAllMocks();
     warn.mockRestore();
     info.mockRestore();
   });
@@ -33,6 +44,127 @@ describe('getEventosInchurch', () => {
       return { count: results.length, next: null, results } as never;
     });
   }
+
+  it('acumula igrejas confirmadas sem sobrescrever a associação anterior nem duplicar o evento', async () => {
+    const raw = fixture.results.find((e) => e.active && e.enabled && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    api.mockImplementation(async (_endpoint, params = []) => ({ results: params.some(([k]) => k === 'category_id') ? [] : [raw], next: null }) as never);
+    const dados = await getEventosInchurch([30146, 31876]);
+    expect(dados?.eventos).toHaveLength(1);
+    expect(dados?.eventos[0]).toMatchObject({ igrejaIds: [30146, 31876] });
+    expect(api).toHaveBeenCalledTimes(4);
+  });
+  it('units administrativas resolvem as duas igrejas mesmo sem correspondência nos filtros públicos', async () => {
+    const base = fixture.results.find((e) => e.active && e.enabled && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    const raw = { ...base, id: 1646183, name: 'HACKATHON ADAI HUB' };
+    api.mockImplementation(async (_endpoint, params = []) => ({ results: params.some(([k]) => k === 'category_id' || k === 'church_id') ? [] : [raw, { ...raw, id: 999, enabled: false }], next: null }) as never);
+    admin.mockResolvedValue({ id: raw.id, units: [
+      { id: 34726, name: 'ADAI CAMPESTRE', related_obj: { id: 30146, model: 'inradartertiarygroup', name: 'ADAI CAMPESTRE' } },
+      { id: 34728, name: 'ADAI SANTOS', related_obj: { id: 31876, model: 'inradartertiarygroup', name: 'ADAI SANTOS' } },
+    ] });
+    expect((await getEventosInchurch([30146, 31876]))?.eventos).toEqual([expect.objectContaining({ id: raw.id, igrejaIds: [30146, 31876] })]);
+    expect(admin).not.toHaveBeenCalledWith(999);
+  });
+
+  it('Connect Pulse publicado na API pública não vira 404 com is_public=false e listas administrativas vazias', async () => {
+    const raw = fixture.results.find((e) => e.id === 1635364)!;
+    api.mockImplementation(async (endpoint) => endpoint === `v1/event/${raw.id}/` ? raw as never : { results: [], next: null } as never);
+    admin.mockResolvedValue({ id: raw.id, is_enabled: true, is_public: false, event_schedule: [], event_attractions: [] });
+    expect(await getEventoDetalhe(raw.id)).toMatchObject({ estado: 'ok', evento: { id: raw.id, programacao: [], convidados: [] } });
+    api.mockImplementation(async (endpoint) => endpoint === `v1/event/${raw.id}/` ? { ...raw, enabled: false } as never : { results: [], next: null } as never);
+    expect(await getEventoDetalhe(raw.id)).toEqual({ estado: 'nao-encontrado' });
+  });
+
+  it.each([false, null, undefined])('consulta individual aceita show_on_site=%s', async (show_on_site) => {
+    const base = fixture.results.find((e) => e.active && e.enabled && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    const raw = { ...base, show_on_site };
+    api.mockImplementation(async (endpoint) => endpoint === `v1/event/${raw.id}/` ? raw as never : { results: [], next: null } as never);
+    admin.mockResolvedValue({ id: raw.id, show_on_site });
+    expect(await getEventoDetalhe(raw.id)).toMatchObject({ estado: 'ok', evento: { id: raw.id } });
+  });
+
+  it('detalhes reutilizam as unidades da Agenda e o vínculo cacheado, mantendo a consulta individual', async () => {
+    getUnidades.mockResolvedValue([{ igrejaId: 30146, nome: 'ADAI Campestre' }, { igrejaId: 31876, nome: 'ADAI Santos' }]);
+    const raw = { ...fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))!, responsible_church: null };
+    api.mockImplementation(async (endpoint, params = []) => {
+      if (endpoint === `v1/event/${raw.id}/`) return { ...raw, description: 'Descrição integral da consulta individual.' } as never;
+      const igreja = params.find(([chave]) => chave === 'church_id')?.[1];
+      const gc = params.some(([chave]) => chave === 'category_id');
+      return { results: gc || (igreja && igreja !== 30146) ? [] : [raw], next: null } as never;
+    });
+    const resultado = await getEventoDetalhe(raw.id);
+    expect(resultado).toMatchObject({ estado: 'ok', evento: { igrejaId: 30146, unidade: 'ADAI Campestre', descricaoCompleta: 'Descrição integral da consulta individual.' } });
+    expect(api).toHaveBeenCalledWith(`v1/event/${raw.id}/`);
+    for (const id of [30146, 31876]) expect(api.mock.calls.filter(([, params = []]) => params.some(([chave, valor]) => chave === 'church_id' && valor === id))).toHaveLength(1);
+  });
+
+  it('show_on_site falso não impede resolver Campestre; sem associação não atribui unidade', async () => {
+    getUnidades.mockResolvedValue([{ igrejaId: 30146, nome: 'ADAI Campestre' }]);
+    const base = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    const hackathon = { ...base, id: 1646183, name: 'HACKATHON ADAI HUB', show_on_site: false, responsible_church: null };
+    const semUnidade = { ...base, responsible_church: null };
+    api.mockImplementation(async (endpoint, params = []) => {
+      if (endpoint === `v1/event/${hackathon.id}/`) return hackathon as never;
+      if (endpoint === `v1/event/${base.id}/`) return semUnidade as never;
+      const gc = params.some(([chave]) => chave === 'category_id');
+      const igreja = params.some(([chave]) => chave === 'church_id');
+      return { results: gc ? [] : igreja ? [hackathon] : [hackathon, semUnidade], next: null } as never;
+    });
+    expect(await getEventoDetalhe(hackathon.id)).toMatchObject({ estado: 'ok', evento: { igrejaId: 30146, unidade: 'ADAI Campestre' } });
+    expect(admin).toHaveBeenCalledWith(hackathon.id);
+    expect(await getEventoDetalhe(base.id)).toMatchObject({ estado: 'ok', evento: { igrejaId: null, unidade: null } });
+    expect(hackathon.show_on_site).toBe(false);
+  });
+
+  it('detalhe publicado usa administração para unidades e programação, sem expor o objeto cru', async () => {
+    const raw = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    api.mockImplementation(async (endpoint) => endpoint === `v1/event/${raw.id}/` ? raw as never : { results: [], next: null } as never);
+    admin.mockResolvedValue({ ...administrativo, id: raw.id, show_on_site: true, is_enabled: true });
+    const resultado = await getEventoDetalhe(raw.id);
+    expect(resultado).toMatchObject({ estado: 'ok', evento: { unidade: 'ADAI CAMPESTRE', programacao: [{ data: '2026-10-17' }] } });
+    expect(JSON.stringify(resultado)).not.toContain('related_obj');
+    admin.mockResolvedValue({ id: raw.id, is_enabled: false });
+    expect(await getEventoDetalhe(raw.id)).toEqual({ estado: 'nao-encontrado' });
+    admin.mockRejectedValue(new InchurchError('http', 'inchurch_event/:id/', 401));
+    expect(await getEventoDetalhe(raw.id)).toMatchObject({ estado: 'ok', evento: { programacao: [] } });
+  });
+
+  it('administração indisponível usa dados públicos sem segredo ou programação inventada', async () => {
+    const raw = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    api.mockImplementation(async (endpoint) => endpoint === `v1/event/${raw.id}/` ? raw as never : { results: [], next: null } as never);
+    admin.mockRejectedValue(new Error('ApiKey usuario:segredo-de-teste'));
+    expect(await getEventoDetalhe(raw.id)).toMatchObject({ estado: 'ok', evento: { id: raw.id, programacao: [] } });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('segredo-de-teste');
+    expect(await getEventoDetalhe(0)).toEqual({ estado: 'nao-encontrado' });
+    expect(admin).toHaveBeenCalledTimes(1);
+  });
+
+  it('detalhe: ID real, 404 confirmado, erro temporário e último válido', async () => {
+    const raw = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))!;
+    let falha: Error | null = null;
+    api.mockImplementation(async (endpoint) => {
+      if (endpoint === `v1/event/${raw.id}/`) {
+        if (falha) throw falha;
+        return raw as never;
+      }
+      return { results: [], next: null } as never;
+    });
+    expect(await getEventoDetalhe(raw.id)).toMatchObject({ estado: 'ok', evento: { id: raw.id } });
+    falha = new InchurchError('timeout', 'v1/event/:id/');
+    expect(await getEventoDetalhe(raw.id)).toMatchObject({ estado: 'ok' });
+    __limparUltimoValido();
+    expect(await getEventoDetalhe(raw.id)).toEqual({ estado: 'indisponivel' });
+    falha = new InchurchError('http', 'v1/event/:id/', 404);
+    expect(await getEventoDetalhe(raw.id)).toEqual({ estado: 'nao-encontrado' });
+    expect(await getEventoDetalhe(-1)).toEqual({ estado: 'nao-encontrado' });
+  });
+
+  it('detalhe: categoria GC permanece oculta e indisponibilidade da lista não vira 404', async () => {
+    api.mockResolvedValue({ results: [{ id: 55 }], next: null } as never);
+    expect(await getEventoDetalhe(55)).toEqual({ estado: 'nao-encontrado' });
+    __limparUltimoValido();
+    api.mockRejectedValue(new InchurchError('timeout', 'v1/event/'));
+    expect(await getEventoDetalhe(55)).toEqual({ estado: 'indisponivel' });
+  });
 
   it('busca todos os eventos + os da categoria GC e normaliza', async () => {
     inchurchOk();

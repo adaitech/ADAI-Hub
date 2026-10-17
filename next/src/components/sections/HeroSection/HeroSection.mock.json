@@ -1,4 +1,8 @@
 {
+  "imagem_evento": {
+    "__component": "sections.hero", "id": 1627743, "titulo": null,
+    "imagem": { "id": 1627743, "url": "https://storage.googleapis.com/media_files_prod/uploads/inchurch/None/image_webp-d6c4d8c66eb666ebe0e6b033d214db5e.webp", "alternativeText": "", "width": 1280, "height": 720 }
+  },
   "completo": {
     "__component": "sections.hero",
     "id": 2,

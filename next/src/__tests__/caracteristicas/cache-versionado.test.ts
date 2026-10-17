@@ -61,13 +61,14 @@ describe('formato guardado em cache × versão da chave', () => {
 
   it('inChurch (próximos eventos)', () => {
     expect({ versao: VERSAO_CACHE_INCHURCH, formato: formatoDe(eventos) }).toEqual({
-      versao: 2,
+      versao: 7,
       formato: [
         'atualizadoEm',
         'eventos[].descricao',
         'eventos[].destaque',
         'eventos[].id',
         'eventos[].igrejaId',
+        'eventos[].igrejaIds[]',
         'eventos[].imagem.height',
         'eventos[].imagem.url',
         'eventos[].imagem.width',
@@ -77,6 +78,7 @@ describe('formato guardado em cache × versão da chave', () => {
         'eventos[].nome',
         'eventos[].ocorrencias[].fim',
         'eventos[].ocorrencias[].inicio',
+        'idsCategoriaGc[]',
       ],
     });
   });

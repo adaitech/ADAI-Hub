@@ -1,11 +1,11 @@
 import { CarrosselCardsSection } from '@/components/sections/CarrosselCardsSection';
 import { CORES_CARD } from '@/components/sections/CarrosselCardsSection/types';
 import fixture from '@/lib/inchurch/__fixtures__/eventos.json';
-import { normalizeEventos, proximosEventos } from '@/lib/inchurch/eventos';
+import { normalizeEventos } from '@/lib/inchurch/eventos';
 import type { InchurchEvento } from '@/lib/inchurch/types';
 import { defineShowcase } from '@/lib/showcase/types';
 import mocks from './ProximosEventosSection.mock.json';
-import { igrejaDe, paraCarrossel, quantidadeDe } from './normalize';
+import { paraCarrossel, quantidadeDe, selecionarEventos } from './normalize';
 import type { ProximosEventosData, ProximosEventosExemplo } from './types';
 
 /** Eventos REAIS da inChurch (lib/inchurch/__fixtures__, sem contatos nem credenciais). */
@@ -26,17 +26,18 @@ export const proximosEventosShowcase = defineShowcase<ProximosEventosExemplo>({
   categoria: 'secao',
   cmsKey: 'sections.proximos-eventos',
   descricao:
-    'Eventos da ADAI vindos da inChurch no mesmo Carrossel de cards, com a arte do evento (16:9, colorida), datas e horário. Só aparecem eventos marcados "Mostrar no site"; GCs ficam de fora.',
+    'Eventos ativos e habilitados da inChurch no mesmo Carrossel de cards, com arte, datas e horário. Os cards abrem os detalhes na Agenda pelo ID do evento; GCs ficam de fora.',
   quandoUsar: 'Na Home (todos os eventos) e nas páginas das unidades (escolhendo a Unidade). No Strapi só se escolhe título, quantidade, cor e unidade; os eventos são da inChurch.',
   doc: 'docs/componentes/proximos-eventos.md',
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-173',
   cms: (data) => data.strapi,
-  render: ({ strapi, inchurch: dados, agora }) => {
-    const eventos = proximosEventos(dados, { agora: new Date(agora), limite: quantidadeDe(strapi), igrejaId: igrejaDe(strapi) });
+  render: ({ strapi, inchurch: dados, agora, detalhes, excluirId }) => {
+    const eventos = selecionarEventos(strapi, dados, { agora: new Date(agora), excluirId, ordemCronologica: detalhes });
     if (eventos.length === 0) return null;
-    return <CarrosselCardsSection data={paraCarrossel(strapi, eventos)} index={1} secao="proximos-eventos" />;
+    return <CarrosselCardsSection data={paraCarrossel(strapi, eventos, detalhes)} index={1} secao="proximos-eventos" colunasDesktop={detalhes ? 3 : undefined} />;
   },
   variantes: [
+    { nome: 'outros_eventos', titulo: 'Outros eventos (detalhes)', descricao: 'Dados externos, até três cards com links internos e exclusão do evento atual.', data: { strapi: mocks.outros_eventos as ProximosEventosData, inchurch, agora: AGORA, detalhes: true, excluirId: inchurch.eventos[0]?.id } },
     {
       nome: 'completo',
       titulo: 'Como em /exemplos (4 eventos, cards pretos)',

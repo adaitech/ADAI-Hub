@@ -28,6 +28,7 @@ Depois do `yarn setup`, preencha os `.env` (nunca commitar; os `.env.example` t�
 | `NEXT_PUBLIC_STRAPI_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_IMAGE_ALLOW_LOCAL_IP` | `next/.env` | URLs e imagens locais |
 | `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_HANDLE` | `next/.env` (só servidor) | Série atual (YouTube Data API v3) |
 | `INCHURCH_API_BASE_PUBLIC`, `INCHURCH_API_KEY`, `INCHURCH_API_SECRET` | `next/.env` (só servidor) | Próximos eventos (inChurch Public API) |
+| `INCHURCH_API_BASE_ADMIN`, `INCHURCH_ADMIN_API_KEY` | `next/.env` (só servidor) | Unidades de publicação e detalhes de eventos. Base `https://www.inradar.com.br/api/v2`; chave com o header completo `ApiKey USUARIO:CHAVE`. O cliente envia `Channel: control_panel`; nunca usar prefixo `NEXT_PUBLIC_`. |
 | `SITE_INDEXAVEL` | `next/.env` | `true` **só em produção** (lido no build): libera o Google no `robots.txt` e gera o `sitemap.xml`. Ausente = tudo bloqueado (homologação/dev). Ver `.agents/rules/Arquitetura-e-Governanca.md` §9 |
 | `NEXT_PUBLIC_GTM_ID` | `next/.env` (público) | Google Tag Manager: `GTM-5945V9DQ` em dev/homologação, `GTM-5MGM7CK2` só em produção. Vazio = sem tags. Ver `docs/analytics/README.md` |
 

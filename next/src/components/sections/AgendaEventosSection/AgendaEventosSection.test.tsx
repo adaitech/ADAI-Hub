@@ -45,6 +45,19 @@ const eventos: EventoSite[] = [
   evento(5, { nome: 'Evento sem arte', imagem: null }),
 ];
 
+it('renderiza todas as badges conhecidas e encontra o card por qualquer unidade associada', () => {
+  const view = normalizeAgendaEventos(data, [evento(1646183, { nome: 'HACKATHON ADAI HUB', igrejaId: 30146, igrejaIds: [30146, 31876, 99999] })], unidades);
+  render(<AgendaEventos view={view} index={1} id={data.id} />);
+  const card = screen.getByRole('article', { name: 'HACKATHON ADAI HUB' });
+  expect(within(card).getByText('ADAI Campestre')).toBeInTheDocument();
+  expect(within(card).getByText('ADAI Santos')).toBeInTheDocument();
+  expect(within(card).queryByText('99999')).not.toBeInTheDocument();
+  for (const id of ['30146', '31876']) {
+    fireEvent.change(screen.getByLabelText('Unidade'), { target: { value: id } });
+    expect(screen.getByRole('article', { name: 'HACKATHON ADAI HUB' })).toBeInTheDocument();
+  }
+});
+
 const dados: EventosInchurch = { eventos, atualizadoEm: '2027-10-01T00:00:00-03:00' };
 
 beforeEach(() => {
@@ -80,7 +93,7 @@ describe('AgendaEventos', () => {
     expect(screen.getByText('OUT')).toBeInTheDocument();
 
     for (const artigo of screen.getAllByRole('article')) {
-      expect(within(artigo).queryByRole('link')).not.toBeInTheDocument();
+      expect(within(artigo).getByRole('link')).toHaveAttribute('href', expect.stringMatching(/^\/agenda\/.+-\d+$/));
       expect(within(artigo).queryByRole('button')).not.toBeInTheDocument();
     }
   });
@@ -122,7 +135,7 @@ describe('AgendaEventosSection', () => {
 
     expect(getEventos).toHaveBeenCalledWith([30146, 31876]);
     const online = screen.getByRole('article', { name: 'Evento online' });
-    expect(within(online).queryByRole('link')).not.toBeInTheDocument();
+    expect(within(online).getByRole('link')).toHaveAttribute('href', '/agenda/evento-online-4');
     expect(within(online).queryByRole('button')).not.toBeInTheDocument();
   });
 

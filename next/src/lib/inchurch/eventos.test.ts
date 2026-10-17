@@ -16,6 +16,19 @@ const evento = (parcial: Partial<InchurchEvento> & { id: number; name: string; s
 });
 
 describe('normalizeEventos (dados reais da inChurch, 28/09/2026)', () => {
+  it('preserva múltiplas igrejas sem duplicar o card e inclui o evento em ambas as unidades', () => {
+    const raw = evento({ id: 1646183, name: 'HACKATHON ADAI HUB', start_datetime: '2027-01-01T10:00:00' });
+    const dados = normalizeEventos([raw, raw], new Set(), new Date(), new Map([[raw.id, [31876, 30146, 30146]]]));
+    expect(dados.eventos).toHaveLength(1);
+    expect(dados.eventos[0]).toMatchObject({ igrejaId: 30146, igrejaIds: [30146, 31876] });
+    for (const igrejaId of [30146, 31876]) expect(proximosEventos(dados, { igrejaId, agora: new Date('2026-01-01') })).toHaveLength(1);
+    expect(proximosEventos(dados, { igrejaId: 999, agora: new Date('2026-01-01') })).toHaveLength(0);
+  });
+  it('usa a unidade informada pela API quando não existe mapa externo', () => {
+    const raw = evento({ id: 1, name: 'Evento', start_datetime: '2027-01-01T09:00:00', responsible_church: { id: 30146, name: 'Campestre' } });
+    expect(normalizeEventos([raw], new Set()).eventos[0].igrejaId).toBe(30146);
+    expect(normalizeEventos([raw], new Set(), new Date(), new Map([[1, 31876]])).eventos[0].igrejaId).toBe(31876);
+  });
   const dados = normalizeEventos(reais, idsGc, em('2026-09-28T09:00'));
   const nomes = dados.eventos.map((e) => e.nome);
 
@@ -37,8 +50,11 @@ describe('normalizeEventos (dados reais da inChurch, 28/09/2026)', () => {
     expect(nomes.some((n) => /^GC\b/.test(n))).toBe(false);
   });
 
-  it('eventos sem "mostrar no site" ficam de fora (ADAI College)', () => {
-    expect(nomes.some((n) => n.includes('ADAI College'))).toBe(false);
+  it('show_on_site falso ou ausente não exclui eventos ativos e habilitados', () => {
+    const base = { name: 'Evento de teste', start_datetime: '2027-01-01T10:00:00' };
+    for (const show_on_site of [false, undefined, null]) {
+      expect(normalizeEventos([evento({ id: 1, ...base, show_on_site })], new Set()).eventos).toHaveLength(1);
+    }
   });
 
   it('recorrência: um item com todas as datas, sem o modelo nem cópias', () => {
@@ -61,7 +77,7 @@ describe('regras', () => {
     expect(ehGrupoDeConexao(evento({ id: 3, name: 'GCs da cidade: culto', start_datetime: '2026-10-01T20:00:00' }), new Set())).toBe(false);
   });
 
-  it('inativo, desabilitado, fora do site ou modelo de recorrência → fora', () => {
+  it('inativo, desabilitado ou modelo de recorrência → fora; show_on_site não filtra', () => {
     const base = { name: 'X', start_datetime: '2026-10-01T20:00:00' };
     const dados = normalizeEventos(
       [
@@ -73,7 +89,7 @@ describe('regras', () => {
       ],
       new Set(),
     );
-    expect(dados.eventos.map((e) => e.nome)).toEqual(['OK']);
+    expect(dados.eventos.map((e) => e.nome)).toEqual(['Z', 'OK']);
   });
 
   it('link: inscrição externa > link online > nenhum; bloqueia javascript:', () => {

@@ -16,7 +16,7 @@ export function filtrarEventosDaAgenda(
 ): AgendaEventoCardView[] {
   const termo = textoParaBusca(busca);
   return cards.filter((card) => {
-    const correspondeUnidade = unidadeId === null || card.unidadeId === unidadeId;
+    const correspondeUnidade = unidadeId === null || (card.unidadeIds?.includes(unidadeId) ?? card.unidadeId === unidadeId);
     const conteudo = textoParaBusca(`${card.titulo} ${card.descricao ?? ''}`);
     return correspondeUnidade && (!termo || conteudo.includes(termo));
   });

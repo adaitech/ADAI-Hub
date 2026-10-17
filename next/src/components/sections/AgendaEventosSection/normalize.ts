@@ -1,5 +1,5 @@
 import { formatarDatasDoEvento } from '@/lib/inchurch/datas';
-import type { EventoSite } from '@/lib/inchurch/eventos';
+import { igrejasDoEvento, type EventoSite } from '@/lib/inchurch/eventos';
 import type { UnidadeInchurch } from '@/lib/strapi/queries/unidades';
 import type { AgendaEventoCardView, AgendaEventosData, AgendaEventosView } from './types';
 
@@ -30,6 +30,8 @@ export function normalizeAgendaEventos(data: AgendaEventosData, eventos: EventoS
   const nomesDasUnidades = new Map(unidades.map((unidade) => [unidade.igrejaId, unidade.nome]));
   const cards = eventos.map((evento) => {
     const datas = formatarDatasDoEvento(evento);
+    const unidadeIds = igrejasDoEvento(evento);
+    const badges = unidadeIds.map((id) => nomesDasUnidades.get(id)).filter((nome): nome is string => Boolean(nome));
     return {
       id: evento.id,
       titulo: evento.nome,
@@ -38,7 +40,9 @@ export function normalizeAgendaEventos(data: AgendaEventosData, eventos: EventoS
       descricao: evento.descricao,
       imagem: evento.imagem,
       unidadeId: evento.igrejaId,
-      badge: evento.igrejaId === null ? null : nomesDasUnidades.get(evento.igrejaId) ?? null,
+      unidadeIds,
+      badge: badges[0] ?? null,
+      badges,
       fallbackData: evento.imagem ? null : fallbackData(evento.ocorrencias[0].inicio),
     };
   });

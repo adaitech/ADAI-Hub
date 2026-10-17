@@ -159,7 +159,8 @@ describe('Página por slug ([slug])', () => {
     const agenda = container.querySelector('[data-section="agenda-eventos"]') as HTMLElement;
     expect(agenda).not.toBeNull();
     expect(within(agenda).getAllByRole('article')).not.toHaveLength(0);
-    expect(within(agenda).queryByRole('link')).not.toBeInTheDocument();
+    expect(within(agenda).getAllByRole('link')).toHaveLength(within(agenda).getAllByRole('article').length);
+    expect(within(agenda).getByRole('link', { name: 'Connect Pulse' })).toHaveAttribute('href', '/agenda/connect-pulse-1635364');
     expect(getEventosInchurch).toHaveBeenCalledWith([30146, 31876]);
 
     const meta = await metadataSlug(params('agenda'));

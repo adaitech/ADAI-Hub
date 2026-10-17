@@ -4,7 +4,7 @@ import type { InchurchEvento } from './types';
 /**
  * Regras dos eventos do site (sem rede, sem React). Validadas com a API real e com a tela
  * "Próximos Eventos" do painel da inChurch (27/09/2026):
- * - só `active && enabled && show_on_site` ("mostrar no site" no painel manda);
+ * - só `active && enabled`; `show_on_site` não é utilizado como filtro;
  * - GCs (Grupos de Conexão) nunca aparecem: categoria "Grupo de Conexão" ou nome "GC …";
  * - `recurrence_model` é o modelo da recorrência, não uma data: ignorado;
  * - mesmo nome + mesmo início = cópia (ex.: evento recriado): uma só;
@@ -32,11 +32,18 @@ export interface EventoSite {
   destaque: boolean;
   /** Igreja (unidade) da inChurch em que o evento foi cadastrado; `null` = evento geral da ADAI. */
   igrejaId: number | null;
+  /** Todas as igrejas confirmadas; opcional para compatibilidade com dados anteriores. */
+  igrejaIds?: number[];
+}
+
+export function igrejasDoEvento(evento: Pick<EventoSite, 'igrejaId' | 'igrejaIds'>): number[] {
+  return evento.igrejaIds ?? (evento.igrejaId === null ? [] : [evento.igrejaId]);
 }
 
 /** Resultado que vai para o cache (não depende de "agora"). */
 export interface EventosInchurch {
   eventos: EventoSite[];
+  idsCategoriaGc?: number[];
   atualizadoEm: string;
 }
 
@@ -57,7 +64,7 @@ export function ehGrupoDeConexao(evento: InchurchEvento, idsCategoriaGc: Readonl
 }
 
 function apareceNoSite(evento: InchurchEvento): boolean {
-  return evento.active === true && evento.enabled === true && evento.show_on_site === true && evento.recurrence_model !== true;
+  return evento.active === true && evento.enabled === true && evento.recurrence_model !== true;
 }
 
 /** Primeiro parágrafo, até ~140 caracteres, sem cortar palavra. */
@@ -80,17 +87,17 @@ const chaveNome = (nome: string) => nome.normalize('NFD').replace(/[̀-ͯ]/g, ''
 
 /**
  * Lista crua da API → eventos do site (um item por evento, com todas as datas).
- * `igrejaPorEvento`: id do evento → igreja da inChurch (vem das buscas por `church_id`;
- * o JSON do evento não traz a igreja). O agrupamento é por nome **e** igreja: "Batismo" do
+ * `igrejaPorEvento`: id do evento → igrejas da inChurch (vem das buscas por `church_id`;
+ * aceita um ID legado ou vários IDs). O agrupamento é por nome e conjunto de igrejas: "Batismo" do
  * Campestre e "Batismo" de Santos são cards separados (cada um aparece na sua unidade).
  */
 export function normalizeEventos(
   eventos: InchurchEvento[],
   idsCategoriaGc: ReadonlySet<number>,
   agora = new Date(),
-  igrejaPorEvento: ReadonlyMap<number, number> = new Map(),
+  igrejaPorEvento: ReadonlyMap<number, number | readonly number[]> = new Map(),
 ): EventosInchurch {
-  const porNome = new Map<string, { base: InchurchEvento; ocorrencias: Map<string, OcorrenciaEvento>; igrejaId: number | null }>();
+  const porNome = new Map<string, { base: InchurchEvento; ocorrencias: Map<string, OcorrenciaEvento>; igrejaId: number | null; igrejaIds: number[] }>();
 
   for (const evento of eventos) {
     const nome = evento.name?.trim();
@@ -98,15 +105,17 @@ export function normalizeEventos(
     if (!nome || !inicio || !apareceNoSite(evento) || ehGrupoDeConexao(evento, idsCategoriaGc)) continue;
     const fim = paraIsoSaoPaulo(evento.end_datetime) ?? inicio;
 
-    const igrejaId = igrejaPorEvento.get(evento.id) ?? null;
-    const chave = `${chaveNome(nome)}|${igrejaId ?? 'geral'}`;
-    const grupo = porNome.get(chave) ?? { base: evento, ocorrencias: new Map(), igrejaId };
+    const associacao = igrejaPorEvento.get(evento.id) ?? idIgrejaValido(evento.responsible_church?.id);
+    const igrejaIds = [...new Set((typeof associacao === 'number' ? [associacao] : associacao ?? []).filter((id) => idIgrejaValido(id) !== null))].sort((a, b) => a - b);
+    const igrejaId = igrejaIds[0] ?? null;
+    const chave = `${chaveNome(nome)}|${igrejaIds.join(',') || 'geral'}`;
+    const grupo = porNome.get(chave) ?? { base: evento, ocorrencias: new Map(), igrejaId, igrejaIds };
     grupo.ocorrencias.set(inicio, { inicio, fim }); // mesma data = cópia
     if (!grupo.base.image && !grupo.base.image_webp && (evento.image || evento.image_webp)) grupo.base = evento;
     porNome.set(chave, grupo);
   }
 
-  const lista: EventoSite[] = [...porNome.values()].map(({ base, ocorrencias, igrejaId }) => {
+  const lista: EventoSite[] = [...porNome.values()].map(({ base, ocorrencias, igrejaId, igrejaIds }) => {
     const url = base.image_webp?.trim() || base.image?.trim();
     return {
       id: base.id,
@@ -118,10 +127,12 @@ export function normalizeEventos(
       link: linkDoEvento(base),
       destaque: base.highlighted === true,
       igrejaId,
+      igrejaIds,
     };
   });
 
   return {
+    idsCategoriaGc: [...idsCategoriaGc],
     eventos: lista.sort((a, b) => a.ocorrencias[0].inicio.localeCompare(b.ocorrencias[0].inicio)),
     atualizadoEm: agora.toISOString(),
   };
@@ -138,7 +149,7 @@ export function proximosEventos(
 ): EventoSite[] {
   const t = agora.getTime();
   return dados.eventos
-    .filter((evento) => igrejaId === null || evento.igrejaId === null || evento.igrejaId === igrejaId)
+    .filter((evento) => igrejaId === null || igrejasDoEvento(evento).length === 0 || igrejasDoEvento(evento).includes(igrejaId))
     .map((evento) => ({ ...evento, ocorrencias: evento.ocorrencias.filter((o) => new Date(o.fim).getTime() >= t) }))
     .filter((evento) => evento.ocorrencias.length > 0)
     .sort((a, b) => Number(b.destaque) - Number(a.destaque) || a.ocorrencias[0].inicio.localeCompare(b.ocorrencias[0].inicio))

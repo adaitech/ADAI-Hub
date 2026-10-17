@@ -18,7 +18,9 @@ export interface AgendaEventoCardView {
   imagem: EventoSite['imagem'];
   /** ID da unidade confirmado pela busca `church_id` da inChurch; `null` em evento geral. */
   unidadeId: number | null;
+  unidadeIds?: number[];
   badge: string | null;
+  badges?: string[];
   /** Dia e mês mostrados no lugar da arte quando a inChurch não fornece uma imagem. */
   fallbackData: { dia: string; mes: string } | null;
 }

@@ -2,6 +2,7 @@ import { bannerCookiesShowcase } from '@/components/layout/BannerCookies/BannerC
 import { footerShowcase } from '@/components/layout/Footer/Footer.showcase';
 import { headerShowcase } from '@/components/layout/Header/Header.showcase';
 import { agendaEventosShowcase } from '@/components/sections/AgendaEventosSection/AgendaEventosSection.showcase';
+import { eventoDetalheShowcase } from '@/components/sections/AgendaEventosSection/EventoDetalhe.showcase';
 import { carrosselCardsShowcase } from '@/components/sections/CarrosselCardsSection/CarrosselCardsSection.showcase';
 import { heroShowcase } from '@/components/sections/HeroSection/HeroSection.showcase';
 import { imagemTextoShowcase } from '@/components/sections/ImagemTextoSection/ImagemTextoSection.showcase';
@@ -19,6 +20,7 @@ import type { ShowcaseCategoria, ShowcaseEntry } from './types';
 export const showcaseCatalog: ShowcaseEntry[] = [
   headerShowcase,
   agendaEventosShowcase,
+  eventoDetalheShowcase,
   heroShowcase,
   carrosselCardsShowcase,
   imagemTextoShowcase,

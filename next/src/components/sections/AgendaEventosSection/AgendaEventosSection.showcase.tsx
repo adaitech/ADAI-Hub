@@ -18,7 +18,7 @@ const eventosNormalizados = normalizeEventos(fixture.results as InchurchEvento[]
 function comIgrejas(dados: EventosInchurch): EventosInchurch {
   return {
     ...dados,
-    eventos: dados.eventos.map((evento, indice) => ({ ...evento, igrejaId: indice === 0 ? 30146 : indice === 1 ? 31876 : null })),
+    eventos: dados.eventos.map((evento, indice) => ({ ...evento, igrejaId: indice === 0 ? 30146 : indice === 1 ? 31876 : null, igrejaIds: indice === 0 ? [30146, 31876] : indice === 1 ? [31876] : [] })),
   };
 }
 
@@ -52,7 +52,7 @@ export const agendaEventosShowcase = defineShowcase<AgendaEventosExemplo>({
     {
       nome: 'completo',
       titulo: 'Arte, data, descrição e unidade',
-      descricao: 'Eventos normalizados da inChurch. Os dois primeiros simulam cadastros por unidade para demonstrar a badge.',
+      descricao: 'Eventos normalizados da inChurch. O primeiro demonstra duas unidades no mesmo card; o segundo, uma unidade.',
       data: { strapi: mocks.completo as AgendaEventosData, inchurch: completo, unidades, agora: AGORA },
     },
     {
