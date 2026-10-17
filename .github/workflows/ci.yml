@@ -59,3 +59,24 @@ jobs:
           cache-dependency-path: strapi/yarn.lock
       - run: yarn install --frozen-lockfile
       - run: yarn build
+
+  seguranca:
+    name: Segurança (alerta)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Varredura simples de segredos no diff
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD -U0 -- . ':!*.lock' ':!**/yarn.lock'             | grep -E '^\+' | grep -vE '^\+\+\+'             | grep -inE "(api[_-]?key|secret|token|password|senha|private[_-]?key)[\"']?\s*[:=]\s*[\"']?[A-Za-z0-9_\-]{16,}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{30,}|-----BEGIN [A-Z ]*PRIVATE KEY"             && echo "::warning title=Possível segredo no diff::Revise as linhas acima antes de aprovar." || echo "Nenhum padrão de segredo encontrado."
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: yarn audit (dependências de produção)
+        continue-on-error: true
+        run: |
+          for app in next strapi; do
+            echo "== $app =="
+            (cd $app && yarn audit --groups dependencies --level high) || echo "::warning title=yarn audit ($app)::Vulnerabilidades altas/críticas. Veja o log."
+          done

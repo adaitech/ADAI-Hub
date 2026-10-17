@@ -101,7 +101,8 @@ cd next && yarn smoke
 
 - [ ] Li o diff inteiro contra a `main` (`git diff origin/main...HEAD`) como se fosse o revisor.
 - [ ] Revisão do superpowers (`requesting-code-review`) feita; achados críticos resolvidos.
-- [ ] Skill `pr-code-review` rodada (agente) ou checklist da §2 dela conferido (dev): arquitetura, componentes/CMS, vitrine, guia do editor, tokens/CSS, a11y, performance, dependências, visão.
+- [ ] **Autorrevisão obrigatória:** rodei `/pr-code-review` **na minha máquina** (skill §0), corrigi todo 🔴 e 🟡 e rodei de novo até sobrar só ✅/💡. Quem não tem agente confere a tabela da §2 da skill à mão (arquitetura, componentes/CMS, vitrine, guia do editor, tokens/CSS, a11y, **SEO, medição (GA4), segurança**, performance, dependências, visão).
+- [ ] A descrição do PR traz a linha *"Autorrevisão: pr-code-review rodado em <data>, veredicto 🎯 <X>"*.
 - [ ] Dependência nova? Justificada em `Stack-Fontes-e-Bibliotecas.md` §5.
 
 ### B2. Descrição do PR
@@ -137,4 +138,4 @@ gh pr create --repo adaitech/ADAI-Hub --base main --title "<tipo>(<escopo>): <re
 
 ## Resumo de uma linha (para colar no chat do agente)
 
-> Testes escritos → `yarn quality` → `yarn build` (+ strapi) → `yarn smoke` com os servidores rodando → navegador em 375/768/1440 sem erro no console nem scroll lateral → 5 pilares → sem segredo no diff → docs atualizados → `git add` explícito → commit em pt-BR → push → `documents/PR.md` → PR para a `main`.
+> Testes escritos → `/pr-code-review` local e correções → `yarn quality` → `yarn build` (+ strapi) → `yarn smoke` com os servidores rodando → navegador em 375/768/1440 sem erro no console nem scroll lateral → 5 pilares → sem segredo no diff → docs atualizados → `git add` explícito → commit em pt-BR → push → `documents/PR.md` → PR para a `main`.
