@@ -58,10 +58,17 @@ describe('getSerieAtual', () => {
   it('sem YOUTUBE_API_KEY → null, sem lançar e sem logar a chave', async () => {
     api.mockImplementation(jest.requireActual('./client').youtubeFetch);
     const chave = process.env.YOUTUBE_API_KEY;
+    const handle = process.env.YOUTUBE_CHANNEL_HANDLE;
     delete process.env.YOUTUBE_API_KEY;
-    await expect(getSerieAtual(null)).resolves.toBeNull();
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('YOUTUBE_API_KEY ausente'));
-    if (chave) process.env.YOUTUBE_API_KEY = chave;
+    process.env.YOUTUBE_CHANNEL_HANDLE = '@canal-de-teste'; // não depender do .env da máquina (CI não tem)
+    try {
+      await expect(getSerieAtual(null)).resolves.toBeNull();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('YOUTUBE_API_KEY ausente'));
+    } finally {
+      if (chave) process.env.YOUTUBE_API_KEY = chave;
+      if (handle === undefined) delete process.env.YOUTUBE_CHANNEL_HANDLE;
+      else process.env.YOUTUBE_CHANNEL_HANDLE = handle;
+    }
   });
 });
 

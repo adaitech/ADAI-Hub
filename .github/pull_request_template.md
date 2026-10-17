@@ -4,6 +4,8 @@ Nenhum PR sem teste: todo código novo ou alterado tem teste unitário (.agents/
 Marque ✅ só o que rodou nesta sessão; o resto é ⏳ com o motivo.
 -->
 
+> ⚠️ **Tamanho:** o ideal é até ~40 arquivos e um assunto só. Passou disso? Explique abaixo por que não dá para dividir.
+
 ## O que mudou
 
 <!-- Comportamento em linguagem natural, decisões e trade-offs. Componente novo: rota da vitrine (/componentes/<slug>) e o que o editor passa a poder fazer no Strapi. -->
