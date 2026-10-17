@@ -31,6 +31,7 @@ Rotas para abrir (375 / 768 / 1440):
 
 ## Validações
 
+- [ ] Autorrevisão: `/pr-code-review` rodado na minha máquina, 🔴/🟡 corrigidos — veredicto 🎯: ___
 - [ ] `yarn quality` (lint + typecheck + testes + cobertura)
 - [ ] `yarn build` (next)
 - [ ] `yarn build` (strapi) — ou não se aplica

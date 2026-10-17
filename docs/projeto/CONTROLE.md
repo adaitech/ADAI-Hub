@@ -35,7 +35,7 @@ Legenda: ⚪ não iniciado · 🟡 em andamento · 🔵 em revisão (PR aberto) 
 
 Todo PR passa por três portas, nesta ordem. Detalhes em `.agents/rules/Pull-Request.md` e `.agents/skills/pr-code-review/SKILL.md`.
 
-1. **Autor** — checklist Partes A e B: `yarn quality`, `yarn build`, `yarn smoke`, navegador em 375/768/1440, 5 pilares, medição no `window.dataLayer`, sem segredos, docs. ✅ só o que rodou na sessão.
+1. **Autor** — roda `/pr-code-review` na própria máquina e corrige 🔴/🟡 (autorrevisão obrigatória), depois o checklist Partes A e B: `yarn quality`, `yarn build`, `yarn smoke`, navegador em 375/768/1440, 5 pilares, medição no `window.dataLayer`, sem segredos, docs. ✅ só o que rodou na sessão.
 2. **Revisão** — skill `pr-code-review` gera `documents/github/CODE_REVIEW.md` com veredicto 🎯.
 3. **Merge** — skill `pre-merge` (quality + build) por quem mergeia; **merge nunca sem humano**.
 
