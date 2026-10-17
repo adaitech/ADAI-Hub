@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  tamanho:
+    name: Tamanho do PR (alerta)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Conta arquivos alterados
+        run: |
+          n=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
+          echo "Arquivos alterados: $n"
+          if [ "$n" -gt 40 ]; then
+            echo "::warning title=PR grande::$n arquivos alterados (teto sugerido: 40). Justifique no PR ou divida."
+          fi
+
+  next:
+    name: Next (quality + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: next
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: next/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: yarn quality
+      - run: yarn build
+
+  strapi:
+    name: Strapi (build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: strapi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: strapi/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
