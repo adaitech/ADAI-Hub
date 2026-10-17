@@ -2,7 +2,7 @@
 
 > Atualizado em **17/10/2026** (Sábado 1 do hackathon). Quem mexe numa frente atualiza a própria linha no mesmo PR.
 > Marcos: **24/10** integração em homologação · **09/11** congelamento · **13–14/11** lançamento (Conferência de Voluntários).
-> Contexto das squads: [`docs/hackathon/2026-10-17-hackathon-adai-tech.md`](../hackathon/2026-10-17-hackathon-adai-tech.md).
+> Contexto das squads: `docs/hackathon/2026-10-17-hackathon-adai-tech.md`.
 
 ## 1. Quem está fazendo o quê
 
