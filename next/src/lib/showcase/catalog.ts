@@ -1,6 +1,7 @@
 import { bannerCookiesShowcase } from '@/components/layout/BannerCookies/BannerCookies.showcase';
 import { footerShowcase } from '@/components/layout/Footer/Footer.showcase';
 import { headerShowcase } from '@/components/layout/Header/Header.showcase';
+import { agendaEventosShowcase } from '@/components/sections/AgendaEventosSection/AgendaEventosSection.showcase';
 import { carrosselCardsShowcase } from '@/components/sections/CarrosselCardsSection/CarrosselCardsSection.showcase';
 import { heroShowcase } from '@/components/sections/HeroSection/HeroSection.showcase';
 import { imagemTextoShowcase } from '@/components/sections/ImagemTextoSection/ImagemTextoSection.showcase';
@@ -17,6 +18,7 @@ import type { ShowcaseCategoria, ShowcaseEntry } from './types';
 /** Todo componente criado ou alterado entra aqui (ver .agents/rules/Vitrine-de-Componentes.md). */
 export const showcaseCatalog: ShowcaseEntry[] = [
   headerShowcase,
+  agendaEventosShowcase,
   heroShowcase,
   carrosselCardsShowcase,
   imagemTextoShowcase,

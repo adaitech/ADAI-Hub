@@ -1,5 +1,5 @@
 import fixture from './__fixtures__/eventos.json';
-import { ehGrupoDeConexao, idIgrejaValido, normalizeEventos, paraIsoSaoPaulo, proximosEventos } from './eventos';
+import { ehGrupoDeConexao, eventosDaAgenda, idIgrejaValido, normalizeEventos, paraIsoSaoPaulo, proximosEventos } from './eventos';
 import type { InchurchEvento } from './types';
 
 const reais = fixture.results as InchurchEvento[];
@@ -110,6 +110,36 @@ describe('proximosEventos (aplica "agora" e quantidade)', () => {
 
   it('sem datas futuras → lista vazia', () => {
     expect(proximosEventos(dados, { agora: em('2027-01-01T00:00') })).toEqual([]);
+  });
+});
+
+describe('eventosDaAgenda (listagem cronológica completa)', () => {
+  it('remove ocorrências encerradas, preserva recorrência e ignora destaque na ordenação', () => {
+    const dados = normalizeEventos(
+      [
+        evento({ id: 1, name: 'Destaque distante', start_datetime: '2026-10-20T10:00:00', highlighted: true }),
+        evento({ id: 2, name: 'Próximo', start_datetime: '2026-10-11T10:00:00' }),
+        evento({ id: 3, name: 'Recorrente', start_datetime: '2026-10-12T10:00:00' }),
+        evento({ id: 4, name: 'Recorrente', start_datetime: '2026-10-18T10:00:00' }),
+        evento({ id: 5, name: 'Encerrado', start_datetime: '2026-10-01T10:00:00', end_datetime: '2026-10-02T10:00:00' }),
+      ],
+      new Set(),
+    );
+
+    const agenda = eventosDaAgenda(dados, { agora: em('2026-10-10T09:00') });
+
+    expect(agenda.map((item) => item.nome)).toEqual(['Próximo', 'Recorrente', 'Destaque distante']);
+    expect(agenda.find((item) => item.nome === 'Recorrente')?.ocorrencias.map((ocorrencia) => ocorrencia.inicio.slice(0, 10))).toEqual(['2026-10-12', '2026-10-18']);
+  });
+
+  it('não limita a lista de eventos futuros', () => {
+    const dados = normalizeEventos(Array.from({ length: 13 }, (_, indice) => evento({
+      id: indice + 1,
+      name: `Evento ${indice + 1}`,
+      start_datetime: `2026-11-${String(indice + 1).padStart(2, '0')}T10:00:00`,
+    })), new Set());
+
+    expect(eventosDaAgenda(dados, { agora: em('2026-10-10T09:00') })).toHaveLength(13);
   });
 });
 

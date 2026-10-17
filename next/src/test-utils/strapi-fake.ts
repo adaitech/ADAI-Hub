@@ -1,5 +1,6 @@
 import footer from '@/components/layout/Footer/Footer.mock.json';
 import header from '@/components/layout/Header/Header.mock.json';
+import agendaEventos from '@/components/sections/AgendaEventosSection/AgendaEventosSection.mock.json';
 import carrossel from '@/components/sections/CarrosselCardsSection/CarrosselCardsSection.mock.json';
 import hero from '@/components/sections/HeroSection/HeroSection.mock.json';
 import imagemTexto from '@/components/sections/ImagemTextoSection/ImagemTextoSection.mock.json';
@@ -46,6 +47,14 @@ export function secoesUnidade() {
   ];
 }
 
+/** Página /agenda: Hero existente, seguido da seção específica de listagem. */
+export function secoesAgenda() {
+  return [
+    comId({ ...hero.unidade, titulo: 'Agenda', subtitulo: null, texto_apoio: 'Confira os próximos eventos, conferências e cultos especiais da ADAI.' }, 31),
+    comId(agendaEventos.completo, 32),
+  ];
+}
+
 /** Tipo Unidades (nome + ID da igreja na inChurch), como o seed cadastra. */
 export const unidadesFake = [
   { id: 1, documentId: 'u1', nome: 'ADAI Campestre', igreja_inchurch_id: 30146 },
@@ -81,6 +90,7 @@ export function criarStrapiFake() {
       sections: [comId({ ...hero.unidade, titulo: 'Nossa história', subtitulo: null }, 16), comId(textoRico.sem_titulo, 17)],
     },
     campestre: { id: 3, documentId: 'campestre', titulo: 'Campestre', slug: 'campestre', seo: seo('Campestre | ADAI'), sections: secoesUnidade() },
+    agenda: { id: 5, documentId: 'agenda', titulo: 'Agenda', slug: 'agenda', seo: seo('Agenda | ADAI'), sections: secoesAgenda() },
   };
   const global = { status: 200, corpo: { data: { header: header.completo, footer: footer.completo, seo: seo('ADAI') } } as unknown };
 

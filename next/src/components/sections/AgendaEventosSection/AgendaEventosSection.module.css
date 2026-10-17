@@ -1,0 +1,212 @@
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  padding: var(--space-section) var(--space-gutter) var(--space-48);
+}
+
+.intro {
+  max-width: var(--intro-max);
+}
+
+.tituloSecao {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h2);
+  letter-spacing: var(--letter-spacing-h2);
+}
+
+.filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-16);
+}
+
+.campoFiltro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.rotuloFiltro {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-text);
+}
+
+.controleFiltro {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: var(--space-10) var(--space-12);
+  border: var(--border-width) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font: inherit;
+  line-height: var(--line-height-text);
+}
+
+.controleFiltro:focus-visible,
+.limparFiltros:focus-visible {
+  outline: var(--border-width) solid var(--color-focus-ring);
+  outline-offset: var(--space-4);
+}
+
+.lista {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-24);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-page);
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-border-subtle);
+}
+
+.midia {
+  position: relative;
+  display: grid;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--color-bg-media);
+}
+
+.imagem {
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  top: var(--space-12);
+  left: var(--space-12);
+  max-width: calc(100% - var(--space-24));
+  padding: var(--space-4) var(--space-12);
+  overflow-wrap: anywhere;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-text);
+}
+
+.fallbackData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  color: var(--color-text-inverse);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.fallbackData span:first-child {
+  font-size: var(--font-size-destaque);
+}
+
+.fallbackData span:last-child {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+}
+
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-24);
+}
+
+.titulo {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-h3);
+}
+
+.data {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-text);
+}
+
+.recorrencia,
+.descricao,
+.vazio {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-text);
+}
+
+.descricao {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.vazioFiltros {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-text);
+}
+
+.limparFiltros {
+  min-height: var(--touch-target-min);
+  padding: var(--space-10) var(--space-16);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-text);
+}
+
+.limparFiltros:hover {
+  background: var(--color-bg-subtle);
+}
+
+.vazio {
+  max-width: var(--texto-max);
+}
+
+/* tier: tablet — a agenda passa a usar duas colunas. */
+@media (min-width: 769px) {
+  .filtros {
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr);
+  }
+
+  .lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* tier: desktop — três cards ocupam a largura editorial da página. */
+@media (min-width: 1024px) {
+  .secao {
+    padding-bottom: calc(var(--space-48) + var(--space-32));
+  }
+
+  .lista {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "uid": "sections.agenda-eventos",
+  "nome": "Agenda de eventos",
+  "resumo": "Lista completa dos próximos eventos da ADAI. Os eventos, suas artes, horários, descrições e unidades vêm automaticamente da inChurch e do cadastro de Unidades.",
+  "ondeAparece": "Na página Agenda, depois do Hero. Os cards mostram arte ou data, nome, horário, descrição e, quando identificada, a unidade.",
+  "boasPraticas": [
+    "Para um evento aparecer, marque \"Mostrar no site\" no evento da inChurch. Para ocultar, desmarque essa opção lá.",
+    "Cadastre uma arte horizontal (16:9) e uma descrição curta no evento da inChurch. Sem arte, o site mostra a data em destaque no card.",
+    "Para exibir o nome da unidade no card, associe o evento à igreja correta na inChurch e mantenha o ID dessa igreja no cadastro de Unidades.",
+    "Não cadastre eventos nem unidades nesta seção: ela controla somente os textos da página."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da seção",
+      "descricao": "Título acima de todos os cards da agenda.",
+      "placeholder": "Ex.: Todos os eventos",
+      "ondeAparece": "Título grande depois do Hero.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Todos os eventos"
+    },
+    {
+      "campo": "mensagem_vazia",
+      "label": "Mensagem sem eventos",
+      "descricao": "Texto mostrado quando a inChurch responde sem eventos futuros.",
+      "placeholder": "Ex.: Ainda não há eventos programados.",
+      "ondeAparece": "Abaixo do título, no lugar dos cards quando não há eventos.",
+      "obrigatorio": true,
+      "limite": "Até 160 caracteres",
+      "exemplo": "Ainda não há eventos programados."
+    }
+  ]
+}

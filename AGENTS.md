@@ -19,6 +19,13 @@ Todo trabalho segue o modelo e o método do **[superpowers](https://github.com/o
 
 Commit, push e PR **só com pedido explícito**; merge nunca sem o usuário — mesmo que uma skill sugira.
 
+## Preferências operacionais do desenvolvedor
+
+Estas preferências prevalecem sobre instruções anteriores que impliquem operação automática dos serviços locais ou exportação de snapshot.
+
+- O desenvolvedor inicia, acompanha e encerra manualmente os servidores do Strapi e do Next numa janela do Terminal do Windows. Agentes não devem iniciar, encerrar, reiniciar nem interromper esses processos, salvo pedido explícito.
+- Não gerar, atualizar nem exportar `strapi/data/adai-conteudo.tar.gz` automaticamente. O snapshot do Strapi só pode ser alterado quando o desenvolvedor solicitar isso explicitamente.
+
 ## ⚠️ Nenhum Pull Request sem teste (obrigatório)
 
 Todo código novo ou alterado — componente, função de `lib/`, rota, integração, correção de bug — chega ao PR com **teste unitário escrito e passando**. Vale para dev e para agente de IA, sem exceção:

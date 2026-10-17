@@ -500,6 +500,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.imagem-texto',
         'sections.serie-atual',
         'sections.proximos-eventos',
+        'sections.agenda-eventos',
         'sections.ministerios',
         'sections.texto-botoes',
         'sections.perguntas-frequentes',

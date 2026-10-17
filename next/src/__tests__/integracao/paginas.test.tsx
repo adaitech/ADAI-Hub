@@ -150,6 +150,23 @@ describe('Home (layout + página vindos do Strapi)', () => {
 });
 
 describe('Página por slug ([slug])', () => {
+  it('/agenda: Hero e listagem são renderizados pelo fluxo genérico, com SEO da página', async () => {
+    const { container } = await renderizarServidor(<SiteLayout>{await SlugPage(params('agenda'))}</SiteLayout>);
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Agenda' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 2, name: 'Todos os eventos' })).toBeInTheDocument();
+    const agenda = container.querySelector('[data-section="agenda-eventos"]') as HTMLElement;
+    expect(agenda).not.toBeNull();
+    expect(within(agenda).getAllByRole('article')).not.toHaveLength(0);
+    expect(within(agenda).queryByRole('link')).not.toBeInTheDocument();
+    expect(getEventosInchurch).toHaveBeenCalledWith([30146, 31876]);
+
+    const meta = await metadataSlug(params('agenda'));
+    expect(meta.title).toBe('Agenda | ADAI');
+    expect(meta.alternates?.canonical).toBe('/agenda');
+  });
+
   it('/politica-de-privacidade: documento com h1, título no SEO e canonical do caminho', async () => {
     await renderizarServidor(<SiteLayout>{await SlugPage(params('politica-de-privacidade'))}</SiteLayout>);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Política de Privacidade e Cookies');

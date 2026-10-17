@@ -144,3 +144,18 @@ export function proximosEventos(
     .sort((a, b) => Number(b.destaque) - Number(a.destaque) || a.ocorrencias[0].inicio.localeCompare(b.ocorrencias[0].inicio))
     .slice(0, Math.max(1, limite));
 }
+
+/**
+ * Lista integral da agenda: somente ocorrências que ainda não terminaram, ordenadas pela
+ * próxima data. Ao contrário de `proximosEventos`, não usa destaque e não aplica limite.
+ */
+export function eventosDaAgenda(
+  dados: EventosInchurch,
+  { agora = new Date() }: { agora?: Date } = {},
+): EventoSite[] {
+  const instanteAtual = agora.getTime();
+  return dados.eventos
+    .map((evento) => ({ ...evento, ocorrencias: evento.ocorrencias.filter((ocorrencia) => new Date(ocorrencia.fim).getTime() >= instanteAtual) }))
+    .filter((evento) => evento.ocorrencias.length > 0)
+    .sort((a, b) => a.ocorrencias[0].inicio.localeCompare(b.ocorrencias[0].inicio));
+}
