@@ -39,6 +39,8 @@ O Figma usa **Inter** e **Suisse Int'l**. A Suisse Int'l é paga e **não há li
 | **Texto / UI** | Inter | 300 (Light), 400 (Regular), 700 (Bold) | Menu, botões, parágrafos, footer | `--font-body` |
 | **Display / títulos** | Inter Tight | 400 (substitui Suisse Book), 700 (substitui Suisse Bold) | "Amar. Servir. Influenciar.", títulos de seção, "ADAI" do footer, texto de apoio do hero | `--font-display` |
 
+**Mapeamento (design system, `docs/design-system.md` §3):** `SuisseIntl-Book` (peso 450 no Figma) → Inter/Inter Tight **400**; `SuisseIntl-Bold` → Inter/Inter Tight **700**. Os HTMLs autocontidos (`docs/design-system.html`, `templates/adai-page-template.html`) não carregam fonte: usam a pilha declarativa `"Suisse Intl", "SuisseIntl-Book", "Inter Tight", Inter, Arial, Helvetica, sans-serif` e `font-weight: 450` para Book. Nenhum arquivo da Suisse é versionado.
+
 ### Como
 
 ```ts

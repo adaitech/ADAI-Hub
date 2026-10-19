@@ -86,10 +86,10 @@
 .mega {
   margin-bottom: -0.12em; /* Figma corta ~12% da altura da palavra na borda inferior */
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: var(--font-size-mega);
+  font-size: var(--font-size-marca);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-mega);
-  letter-spacing: var(--letter-spacing-mega);
+  line-height: var(--line-height-marca);
+  letter-spacing: var(--letter-spacing-marca);
   text-align: center;
   opacity: var(--opacity-ghost);
   user-select: none;

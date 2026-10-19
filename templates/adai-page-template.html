@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADAI · Template de página</title>
+<meta name="description" content="Template de página da ADAI composto com os componentes do design system: anúncio, navegação, hero, editorial, cards, eventos, CTA, formulário e rodapé.">
+<!--
+  Template de página da ADAI — composição reutilizável do design system.
+  Referência: docs/design-system.md · style guide: docs/design-system.html · spec: docs/superpowers/specs/2026-10-18-design-system-figma-design.md.
+  Autocontido (sem rede). Tokens = cópia de next/src/styles/tokens.css (teste de característica garante a igualdade).
+
+  VARIAÇÕES: troque a classe do <body> e siga os comentários "VARIAÇÃO" de cada seção.
+    pagina--institucional · pagina--ministerio · pagina--proximo-passo · pagina--evento · pagina--mensagens
+  Pontos de troca de conteúdo, imagem e destino estão marcados com "TROCAR".
+  Imagens de exemplo ficam em templates/assets/: copie a pasta junto com o template ou TROQUE os src.
+  Rotas internas ("/agenda") mostram um aviso em vez de navegar, porque o template roda fora do Next.
+-->
+<style>
+/* =========================================================================
+   1. TOKENS — cópia de next/src/styles/tokens.css (mesmos nomes e valores, verificado por
+      next/src/__tests__/caracteristicas/design-system.test.ts) + tokens só de documentação.
+      Origem em comentário: O Observado no Figma · D Derivado · P Proposto.
+   ========================================================================= */
+:root {
+  /* ---------- Cores: primitivos (usar só aqui) ---------- */
+  --black: #000000;
+  --white: #ffffff;
+  --gray-900: #333333;
+  --gray-600: #6b6b6b; /* acessível: 4,76:1 sobre --gray-100 (o #777 do Figma dá 4,00:1 e falha AA) */
+  --gray-500: #777777; /* valor do Figma — não usar em texto sobre --gray-100 */
+  --gray-100: #f2f2f2; /* O Figma cor/superficie */
+  --gray-200: #e8e8e8; /* O Figma cor/superficie-2 */
+  --gray-300: #d9d9d9; /* 🟡 borda do card branco */
+
+  /* Paleta de cards — 🟡 proposta (não está no Figma); todas com texto branco ≥ 5,4:1 (AA) */
+  --blue-700: #1d4e89; /* 8,39:1 */
+  --green-700: #1e6b4f; /* 6,42:1 */
+  --orange-700: #b3471d; /* 5,47:1 */
+  --wine-700: #7b1e3a; /* 10,05:1 */
+  --overlay-strong: rgba(0, 0, 0, 0.6);
+  --overlay-soft: rgba(0, 0, 0, 0.05);
+
+  /* ---------- Cores: semânticos (usar nos componentes) ---------- */
+  --color-bg-page: var(--white);
+  --color-bg-subtle: var(--gray-100);
+  --color-bg-subtle-2: var(--gray-200); /* P uso: hover de card. Não usar --color-text-muted sobre ela (4,35:1) */
+  --color-bg-inverse: var(--black);
+  --color-bg-media: var(--gray-900);
+  --color-text-primary: var(--black);
+  --color-text-muted: var(--gray-600);
+  --color-text-inverse: var(--white);
+  --color-border-strong: var(--black);
+  --color-border-inverse: var(--white);
+  --color-focus-ring: var(--black);
+  --color-focus-ring-inverse: var(--white);
+  --gradient-media-overlay: linear-gradient(to top, var(--overlay-strong), var(--overlay-soft) 65%);
+  --color-border-subtle: var(--gray-300);
+
+  /* Cores de card (campo "Cor do card" no Strapi) */
+  --card-cinza: var(--color-bg-subtle);
+  --card-branco: var(--color-bg-page);
+  --card-preto: var(--black);
+  --card-azul: var(--blue-700);
+  --card-verde: var(--green-700);
+  --card-laranja: var(--orange-700);
+  --card-vinho: var(--wine-700);
+
+  /* ---------- Tipografia ---------- */
+  /* --font-body e --font-display são definidos pelo next/font em src/app/fonts.ts */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  /* Escala do Figma (estilos locais). Valor máximo = Figma 1440 (O); mínimo do clamp = proposta (P). */
+  --font-size-display: clamp(48px, 9.03vw, 130px); /* O Display 130 */
+  --font-size-h1: clamp(2.5rem, 5.417vw, 4.875rem); /* O H1 78 — títulos de seção (linha de 74px) */
+  --font-size-h2: clamp(2rem, 3.333vw, 3rem); /* O H2 48 */
+  --font-size-h3: 1.75rem; /* O H3 28 */
+  --font-size-h4: 1.25rem; /* O H4 20 */
+  --font-size-numero: clamp(4rem, 5.972vw, 5.375rem); /* O Número / Data 86 */
+  --font-size-marca: clamp(96px, 30vw, 432px); /* O Marca / Rodapé 432 */
+  --font-size-corpo: 1.125rem; /* O Corpo 18 */
+  --font-size-corpo-pequeno: 1rem; /* O Corpo pequeno 16 */
+  --font-size-legenda: 0.9375rem; /* O Legenda 15 */
+  --font-size-micro: 0.8125rem; /* O Micro 13 */
+  --font-size-botao: 1rem; /* O Botão 16 Bold */
+  --font-size-link-menu: var(--font-size-corpo-pequeno); /* D o menu do header usa Corpo pequeno */
+  --font-size-mega: var(--font-size-marca); /* alias: migrar para --font-size-marca */
+  --font-size-ministerio: clamp(1.75rem, 3vw, 2.625rem); /* ✅ Figma 1:230: nome de 42px */
+  --font-size-chamada: var(--font-size-h1); /* alias: migrar para --font-size-h1 (Figma 1:298 = H1) */
+  --font-size-chamada-apoio: 1.25rem; /* ✅ Figma 1:300: 20px */
+  --font-size-destaque: 2rem; /* 🟡 horários: 3 linhas em 109px no Figma */
+  --font-size-lead: var(--font-size-corpo); /* alias: migrar para --font-size-corpo */
+  --font-size-body-lg: 1.0625rem;
+  --font-size-body: var(--font-size-corpo-pequeno); /* alias: migrar para --font-size-corpo-pequeno */
+  --font-size-sm: 0.875rem; /* P do projeto: 14px não existe na escala do Figma */
+  --font-size-xs: var(--font-size-micro); /* alias: migrar para --font-size-micro */
+
+  --line-height-display: 0.88; /* O */
+  --line-height-h1: 0.95; /* O */
+  --line-height-h2: 0.98; /* O */
+  --line-height-h3: 1.1; /* O */
+  --line-height-h4: 1.15; /* O */
+  --line-height-numero: 0.85; /* O */
+  --line-height-marca: 0.78; /* O */
+  --line-height-legenda: 1.45; /* O Legenda e Micro */
+  --line-height-text: 1.5; /* O Corpo, Corpo pequeno e Botão */
+  --line-height-mega: var(--line-height-marca); /* alias: migrar para --line-height-marca */
+  --line-height-chamada: var(--line-height-h1); /* alias: migrar para --line-height-h1 */
+  --line-height-destaque: 1.1;
+
+  /* Tracking do Figma em % = em */
+  --letter-spacing-display: -0.055em; /* O */
+  --letter-spacing-h1: -0.045em; /* O */
+  --letter-spacing-h2: -0.04em; /* O */
+  --letter-spacing-h3: -0.03em; /* O */
+  --letter-spacing-h4: -0.02em; /* O */
+  --letter-spacing-numero: -0.06em; /* O */
+  --letter-spacing-marca: -0.07em; /* O */
+  --letter-spacing-mega: var(--letter-spacing-marca); /* alias: migrar para --letter-spacing-marca */
+  --letter-spacing-chamada: var(--letter-spacing-h1); /* alias: migrar para --letter-spacing-h1 */
+
+  /* ---------- Espaçamento ---------- */
+  --space-4: 0.25rem;
+  --space-8: 0.5rem;
+  --space-10: 0.625rem;
+  --space-12: 0.75rem;
+  --space-14: 0.875rem;
+  --space-16: 1rem;
+  --space-20: 1.25rem;
+  --space-24: 1.5rem;
+  --space-30: 1.875rem;
+  --space-32: 2rem;
+  --space-40: 2.5rem;
+  --space-48: 3rem;
+  --space-56: 3.5rem;
+  --space-96: 6rem;
+
+  --space-gutter: clamp(16px, 3vw, 57.6px);
+  --space-coluna: clamp(32px, 6vw, 86.4px); /* 86,4px entre foto e texto no Figma (6%) */
+  --space-section: clamp(64px, 8.333vw, 120px); /* D 120 recorrente no Figma · P mínimo */
+  --space-page-margin: clamp(16px, 5.556vw, 80px); /* O 80 nas seções em 1440 · P mínimo */
+  --container-max: 90rem; /* O shell de 1440 */
+  --content-max: 80rem; /* O conteúdo de 1280 */
+  --z-banner-cookies: 50; /* acima do conteúdo e do header fixo; abaixo do dialog do player (top layer) */
+  --texto-rico-max: 46rem; /* 🟡 coluna de leitura de documentos (~75 caracteres por linha) */
+  --banner-cookies-max: 40rem; /* 🟡 proposta: largura máxima do aviso de cookies (sem Figma) */
+
+  /* ---------- Raios, bordas, opacidade ---------- */
+  --radius-lg: 28px; /* O Figma raio/grande */
+  --radius-md: 20px; /* O Figma raio/medio */
+  --radius-sm: 14px; /* O Figma raio/pequeno */
+  --radius-pill: 999px; /* O Figma raio/pilula */
+  --border-width: 1px;
+  --opacity-ghost: 0.18;
+
+  /* ---------- Componentes ---------- */
+  --button-height-sm: 40px;
+  --button-height-md: 52px;
+  --touch-target-min: 44px;
+  --header-height: 80px;
+  --topbar-height: 36px;
+  --hero-min-height-mobile: 600px; /* 🟡 proposta: sem Figma mobile */
+  --hero-min-height: clamp(600px, 48.75vw, 702px); /* 702px no Figma (1440) */
+  --hero-apoio-max: 22.5rem; /* 360px no Figma */
+  --hero-subtitulo-max: 39.125rem; /* 626px no Figma (Hero / Campestre, 28:419) */
+  --footer-texto-max: 18.75rem; /* 300px no Figma */
+  --carrossel-botao: 52px; /* setas: 52 × 52 no Figma (Próximos eventos) */
+  --lista-rotulo: 10.625rem; /* 170px: coluna do título na lista (Primeira vez) */
+  --texto-max: 32.5rem; /* 520px: largura máxima do texto de apoio */
+  --intro-max: 47rem; /* 751px: bloco título + apoio de seção (Neste domingo) */
+  --font-size-titulo-serie: clamp(2.25rem, 4vw, 3.6rem); /* 57,6px no Figma (Mensagens 1:139) */
+  --serie-caixa-padding: clamp(24px, 5vw, 72px); /* 72px no Figma (Mensagens 1:133) */
+  --serie-play: 60px; /* botão play sobre a thumbnail (1:149) */
+  --serie-parte-min: 180px; /* altura mínima do card de parte (1:152) */
+  --ministerios-padding: clamp(24px, 5vw, 72px); /* ✅ Figma 1:230: 72px no desktop */
+  --ministerios-linha-altura: 78px; /* ✅ Figma 1:239 */
+  --ministerios-linha-raio: 14px; /* ✅ Figma 1:239 */
+  --ministerios-card-altura: 180px; /* ✅ Figma 28:467 (Pra todas as idades, páginas das unidades) */
+  --faq-pergunta-altura: 4.5rem; /* 🟡 altura mínima proposta para o acordeão */
+
+  /* ---------- Movimento ---------- */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ---------- Só nos HTMLs autocontidos (não existem no tokens.css) ---------- */
+  /* Fonte: no Next, --font-body/--font-display vêm do next/font (Inter/Inter Tight). Aqui a pilha é declarativa. */
+  --font-stack: "Suisse Intl", "SuisseIntl-Book", "Inter Tight", Inter, Arial, Helvetica, sans-serif;
+  --font-weight-book: 450; /* O SuisseIntl-Book; nas substitutas cai para 400 */
+  --color-alert: var(--orange-700); /* P erro de formulário, sempre com ícone e texto (5,47:1) */
+  --color-border-field: var(--gray-500); /* P borda de campo: #777 dá 4,48:1 no branco (≥ 3:1, WCAG 1.4.11) */
+  --space-2: 0.125rem;
+  --space-22: 1.375rem; /* O padding do Card / Evento */
+  --space-28: 1.75rem; /* O gap da top bar */
+  --space-72: 4.5rem; /* D padding das caixas cinza (Mensagens, Ministérios) */
+  --announcement-height: 48px; /* O Barra de anúncio 244:1256 */
+}
+
+/* =========================================================================
+   2. BASE
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-stack);
+  font-weight: var(--font-weight-book);
+  font-size: var(--font-size-corpo-pequeno);
+  line-height: var(--line-height-text);
+  overflow-wrap: break-word;
+}
+img { display: block; max-width: 100%; height: auto; }
+h1, h2, h3, h4, p, ul, ol, dl, dd, figure { margin: 0; }
+ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+.inverso :where(a, button):focus-visible { outline-color: var(--color-focus-ring-inverse); }
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.pular {
+  position: absolute; left: var(--space-16); top: -100px; z-index: 100;
+  padding: var(--space-12) var(--space-20); border-radius: var(--radius-pill);
+  background: var(--black); color: var(--white); font-weight: var(--font-weight-bold); text-decoration: none;
+}
+.pular:focus { top: var(--space-16); outline-color: var(--black); box-shadow: 0 0 0 3px var(--white); }
+.container { width: min(100% - 2 * var(--space-page-margin), var(--content-max)); margin-inline: auto; }
+.secao { padding-block: var(--space-section); }
+
+/* Tipos */
+.t-display, .t-h1, .t-h2, .t-h3, .t-h4, .t-numero { font-weight: var(--font-weight-bold); text-wrap: balance; }
+.t-display { font-size: var(--font-size-display); line-height: var(--line-height-display); letter-spacing: var(--letter-spacing-display); }
+.t-h1 { font-size: var(--font-size-h1); line-height: var(--line-height-h1); letter-spacing: var(--letter-spacing-h1); }
+.t-h2 { font-size: var(--font-size-h2); line-height: var(--line-height-h2); letter-spacing: var(--letter-spacing-h2); }
+.t-h3 { font-size: var(--font-size-h3); line-height: var(--line-height-h3); letter-spacing: var(--letter-spacing-h3); }
+.t-h4 { font-size: var(--font-size-h4); line-height: var(--line-height-h4); letter-spacing: var(--letter-spacing-h4); }
+.t-numero { font-size: var(--font-size-numero); line-height: var(--line-height-numero); letter-spacing: var(--letter-spacing-numero); }
+.t-corpo { font-size: var(--font-size-corpo); line-height: var(--line-height-text); }
+.t-corpo-pequeno { font-size: var(--font-size-corpo-pequeno); line-height: var(--line-height-text); }
+.t-legenda { font-size: var(--font-size-legenda); line-height: var(--line-height-legenda); }
+.t-micro { font-size: var(--font-size-micro); line-height: var(--line-height-legenda); }
+.t-suave { color: var(--color-text-muted); }
+.t-bold { font-weight: var(--font-weight-bold); }
+
+/* =========================================================================
+   3. COMPONENTES
+   ========================================================================= */
+
+/* Botão — Claro / Contorno / Primário [O]; estados [P] */
+.botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  min-height: var(--button-height-md); padding: 0 28.5px;
+  border: var(--border-width) solid transparent; border-radius: var(--radius-pill);
+  font-size: var(--font-size-botao); font-weight: var(--font-weight-bold); line-height: var(--line-height-text);
+  text-align: center; text-decoration: none; cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-standard), color var(--duration-fast) var(--easing-standard),
+              border-color var(--duration-fast) var(--easing-standard), transform var(--duration-fast) var(--easing-standard);
+}
+.botao--primario { background: var(--black); border-color: var(--black); color: var(--white); padding-inline: 29.5px; }
+.botao--claro { background: var(--white); border-color: var(--white); color: var(--black); }
+.botao--contorno { background: transparent; border-color: var(--white); color: var(--white); }
+.botao--contorno-escuro { background: transparent; border-color: var(--black); color: var(--black); }
+.botao--baixo { min-height: var(--button-height-sm); padding-inline: 19.5px; }
+@media (hover: hover) {
+  .botao--primario:hover, .botao--primario.is-hover { background: var(--gray-900); border-color: var(--gray-900); }
+  .botao--claro:hover, .botao--claro.is-hover { background: var(--gray-100); border-color: var(--gray-100); }
+  .botao--contorno:hover, .botao--contorno.is-hover { background: var(--white); color: var(--black); }
+  .botao--contorno-escuro:hover, .botao--contorno-escuro.is-hover { background: var(--black); color: var(--white); }
+}
+.botao:active, .botao.is-active { transform: scale(0.97); }
+.botao:disabled, .botao[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; transform: none; }
+.botao.is-foco { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
+.inverso .botao.is-foco { outline-color: var(--color-focus-ring-inverse); }
+.botoes { display: flex; flex-wrap: wrap; gap: var(--space-10); }
+
+/* Link de texto [O] sublinhado (barra de anúncio, "Como chegar") */
+.link { font-weight: var(--font-weight-bold); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.link:hover { text-decoration-thickness: 2px; }
+.link-seta { display: inline-flex; align-items: center; gap: var(--space-8); min-height: var(--touch-target-min); font-weight: var(--font-weight-bold); text-decoration: none; border-bottom: var(--border-width) solid currentColor; }
+.link-seta:hover { border-bottom-width: 2px; }
+
+/* Barra de anúncio [O] 48px preto, Bold 16 branco, gap 12 */
+.anuncio {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-4) var(--space-12);
+  min-height: var(--announcement-height); padding: var(--space-8) var(--space-gutter);
+  background: var(--black); color: var(--white);
+  font-weight: var(--font-weight-bold); text-align: center;
+}
+.anuncio .link { display: inline-flex; align-items: center; min-height: var(--touch-target-min); }
+
+/* Top bar [O] 36px, Micro 13, gap 28, centralizada; cor #777 → [P] #6B6B6B */
+.topbar ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 var(--space-28); padding: 0 var(--space-gutter); }
+.topbar a {
+  display: inline-flex; align-items: center; min-height: var(--touch-target-min);
+  color: var(--color-text-muted); font-size: var(--font-size-micro); line-height: var(--line-height-legenda); text-decoration: none;
+}
+.topbar a:hover { color: var(--color-text-primary); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Header [O] 80px, padding 43,2, nav gap 32, CTAs gap 12 */
+.header { position: relative; }
+.header__barra {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-16);
+  min-height: var(--header-height); padding-inline: var(--space-gutter);
+}
+.logo { display: inline-flex; align-items: center; align-self: flex-start; min-height: var(--touch-target-min); color: var(--black); }
+.logo svg { width: 99.21px; height: 32.6px; }
+.menu-botao {
+  display: inline-flex; align-items: center; gap: var(--space-8);
+  min-width: var(--touch-target-min); min-height: var(--touch-target-min); padding: 0 var(--space-16);
+  border: var(--border-width) solid var(--black); border-radius: var(--radius-pill);
+  background: var(--white); font-weight: var(--font-weight-bold); cursor: pointer;
+}
+.menu-botao__icone { width: 18px; height: 12px; position: relative; }
+.menu-botao__icone::before, .menu-botao__icone::after { content: ""; position: absolute; left: 0; right: 0; height: 2px; background: currentColor; transition: transform var(--duration-fast) var(--easing-standard); }
+.menu-botao__icone::before { top: 2px; }
+.menu-botao__icone::after { bottom: 2px; }
+.menu-botao[aria-expanded="true"] .menu-botao__icone::before { transform: translateY(3px) rotate(45deg); }
+.menu-botao[aria-expanded="true"] .menu-botao__icone::after { transform: translateY(-3px) rotate(-45deg); }
+.header__painel { padding: 0 var(--space-gutter) var(--space-24); border-bottom: var(--border-width) solid var(--gray-200); }
+.js .header__painel[hidden] { display: none; }
+.nav-principal ul { display: flex; flex-direction: column; }
+.nav-principal a {
+  display: flex; align-items: center; min-height: var(--touch-target-min);
+  font-size: var(--font-size-h4); font-weight: var(--font-weight-bold); letter-spacing: var(--letter-spacing-h4); text-decoration: none;
+  border-bottom: var(--border-width) solid var(--gray-200);
+}
+.nav-principal a[aria-current="page"] { text-decoration: underline; text-underline-offset: 6px; }
+.header__acoes { display: flex; flex-wrap: wrap; gap: var(--space-12); margin-top: var(--space-20); }
+.header__acoes .botao { min-height: var(--touch-target-min); }
+
+/* Hero [O] raio 28, altura 702, padding 56, degradê; foto colorida no Figma */
+.hero { padding-inline: var(--space-gutter); }
+.hero__caixa {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: flex-end;
+  min-height: var(--hero-min-height); border-radius: var(--radius-lg);
+  background: var(--gray-900); color: var(--color-text-inverse);
+}
+.hero__foto { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.hero__caixa::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--gradient-media-overlay); }
+.hero__conteudo { display: flex; flex-direction: column; gap: var(--space-24); width: 100%; padding: var(--space-24); }
+.hero__apoio { display: flex; flex-direction: column; gap: var(--space-20); max-width: 22.5rem; }
+
+/* Seção editorial texto + imagem [O] Primeira vez 1:107 */
+.editorial { display: grid; gap: var(--space-40); }
+.editorial__foto { width: 100%; aspect-ratio: 4 / 5; max-height: 34rem; object-fit: cover; border-radius: var(--radius-md); filter: grayscale(1); }
+.editorial__texto { display: flex; flex-direction: column; gap: var(--space-20); align-self: center; }
+.editorial__apoio { max-width: 32.5rem; }
+.lista-caixas { display: grid; gap: var(--space-10); margin-block: var(--space-16) var(--space-4); }
+.lista-caixas li {
+  display: grid; gap: var(--space-4);
+  padding: var(--space-20) var(--space-22); border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+}
+.lista-caixas strong { font-weight: var(--font-weight-bold); }
+
+/* Cabeçalho de seção [D] H1 78 (linha 74) + apoio 18 em até 751px */
+.cabecalho-secao { display: flex; flex-direction: column; gap: var(--space-16); max-width: 47rem; }
+.cabecalho-secao--acoes { max-width: none; }
+
+/* Card / Unidade [O] 261 × 360, padding 24, nome H3, horários 32 */
+.grade-unidades { display: grid; grid-template-columns: 1fr; gap: var(--space-12); margin-top: var(--space-40); }
+.card-unidade {
+  position: relative; display: flex; flex-direction: column; gap: var(--space-16);
+  min-height: 17rem; padding: var(--space-24); border-radius: var(--radius-md);
+  background: var(--color-bg-subtle); transition: background-color var(--duration-fast) var(--easing-standard);
+}
+.card-unidade:hover { background: var(--color-bg-subtle-2); }
+.card-unidade__horarios { font-size: 2rem; font-weight: var(--font-weight-bold); line-height: 1.1; letter-spacing: -0.03em; }
+.card-unidade__horarios li { display: block; }
+.card-unidade__endereco { font-style: normal; }
+.card-unidade .link-seta { align-self: flex-start; margin-top: auto; }
+.card-unidade .link-seta::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.card-unidade:has(.link-seta:focus-visible) { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
+.card-unidade .link-seta:focus-visible { outline: none; }
+
+/* Próximos eventos — Card / Evento [O] 329,41, data 86, mês H4, título H3, legenda */
+.eventos__topo { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-24); }
+.eventos__controles { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-10); }
+.seta {
+  display: inline-grid; place-items: center; width: 52px; height: 52px;
+  border: var(--border-width) solid var(--black); border-radius: var(--radius-pill);
+  background: var(--white); cursor: pointer; transition: background-color var(--duration-fast) var(--easing-standard), color var(--duration-fast) var(--easing-standard);
+}
+.seta:hover:not(:disabled) { background: var(--black); color: var(--white); }
+.seta:disabled { opacity: 0.35; cursor: not-allowed; }
+.seta svg { width: 19px; height: 8px; }
+.trilho {
+  position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: min(80%, 329.41px);
+  gap: var(--space-12); margin-top: var(--space-40); padding-bottom: var(--space-12);
+  overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+}
+.trilho > li { scroll-snap-align: start; }
+.card-evento { position: relative; display: flex; flex-direction: column; gap: var(--space-14); }
+.card-evento__data {
+  display: flex; flex-direction: column; justify-content: space-between;
+  aspect-ratio: 329.41 / 329; padding: var(--space-22); border-radius: var(--radius-md);
+  background: var(--color-bg-subtle); transition: background-color var(--duration-fast) var(--easing-standard);
+}
+.card-evento:hover .card-evento__data { background: var(--color-bg-subtle-2); }
+.card-evento__info { display: flex; flex-direction: column; gap: var(--space-2); padding-inline: var(--space-4); }
+.card-evento a { text-decoration: none; }
+.card-evento a::after { content: ""; position: absolute; inset: 0; }
+.card-evento:has(a:focus-visible) { outline: 3px solid var(--color-focus-ring); outline-offset: 4px; border-radius: var(--radius-md); }
+.card-evento a:focus-visible { outline: none; }
+.card-evento:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+/* CTA de destaque [D] caixa cinza 1280, padding 72, raio 28 (Mensagens 1:133 / Ministérios 1:230) */
+.cta {
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-20);
+  padding: clamp(1.5rem, 5vw, 4.5rem); border-radius: var(--radius-lg); background: var(--color-bg-subtle);
+}
+.cta__apoio { max-width: 30rem; }
+.cta__links { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.cta__links a {
+  display: inline-flex; align-items: center; min-height: var(--touch-target-min); padding-inline: 19.5px;
+  border-radius: var(--radius-pill); font-weight: var(--font-weight-bold); text-decoration: underline; text-underline-offset: 4px;
+}
+.cta__links a:hover { background: var(--color-bg-subtle-2); }
+
+/* Formulário [P] — campo de 52px e recuo de 24px vêm do campo "Seu melhor e-mail" (245:1295) */
+.form-secao { display: grid; gap: var(--space-40); }
+.form { display: grid; gap: var(--space-24); }
+.form__grupo { display: grid; gap: var(--space-8); }
+.form__linha { display: grid; gap: var(--space-24); }
+.rotulo { font-weight: var(--font-weight-bold); }
+.rotulo .opcional { font-weight: var(--font-weight-book); color: var(--color-text-muted); }
+.ajuda { color: var(--color-text-muted); font-size: var(--font-size-legenda); line-height: var(--line-height-legenda); }
+.campo {
+  width: 100%; min-height: var(--button-height-md); padding: var(--space-12) var(--space-24);
+  border: var(--border-width) solid var(--color-border-field); border-radius: var(--radius-sm);
+  background: var(--white); font-size: var(--font-size-corpo-pequeno);
+  transition: border-color var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard);
+}
+.campo:hover:not(:disabled) { border-color: var(--black); }
+.campo:focus-visible, .campo.is-foco { outline: none; border-color: var(--black); box-shadow: 0 0 0 2px var(--black); }
+.campo:disabled { background: var(--gray-100); color: var(--color-text-muted); cursor: not-allowed; }
+.campo[aria-invalid="true"] { border-color: var(--color-alert); box-shadow: 0 0 0 1px var(--color-alert); }
+select.campo {
+  appearance: none; padding-right: var(--space-56);
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 30px) 50%, calc(100% - 24px) 50%;
+  background-size: 6px 6px; background-repeat: no-repeat;
+}
+textarea.campo { min-height: 8rem; resize: vertical; }
+.erro { display: flex; gap: var(--space-8); color: var(--color-alert); font-weight: var(--font-weight-bold); font-size: var(--font-size-legenda); }
+.erro[hidden] { display: none; }
+.erro::before { content: "!"; display: inline-grid; place-items: center; flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--color-alert); color: var(--white); font-size: 13px; }
+fieldset { margin: 0; padding: 0; border: 0; }
+legend { padding: 0; margin-bottom: var(--space-8); }
+.opcoes { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-24); }
+.opcao { display: inline-flex; align-items: center; gap: var(--space-12); min-height: var(--touch-target-min); cursor: pointer; }
+.opcao input { width: 22px; height: 22px; margin: 0; accent-color: var(--black); flex: none; }
+.resumo-erros { padding: var(--space-20) var(--space-24); border: 2px solid var(--color-alert); border-radius: var(--radius-sm); }
+.resumo-erros ul { margin-top: var(--space-8); padding-left: var(--space-20); }
+.resumo-erros a { color: var(--color-alert); font-weight: var(--font-weight-bold); }
+.sucesso { padding: var(--space-20) var(--space-24); border-radius: var(--radius-sm); background: var(--black); color: var(--white); font-weight: var(--font-weight-bold); }
+
+/* Footer [O] fundo #F2F2F2, padding-top 96, grade 1.4fr/1fr/1fr/1fr gap 40, "ADAI" 432 a 18% */
+.footer { overflow: hidden; background: var(--color-bg-subtle); }
+.footer__grade { display: grid; gap: var(--space-40); padding-top: var(--space-56); }
+.footer__marca { display: flex; flex-direction: column; gap: var(--space-12); }
+.footer__marca p { max-width: 18.75rem; color: var(--color-text-muted); font-size: 1.0625rem; font-weight: 300; }
+.footer__colunas { display: grid; gap: var(--space-32); }
+.footer__coluna h2 { margin-bottom: var(--space-14); font-size: var(--font-size-corpo-pequeno); font-weight: var(--font-weight-bold); line-height: var(--line-height-text); letter-spacing: 0; }
+.footer__coluna ul { display: grid; gap: 0; }
+.footer__coluna a { display: inline-flex; align-items: center; min-height: var(--touch-target-min); font-size: 1.0625rem; font-weight: var(--font-weight-bold); text-decoration: none; }
+.footer__coluna a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.footer__legal {
+  display: flex; flex-direction: column; gap: var(--space-4);
+  padding-block: var(--space-40) var(--space-24); color: var(--color-text-muted); font-size: var(--font-size-micro); font-weight: 300;
+}
+.footer__legal a { display: inline-flex; align-items: center; min-height: var(--touch-target-min); }
+.footer__mega {
+  margin-bottom: -0.14em; font-size: var(--font-size-marca); font-weight: var(--font-weight-bold); line-height: var(--line-height-marca); letter-spacing: var(--letter-spacing-marca);
+  text-align: center; opacity: 0.18; user-select: none; pointer-events: none; white-space: nowrap;
+}
+
+/* Card / Evento agenda [D] (anatomia do AgendaEventoCard já implementado; 443 × 413 no Figma) */
+.card-agenda { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-md); background: var(--color-bg-subtle); }
+.card-agenda__arte { position: relative; aspect-ratio: 16 / 9; background: var(--gray-900); }
+.card-agenda__arte img { width: 100%; height: 100%; object-fit: cover; }
+.card-agenda__selo { position: absolute; top: var(--space-12); right: var(--space-12); padding: var(--space-4) var(--space-12); border-radius: var(--radius-pill); background: var(--white); font-size: var(--font-size-micro); font-weight: var(--font-weight-bold); }
+.card-agenda__corpo { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-24); }
+.card-agenda a { text-decoration: none; }
+.card-agenda a::after { content: ""; position: absolute; inset: 0; }
+.card-agenda:has(a:focus-visible) { outline: 3px solid var(--color-focus-ring); outline-offset: 3px; }
+.card-agenda a:focus-visible { outline: none; }
+.card-agenda:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; } /* sem fundo --color-bg-subtle-2: o resumo em --color-text-muted cairia para 4,35:1 */
+
+/* Card / Página relacionada [P] anatomia (nó 234:1010 com 443,2 × 508; interior não extraído) */
+.card-relacionada { position: relative; display: flex; flex-direction: column; gap: var(--space-16); }
+.card-relacionada img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-md); filter: grayscale(1); }
+.card-relacionada a { text-decoration: none; }
+.card-relacionada a::after { content: ""; position: absolute; inset: 0; }
+.card-relacionada:has(a:focus-visible) { outline: 3px solid var(--color-focus-ring); outline-offset: 4px; border-radius: var(--radius-md); }
+.card-relacionada a:focus-visible { outline: none; }
+.card-relacionada:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.card-relacionada__mais { font-weight: var(--font-weight-bold); }
+
+/* =========================================================================
+   4. ÁREA DE DESIGN SYSTEM E CAMADA DO PROTÓTIPO (fora do site)
+   ========================================================================= */
+.prototipo-barra {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8) var(--space-16);
+  padding: var(--space-8) var(--space-gutter); background: var(--gray-200);
+  border-bottom: 2px dashed var(--black); font-size: var(--font-size-legenda);
+}
+.prototipo-barra nav ul { display: flex; flex-wrap: wrap; gap: 0 var(--space-16); }
+.prototipo-barra a { display: inline-flex; align-items: center; min-height: var(--touch-target-min); font-weight: var(--font-weight-bold); }
+.alternar {
+  display: inline-flex; align-items: center; gap: var(--space-8); min-height: var(--touch-target-min); padding: 0 var(--space-16);
+  border: var(--border-width) solid var(--black); border-radius: var(--radius-pill); background: var(--white); font-weight: var(--font-weight-bold); cursor: pointer;
+}
+.alternar[aria-pressed="true"] { background: var(--black); color: var(--white); }
+
+.selo {
+  display: inline-flex; align-items: center; gap: var(--space-4); padding: 2px 10px; border-radius: var(--radius-pill);
+  font-size: var(--font-size-micro); font-weight: var(--font-weight-bold); line-height: 1.6; letter-spacing: 0; white-space: nowrap; vertical-align: middle;
+}
+.selo--o { background: var(--black); color: var(--white); border: var(--border-width) solid var(--black); }
+.selo--o::before { content: "●"; font-size: 9px; }
+.selo--d { background: var(--white); color: var(--black); border: var(--border-width) solid var(--black); }
+.selo--d::before { content: "◐"; font-size: 11px; }
+.selo--p { background: var(--gray-100); color: var(--black); border: var(--border-width) dashed var(--black); }
+.selo--p::before { content: "○"; font-size: 11px; }
+.selo--a11y { background: var(--white); color: var(--black); border: 2px solid var(--black); }
+
+.anotacao { display: none; }
+.mostrar-anotacoes .anotacao {
+  display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center;
+  margin-block: var(--space-8); font-size: var(--font-size-micro); color: var(--color-text-primary);
+}
+.mostrar-anotacoes .anotacao span:not(.selo) { padding: 2px 8px; border-radius: var(--radius-pill); background: var(--white); }
+.mostrar-anotacoes [data-anotada] { outline: 1px dashed var(--gray-500); outline-offset: 4px; }
+
+.ds { border-top: 2px dashed var(--black); background: var(--white); }
+.ds__intro { display: grid; gap: var(--space-20); max-width: 47rem; }
+.ds__bloco { padding-top: var(--space-section); }
+.ds__bloco > h2 { margin-bottom: var(--space-12); }
+.ds__bloco > p { max-width: 47rem; margin-bottom: var(--space-32); }
+.legenda-selos { display: grid; gap: var(--space-12); margin-top: var(--space-24); }
+.legenda-selos li { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: baseline; }
+
+.paleta { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--space-12); }
+.amostra { display: flex; flex-direction: column; overflow: hidden; border: var(--border-width) solid var(--gray-200); border-radius: var(--radius-md); }
+.amostra__cor { height: 104px; }
+.amostra__info { display: grid; gap: var(--space-4); padding: var(--space-16); font-size: var(--font-size-legenda); line-height: var(--line-height-legenda); }
+.amostra code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.8125rem; }
+
+.tabela-rolagem { position: relative; overflow-x: auto; border: var(--border-width) solid var(--gray-200); border-radius: var(--radius-md); }
+.tabela { width: 100%; border-collapse: collapse; font-size: var(--font-size-legenda); line-height: var(--line-height-legenda); }
+.tabela caption { padding: var(--space-16) var(--space-20); text-align: left; font-weight: var(--font-weight-bold); }
+.tabela th, .tabela td { padding: var(--space-12) var(--space-20); text-align: left; vertical-align: top; border-top: var(--border-width) solid var(--gray-200); }
+.tabela thead th { background: var(--gray-100); font-weight: var(--font-weight-bold); white-space: nowrap; }
+.tabela code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.8125rem; }
+
+.escala { display: grid; gap: 0; border-top: var(--border-width) solid var(--gray-200); }
+.escala__item { display: grid; gap: var(--space-12); padding-block: var(--space-24); border-bottom: var(--border-width) solid var(--gray-200); }
+.escala__meta { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-16); align-items: center; font-size: var(--font-size-legenda); color: var(--color-text-muted); }
+.escala__meta strong { color: var(--color-text-primary); }
+.escala__amostra { overflow-wrap: anywhere; }
+.escala__amostra--marca { overflow: hidden; white-space: nowrap; }
+
+.pesos { display: grid; gap: var(--space-12); }
+.peso { padding: var(--space-24); border-radius: var(--radius-md); background: var(--color-bg-subtle); }
+.peso__nome { margin-bottom: var(--space-12); font-size: var(--font-size-legenda); }
+.peso__grande { font-size: var(--font-size-h2); line-height: var(--line-height-h2); letter-spacing: var(--letter-spacing-h2); }
+.regras { display: grid; gap: var(--space-12); margin-top: var(--space-24); }
+.regra { padding: var(--space-20) var(--space-24); border-radius: var(--radius-sm); border: var(--border-width) solid var(--gray-200); }
+.regra__tipo { display: block; margin-bottom: var(--space-8); font-size: var(--font-size-micro); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.espacos { display: grid; gap: var(--space-8); }
+.espaco { display: grid; grid-template-columns: 6.5rem 1fr; gap: var(--space-16); align-items: center; font-size: var(--font-size-legenda); }
+.espaco__barra { height: 20px; background: var(--black); border-radius: 2px; }
+.espaco__uso { grid-column: 2; color: var(--color-text-muted); font-size: var(--font-size-micro); margin-top: -4px; }
+
+.raios { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: var(--space-12); }
+.raio { display: grid; gap: var(--space-12); }
+.raio__forma { height: 120px; border: 2px solid var(--black); background: var(--gray-100); }
+
+.vitrine { display: grid; gap: var(--space-12); }
+.palco { display: grid; gap: var(--space-16); padding: var(--space-24); border-radius: var(--radius-md); background: var(--color-bg-subtle); }
+.palco--escuro { background: var(--black); color: var(--white); }
+.palco--foto { position: relative; isolation: isolate; overflow: hidden; color: var(--white); background: var(--gray-900); }
+.palco--foto img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.palco--foto::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(0, 0, 0, 0.55); }
+.palco__titulo { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: center; font-weight: var(--font-weight-bold); }
+.estados { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: var(--space-16); align-items: end; }
+.estado { display: grid; gap: var(--space-8); justify-items: start; font-size: var(--font-size-micro); }
+.palco--branco { background: var(--white); border: var(--border-width) solid var(--gray-200); }
+
+.cards-demo { display: grid; gap: var(--space-24); }
+.cards-demo > div { display: grid; gap: var(--space-12); align-content: start; }
+
+.inventario { columns: 1; column-gap: var(--space-40); }
+.inventario li { break-inside: avoid; padding-block: var(--space-8); border-bottom: var(--border-width) solid var(--gray-200); }
+
+.contraste-ok::before { content: "✓ "; font-weight: var(--font-weight-bold); }
+.contraste-falha::before { content: "✕ "; font-weight: var(--font-weight-bold); }
+
+.toast {
+  position: fixed; left: 50%; bottom: var(--space-24); z-index: 60; transform: translateX(-50%);
+  max-width: calc(100% - 2rem); padding: var(--space-12) var(--space-20); border-radius: var(--radius-pill);
+  background: var(--black); color: var(--white); font-size: var(--font-size-legenda); font-weight: var(--font-weight-bold);
+}
+.toast[hidden] { display: none; }
+
+/* =========================================================================
+   5. RESPONSIVO — mobile é base [P]; 769 tablet [P]; 1024 desktop [O em 1440]
+   ========================================================================= */
+/* tier: tablet */
+@media (min-width: 769px) {
+  .hero__conteudo { padding: var(--space-40); }
+  .grade-unidades { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trilho { grid-auto-columns: calc((100% - 2 * var(--space-12)) / 2.5); }
+  .form__linha { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer__colunas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .footer__legal { flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+  .pesos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards-demo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lista-caixas li { grid-template-columns: 10.625rem 1fr; gap: var(--space-20); }
+  .inventario { columns: 2; }
+  .escala__item { grid-template-columns: 15rem 1fr; align-items: baseline; }
+}
+
+/* tier: desktop */
+@media (min-width: 1024px) {
+  .menu-botao { display: none; }
+  .header__barra { gap: var(--space-32); }
+  .js .header__painel[hidden], .header__painel {
+    display: flex; position: static; align-items: center; justify-content: space-between; flex: 1;
+    padding: 0; border: 0;
+  }
+  .header__painel { margin-left: auto; }
+  .nav-principal { margin-inline: auto; }
+  .nav-principal ul { flex-direction: row; gap: var(--space-32); }
+  .nav-principal a { min-height: var(--touch-target-min); font-size: var(--font-size-corpo-pequeno); font-weight: var(--font-weight-book); letter-spacing: 0; border: 0; }
+  .nav-principal a:hover { text-decoration: underline; text-underline-offset: 6px; }
+  .header__acoes { margin-top: 0; }
+  .header__acoes .botao { min-height: var(--button-height-sm); }
+  .header__barra { display: grid; grid-template-columns: auto 1fr; }
+
+  .hero__conteudo { flex-direction: row; align-items: flex-end; justify-content: space-between; padding: var(--space-56); }
+
+  .editorial { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-coluna); align-items: center; }
+  .editorial__foto { aspect-ratio: 596.8 / 746; max-height: none; }
+  .card-unidade { min-height: 360px; }
+
+  .grade-unidades { grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: var(--space-56); }
+  .trilho { grid-auto-columns: calc((100% - 3 * var(--space-12)) / 4); margin-top: var(--space-56); }
+
+  .form-secao { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: var(--space-coluna); }
+
+  .footer__grade { grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); padding-top: var(--space-96); }
+  .footer__colunas { grid-column: 2 / -1; grid-template-columns: subgrid; gap: var(--space-40); }
+
+  .cards-demo { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .inventario { columns: 3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .botao:active, .botao.is-active { transform: none; }
+}
+@media (prefers-contrast: more) {
+  :root { --color-text-muted: var(--black); --color-border-field: var(--black); }
+  .card-unidade, .card-evento__data, .lista-caixas li, .cta, .card-agenda { outline: 1px solid var(--black); }
+}
+@media (forced-colors: active) {
+  .botao, .seta, .campo, .menu-botao { border: 1px solid ButtonText; }
+}
+</style>
+</head>
+<body class="pagina--institucional">
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="pagina">
+
+  <!-- 1. Barra de anúncio (244:1256). TROCAR: texto do aviso e destino do link. Remover o bloco se não houver aviso. -->
+  <aside class="anuncio" aria-label="Anúncio">
+    <p>Inscrições abertas para o Alpha · nova turma em novembro</p>
+    <a class="link" href="/proximos-passos/alpha">Inscrever-se<span class="sr-only"> no Alpha</span></a>
+  </aside>
+
+  <!-- 2. Top bar (233:21). Links institucionais fixos do site. -->
+  <nav class="topbar" aria-label="Institucional">
+    <ul role="list">
+      <li><a href="/sobre-nos/nossa-historia">Sobre nós</a></li>
+      <li><a href="/unidades">Localidades</a></li>
+      <li><a href="/contribua">Contribua</a></li>
+      <li><a href="/contato">Contato</a></li>
+    </ul>
+  </nav>
+
+  <!-- 3. Header (233:48). TROCAR: aria-current="page" no item da seção atual. -->
+  <header class="header">
+    <div class="header__barra">
+      <a class="logo" href="/" aria-label="ADAI, página inicial">
+        <svg viewBox="0 0 99.21 32.6" aria-hidden="true" focusable="false"><use href="#logo-uso"/></svg>
+      </a>
+      <button type="button" class="menu-botao" aria-expanded="false" aria-controls="menu-principal" hidden>
+        <span class="menu-botao__icone" aria-hidden="true"></span>Menu
+      </button>
+      <div class="header__painel" id="menu-principal">
+        <nav class="nav-principal" aria-label="Principal">
+          <ul role="list">
+            <li><a href="/unidades">Unidades</a></li>
+            <li><a href="/mensagens">Mensagens</a></li>
+            <li><a href="/agenda">Agenda</a></li>
+            <li><a href="/ministerios">Ministérios</a></li>
+            <li><a href="/contribua">Contribua</a></li>
+          </ul>
+        </nav>
+        <div class="header__acoes">
+          <a class="botao botao--contorno-escuro botao--baixo" href="/ao-vivo">Ao vivo</a>
+          <a class="botao botao--primario botao--baixo" href="#planeje">Planeje sua visita</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo" tabindex="-1">
+
+    <!-- 4. Hero (1:32). TROCAR: foto (com alt descritivo), título (único h1), apoio e as duas ações.
+         VARIAÇÃO ministério/evento: título = nome do ministério/evento; próximo passo: título = o passo ("Batismo"). -->
+    <section class="hero" aria-labelledby="hero-titulo">
+      <div class="hero__caixa inverso">
+        <img class="hero__foto" src="assets/hero-adai.jpg" alt="Pessoas sorrindo na entrada da ADAI; uma voluntária segura uma placa com as palavras Amar, Servir, Influenciar." width="1600" height="1067">
+        <div class="hero__conteudo">
+          <h1 class="t-display" id="hero-titulo">Amar.<br>Servir.<br>Influenciar.</h1>
+          <div class="hero__apoio">
+            <p class="t-corpo">Uma igreja que ama, serve e influencia em cinco localidades, com as portas abertas todo domingo. Tem um lugar pra você aqui.</p>
+            <div class="botoes">
+              <a class="botao botao--claro" href="#planeje">Planeje sua visita</a>
+              <a class="botao botao--contorno" href="#unidades">Ver unidades</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Editorial (Primeira vez 1:107). TROCAR: foto (P&B via filter), título, apoio, itens da lista e ação.
+         VARIAÇÃO institucional (Nossa História, No que cremos, Jesus): sem lista, só texto. -->
+    <section class="secao" aria-labelledby="primeira-vez">
+      <div class="container editorial">
+        <img class="editorial__foto" src="assets/primeira-vez-culto.jpg" alt="Homem com violão em momento de oração durante o culto." width="1200" height="1500" loading="lazy">
+        <div class="editorial__texto">
+          <h2 class="t-h1" id="primeira-vez">Primeira vez na ADAI?</h2>
+          <p class="t-corpo editorial__apoio">Chegar num lugar novo pode ser estranho. Por isso, vale saber um pouco antes de ir.</p>
+          <ul class="lista-caixas" role="list">
+            <li><strong>Como é o culto</strong><span>Louvor, uma mensagem da Bíblia pra vida real e gente disposta a te receber bem.</span></li>
+            <li><strong>Seus filhos</strong><span>O ADAI Kids cuida das crianças enquanto você participa do culto.</span></li>
+            <li><strong>Fale com a gente</strong><span>Avise que vai e alguém do nosso time te espera na entrada.</span></li>
+          </ul>
+          <div><a class="botao botao--primario" href="#planeje">Planeje sua visita</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Grade de cards (Neste domingo 1:51). TROCAR: um <li class="card-unidade"> por unidade.
+         VARIAÇÃO ministério/institucional: trocar por Card / Página relacionada (ver docs/design-system.html#ds-cards). -->
+    <section class="secao" id="unidades" aria-labelledby="neste-domingo" style="padding-top:0">
+      <div class="container">
+        <div class="cabecalho-secao">
+          <h2 class="t-h1" id="neste-domingo">Neste domingo</h2>
+          <p class="t-corpo">Escolha a unidade mais perto de você ou participe de casa pela ADAI On.</p>
+        </div>
+        <ul class="grade-unidades" role="list">
+          <li class="card-unidade">
+            <h3 class="t-h3">Campestre</h3>
+            <ul class="card-unidade__horarios" role="list" aria-label="Horários"><li>9h</li><li>11h</li><li>18h</li></ul>
+            <address class="card-unidade__endereco t-legenda">Av. Dom Pedro II, 3405<br>Santo André</address>
+            <a class="link-seta" href="/unidades/campestre">Como chegar<span class="sr-only"> à unidade Campestre</span></a>
+          </li>
+          <li class="card-unidade">
+            <h3 class="t-h3">Anália Franco</h3>
+            <ul class="card-unidade__horarios" role="list" aria-label="Horários"><li>9h</li><li>11h</li></ul>
+            <address class="card-unidade__endereco t-legenda">R. Eleonora Cintra, 960<br>Jardim Anália Franco, São Paulo</address>
+            <a class="link-seta" href="/unidades/analia-franco">Como chegar<span class="sr-only"> à unidade Anália Franco</span></a>
+          </li>
+          <li class="card-unidade">
+            <h3 class="t-h3">São Bernardo</h3>
+            <ul class="card-unidade__horarios" role="list" aria-label="Horários"><li>9h</li><li>11h</li><li>18h</li></ul>
+            <address class="card-unidade__endereco t-legenda">R. Cabral da Câmara, 315<br>Planalto, SBC</address>
+            <a class="link-seta" href="/unidades/sao-bernardo">Como chegar<span class="sr-only"> à unidade São Bernardo</span></a>
+          </li>
+          <li class="card-unidade">
+            <h3 class="t-h3">Santos</h3>
+            <ul class="card-unidade__horarios" role="list" aria-label="Horários"><li>9h30</li><li>11h30</li></ul>
+            <address class="card-unidade__endereco t-legenda">R. Campos Mello, 197<br>Vila Matias, Santos</address>
+            <a class="link-seta" href="/unidades/santos">Como chegar<span class="sr-only"> à unidade Santos</span></a>
+          </li>
+          <li class="card-unidade">
+            <h3 class="t-h3">ADAI On</h3>
+            <ul class="card-unidade__horarios" role="list" aria-label="Horários"><li>11h</li><li>15h</li></ul>
+            <p class="card-unidade__endereco t-legenda">11h no YouTube<br>15h no Zoom</p>
+            <a class="link-seta" href="/ao-vivo">Assistir<span class="sr-only"> ao culto da ADAI On</span></a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7. Próximos eventos (1:173). TROCAR: um <li> por evento, com data também em texto (<time>).
+         VARIAÇÃO evento: usar "Outros eventos"; mensagens: trocar por cards de parte da série. -->
+    <section class="secao" aria-labelledby="proximos-eventos" style="padding-top:0">
+      <div class="container">
+        <div class="eventos__topo">
+          <h2 class="t-h1" id="proximos-eventos">Próximos eventos</h2>
+          <div class="eventos__controles">
+            <a class="botao botao--primario" href="/agenda">Ver agenda completa</a>
+            <button type="button" class="seta" data-trilho="trilho-eventos" data-direcao="-1" aria-label="Eventos anteriores" hidden>
+              <svg viewBox="0 0 19 8" aria-hidden="true" focusable="false"><path d="M18.5 4H1M4.5 0.5L1 4l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+            <button type="button" class="seta" data-trilho="trilho-eventos" data-direcao="1" aria-label="Próximos eventos" hidden>
+              <svg viewBox="0 0 19 8" aria-hidden="true" focusable="false"><path d="M0.5 4H18M14.5 0.5L18 4l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+          </div>
+        </div>
+        <ul class="trilho" id="trilho-eventos" role="list" aria-label="Lista de próximos eventos" tabindex="0">
+          <li><article class="card-evento">
+            <div class="card-evento__data" aria-hidden="true"><span class="t-h4">Out</span><span class="t-numero">25</span></div>
+            <div class="card-evento__info"><h3 class="t-h3"><a href="/agenda/culto-50-mais">Culto 50+</a></h3><p class="t-legenda t-suave"><time datetime="2026-10-25T17:00">25 de outubro</time> · Campestre, 17h</p></div>
+          </article></li>
+          <li><article class="card-evento">
+            <div class="card-evento__data" aria-hidden="true"><span class="t-h4">Nov</span><span class="t-numero">01</span></div>
+            <div class="card-evento__info"><h3 class="t-h3"><a href="/agenda/batismo">Batismo</a></h3><p class="t-legenda t-suave"><time datetime="2026-11-01T11:00">1º de novembro</time> · Anália Franco, 11h</p></div>
+          </article></li>
+          <li><article class="card-evento">
+            <div class="card-evento__data" aria-hidden="true"><span class="t-h4">Nov</span><span class="t-numero">08</span></div>
+            <div class="card-evento__info"><h3 class="t-h3"><a href="/agenda/encontro-flores">Encontro FLORES</a></h3><p class="t-legenda t-suave"><time datetime="2026-11-08T19:30">8 de novembro</time> · São Bernardo, 19h30</p></div>
+          </article></li>
+          <li><article class="card-evento">
+            <div class="card-evento__data" aria-hidden="true"><span class="t-h4">Nov</span><span class="t-numero">14</span></div>
+            <div class="card-evento__info"><h3 class="t-h3"><a href="/agenda/noite-de-louvor">Noite de Louvor</a></h3><p class="t-legenda t-suave"><time datetime="2026-11-14T20:00">14 de novembro</time> · Campestre, 20h</p></div>
+          </article></li>
+          <li><article class="card-evento">
+            <div class="card-evento__data" aria-hidden="true"><span class="t-h4">Nov</span><span class="t-numero">21</span></div>
+            <div class="card-evento__info"><h3 class="t-h3"><a href="/agenda/pulse-conecta">PULSE Conecta</a></h3><p class="t-legenda t-suave"><time datetime="2026-11-21T19:00">21 de novembro</time> · Santos, 19h</p></div>
+          </article></li>
+          <li><article class="card-evento">
+            <div class="card-evento__data" aria-hidden="true"><span class="t-h4">Dez</span><span class="t-numero">06</span></div>
+            <div class="card-evento__info"><h3 class="t-h3"><a href="/agenda/cantata-de-natal">Cantata de Natal</a></h3><p class="t-legenda t-suave"><time datetime="2026-12-06T18:00">6 de dezembro</time> · Todas as unidades, 18h</p></div>
+          </article></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. CTA de destaque (caixa cinza). TROCAR: título, apoio, ação principal e links secundários. -->
+    <section class="secao" aria-labelledby="contribua" style="padding-top:0">
+      <div class="container">
+        <div class="cta">
+          <h2 class="t-h1" id="contribua">Contribua</h2>
+          <p class="t-corpo cta__apoio">Dizimar e ofertar não é obrigação. É um ato de fidelidade e gratidão, e o privilégio de participar do que Deus está fazendo aqui na terra.</p>
+          <a class="botao botao--primario" href="/contribua">Quero contribuir</a>
+          <div class="cta__links">
+            <a href="/nossacasa">Projeto Nossa Casa</a>
+            <a href="/contribua#outras-formas">Outras formas de contribuir</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Formulário. TROCAR: campos e destino do envio. Manter rótulos visíveis, mensagens de erro e o resumo.
+         VARIAÇÃO próximo passo: formulário de inscrição; contato: formulário de contato. -->
+    <section class="secao" id="planeje" aria-labelledby="planeje-titulo" style="padding-top:0">
+      <div class="container form-secao">
+        <div class="cabecalho-secao">
+          <h2 class="t-h1" id="planeje-titulo">Planeje sua visita</h2>
+          <p class="t-corpo">Conta pra gente quando você vem. Alguém do time vai te esperar na entrada e te ajudar com o que precisar.</p>
+          <p class="t-legenda t-suave">Campos com * são obrigatórios. Seus dados ficam só com a equipe de recepção da ADAI.</p>
+        </div>
+        <form class="form" id="form-visita" novalidate>
+          <div class="resumo-erros" id="resumo-erros" tabindex="-1" hidden>
+            <h3 class="t-h4">Confira os campos abaixo</h3>
+            <ul></ul>
+          </div>
+          <div class="form__linha">
+            <div class="form__grupo">
+              <label class="rotulo" for="nome">Nome *</label>
+              <input class="campo" id="nome" name="nome" type="text" autocomplete="name" required aria-describedby="nome-erro">
+              <p class="erro" id="nome-erro" hidden>Digite seu nome.</p>
+            </div>
+            <div class="form__grupo">
+              <label class="rotulo" for="email">E-mail *</label>
+              <input class="campo" id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-ajuda email-erro">
+              <p class="ajuda" id="email-ajuda">Ex.: maria@email.com</p>
+              <p class="erro" id="email-erro" hidden>Digite um e-mail válido, como maria@email.com.</p>
+            </div>
+          </div>
+          <div class="form__linha">
+            <div class="form__grupo">
+              <label class="rotulo" for="unidade">Unidade *</label>
+              <select class="campo" id="unidade" name="unidade" required aria-describedby="unidade-erro">
+                <option value="">Escolha uma unidade</option>
+                <option>Campestre · Santo André</option>
+                <option>Anália Franco · São Paulo</option>
+                <option>São Bernardo</option>
+                <option>Santos</option>
+              </select>
+              <p class="erro" id="unidade-erro" hidden>Escolha a unidade que você vai visitar.</p>
+            </div>
+            <div class="form__grupo">
+              <label class="rotulo" for="whatsapp">WhatsApp <span class="opcional">(opcional)</span></label>
+              <input class="campo" id="whatsapp" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="whatsapp-ajuda">
+              <p class="ajuda" id="whatsapp-ajuda">Com DDD. Usamos só para confirmar sua visita.</p>
+            </div>
+          </div>
+          <fieldset class="form__grupo">
+            <legend class="rotulo">Vai levar crianças?</legend>
+            <div class="opcoes">
+              <label class="opcao"><input type="radio" name="criancas" value="sim"> Sim, quero conhecer o ADAI Kids</label>
+              <label class="opcao"><input type="radio" name="criancas" value="nao" checked> Não desta vez</label>
+            </div>
+          </fieldset>
+          <div class="form__grupo">
+            <label class="rotulo" for="mensagem">Quer contar algo pra gente? <span class="opcional">(opcional)</span></label>
+            <textarea class="campo" id="mensagem" name="mensagem" rows="4"></textarea>
+          </div>
+          <div class="form__grupo">
+            <label class="opcao"><input type="checkbox" id="consentimento" name="consentimento" required aria-describedby="consentimento-erro"> Concordo que a ADAI use esses dados para me receber. *</label>
+            <p class="erro" id="consentimento-erro" hidden>Marque a concordância para enviar.</p>
+          </div>
+          <div class="botoes">
+            <button class="botao botao--primario" type="submit">Enviar</button>
+          </div>
+          <p class="sucesso" id="form-sucesso" role="status" hidden></p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 10. Footer (233:106). Conteúdo global do site (no Next vem do Strapi). -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grade">
+        <div class="footer__marca">
+          <a class="logo" href="/" aria-label="ADAI, página inicial">
+            <svg viewBox="19 3 62 27" style="width:62px;height:27px" aria-hidden="true" focusable="false"><use href="#logo-uso" x="0" y="0" width="99.21" height="32.6"/></svg>
+          </a>
+          <p>Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo.</p>
+        </div>
+        <nav class="footer__colunas" aria-label="Rodapé">
+          <div class="footer__coluna">
+            <h2>Igreja</h2>
+            <ul role="list">
+              <li><a href="/sobre-nos/nossa-historia">Nossa história</a></li>
+              <li><a href="/sobre-nos/a-igreja-que-vemos">A igreja que vemos</a></li>
+              <li><a href="/sobre-nos/no-que-acreditamos">No que acreditamos</a></li>
+              <li><a href="/jesus">Jesus</a></li>
+            </ul>
+          </div>
+          <div class="footer__coluna">
+            <h2>Participe</h2>
+            <ul role="list">
+              <li><a href="/unidades">Unidades</a></li>
+              <li><a href="/agenda">Agenda</a></li>
+              <li><a href="/ministerios">Ministérios</a></li>
+              <li><a href="/connect">Connect</a></li>
+            </ul>
+          </div>
+          <div class="footer__coluna">
+            <h2>Contato</h2>
+            <ul role="list">
+              <li><a href="mailto:contato@adai.com.br">E-mail<span class="sr-only"> contato@adai.com.br</span></a></li>
+              <li><a href="/contato">Fale com a gente</a></li>
+              <li><a href="/nossacasa">Nossa Casa</a></li>
+              <li><a href="/contribua">Contribua</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__legal">
+        <p>© 2026 ADAI. Todos os direitos reservados. <a href="/politica-de-privacidade">Política de Privacidade</a></p>
+        <p>Amar · Servir · Influenciar.</p>
+      </div>
+    </div>
+    <p class="footer__mega" aria-hidden="true">ADAI</p>
+  </footer>
+</div>
+
+
+<!-- Símbolo do logo reaproveitado no footer -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="logo-uso" viewBox="0 0 99.21 32.6">
+    <g transform="translate(19.46 3.29)" fill="currentColor"><path d="M13.01 0C5.82 0 0 5.83 0 13.01C0 20.19 5.83 26.02 13.01 26.02C20.19 26.02 26.02 20.19 26.02 13.01C26.02 5.83 20.19 0 13.01 0ZM14.27 18.35L14.25 15.75H16.31L13.02 10.12L9.76 15.75H11.7V18.35H5.12L9.06 11.53L13 4.71L16.94 11.53L20.88 18.35H14.26H14.27Z"/></g>
+    <g transform="translate(48.71 7.15)" fill="currentColor"><path d="M5.93 17.09L5.49 13.75H3L2.49 17.09H0L2.85 0H5.85L8.7 17.09H5.93ZM4.34 4.49L3.34 11.47H5.19L4.34 4.49Z"/><path d="M13.91 17.09H9.75V0H13.91C16.37 0 17.81 1.54 17.81 4.08V13.11C17.81 15.68 16.37 17.09 13.91 17.09ZM15.09 4.06C15.09 2.98 14.68 2.44 13.73 2.44H12.47V14.68H13.73C14.68 14.68 15.09 14.12 15.09 13.06V4.05V4.06Z"/><path d="M24.5 17.09L24.06 13.75H21.57L21.06 17.09H18.57L21.42 0H24.42L27.27 17.09H24.5ZM22.91 4.49L21.91 11.47H23.76L22.91 4.49Z"/><path d="M28.33 17.09V0H31.05V17.09H28.33Z"/></g>
+  </symbol>
+</svg>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(function () {
+  'use strict';
+  document.documentElement.classList.add('js');
+
+  // Rotas do site: no protótipo, avisa o destino em vez de navegar para um arquivo inexistente.
+  var toast = document.getElementById('toast');
+  var tempo;
+  function avisar(texto) {
+    toast.textContent = texto;
+    toast.hidden = false;
+    clearTimeout(tempo);
+    tempo = setTimeout(function () { toast.hidden = true; }, 2600);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href^="/"], a[href^="mailto:"]');
+    if (!a) return;
+    e.preventDefault();
+    avisar('Protótipo: este link leva a ' + a.getAttribute('href'));
+  });
+
+  // Menu compacto (< 1024px)
+  var botaoMenu = document.querySelector('.menu-botao');
+  if (botaoMenu) {
+  var painel = document.getElementById('menu-principal');
+  var desktop = window.matchMedia('(min-width: 1024px)');
+  function sincronizarMenu() {
+    if (desktop.matches) { painel.hidden = false; botaoMenu.setAttribute('aria-expanded', 'false'); }
+    else if (botaoMenu.getAttribute('aria-expanded') !== 'true') { painel.hidden = true; }
+  }
+  botaoMenu.hidden = false;
+  botaoMenu.addEventListener('click', function () {
+    var aberto = botaoMenu.getAttribute('aria-expanded') === 'true';
+    botaoMenu.setAttribute('aria-expanded', String(!aberto));
+    painel.hidden = aberto;
+    if (!aberto) { var primeiro = painel.querySelector('a'); if (primeiro) primeiro.focus(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && botaoMenu.getAttribute('aria-expanded') === 'true' && !desktop.matches) {
+      botaoMenu.setAttribute('aria-expanded', 'false');
+      painel.hidden = true;
+      botaoMenu.focus();
+    }
+  });
+  desktop.addEventListener('change', sincronizarMenu);
+  sincronizarMenu();
+  }
+
+  // Setas do trilho de eventos
+  var trilho = document.getElementById('trilho-eventos');
+  if (trilho) {
+  document.querySelectorAll('.seta').forEach(function (seta) { seta.hidden = false; });
+  var setas = document.querySelectorAll('[data-trilho="trilho-eventos"]');
+  var reduzir = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function atualizarSetas() {
+    var fim = trilho.scrollWidth - trilho.clientWidth - 2;
+    setas[0].disabled = trilho.scrollLeft <= 2;
+    setas[1].disabled = trilho.scrollLeft >= fim;
+  }
+  setas.forEach(function (seta) {
+    seta.addEventListener('click', function () {
+      var passo = trilho.querySelector('li').getBoundingClientRect().width + 12;
+      trilho.scrollBy({ left: passo * Number(seta.dataset.direcao), behavior: reduzir.matches ? 'auto' : 'smooth' });
+    });
+  });
+  trilho.addEventListener('scroll', atualizarSetas, { passive: true });
+  window.addEventListener('resize', atualizarSetas);
+  atualizarSetas();
+  }
+
+  // Formulário com validação acessível
+  var form = document.getElementById('form-visita');
+  if (form) {
+  var resumo = document.getElementById('resumo-erros');
+  var sucesso = document.getElementById('form-sucesso');
+  var regras = [
+    { id: 'nome', ok: function (el) { return el.value.trim().length > 1; } },
+    { id: 'email', ok: function (el) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()); } },
+    { id: 'unidade', ok: function (el) { return el.value !== ''; } },
+    { id: 'consentimento', ok: function (el) { return el.checked; } }
+  ];
+  function validar(regra) {
+    var el = document.getElementById(regra.id);
+    var msg = document.getElementById(regra.id + '-erro');
+    var valido = regra.ok(el);
+    el.setAttribute('aria-invalid', String(!valido));
+    msg.hidden = valido;
+    return valido;
+  }
+  regras.forEach(function (regra) {
+    var el = document.getElementById(regra.id);
+    el.addEventListener('blur', function () { if (el.getAttribute('aria-invalid') === 'true') validar(regra); });
+    el.addEventListener('change', function () { if (el.getAttribute('aria-invalid') === 'true') validar(regra); });
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    sucesso.hidden = true;
+    var lista = resumo.querySelector('ul');
+    lista.innerHTML = '';
+    var erros = regras.filter(function (r) { return !validar(r); });
+    if (erros.length) {
+      erros.forEach(function (r) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '#' + r.id;
+        a.textContent = document.getElementById(r.id + '-erro').textContent;
+        a.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); document.getElementById(r.id).focus(); });
+        li.appendChild(a);
+        lista.appendChild(li);
+      });
+      resumo.hidden = false;
+      resumo.focus();
+      return;
+    }
+    resumo.hidden = true;
+    var nome = document.getElementById('nome').value.trim().split(' ')[0];
+    sucesso.textContent = 'Obrigado, ' + nome + '! Recebemos sua visita. No protótipo, nada foi enviado.';
+    sucesso.hidden = false;
+    form.reset();
+  });
+  }
+
+  // Marcações Observado / Derivado / Proposto na página
+  var alternar = document.getElementById('alternar-anotacoes');
+  if (alternar) {
+  alternar.hidden = false;
+  alternar.addEventListener('click', function () {
+    var ligado = alternar.getAttribute('aria-pressed') !== 'true';
+    alternar.setAttribute('aria-pressed', String(ligado));
+    alternar.textContent = ligado ? 'Ocultar marcações O/D/P' : 'Mostrar marcações O/D/P';
+    document.body.classList.toggle('mostrar-anotacoes', ligado);
+  });
+  }
+})();
+</script>
+</body>
+</html>
