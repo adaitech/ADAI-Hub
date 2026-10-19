@@ -12,7 +12,8 @@ alwaysApply: true
 > Verificado no `yarn test` (`src/__tests__/caracteristicas/css.test.ts`): nenhuma cor (hex/rgb/hsl) fora de `tokens.css` e todo `var(--token)` usado existe.
 
 **Arquivo de código:** `next/src/styles/tokens.css` (importado uma vez em `src/styles/globals.css`).
-**Origem:** Figma `adai.com.br` (fileKey `cN5RwPRMA6zw5oLoeXidk7`), frame `Home / Desktop` (1440px). O arquivo **não tem variáveis/tokens no Figma**; os valores abaixo foram extraídos dos layers.
+**Origem:** Figma `adai.com.br` (fileKey `cN5RwPRMA6zw5oLoeXidk7`), frame `Home / Desktop` (1440px). O arquivo tem **variáveis locais** (`cor/*`, `raio/*`) e **14 estilos de texto**, lidos em 2026-10-18; o restante veio dos layers.
+**Referência completa:** [`docs/design-system.md`](../../docs/design-system.md) (Observado / Derivado / Proposto, componentes, pranchas e pendências) · style guide [`docs/design-system.html`](../../docs/design-system.html) · template [`templates/adai-page-template.html`](../../templates/adai-page-template.html). Os dois HTMLs repetem os tokens canônicos e `src/__tests__/caracteristicas/design-system.test.ts` falha se divergirem.
 
 ## Status dos valores
 
@@ -40,12 +41,13 @@ Ao implementar uma seção: comparar os valores do Figma com esta tabela. Valor 
 
 | Token | Valor | Status | Onde aparece |
 | --- | --- | --- | --- |
-| `--black` | `#000000` | ✅ | Texto, botão primário, borda de botão |
-| `--white` | `#FFFFFF` | ✅ | Fundo da página, texto sobre foto |
+| `--black` | `#000000` | ✅ variável `cor/preto` | Texto, botão primário, borda de botão |
+| `--white` | `#FFFFFF` | ✅ variável `cor/branco` | Fundo da página, texto sobre foto |
 | `--gray-900` | `#333333` | ✅ | Fundo do Hero (atrás da foto) |
 | `--gray-600` | `#6B6B6B` | 🟡 decisão a11y | Texto secundário (substitui o `#777` do Figma: 4,76:1 sobre `#F2F2F2`) |
-| `--gray-500` | `#777777` | ✅ Figma | **Não usar em texto sobre `--gray-100`**: contraste 4,00:1 falha WCAG AA (mín. 4,5:1). Aguardando aprovação do design para o `#6B6B6B` |
-| `--gray-100` | `#F2F2F2` | ✅ | Fundo do footer |
+| `--gray-500` | `#777777` | ✅ variável `cor/cinza` | **Não usar em texto sobre `--gray-100`**: contraste 4,00:1 falha WCAG AA (mín. 4,5:1). Aguardando aprovação do design para o `#6B6B6B` |
+| `--gray-100` | `#F2F2F2` | ✅ variável `cor/superficie` | Fundo do footer, cards, caixas |
+| `--gray-200` | `#E8E8E8` | ✅ variável `cor/superficie-2` | Hover de superfície cinza (uso 🟡) |
 | `--gray-300` | `#D9D9D9` | 🟡 proposta | Borda do card branco (decorativa: o texto do card já identifica a área) |
 | `--blue-700` | `#1D4E89` | 🟡 proposta | Card azul — branco sobre ele: 8,39:1 |
 | `--green-700` | `#1E6B4F` | 🟡 proposta | Card verde — branco: 6,42:1 |
@@ -60,6 +62,7 @@ Ao implementar uma seção: comparar os valores do Figma com esta tabela. Valor 
 | --- | --- | --- |
 | `--color-bg-page` | `--white` | Fundo padrão |
 | `--color-bg-subtle` | `--gray-100` | Footer, blocos cinza (cards FAQ/“Primeira vez”: 🟡 confirmar) |
+| `--color-bg-subtle-2` | `--gray-200` | 🟡 Hover de superfície cinza. **Não** usar `--color-text-muted` sobre ela (4,35:1) |
 | `--color-bg-inverse` | `--black` | Faixas escuras, botão primário |
 | `--color-bg-media` | `--gray-900` | Placeholder atrás de fotos |
 | `--color-text-primary` | `--black` | Texto padrão |
@@ -105,28 +108,35 @@ Famílias: `--font-body` (Inter) e `--font-display` (Inter Tight) — ver `Stack
 
 ### 3.2 Escala
 
-| Token | Figma (1440px) | Valor CSS | Line-height | Tracking | Status | Uso |
-| --- | --- | --- | --- | --- | --- | --- |
-| `--font-size-mega` | 432px | `clamp(96px, 30vw, 432px)` | 0.72 | `-0.07em` | ✅ desktop / 🟡 mínimo | "ADAI" gigante do footer (opacidade 18%) |
-| `--font-size-display` | 129,6px | `clamp(48px, 9vw, 129.6px)` | 0.88 | `-0.055em` | ✅ desktop / 🟡 mínimo | "Amar. Servir. Influenciar." |
-| `--font-size-chamada` | 77,8px | `clamp(40px, 5.4vw, 77.8px)` | 0.95 | `-0.045em` | ✅ Figma App 1:296 / 🟡 mínimo | "A igreja no seu bolso" |
-| `--font-size-chamada-apoio` | 20px | `1.25rem` | 1.5 | 0 | ✅ Figma App 1:296 | Apoio da chamada |
-| `--font-size-h2` | ~72px (linha de 74px) | `clamp(40px, 5vw, 72px)` | 1.03 | `-0.04em` | 🟡 inferido | Títulos de seção ("Neste domingo", "Primeira vez na ADAI?") |
-| `--font-size-h3` | ~28px (linha de 32px) | `1.75rem` | 1.15 | 0 | 🟡 inferido | Título de card (nome da unidade) |
-| `--font-size-destaque` | ~32px (3 linhas em 109px) | `2rem` | 1.1 | 0 | 🟡 inferido | Destaques do card (horários) |
-| `--font-size-lead` | 18px | `1.125rem` | 1.5 (27px) | 0 | ✅ | Texto de apoio do Hero |
-| `--font-size-body-lg` | 17px | `1.0625rem` | 1.5 (25,5px) | 0 | ✅ | Links e texto do footer |
-| `--font-size-body` | 16px | `1rem` | 1.5 (24px) | 0 | ✅ | Menu, texto padrão, botão grande |
-| `--font-size-sm` | 14px | `0.875rem` | 1.5 (21px) | 0 | ✅ | Botão pequeno (header) |
-| `--font-size-xs` | 13px | `0.8125rem` | 1.5 (19,5px) | 0 | ✅ | Copyright / legal |
+Estilos locais do Figma (✅ em 1440; mínimo do `clamp()` 🟡). Tracking do Figma em % = `em`.
+
+| Token | Figma | Valor CSS | Line-height | Tracking | Uso |
+| --- | --- | --- | --- | --- | --- |
+| `--font-size-display` | Display 130 | `clamp(48px, 9.03vw, 130px)` | `--line-height-display` 0.88 | `--letter-spacing-display` `-0.055em` | "Amar. Servir. Influenciar." |
+| `--font-size-h1` | H1 78 | `clamp(2.5rem, 5.417vw, 4.875rem)` | `--line-height-h1` 0.95 | `--letter-spacing-h1` `-0.045em` | **Títulos de seção** (linha de 74px no Figma) |
+| `--font-size-h2` | H2 48 | `clamp(2rem, 3.333vw, 3rem)` | `--line-height-h2` 0.98 | `--letter-spacing-h2` `-0.04em` | Subtítulos ("Ecossistema ADAI"); ainda sem consumidor |
+| `--font-size-h3` | H3 28 | `1.75rem` | `--line-height-h3` 1.1 | `--letter-spacing-h3` `-0.03em` | Título de card |
+| `--font-size-h4` | H4 20 | `1.25rem` | `--line-height-h4` 1.15 | `--letter-spacing-h4` `-0.02em` | Mês do card de evento |
+| `--font-size-numero` | Número / Data 86 | `clamp(4rem, 5.972vw, 5.375rem)` | `--line-height-numero` 0.85 | `--letter-spacing-numero` `-0.06em` | Dia do card de evento |
+| `--font-size-marca` | Marca / Rodapé 432 | `clamp(96px, 30vw, 432px)` | `--line-height-marca` 0.78 | `--letter-spacing-marca` `-0.07em` | "ADAI" do footer (opacidade 18%) |
+| `--font-size-corpo` | Corpo 18 | `1.125rem` | 1.5 | 0 | Apoio de hero e de seção |
+| `--font-size-corpo-pequeno` | Corpo pequeno 16 | `1rem` | 1.5 | 0 | Menu, texto padrão |
+| `--font-size-legenda` | Legenda 15 | `0.9375rem` | `--line-height-legenda` 1.45 | 0 | Local/hora de evento |
+| `--font-size-micro` | Micro 13 | `0.8125rem` | 1.45 | 0 | Top bar, legal |
+| `--font-size-botao` | Botão 16 Bold | `1rem` | 1.5 | 0 | Rótulo de botão |
+| `--font-size-link-menu` | Link menu = Corpo pequeno | `var(--font-size-corpo-pequeno)` | 1.5 | 0 | Menu do header |
+| — | Abertura | **não identificado** | — | — | Pendente |
+
+Aliases de migração (apontam para o canônico; não usar em código novo): `--font-size-mega` → `--font-size-marca`, `--font-size-chamada` → `--font-size-h1`, `--font-size-lead` → `--font-size-corpo`, `--font-size-body` → `--font-size-corpo-pequeno`, `--font-size-xs` → `--font-size-micro`, e as linhas/trackings `-mega`/`-chamada`. Fora da escala do Figma: `--font-size-body-lg` (17, footer ✅ layers), `--font-size-destaque` (32, 🟡), `--font-size-chamada-apoio` (20, ✅ 1:300), `--font-size-sm` (14, 🟡).
 
 Mapeamento de estilos:
 
 | Estilo | Família | Peso | Tamanho |
 | --- | --- | --- | --- |
 | Display (hero) | display | bold | `--font-size-display` |
-| Mega (footer) | display | bold | `--font-size-mega` |
-| Lead (apoio do hero) | display | regular | `--font-size-lead` |
+| Título de seção | display | bold | `--font-size-h1` |
+| Marca (footer) | display | bold | `--font-size-marca` |
+| Corpo (apoio do hero) | display | regular | `--font-size-corpo` |
 | Menu | body | regular | `--font-size-body` |
 | Botão | body | bold | `--font-size-body` (grande) / `--font-size-sm` (pequeno) |
 | Título de coluna do footer | body | bold | `--font-size-body` |
@@ -161,9 +171,11 @@ Mapeamento de estilos:
 
 | Token | Figma (1440px) | Valor CSS | Status |
 | --- | --- | --- | --- |
-| `--space-gutter` | 43,2px (3%) | `clamp(16px, 3vw, 57.6px)` | ✅ desktop / 🟡 mobile |
-| `--space-section` | 129,6px (9%) | `clamp(64px, 9vw, 172.8px)` | ✅ desktop / 🟡 mobile |
-| `--container-max` | 1440px | `90rem` | ✅ footer |
+| `--space-gutter` | 43,2px (3%) | `clamp(16px, 3vw, 57.6px)` | ✅ header/top bar / 🟡 mobile |
+| `--space-section` | 120px (recorrente) | `clamp(64px, 8.333vw, 120px)` | ✅ desktop (derivado) / 🟡 mobile |
+| `--space-page-margin` | 80px | `clamp(16px, 5.556vw, 80px)` | ✅ desktop / 🟡 mobile — margem lateral das seções |
+| `--container-max` | 1440px | `90rem` | ✅ shell |
+| `--content-max` | 1280px | `80rem` | ✅ conteúdo das seções |
 
 ---
 
@@ -171,10 +183,10 @@ Mapeamento de estilos:
 
 | Token | Valor | Status | Uso |
 | --- | --- | --- | --- |
-| `--radius-lg` | `28px` | ✅ | Hero (mídia grande); cards 🟡 confirmar |
-| `--radius-pill` | `999px` | ✅ | Botões |
-| `--radius-md` | `20px` | ✅ fotos de Imagem e texto (Figma 1:108, 6:14) · 🟡 cards e caixas da lista | Fotos de Imagem e texto, cards do carrossel, caixas da lista |
-| `--radius-sm` | `12px` | 🟡 | Foto dentro do card |
+| `--radius-lg` | `28px` | ✅ variável `raio/grande` | Hero (mídia grande); cards 🟡 confirmar |
+| `--radius-pill` | `999px` | ✅ variável `raio/pilula` | Botões |
+| `--radius-md` | `20px` | ✅ variável `raio/medio` | Fotos de Imagem e texto, card de evento, cards do carrossel, caixas da lista |
+| `--radius-sm` | `14px` | ✅ variável `raio/pequeno` | Linhas da lista de ministérios, foto dentro do card, campos |
 | `--border-width` | `1px` | ✅ | Botões outline |
 | `--opacity-ghost` | `0.18` | ✅ | "ADAI" do footer |
 
@@ -220,4 +232,4 @@ Toda animação é desligada em `@media (prefers-reduced-motion: reduce)`.
 
 ## 8. Pendências de extração
 
-Seções do Figma ainda **não** inspecionadas para tokens (atualizar este arquivo ao extrair cada uma): Top bar, Neste domingo (Unidades), Primeira vez, Nossa Liderança, Mensagens e Próximos eventos. “Encontre seu lugar”, “Contribua”, “App” e “Perguntas frequentes” foram inspecionadas. O Figma **não tem versão mobile** — valores mínimos dos `clamp()` são propostas até existir referência.
+Atualizado em 2026-10-18 (ver `docs/design-system.md` §12). O Figma MCP bloqueou após nove leituras (limite do assento View). **Não lidos:** interior de Card / Unidade (`234:998`), Card / Evento agenda (`238:1236`), Card / Página relacionada (`234:1010`) e Footer (`233:106`) na seção Componentes; as pranchas além de Home e Unidade. **Estilo Abertura:** não identificado. **Container das seções:** migrar módulos de `--container-max` + `--space-gutter` para `--content-max` + `--space-page-margin`. O Figma **não tem versão mobile** — mínimos dos `clamp()` são propostas até existir referência.
