@@ -1,16 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
+import { ebaCursosSections, ebaSections, ensureCursos } from './seed-eba';
 
 /**
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 18;
+const SEED_VERSION = 19;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
 type Upload = { id: number };
+
+const MIME: Record<string, string> = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 
 /** Reaproveita a imagem se já estiver na Biblioteca de Mídia; senão, faz o upload. */
 async function image(strapi: Core.Strapi, fileName: string, alternativeText: string): Promise<number> {
@@ -22,7 +25,7 @@ async function image(strapi: Core.Strapi, fileName: string, alternativeText: str
   const filepath = path.join(SEED_DIR, fileName);
   const [file] = (await strapi.plugin('upload').service('upload').upload({
     data: { fileInfo: { name: fileName, alternativeText, caption: alternativeText } },
-    files: { filepath, originalFilename: fileName, mimetype: 'image/jpeg', size: fs.statSync(filepath).size },
+    files: { filepath, originalFilename: path.basename(fileName), mimetype: MIME[path.extname(fileName).toLowerCase()] ?? 'image/jpeg', size: fs.statSync(filepath).size },
   })) as Upload[];
   return file.id;
 }
@@ -43,6 +46,7 @@ const header = {
     { texto: 'Agenda', url: '/agenda' },
     { texto: 'Ministérios', url: '/ministerios' },
     { texto: 'Contribua', url: '/contribua' },
+    { texto: 'EBA', url: '/eba' },
   ],
   botoes: [
     { texto: 'Ao vivo', url: '/ao-vivo', estilo: 'contorno' },
@@ -69,6 +73,7 @@ const footer = {
         { texto: 'Agenda', url: '/agenda' },
         { texto: 'Ministérios', url: '/ministerios' },
         { texto: 'Contribua', url: '/contribua' },
+        { texto: 'Escola Bíblica (EBA)', url: '/eba' },
       ],
     },
     {
@@ -616,8 +621,8 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     await strapi.documents('api::global.global').create({ data: { header, footer, seo } as never });
     strapi.log.info('[seed] Configurações do site (cabeçalho e rodapé) criadas.');
   } else if (storedVersion < SEED_VERSION) {
-    await strapi.documents('api::global.global').update({ documentId: global.documentId, data: { footer } as never });
-    strapi.log.warn(`[seed] Rodapé reconstruído (seed v${storedVersion} → v${SEED_VERSION}).`);
+    await strapi.documents('api::global.global').update({ documentId: global.documentId, data: { header, footer } as never });
+    strapi.log.warn(`[seed] Cabeçalho e rodapé reconstruídos (seed v${storedVersion} → v${SEED_VERSION}).`);
   }
 
   const agenda = await pages.findFirst({ filters: { slug: 'agenda' } });
@@ -706,6 +711,26 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     await pages.update({ documentId: politica.documentId, data: { sections: politicaSections() } as never });
     await publishPage(strapi, politica.documentId);
     strapi.log.warn(`[seed] Política de Privacidade reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
+  }
+
+  // EBA (Escola Bíblica ADAI): cursos + páginas /eba e /eba/cursos (entrega 1 da migração).
+  await ensureCursos(strapi, image, storedVersion < SEED_VERSION);
+  const paginasEba = [
+    { slug: 'eba', titulo: 'EBA — Escola Bíblica ADAI', descricao: 'Cursos e testes da Escola Bíblica ADAI: formação para cada fase da caminhada cristã.', secoes: () => ebaSections(strapi, image) },
+    { slug: 'eba-cursos', titulo: 'Cursos da EBA', descricao: 'Reset, Start, CDV e Talmidim: conheça os cursos da Escola Bíblica ADAI.', secoes: async () => ebaCursosSections() },
+  ];
+  for (const p of paginasEba) {
+    const existente = await pages.findFirst({ filters: { slug: p.slug } });
+    const data = { seo: { metaTitle: `${p.titulo} | ADAI`, metaDescription: p.descricao }, sections: await p.secoes() };
+    if (!existente) {
+      const created = await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...data } as never });
+      await publishPage(strapi, created.documentId);
+      strapi.log.info(`[seed] Página "${p.slug}" criada e publicada.`);
+    } else if (storedVersion < SEED_VERSION) {
+      await pages.update({ documentId: existente.documentId, data: data as never });
+      await publishPage(strapi, existente.documentId);
+      strapi.log.warn(`[seed] Página "${p.slug}" reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
+    }
   }
 
   for (const p of PAGINAS_INSTITUCIONAIS) {
