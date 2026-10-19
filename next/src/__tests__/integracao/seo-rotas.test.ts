@@ -48,6 +48,9 @@ describe('/sitemap.xml', () => {
       { url: 'https://adai.com.br/eba/cursos', lastModified: '2026-10-02', priority: 0.8 },
       { url: 'https://adai.com.br/politica-de-privacidade', lastModified: '2026-10-02', priority: 0.8 },
       { url: 'https://adai.com.br/sobre-nos/nossa-historia', lastModified: '2026-10-02', priority: 0.8 },
+      { url: 'https://adai.com.br/eba/cursos/reset', lastModified: '2026-10-18', priority: 0.7 },
+      { url: 'https://adai.com.br/eba/cursos/start', lastModified: '2026-10-18', priority: 0.7 },
+      { url: 'https://adai.com.br/eba/cursos/talmidim', lastModified: '2026-10-18', priority: 0.7 },
     ]);
   });
 
@@ -67,6 +70,9 @@ describe('/sitemap.xml', () => {
       'https://adai.com.br/kids',
       'https://adai.com.br/politica-de-privacidade',
       'https://adai.com.br/sobre-nos/nossa-historia',
+      'https://adai.com.br/eba/cursos/reset',
+      'https://adai.com.br/eba/cursos/start',
+      'https://adai.com.br/eba/cursos/talmidim',
     ]);
   });
 
