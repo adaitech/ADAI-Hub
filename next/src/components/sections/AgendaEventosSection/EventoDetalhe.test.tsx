@@ -6,6 +6,16 @@ import type { InchurchEvento } from '@/lib/inchurch/types';
 import { EventoDetalhe } from './EventoDetalhe';
 
 const raw = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))! as InchurchEvento;
+beforeEach(() => { jest.useFakeTimers({ now: new Date('2026-09-28T12:00:00-03:00') }); });
+afterEach(() => { jest.useRealTimers(); });
+
+it('encerrado permanece acessível com aviso, retorno à Agenda e sem CTA', () => {
+  const evento = normalizeDetalhe({ ...raw, start_datetime: '2020-01-01T10:00:00', end_datetime: '2020-01-01T11:00:00', event_url: 'https://example.com/evento' })!;
+  render(<EventoDetalhe evento={evento} />);
+  expect(screen.getByText('Este evento já aconteceu.')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Confira os próximos eventos na Agenda' })).toHaveAttribute('href', '/agenda');
+  expect(screen.queryByRole('link', { name: /Acessar evento/ })).not.toBeInTheDocument();
+});
 
 it('convidado mostra foto, cargo, biografia em parágrafos e link com seta em nova aba', () => {
   const evento = normalizeDetalheAdministrativo({ id: raw.id, event_attractions: [{ name: 'Diogo Mour', title: 'Software Development Manager', description: '<p>Biografia do convidado</p><p>Outro parágrafo\nOutra linha</p><script>alert(1)</script>', photo: 'https://storage.googleapis.com/convidado.jpg', url: 'https://www.linkedin.com/in/diogomoura/' }] }, normalizeDetalhe(raw)!, [])!;

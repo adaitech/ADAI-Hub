@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import type { EventoSite, EventosInchurch } from '@/lib/inchurch/eventos';
 import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
 import { getUnidadesInchurch, type UnidadeInchurch } from '@/lib/strapi/queries/unidades';
@@ -79,6 +79,36 @@ describe('normalizeAgendaEventos', () => {
 });
 
 describe('AgendaEventos', () => {
+  it('mede filtro com contagem correta e busca com debounce, sem enviar texto pessoal', () => {
+    jest.useFakeTimers();
+    window.dataLayer = [];
+    const { unmount } = render(<AgendaEventos view={normalizeAgendaEventos(data, eventos, unidades)} index={1} id={data.id} />);
+    fireEvent.change(screen.getByLabelText('Unidade'), { target: { value: '30146' } });
+    expect(window.dataLayer).toContainEqual(expect.objectContaining({ event: 'filtrar_agenda', resultados: 5, valor_filtro: 'adai campestre' }));
+    fireEvent.change(screen.getByLabelText('Buscar eventos'), { target: { value: 'meu-email@example.com' } });
+    act(() => jest.advanceTimersByTime(999));
+    expect(window.dataLayer?.filter(e => e.event === 'buscar_evento')).toHaveLength(0);
+    act(() => jest.advanceTimersByTime(1));
+    expect(window.dataLayer).toContainEqual(expect.objectContaining({ event: 'buscar_evento', caracteres: 21, resultados: 0 }));
+    expect(JSON.stringify(window.dataLayer)).not.toContain('example.com');
+    fireEvent.change(screen.getByLabelText('Buscar eventos'), { target: { value: 'ab' } });
+    act(() => jest.advanceTimersByTime(1000));
+    expect(window.dataLayer?.filter(e => e.event === 'buscar_evento')).toHaveLength(1);
+    fireEvent.change(screen.getByLabelText('Buscar eventos'), { target: { value: 'cancelar' } });
+    unmount();
+    act(() => jest.advanceTimersByTime(1000));
+    expect(window.dataLayer?.filter(e => e.event === 'buscar_evento')).toHaveLength(1);
+    jest.useRealTimers();
+  });
+  it('filtro de unidade preserva gerais e denominação, mas oculta outras unidades', () => {
+    const view = normalizeAgendaEventos(data, [evento(90, { nome: 'Geral', igrejaId: null }), evento(91, { nome: 'Denominação', igrejaId: 3320 }), evento(92, { nome: 'Santos', igrejaId: 31876 }), evento(93, { nome: 'Campestre', igrejaId: 30146 })], unidades);
+    render(<AgendaEventos view={view} index={1} id={data.id} />);
+    fireEvent.change(screen.getByLabelText('Unidade'), { target: { value: '30146' } });
+    expect(screen.getByRole('article', { name: 'Geral' })).toBeInTheDocument();
+    expect(screen.getByRole('article', { name: 'Denominação' })).toBeInTheDocument();
+    expect(screen.getByRole('article', { name: 'Campestre' })).toBeInTheDocument();
+    expect(screen.queryByRole('article', { name: 'Santos' })).not.toBeInTheDocument();
+  });
   it('renderiza cards informativos com arte, badge, data, descrição e fallback', () => {
     const view = normalizeAgendaEventos(data, eventos, unidades);
     render(<AgendaEventos view={view} index={1} id={data.id} />);

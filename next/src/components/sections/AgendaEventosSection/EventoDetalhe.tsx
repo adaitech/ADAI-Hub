@@ -4,7 +4,7 @@ import { ButtonLink } from '@/components/ui/ButtonLink';
 import { SmartLink } from '@/components/ui/SmartLink';
 import { TextLink } from '@/components/ui/TextLink';
 import type { EventoDetalhe as Evento } from '@/lib/inchurch/detalhes';
-import { partesDaDescricao } from '@/lib/inchurch/detalhes';
+import { eventoEncerrado, partesDaDescricao } from '@/lib/inchurch/detalhes';
 import styles from './EventoDetalhe.module.css';
 import { GaleriaEvento } from './GaleriaEvento';
 
@@ -16,6 +16,7 @@ const diaProgramacao = (dia: string) => new Intl.DateTimeFormat('pt-BR', { timeZ
 /** Detalhes vindos exclusivamente da inChurch; não é uma seção editorial do CMS. */
 export function EventoDetalhe({ evento }: { evento: Evento }) {
   const inicio = evento.ocorrencias[0].inicio;
+  const encerrado = eventoEncerrado(evento);
   const itens = [
     ['Data', evento.fim && data(evento.fim) !== data(inicio) ? `${data(inicio)} a ${data(evento.fim)}` : data(inicio)],
     ['Horário', evento.fim ? `${hora(inicio)} às ${hora(evento.fim)}` : hora(inicio)],
@@ -24,10 +25,11 @@ export function EventoDetalhe({ evento }: { evento: Evento }) {
   return (
     <>
       <HeroSection index={0} somenteImagem data={{ __component: 'sections.hero', id: evento.id, imagem: evento.imagem ? { ...evento.imagem, id: evento.id, alternativeText: '' } : null }} />
-      <section className={styles.conteudo} aria-labelledby="evento-titulo" data-section="evento-detalhe">
+      <section className={styles.conteudo} aria-labelledby="evento-titulo" data-section="evento-detalhe" data-evento={evento.nome} data-evento-id={evento.id} data-unidade={evento.unidade ?? ''} data-local={evento.localizacao?.linhas.join(', ') ?? ''}>
         <div className={styles.principal}>
           <nav aria-label="Breadcrumb"><ol className={styles.breadcrumb} role="list"><li><SmartLink href="/agenda">Agenda</SmartLink></li><li aria-current="page">{evento.nome}</li></ol></nav>
           <h1 id="evento-titulo" className={styles.titulo}>{evento.nome}</h1>
+          {encerrado && <div className={styles.aviso}><p>Este evento já aconteceu.</p><SmartLink href="/agenda">Confira os próximos eventos na Agenda</SmartLink></div>}
           {evento.descricaoCompleta && <div className={styles.descricao}>{evento.descricaoCompleta.split(/\n\s*\n/).map((paragrafo, i) => <p key={i}>{partesDaDescricao(paragrafo).map((parte, j) => parte.url ? <SmartLink key={j} href={parte.url} novaAba>{parte.texto}</SmartLink> : parte.texto)}</p>)}</div>}
         </div>
         <aside className={styles.informacoes} aria-label="Informações do evento">
@@ -38,7 +40,7 @@ export function EventoDetalhe({ evento }: { evento: Evento }) {
               <SmartLink href={evento.localizacao.urlMapa} novaAba>Ver no Google Maps</SmartLink>
             </dd></div>}
           </dl>
-          {evento.cta && <ButtonLink href={evento.cta.url} novaAba>{evento.cta.texto}</ButtonLink>}
+          {!encerrado && evento.cta && <div data-acao-evento="acessar"><ButtonLink href={evento.cta.url} novaAba>{evento.cta.texto}</ButtonLink></div>}
         </aside>
       </section>
       {evento.programacao.length > 0 && <section className={styles.programacao} aria-labelledby="evento-programacao-titulo" data-section="programacao-evento">

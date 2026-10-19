@@ -1,8 +1,8 @@
 {
   "id": 1635360,
   "name": "ADAI 360",
-  "start_datetime": "2026-10-07T20:00:00",
-  "end_datetime": "2026-10-07T22:00:00",
+  "start_datetime": "2099-10-07T20:00:00",
+  "end_datetime": "2099-10-07T22:00:00",
   "active": true,
   "enabled": true,
   "show_on_site": true,

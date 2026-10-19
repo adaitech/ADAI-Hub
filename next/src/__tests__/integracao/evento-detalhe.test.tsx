@@ -1,17 +1,17 @@
 import { screen } from '@testing-library/react';
 import EventoPage, { generateMetadata } from '@/app/(site)/agenda/[slug]/page';
 import { getEventoDetalhe } from '@/lib/inchurch/eventos-cache';
-import { normalizeDetalhe, normalizeDetalheAdministrativo } from '@/lib/inchurch/detalhes';
+import { normalizeDetalhe, normalizeDetalheAdministrativo, urlDoEvento } from '@/lib/inchurch/detalhes';
 import administrativo from '@/lib/inchurch/__fixtures__/evento-admin.json';
 import fixture from '@/lib/inchurch/__fixtures__/eventos.json';
 import type { InchurchEvento } from '@/lib/inchurch/types';
 import { renderizarServidor } from '@/test-utils/servidor';
 
 jest.mock('@/lib/inchurch/eventos-cache', () => ({ getEventoDetalhe: jest.fn() }));
-jest.mock('next/navigation', () => ({ notFound: () => { throw new Error('NOT_FOUND'); } }));
+jest.mock('next/navigation', () => ({ notFound: () => { throw new Error('NOT_FOUND'); }, permanentRedirect: (url: string) => { throw new Error(`REDIRECT_308:${url}`); } }));
 const getDetalhe = jest.mocked(getEventoDetalhe);
 const raw = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))! as InchurchEvento;
-const props = { params: Promise.resolve({ slug: `titulo-antigo-${raw.id}` }) };
+const props = { params: Promise.resolve({ slug: urlDoEvento({ id: raw.id, nome: raw.name! }).split('/').at(-1)! }) };
 
 it('evento de referência usa SEO e JSON-LD normais, sem prévia local', async () => {
   const evento = normalizeDetalhe({ ...raw, location: { address: 'Rua Real', city: 'Santo André' } })!;
@@ -22,13 +22,12 @@ it('evento de referência usa SEO e JSON-LD normais, sem prévia local', async (
   expect(screen.getByRole('heading', { level: 1, name: raw.name! })).toBeInTheDocument();
 });
 
-it('detalhes e metadata encontram o evento pelo ID com título antigo', async () => {
+it('título antigo ou arbitrário redireciona na página e na metadata para o canônico', async () => {
   const evento = normalizeDetalhe(raw)!;
   getDetalhe.mockResolvedValue({ estado: 'ok', evento, relacionados: { eventos: [], atualizadoEm: '' } });
-  await renderizarServidor(await EventoPage(props));
-  expect(screen.getByRole('heading', { level: 1, name: raw.name! })).toBeInTheDocument();
-  expect(screen.queryByText('Outros eventos')).not.toBeInTheDocument();
-  expect(await generateMetadata(props)).toMatchObject({ title: { absolute: `${raw.name} | ADAI` } });
+  const antigo = { params: Promise.resolve({ slug: `blablabla-${raw.id}` }) };
+  await expect(EventoPage(antigo)).rejects.toThrow(`REDIRECT_308:${urlDoEvento(evento)}`);
+  await expect(generateMetadata(antigo)).rejects.toThrow(`REDIRECT_308:${urlDoEvento(evento)}`);
   expect(getDetalhe).toHaveBeenCalledWith(raw.id);
 });
 
@@ -57,8 +56,8 @@ it('conteúdo administrativo normalizado aparece no HTML e no SEO sem campos int
 it('JSON-LD renderizado no servidor é JSON válido e não permite fechar o script', async () => {
   const evento = normalizeDetalhe({ ...raw, name: 'Evento </script><script>alert(1)</script>', description: '<p>Descrição</p>', location: { address: 'Rua Real', city: 'Santo André' } })!;
   getDetalhe.mockResolvedValue({ estado: 'ok', evento, relacionados: { eventos: [], atualizadoEm: '' } });
-  const { container } = await renderizarServidor(await EventoPage(props));
+  const { container } = await renderizarServidor(await EventoPage({ params: Promise.resolve({ slug: urlDoEvento(evento).split('/').at(-1)! }) }));
   const scripts = container.querySelectorAll('script');
-  expect(scripts).toHaveLength(1);
-  expect(JSON.parse(scripts[0].textContent!)).toMatchObject({ '@type': 'Event', name: evento.nome });
+  const eventScript = Array.from(scripts).map((script) => JSON.parse(script.textContent!)).find((schema) => schema['@type'] === 'Event');
+  expect(eventScript).toMatchObject({ '@type': 'Event', name: evento.nome });
 });

@@ -13,22 +13,22 @@ export const TTL_EVENTOS_S = 1800;
 /** Trava de segurança da paginação (100 por página). */
 const MAX_PAGINAS = 5;
 
-/** Todos os eventos a partir de hoje (paginado de 100 em 100). */
+/** Futuros (inclusive sem fim) + iniciados antes de hoje ainda em andamento.
+ * Janelas distintas, dentro do mesmo cache; IDs na fronteira são deduplicados. */
 async function listarEventos(extra: [string, string | number][] = []): Promise<InchurchEvento[]> {
   const hoje = `${diaEmSaoPaulo(new Date())}T00:00:00`;
   const eventos: InchurchEvento[] = [];
-  for (let pagina = 0; pagina < MAX_PAGINAS; pagina++) {
-    const resposta = await inchurchFetch<InchurchLista<InchurchEvento>>('v1/event/', [
-      ['start_after', hoje],
-      ['ordering', 'start_datetime'],
-      ['limit', 100],
-      ['offset', pagina * 100],
-      ...extra,
-    ]);
-    eventos.push(...(resposta.results ?? []));
-    if (!resposta.next) break;
+  const janelas: [string, string | number][][] = [[['start_after', hoje]], [['start_before', hoje], ['end_after', hoje]]];
+  for (const janela of janelas) {
+    for (let pagina = 0; pagina < MAX_PAGINAS; pagina++) {
+      const resposta = await inchurchFetch<InchurchLista<InchurchEvento>>('v1/event/', [
+        ...janela, ['ordering', 'start_datetime'], ['limit', 100], ['offset', pagina * 100], ...extra,
+      ]);
+      eventos.push(...(resposta.results ?? []));
+      if (!resposta.next) break;
+    }
   }
-  return eventos;
+  return [...new Map(eventos.map((evento) => [evento.id, evento])).values()];
 }
 
 /**
@@ -78,7 +78,7 @@ async function carregarEventos(igrejas: readonly number[]): Promise<EventosInchu
  * Versão do formato guardado no cache (resultado normalizado, pode sobreviver a um deploy).
  * Ao mudar `EventosInchurch`, suba este número. Guardado por `cache-versionado.test.ts`.
  */
-export const VERSAO_CACHE_INCHURCH = 7;
+export const VERSAO_CACHE_INCHURCH = 8;
 
 const eventosCache = unstable_cache(carregarEventos, ['inchurch', 'eventos', `v${VERSAO_CACHE_INCHURCH}`], {
   revalidate: TTL_EVENTOS_S,
@@ -123,7 +123,7 @@ const detalhesCache = unstable_cache(async (id: number, unidade: UnidadeInchurch
     if (error instanceof InchurchError && error.status === 404) return null;
     throw error; // Falhas temporárias não entram no cache.
   }
-}, ['inchurch', 'evento-detalhe-publico', 'v5'], { revalidate: TTL_EVENTOS_S, tags: [INCHURCH_CACHE_TAG] });
+}, ['inchurch', 'evento-detalhe-publico', 'v6'], { revalidate: TTL_EVENTOS_S, tags: [INCHURCH_CACHE_TAG] });
 
 /** Guarda só a projeção pública normalizada, nunca o objeto administrativo cru. */
 const detalhesAdminCache = unstable_cache(async (id: number, publico: EventoDetalhe, unidades: UnidadeInchurch[]) => {
@@ -133,10 +133,29 @@ const detalhesAdminCache = unstable_cache(async (id: number, publico: EventoDeta
     if (error instanceof InchurchError && error.status === 404) return null;
     throw error; // Falhas administrativas não são cacheadas como dados vazios.
   }
-}, ['inchurch', 'evento-detalhe-admin', 'v8'], { revalidate: TTL_EVENTOS_S, tags: [INCHURCH_CACHE_TAG] });
+}, ['inchurch', 'evento-detalhe-admin', 'v9'], { revalidate: TTL_EVENTOS_S, tags: [INCHURCH_CACHE_TAG] });
 
 const ultimosDetalhes = new Map<number, EventoDetalhe>();
 type ResultadoDetalhe = { estado: 'ok'; evento: EventoDetalhe; relacionados: EventosInchurch } | { estado: 'nao-encontrado' | 'indisponivel' };
+
+/** A lista futura não confirma a categoria de eventos antigos. Consulta pública restrita ao dia,
+ * compartilhada em cache por 30 min; nenhum dado administrativo é lido antes dessa validação. */
+const idsGcDaDataCache = unstable_cache(async (dia: string): Promise<number[]> => {
+  const seguinte = new Date(`${dia}T00:00:00Z`);
+  seguinte.setUTCDate(seguinte.getUTCDate() + 1);
+  const ids: number[] = [];
+  for (let pagina = 0; pagina < MAX_PAGINAS; pagina++) {
+    const resposta = await inchurchFetch<InchurchLista<InchurchEvento>>('v1/event/', [
+      ['category_id', CATEGORIA_GRUPO_DE_CONEXAO], ['start_after', `${dia}T00:00:00`],
+      ['start_before', `${seguinte.toISOString().slice(0, 10)}T00:00:00`], ['limit', 100], ['offset', pagina * 100],
+    ]);
+    if (!Array.isArray(resposta.results)) throw new InchurchError('resposta', 'v1/event/:categoria-historica');
+    ids.push(...resposta.results.map((evento) => evento.id));
+    if (!resposta.next) return ids;
+  }
+  // Uma confirmação incompleta não pode liberar um GC como evento público.
+  throw new InchurchError('resposta', 'v1/event/:categoria-historica');
+}, ['inchurch', 'categoria-gc-por-data', 'v1'], { revalidate: TTL_EVENTOS_S, tags: [INCHURCH_CACHE_TAG] });
 
 /** Compartilhado entre metadata e página; reutiliza o cadastro e o cache de unidades da Agenda. */
 export const getEventoDetalhe = cache(async (id: number): Promise<ResultadoDetalhe> => {
@@ -151,6 +170,11 @@ export const getEventoDetalhe = cache(async (id: number): Promise<ResultadoDetal
     // A validação pública acontece antes de qualquer leitura administrativa ou fallback.
     const publico = await detalhesCache(id, unidade);
     if (!publico) { ultimosDetalhes.delete(id); return { estado: 'nao-encontrado' }; }
+    const dia = diaEmSaoPaulo(new Date(publico.ocorrencias[0].inicio));
+    if (dia < diaEmSaoPaulo(new Date()) && (await idsGcDaDataCache(dia)).includes(id)) {
+      ultimosDetalhes.delete(id);
+      return { estado: 'nao-encontrado' };
+    }
     let evento: EventoDetalhe | null;
     try {
       evento = await detalhesAdminCache(id, publico, unidades);

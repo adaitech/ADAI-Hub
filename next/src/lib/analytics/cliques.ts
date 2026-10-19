@@ -16,6 +16,11 @@ export interface ContextoClique {
   card: string | null;
   /** Título (h1) da página: nas páginas de unidade, o nome da unidade. */
   pagina?: string | null;
+  evento?: string;
+  eventoId?: number;
+  unidade?: string;
+  local?: string;
+  acaoEvento?: boolean;
 }
 
 export type EventoGerado = { [N in NomeEvento]: [N, EventosAnalytics[N]] }[NomeEvento];
@@ -41,7 +46,7 @@ function destinoSeguro(u: URL | null, destino: string): string {
   return /^https?:$/.test(u.protocol) ? `${u.origin}${u.pathname}` : u.protocol;
 }
 
-export function eventosDoClique({ secao, texto, destino, card, pagina = null }: ContextoClique): EventoGerado[] {
+export function eventosDoClique({ secao, texto, destino, card, pagina = null, evento = '', eventoId, unidade = '', local = '', acaoEvento = false }: ContextoClique): EventoGerado[] {
   const u = url(destino);
   const caminho = u?.pathname ?? '';
   const eventos: EventoGerado[] = [];
@@ -53,15 +58,20 @@ export function eventosDoClique({ secao, texto, destino, card, pagina = null }: 
     // Card de unidade (Neste domingo, Outras unidades) → título do card. Fora dele (Hero ou o card
     // "Como chegar" da página da unidade) → título da página, que é o nome da unidade.
     const cardDeUnidade = card && !/^como chegar$/i.test(card) ? card : null;
-    eventos.push(['como_chegar', { origem: secao, unidade: cardDeUnidade ?? pagina ?? card ?? texto }]);
+    eventos.push(['como_chegar', secao === 'evento-detalhe'
+      ? { origem: secao, local: local || unidade, unidade, evento }
+      : { origem: secao, unidade: cardDeUnidade ?? pagina ?? card ?? texto }]);
   }
   if (caminho.startsWith('/contribua') || /contribu|d[ií]zimo|ofert|doa[cç]/i.test(texto)) {
     eventos.push(['contribuir', { origem: secao, texto }]);
   }
   if (u?.hostname === 'apps.apple.com') eventos.push(['baixar_app', { origem: secao, loja: 'app_store' }]);
   if (u?.hostname === 'play.google.com') eventos.push(['baixar_app', { origem: secao, loja: 'google_play' }]);
-  if (secao === 'proximos-eventos' && card) {
-    eventos.push(['selecionar_evento', { evento: card, acao: texto }]);
+  if ((secao === 'proximos-eventos' || secao === 'agenda-eventos') && card) {
+    eventos.push(['selecionar_evento', { origem: secao, evento: card, acao: texto }]);
+  }
+  if (secao === 'evento-detalhe' && acaoEvento && evento && Number.isSafeInteger(eventoId) && eventoId! > 0 && u && /^https?:$/.test(u.protocol)) {
+    eventos.push(['acessar_evento', { origem: secao, evento, evento_id: eventoId!, destino: destinoSeguro(u, destino) }]);
   }
   if (secao === 'ministerios' && card) {
     eventos.push(['selecionar_ministerio', { ministerio: card }]);

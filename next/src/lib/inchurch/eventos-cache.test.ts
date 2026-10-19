@@ -15,6 +15,41 @@ jest.mock('./admin-client', () => ({ getEventoAdministrativo: jest.fn() }));
 const admin = jest.mocked(getEventoAdministrativo);
 
 describe('getEventosInchurch', () => {
+  it('recupera também eventos iniciados antes de hoje, sem perder futuros sem término nem duplicar IDs', async () => {
+    const futuro = { id: 700, name: 'Sem término', active: true, enabled: true, start_datetime: '2099-01-01T10:00:00', end_datetime: null };
+    const emAndamento = { id: 701, name: 'Vários dias', active: true, enabled: true, start_datetime: '2020-01-01T10:00:00', end_datetime: '2099-01-01T11:00:00' };
+    api.mockImplementation(async (_endpoint, params = []) => ({ results: params.some(([k]) => k === 'category_id') ? [] : params.some(([k]) => k === 'end_after') ? [emAndamento, futuro] : [futuro], next: null }) as never);
+    expect((await getEventosInchurch())?.eventos.map(e => e.id)).toEqual([701, 700]);
+    expect(api).toHaveBeenCalledWith('v1/event/', expect.arrayContaining([['end_after', expect.any(String)], ['start_before', expect.any(String)]]));
+  });
+  it('GC histórico de nome comum não abre pelo detalhe, mesmo fora da lista futura', async () => {
+    const raw = { id: 600, name: 'Encontro de amigos', active: true, enabled: true, start_datetime: '2020-01-01T10:00:00', end_datetime: '2020-01-01T11:00:00' };
+    api.mockImplementation(async (endpoint, params = []) => {
+      if (endpoint === 'v1/event/600/') return raw as never;
+      return { results: params.some(([k, v]) => k === 'start_after' && v === '2020-01-01T00:00:00') ? [raw] : [], next: null } as never;
+    });
+    expect(await getEventoDetalhe(600)).toEqual({ estado: 'nao-encontrado' });
+    expect(admin).not.toHaveBeenCalled();
+    expect(api).toHaveBeenCalledWith('v1/event/', expect.arrayContaining([['category_id', 8776], ['start_before', '2020-01-02T00:00:00']]));
+  });
+  it('falha ao confirmar categoria histórica não libera conteúdo nem vira 404', async () => {
+    api.mockImplementation(async (endpoint, params = []) => {
+      if (endpoint === 'v1/event/601/') return { id: 601, name: 'Evento antigo', active: true, enabled: true, start_datetime: '2020-01-01T10:00:00' } as never;
+      if (params.some(([k, v]) => k === 'start_after' && v === '2020-01-01T00:00:00')) throw new InchurchError('timeout', 'v1/event/');
+      return { results: [], next: null } as never;
+    });
+    expect(await getEventoDetalhe(601)).toEqual({ estado: 'indisponivel' });
+    expect(admin).not.toHaveBeenCalled();
+  });
+  it.each([{}, { results: [], next: '/mais-resultados' }])('confirmação histórica incompleta não libera evento: %j', async (resposta) => {
+    api.mockImplementation(async (endpoint, params = []) => {
+      if (endpoint === 'v1/event/602/') return { id: 602, name: 'Evento antigo', active: true, enabled: true, start_datetime: '2020-01-01T10:00:00' } as never;
+      if (params.some(([k, v]) => k === 'start_after' && v === '2020-01-01T00:00:00')) return resposta as never;
+      return { results: [], next: null } as never;
+    });
+    expect(await getEventoDetalhe(602)).toEqual({ estado: 'indisponivel' });
+    expect(admin).not.toHaveBeenCalled();
+  });
   let warn: jest.SpyInstance;
   let info: jest.SpyInstance;
   beforeEach(() => {
@@ -51,7 +86,8 @@ describe('getEventosInchurch', () => {
     const dados = await getEventosInchurch([30146, 31876]);
     expect(dados?.eventos).toHaveLength(1);
     expect(dados?.eventos[0]).toMatchObject({ igrejaIds: [30146, 31876] });
-    expect(api).toHaveBeenCalledTimes(4);
+    // Duas janelas temporais por consulta: futuros e iniciados antes de hoje ainda em andamento.
+    expect(api).toHaveBeenCalledTimes(8);
   });
   it('units administrativas resolvem as duas igrejas mesmo sem correspondência nos filtros públicos', async () => {
     const base = fixture.results.find((e) => e.active && e.enabled && !e.recurrence_model && !/^GC\b/.test(e.name))!;
@@ -94,7 +130,12 @@ describe('getEventosInchurch', () => {
     const resultado = await getEventoDetalhe(raw.id);
     expect(resultado).toMatchObject({ estado: 'ok', evento: { igrejaId: 30146, unidade: 'ADAI Campestre', descricaoCompleta: 'Descrição integral da consulta individual.' } });
     expect(api).toHaveBeenCalledWith(`v1/event/${raw.id}/`);
-    for (const id of [30146, 31876]) expect(api.mock.calls.filter(([, params = []]) => params.some(([chave, valor]) => chave === 'church_id' && valor === id))).toHaveLength(1);
+    for (const id of [30146, 31876]) {
+      const consultas = api.mock.calls.filter(([, params = []]) => params.some(([chave, valor]) => chave === 'church_id' && valor === id));
+      expect(consultas).toHaveLength(2);
+      expect(consultas.filter(([, params = []]) => params.some(([chave]) => chave === 'end_after'))).toHaveLength(1);
+      expect(consultas.filter(([, params = []]) => params.some(([chave]) => chave === 'start_after'))).toHaveLength(1);
+    }
   });
 
   it('show_on_site falso não impede resolver Campestre; sem associação não atribui unidade', async () => {
