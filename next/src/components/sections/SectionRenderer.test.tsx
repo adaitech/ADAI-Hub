@@ -15,6 +15,11 @@ describe('SectionRenderer', () => {
     expect(screen.getAllByRole('region')).toHaveLength(2);
   });
 
+  it('indiceInicial: seções depois de um título próprio da página começam em h2', () => {
+    render(<SectionRenderer sections={[mocks.completo]} indiceInicial={1} />);
+    expect(screen.getByRole('heading').tagName).toBe('H2');
+  });
+
   it('não renderiza nada sem seções', () => {
     const { container } = render(<SectionRenderer sections={[]} />);
     expect(container).toBeEmptyDOMElement();

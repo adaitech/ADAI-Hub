@@ -1,1 +1,1 @@
-export { ANCORA_PERGUNTAS, CursoCabecalho, type CursoCabecalhoProps } from './CursoCabecalho';
+export { ANCORA_PERGUNTAS, CursoCabecalho, CursoInscricao, type CursoCabecalhoProps } from './CursoCabecalho';

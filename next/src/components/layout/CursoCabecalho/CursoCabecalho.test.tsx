@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import fixture from '@/lib/eba/__fixtures__/cursos.json';
 import { normalizeCurso } from '@/lib/eba/curso';
 import type { CursoView, StrapiCurso } from '@/lib/eba/types';
-import { CursoCabecalho } from './CursoCabecalho';
+import { CursoCabecalho, CursoInscricao } from './CursoCabecalho';
 
 const [talmidimCru, , startCru] = fixture.data as StrapiCurso[];
 const talmidim = normalizeCurso(talmidimCru) as CursoView;
@@ -49,4 +49,14 @@ describe('CursoCabecalho', () => {
     expect(container.querySelector('img')).toBeNull();
     expect(screen.queryByRole('link', { name: /inscrever/ })).toBeNull();
   });
+
+  it('bloco final "Pronto para começar?" repete a inscrição com data-curso; sem inscrição → nada', () => {
+    const { container, rerender } = render(<CursoInscricao curso={talmidim} />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Pronto para começar?' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Quero me inscrever/ })).toHaveAttribute('data-curso', 'talmidim');
+    expect(container.querySelector('[data-section="curso-inscricao"]')).not.toBeNull();
+    rerender(<CursoInscricao curso={start} />);
+    expect(screen.queryByText('Pronto para começar?')).toBeNull();
+  });
 });
+

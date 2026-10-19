@@ -2,6 +2,7 @@ import footer from '@/components/layout/Footer/Footer.mock.json';
 import header from '@/components/layout/Header/Header.mock.json';
 import agendaEventos from '@/components/sections/AgendaEventosSection/AgendaEventosSection.mock.json';
 import carrossel from '@/components/sections/CarrosselCardsSection/CarrosselCardsSection.mock.json';
+import catalogoCursos from '@/components/sections/CatalogoCursosSection/CatalogoCursosSection.mock.json';
 import hero from '@/components/sections/HeroSection/HeroSection.mock.json';
 import imagemTexto from '@/components/sections/ImagemTextoSection/ImagemTextoSection.mock.json';
 import ministerios from '@/components/sections/MinisteriosSection/MinisteriosSection.mock.json';
@@ -10,10 +11,11 @@ import proximosEventos from '@/components/sections/ProximosEventosSection/Proxim
 import serieAtual from '@/components/sections/SerieAtualSection/SerieAtualSection.mock.json';
 import textoBotoes from '@/components/sections/TextoBotoesSection/TextoBotoesSection.mock.json';
 import textoRico from '@/components/sections/TextoRicoSection/TextoRicoSection.mock.json';
+import cursosEba from '@/lib/eba/__fixtures__/cursos.json';
 
 /**
- * Strapi simulado para testes de integração e de característica: responde `/api/pages` e
- * `/api/global` com o **mesmo JSON** dos `.mock.json` (que espelham a API real), sem rede.
+ * Strapi simulado para testes de integração e de característica: responde `/api/pages`,
+ * `/api/cursos` e `/api/global` com o **mesmo JSON** dos `.mock.json` (que espelham a API real), sem rede.
  *
  * Uso: `const strapi = criarStrapiFake(); globalThis.fetch = strapi.fetch;`
  */
@@ -56,6 +58,15 @@ export function secoesAgenda() {
 }
 
 /** Tipo Unidades (nome + ID da igreja na inChurch), como o seed cadastra. */
+/** Cursos da EBA (fixture no formato da API); o Talmidim tem corpo com Imagem e texto e Perguntas frequentes. */
+export function cursosFake() {
+  return cursosEba.data.map((curso) =>
+    curso.slug === 'talmidim'
+      ? { ...curso, secoes: [comId(imagemTexto.completo, 41), comId(faq.completo, 42)] }
+      : { ...curso, secoes: [] },
+  );
+}
+
 export const unidadesFake = [
   { id: 1, documentId: 'u1', nome: 'ADAI Campestre', igreja_inchurch_id: 30146 },
   { id: 2, documentId: 'u2', nome: 'ADAI Santos', igreja_inchurch_id: 31876 },
@@ -91,7 +102,24 @@ export function criarStrapiFake() {
     },
     campestre: { id: 3, documentId: 'campestre', titulo: 'Campestre', slug: 'campestre', seo: seo('Campestre | ADAI'), sections: secoesUnidade() },
     agenda: { id: 5, documentId: 'agenda', titulo: 'Agenda', slug: 'agenda', seo: seo('Agenda | ADAI'), sections: secoesAgenda() },
+    eba: {
+      id: 6,
+      documentId: 'eba',
+      titulo: 'EBA',
+      slug: 'eba',
+      seo: seo('EBA — Escola Bíblica ADAI | ADAI'),
+      sections: [comId({ ...hero.unidade, titulo: 'Escola Bíblica ADAI', subtitulo: null }, 51), comId(catalogoCursos.completo, 52)],
+    },
+    'eba-cursos': {
+      id: 7,
+      documentId: 'eba-cursos',
+      titulo: 'Cursos da EBA',
+      slug: 'eba-cursos',
+      seo: seo('Cursos da EBA | ADAI'),
+      sections: [comId(catalogoCursos.minimo, 53)],
+    },
   };
+  const cursos = cursosFake();
   const global = { status: 200, corpo: { data: { header: header.completo, footer: footer.completo, seo: seo('ADAI') } } as unknown };
 
   const responder = (status: number, corpo: unknown) =>
@@ -101,6 +129,11 @@ export function criarStrapiFake() {
     const endereco = decodeURIComponent(url);
     if (endereco.includes('/api/global')) return responder(global.status, global.corpo);
     if (endereco.includes('/api/unidades')) return responder(200, { data: unidadesFake, meta: {} });
+    if (endereco.includes('/api/cursos')) {
+      const slugCurso = /filters\[slug\]\[\$eq\]=([^&]+)/.exec(endereco)?.[1];
+      const lista = slugCurso === undefined ? cursos : cursos.filter((c) => c.slug === slugCurso);
+      return responder(200, { data: lista, meta: { pagination: { page: 1, pageSize: 100, pageCount: 1, total: lista.length } } });
+    }
     const slug = /filters\[slug\]\[\$eq\]=([^&]+)/.exec(endereco)?.[1];
     // Sem filtro de slug = listagem (sitemap): todas as páginas, em uma página da paginação.
     if (slug === undefined) {
@@ -113,6 +146,7 @@ export function criarStrapiFake() {
   return {
     fetch: fetch as unknown as typeof globalThis.fetch & jest.Mock,
     paginas,
+    cursos,
     global,
     /** Simula o Strapi fora do ar (toda chamada responde com `status`). */
     foraDoAr(status = 503) {

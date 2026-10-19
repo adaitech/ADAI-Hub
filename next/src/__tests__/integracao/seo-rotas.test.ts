@@ -44,6 +44,8 @@ describe('/sitemap.xml', () => {
       { url: 'https://adai.com.br', lastModified: '2026-10-02', priority: 1 },
       { url: 'https://adai.com.br/agenda', lastModified: '2026-10-02', priority: 0.8 },
       { url: 'https://adai.com.br/campestre', lastModified: '2026-10-02', priority: 0.8 },
+      { url: 'https://adai.com.br/eba', lastModified: '2026-10-02', priority: 0.8 },
+      { url: 'https://adai.com.br/eba/cursos', lastModified: '2026-10-02', priority: 0.8 },
       { url: 'https://adai.com.br/politica-de-privacidade', lastModified: '2026-10-02', priority: 0.8 },
       { url: 'https://adai.com.br/sobre-nos/nossa-historia', lastModified: '2026-10-02', priority: 0.8 },
     ]);
@@ -60,6 +62,8 @@ describe('/sitemap.xml', () => {
       'https://adai.com.br',
       'https://adai.com.br/agenda',
       'https://adai.com.br/campestre',
+      'https://adai.com.br/eba',
+      'https://adai.com.br/eba/cursos',
       'https://adai.com.br/kids',
       'https://adai.com.br/politica-de-privacidade',
       'https://adai.com.br/sobre-nos/nossa-historia',

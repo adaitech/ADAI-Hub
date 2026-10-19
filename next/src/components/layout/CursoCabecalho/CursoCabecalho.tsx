@@ -66,3 +66,25 @@ export function CursoCabecalho({ curso, trilha }: CursoCabecalhoProps) {
     </div>
   );
 }
+
+/** Bloco final "Pronto para começar?": repete a inscrição do curso. Sem inscrição → nada. */
+export function CursoInscricao({ curso }: { curso: CursoView }) {
+  const { inscricao } = curso;
+  if (!inscricao) return null;
+  const tituloId = `curso-inscricao-${curso.slug}-titulo`;
+  return (
+    <section className={styles.inscricao} aria-labelledby={tituloId} data-section="curso-inscricao">
+      <div className={styles.inscricaoCaixa}>
+        <h2 id={tituloId} className={styles.inscricaoTitulo}>
+          Pronto para começar?
+        </h2>
+        <p className={styles.resumo}>Faça sua inscrição e a equipe da EBA entra em contato com os próximos passos.</p>
+        <div className={styles.acoes}>
+          <ButtonLink href={inscricao.href} novaAba={inscricao.novaAba} curso={curso.slug}>
+            {inscricao.label}
+          </ButtonLink>
+        </div>
+      </div>
+    </section>
+  );
+}
