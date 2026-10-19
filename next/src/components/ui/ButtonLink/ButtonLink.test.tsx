@@ -28,4 +28,15 @@ describe('ButtonLink', () => {
     );
     expect(screen.getByRole('link')).toHaveClass('botao', 'contorno', 'escura', 'sm');
   });
+
+  it('curso (opcional) vira data-curso no link, para a medição de inscrição', () => {
+    render(<ButtonLink href="https://forms.gle/x" curso="reset">Quero me inscrever</ButtonLink>);
+    expect(screen.getByRole('link', { name: 'Quero me inscrever' })).toHaveAttribute('data-curso', 'reset');
+  });
+
+  it('sem curso → sem data-curso (comportamento atual)', () => {
+    render(<ButtonLink href="/agenda">Agenda</ButtonLink>);
+    expect(screen.getByRole('link', { name: 'Agenda' })).not.toHaveAttribute('data-curso');
+  });
 });
+

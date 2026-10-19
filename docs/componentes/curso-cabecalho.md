@@ -13,14 +13,14 @@ Abertura da página `/eba/cursos/<slug>`. Não é uma seção da dynamic zone: �
 | Título (`h1`) | `nome` | Escala display |
 | Resumo | `resumo` | — |
 | Informações | `publico_alvo`, `duracao`, `formato`, `entrada` | Lista com rótulo visível (`Chips`); só as preenchidas |
-| Botão de inscrição | `inscricao` | Nova aba quando marcado, com aviso "abre em nova aba"; leva `data-curso` |
+| Botão de inscrição | `inscricao` | Nova aba quando marcado, com aviso "A inscrição abre em nova aba."; leva `data-curso` (prop `curso` do `ButtonLink`) |
 | "Perguntas frequentes" | — | Só quando o corpo tem a seção Perguntas frequentes (âncora) |
 | Vídeo de apresentação | `video_apresentacao` | Só YouTube; player do site (youtube-nocookie) só depois do clique |
 | Foto | `capa` | Some sem texto alternativo; carrega com prioridade (LCP) |
 
 ## Medição (DataLayer)
 
-Evento novo **`inscrever_curso`** (`origem`, `curso` = slug) no clique do botão de inscrição — evento-chave, no padrão de `planejar_visita`. Os demais cliques ficam com `clique_cta`; o vídeo usa `assistir_mensagem` do player existente. Ver `docs/analytics/README.md` §3.
+Evento novo **`inscrever_curso`** (`origem`, `curso` = slug) no clique do botão de inscrição — evento-chave, no padrão de `planejar_visita`. Os demais cliques ("Perguntas frequentes", "Assistir à apresentação") ficam com `clique_cta`; o player é o mesmo da Série atual, sem o evento `assistir_mensagem` (que é das mensagens). Ver `docs/analytics/README.md` §3.
 
 ## Testes
 
