@@ -7,6 +7,7 @@ import { draftMode } from 'next/headers';
 import EbaPage, { generateMetadata as metadataEba } from '@/app/(site)/eba/page';
 import CursosPage, { generateMetadata as metadataCursos } from '@/app/(site)/eba/cursos/page';
 import CursoPage, { generateMetadata as metadataCurso } from '@/app/(site)/eba/cursos/[slug]/page';
+import EbaSubPage, { generateMetadata as metadataEbaSub } from '@/app/(site)/eba/[slug]/page';
 import { renderizarServidor } from '@/test-utils/servidor';
 import { criarStrapiFake } from '@/test-utils/strapi-fake';
 
@@ -45,6 +46,20 @@ describe('/eba — home da EBA', () => {
   it('sem a página no Strapi → 404', async () => {
     delete strapi.paginas.eba;
     expect((await erroDe(EbaPage())).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
+  });
+});
+
+describe('/eba/<slug> — outras páginas da EBA no Strapi ("eba-<slug>")', () => {
+  it('página "eba-sobre" do Strapi abre em /eba/sobre, com canonical aninhado', async () => {
+    strapi.paginas['eba-sobre'] = { ...strapi.paginas.eba, id: 8, documentId: 'eba-sobre', slug: 'eba-sobre' };
+    await renderizarServidor(await EbaSubPage(params('sobre')));
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect((await metadataEbaSub(params('sobre'))).alternates?.canonical).toMatch(/\/eba\/sobre$/);
+  });
+
+  it('inexistente ou fora do padrão → 404', async () => {
+    expect((await erroDe(EbaSubPage(params('nao-existe')))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
+    expect((await erroDe(EbaSubPage(params('Sobre')))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
   });
 });
 

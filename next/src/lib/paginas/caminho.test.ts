@@ -1,4 +1,4 @@
-import { caminhoDaPagina, caminhoDoCurso, slugDaPaginaSobreNos, slugDoCurso } from './caminho';
+import { caminhoDaPagina, caminhoDoCurso, slugDaPaginaEba, slugDaPaginaSobreNos, slugDoCurso } from './caminho';
 
 describe('caminhoDaPagina (slug do Strapi → endereço no site)', () => {
   it('home é a raiz; páginas comuns ficam na raiz', () => {
@@ -37,3 +37,12 @@ describe('caminhoDoCurso / slugDoCurso (cursos da EBA)', () => {
     expect(slugDoCurso('')).toBeNull();
   });
 });
+
+describe('slugDaPaginaEba (páginas /eba/<segmento> montadas no Strapi)', () => {
+  it('segmento da URL → slug "eba-<segmento>"; fora do padrão → null', () => {
+    expect(slugDaPaginaEba('sobre')).toBe('eba-sobre');
+    expect(slugDaPaginaEba('Sobre')).toBeNull();
+    expect(slugDaPaginaEba('')).toBeNull();
+  });
+});
+

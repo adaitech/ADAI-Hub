@@ -21,6 +21,11 @@ export function slugDaPaginaSobreNos(segmento: string): string | null {
   return SEGMENTO_VALIDO.test(segmento) ? `${PREFIXO_SOBRE_NOS}${segmento}` : null;
 }
 
+/** Segmento de `/eba/<segmento>` → slug "eba-<segmento>" do Strapi; fora do padrão de URL → null. */
+export function slugDaPaginaEba(segmento: string): string | null {
+  return SEGMENTO_VALIDO.test(segmento) ? `${PREFIXO_EBA}${segmento}` : null;
+}
+
 /** Endereço da página de um curso da EBA. */
 export function caminhoDoCurso(slug: string): string {
   return `/eba/cursos/${slug}`;
