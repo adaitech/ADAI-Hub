@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cursos da EBA | ADAI</title>
+<meta name="description" content="Reset, Start, CDV e Talmidim: conheça os cursos da Escola Bíblica ADAI.">
+<meta name="robots" content="noindex, nofollow">
+<!-- Protótipo da migração da EBA (entrega 1). Base visual: docs/prototipo/index.html (design system).
+     Conteúdo real do site atual eba.adai.com.br. Nada aqui é código de produção. -->
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="eba.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="logo-uso" viewBox="0 0 99.21 32.6">
+    <g transform="translate(19.46 3.29)" fill="currentColor"><path d="M13.01 0C5.82 0 0 5.83 0 13.01C0 20.19 5.83 26.02 13.01 26.02C20.19 26.02 26.02 20.19 26.02 13.01C26.02 5.83 20.19 0 13.01 0ZM14.27 18.35L14.25 15.75H16.31L13.02 10.12L9.76 15.75H11.7V18.35H5.12L9.06 11.53L13 4.71L16.94 11.53L20.88 18.35H14.26H14.27Z"/></g>
+    <g transform="translate(48.71 7.15)" fill="currentColor"><path d="M5.93 17.09L5.49 13.75H3L2.49 17.09H0L2.85 0H5.85L8.7 17.09H5.93ZM4.34 4.49L3.34 11.47H5.19L4.34 4.49Z"/><path d="M13.91 17.09H9.75V0H13.91C16.37 0 17.81 1.54 17.81 4.08V13.11C17.81 15.68 16.37 17.09 13.91 17.09ZM15.09 4.06C15.09 2.98 14.68 2.44 13.73 2.44H12.47V14.68H13.73C14.68 14.68 15.09 14.12 15.09 13.06V4.05V4.06Z"/><path d="M24.5 17.09L24.06 13.75H21.57L21.06 17.09H18.57L21.42 0H24.42L27.27 17.09H24.5ZM22.91 4.49L21.91 11.47H23.76L22.91 4.49Z"/><path d="M28.33 17.09V0H31.05V17.09H28.33Z"/></g>
+  </symbol>
+</svg>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="prototipo-barra" role="region" aria-label="Controles do protótipo">
+  <strong>Protótipo · EBA no ADAI Hub · entrega 1</strong>
+  <nav aria-label="Telas do protótipo">
+    <ul role="list">
+      <li><a href="index.html">/eba</a></li>
+      <li><a href="cursos.html">/eba/cursos</a></li>
+      <li><a href="talmidim.html">Talmidim</a></li>
+      <li><a href="reset.html">Reset</a></li>
+      <li><a href="start.html">Start</a></li>
+      <li><a href="cdv.html">CDV</a></li>
+      <li><a href="estados.html">Estados</a></li>
+    </ul>
+  </nav>
+  <div class="alternancias">
+    <div class="grupo-nav" role="group" aria-label="Navegação interna da EBA" hidden>
+      <span>Navegação:</span>
+      <button type="button" class="alternar" data-nav="a" aria-pressed="true">A · conteúdo + trilha</button>
+      <button type="button" class="alternar" data-nav="b" aria-pressed="false">B · barra da área</button>
+    </div>
+    <button type="button" class="alternar" id="alternar-anotacoes" aria-pressed="false" hidden>Mostrar marcações O/D/P</button>
+  </div>
+</div>
+
+<nav class="topbar" aria-label="Institucional">
+  <ul role="list">
+    <li><a href="/sobre-nos/nossa-historia">Sobre nós</a></li>
+    <li><a href="/unidades">Localidades</a></li>
+    <li><a href="/contribua">Contribua</a></li>
+    <li><a href="/contato">Contato</a></li>
+  </ul>
+</nav>
+
+<header class="header" data-anotada>
+  <div class="header__barra">
+    <a class="logo" href="/" aria-label="ADAI, página inicial">
+      <svg viewBox="0 0 99.21 32.6" aria-hidden="true" focusable="false"><use href="#logo-uso"/></svg>
+    </a>
+    <button type="button" class="menu-botao" aria-expanded="false" aria-controls="menu-principal" hidden>
+      <span class="menu-botao__icone" aria-hidden="true"></span>Menu
+    </button>
+    <div class="header__painel" id="menu-principal">
+      <nav class="nav-principal" aria-label="Principal">
+        <ul role="list">
+          <li><a href="/unidades">Unidades</a></li>
+          <li><a href="/mensagens">Mensagens</a></li>
+          <li><a href="/agenda">Agenda</a></li>
+          <li><a href="/ministerios">Ministérios</a></li>
+          <li><a href="/contribua">Contribua</a></li>
+          <li><a href="index.html" aria-current="true">EBA</a></li>
+        </ul>
+      </nav>
+      <div class="header__acoes">
+        <a class="botao botao--contorno-escuro botao--baixo" href="/ao-vivo">Ao vivo</a>
+        <a class="botao botao--primario botao--baixo" href="/planeje-sua-visita">Planeje sua visita</a>
+      </div>
+    </div>
+  </div>
+</header>
+<p class="anotacao container"><span class="selo selo--o">Observado</span><span>Header 233:48 · 80px · menu gap 32</span><span class="selo selo--p">Proposto</span><span>“EBA” é o 6º link (limite do cabeçalho), cadastrado no Strapi sem código</span><span class="selo selo--p">Proposto</span><span>aria-current marca a área da EBA</span></p>
+<nav class="area-nav" aria-label="Escola Bíblica ADAI" data-anotada>
+    <div class="area-nav__barra">
+      <a class="area-nav__marca" href="index.html"><img src="assets/logo-eba.webp" alt="EBA, início da Escola Bíblica ADAI" width="400" height="118"></a>
+      <ul role="list">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="cursos.html" aria-current="page">Cursos</a></li>
+        <li><a href="https://eba.adai.com.br/teste/temperamento-pessoal" class="externo" data-externo>Testes<span class="sr-only"> (no site atual da EBA)</span></a></li>
+        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Entrar<span class="sr-only"> (no site atual da EBA)</span></a></li>
+      </ul>
+    </div>
+  </nav>
+  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes e Entrar levam ao site atual até as entregas 2 e 4</span></p>
+<main id="conteudo" tabindex="-1">
+<nav class="trilha container" aria-label="Trilha" data-anotada>
+      <ol role="list"><li><a href="/">ADAI</a></li><li><a href="index.html">EBA</a></li><li><span aria-current="page">Cursos</span></li></ol>
+    </nav>
+    <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Trilha (opção A): completa a partir de 769px; no celular vira “‹ voltar” ao nível anterior</span><span class="selo selo--p">Proposto</span><span>Gera o BreadcrumbList no HTML do servidor</span></p>
+<section class="secao" aria-labelledby="catalogo-titulo" data-section="catalogo-cursos" data-anotada>
+  <div class="container">
+    <div class="cabecalho-secao">
+      <h1 class="t-h1" id="catalogo-titulo">Cursos da EBA</h1>
+      <p class="t-corpo">Formação bíblica para cada fase da caminhada com Jesus. Os cursos são presenciais ou on-line, conforme a unidade.</p>
+    </div>
+    <ul class="grade-cursos" role="list">
+      <li class="card-curso">
+        <img class="card-curso__foto" src="assets/reset-capa.webp" alt="" width="1600" height="1066" loading="lazy">
+        <div class="card-curso__texto">
+          <p class="t-micro t-suave">Curso de integração</p>
+          <h2 class="t-h3"><a href="reset.html">Reset</a></h2>
+          <p class="t-corpo-pequeno">Um passo de fé e obediência, transformação interior e início de uma nova caminhada com Jesus.</p>
+          <ul class="chips" role="list"><li><strong>Para quem</strong>A partir de 16 anos</li><li><strong>Duração</strong>7 aulas de 1 hora, semanais</li></ul>
+          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+        </div>
+      </li><li class="card-curso">
+        <img class="card-curso__foto" src="assets/start-capa.webp" alt="" width="1600" height="1066" loading="lazy">
+        <div class="card-curso__texto">
+          <p class="t-micro t-suave">Curso de integração</p>
+          <h2 class="t-h3"><a href="start.html">Start</a></h2>
+          <p class="t-corpo-pequeno">Porta de entrada para a vida cristã na igreja local.</p>
+          <ul class="chips" role="list"><li><strong>Para quem</strong>Novos membros e novos convertidos batizados</li><li><strong>Duração</strong>8 aulas</li></ul>
+          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+        </div>
+      </li><li class="card-curso">
+        <img class="card-curso__foto" src="assets/cdv-capa.webp" alt="" width="1600" height="1066" loading="lazy">
+        <div class="card-curso__texto">
+          <p class="t-micro t-suave">Curso de integração</p>
+          <h2 class="t-h3"><a href="cdv.html">CDV</a></h2>
+          <p class="t-corpo-pequeno">Conhecendo os seus dons e talentos para servir a Deus.</p>
+          <ul class="chips" role="list"><li><strong>Para quem</strong>Quem concluiu o Start</li><li><strong>Duração</strong>8 aulas</li></ul>
+          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+        </div>
+      </li><li class="card-curso">
+        <img class="card-curso__foto" src="assets/talmidim-capa.webp" alt="" width="1600" height="1066" loading="lazy">
+        <div class="card-curso__texto">
+          <p class="t-micro t-suave">Curso de integração</p>
+          <h2 class="t-h3"><a href="talmidim.html">Talmidim</a></h2>
+          <p class="t-corpo-pequeno">Acompanhamento do adolescente no início de uma nova caminhada com Jesus.</p>
+          <ul class="chips" role="list"><li><strong>Para quem</strong>Adolescentes de 12 a 15 anos</li><li><strong>Duração</strong>13 aulas de 1 hora, semanais</li></ul>
+          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Página “eba-cursos” do Strapi: abertura editorial + catálogo automático</span><span class="selo selo--p">Proposto</span><span>ItemList (JSON-LD) com os cursos publicados</span></p>
+
+<section class="secao" aria-labelledby="comecar-titulo" data-anotada>
+  <div class="container">
+    <div class="cabecalho-secao">
+      <h2 class="t-h1" id="comecar-titulo">Por onde começar</h2>
+      <p class="t-corpo">Os cursos de integração seguem uma ordem. Adolescentes de 12 a 15 anos começam pelo Talmidim.</p>
+    </div>
+    <ol class="caminho" role="list">
+      <li><strong class="t-h4"><a class="link" href="reset.html">Reset</a></strong><span>Para quem ainda não foi batizado. Prepara para o batismo nas águas.</span></li>
+      <li><strong class="t-h4"><a class="link" href="start.html">Start</a></strong><span>Para quem já é batizado: fundamentos da fé e a vida na igreja local.</span></li>
+      <li><strong class="t-h4"><a class="link" href="cdv.html">CDV</a></strong><span>Depois do Start: descubra seus dons e talentos para servir.</span></li>
+    </ol>
+  </div>
+</section>
+<p class="anotacao container"><span class="selo selo--d">Derivado</span><span>Ordem derivada dos pré-requisitos de cada curso (Start pede batismo; CDV pede Start)</span><span class="selo selo--p">Proposto</span><span>Lista numerada em caixas; precisa de validação da EBA</span></p>
+
+<section class="secao" aria-labelledby="duvidas-titulo">
+  <div class="container">
+    <div class="cta">
+      <h2 class="t-h1" id="duvidas-titulo">Ficou com dúvida?</h2>
+      <p class="t-corpo cta__apoio">Fale com a equipe da EBA da sua unidade ou escreva para a gente.</p>
+      <div class="botoes"><a class="botao botao--primario" href="mailto:contato@adai.com.br">Escrever para contato@adai.com.br</a></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grade">
+      <div class="footer__marca">
+        <a class="logo" href="/" aria-label="ADAI, página inicial">
+          <svg viewBox="19 3 62 27" style="width:62px;height:27px" aria-hidden="true" focusable="false"><use href="#logo-uso" x="0" y="0" width="99.21" height="32.6"/></svg>
+        </a>
+        <p>Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo.</p>
+      </div>
+      <nav class="footer__colunas" aria-label="Rodapé">
+        <div class="footer__coluna">
+          <h2>Igreja</h2>
+          <ul role="list">
+            <li><a href="/sobre-nos/nossa-historia">Nossa história</a></li>
+            <li><a href="/sobre-nos/a-igreja-que-vemos">A igreja que vemos</a></li>
+            <li><a href="/sobre-nos/no-que-acreditamos">No que acreditamos</a></li>
+            <li><a href="/jesus">Jesus</a></li>
+          </ul>
+        </div>
+        <div class="footer__coluna">
+          <h2>Participe</h2>
+          <ul role="list">
+            <li><a href="/unidades">Unidades</a></li>
+            <li><a href="/agenda">Agenda</a></li>
+            <li><a href="/ministerios">Ministérios</a></li>
+            <li><a href="index.html">Escola Bíblica (EBA)</a></li>
+          </ul>
+        </div>
+        <div class="footer__coluna">
+          <h2>Contato</h2>
+          <ul role="list">
+            <li><a href="mailto:contato@adai.com.br">E-mail<span class="sr-only"> contato@adai.com.br</span></a></li>
+            <li><a href="/contato">Fale com a gente</a></li>
+            <li><a href="/contribua">Contribua</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="footer__legal">
+      <p>© 2026 ADAI. Todos os direitos reservados. <a href="/politica-de-privacidade">Política de Privacidade</a></p>
+      <p>Amar · Servir · Influenciar.</p>
+    </div>
+  </div>
+  <p class="footer__mega" aria-hidden="true">ADAI</p>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="prototipo.js"></script>
+</body>
+</html>
