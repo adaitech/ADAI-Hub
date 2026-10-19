@@ -30,6 +30,8 @@ Cada componente tem três artefatos coerentes entre si:
 | [perguntas-frequentes.md](./perguntas-frequentes.md) | Perguntas frequentes | `sections.perguntas-frequentes` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [footer.md](./footer.md) | Footer | `layout.footer` | single type `global` | implementado · publicado (dev) |
 | [texto-rico.md](./texto-rico.md) | Texto (documento) — Política de Privacidade | `sections.texto-rico` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
+| [catalogo-cursos.md](./catalogo-cursos.md) | Catálogo de cursos da EBA (+ Card de curso) | `sections.catalogo-cursos` | dynamic zone `sections` de `page` (`/eba`, `/eba/cursos`) | implementado · seed v19 (dev) |
+| [curso-cabecalho.md](./curso-cabecalho.md) | Topo do curso da EBA (+ Informações, Trilha) | — (campos fixos do tipo `curso`) | página `/eba/cursos/<slug>` | implementado |
 | [banner-cookies.md](./banner-cookies.md) | Aviso de cookies (LGPD) | — (código; não vem do Strapi) | layout do site | implementado |
 
 Status possíveis: **proposto → implementado → publicado no Strapi → validado**.

@@ -13,7 +13,10 @@ import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/Seri
 import { textoBotoesShowcase } from '@/components/sections/TextoBotoesSection/TextoBotoesSection.showcase';
 import { textoRicoShowcase } from '@/components/sections/TextoRicoSection/TextoRicoSection.showcase';
 import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showcase';
+import { cardCursoShowcase } from '@/components/ui/CardCurso/CardCurso.showcase';
+import { chipsShowcase } from '@/components/ui/Chips/Chips.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
+import { trilhaShowcase } from '@/components/ui/Trilha/Trilha.showcase';
 import type { ShowcaseCategoria, ShowcaseEntry } from './types';
 
 /** Todo componente criado ou alterado entra aqui (ver .agents/rules/Vitrine-de-Componentes.md). */
@@ -34,6 +37,9 @@ export const showcaseCatalog: ShowcaseEntry[] = [
   bannerCookiesShowcase,
   buttonLinkShowcase,
   textLinkShowcase,
+  chipsShowcase,
+  trilhaShowcase,
+  cardCursoShowcase,
 ];
 
 export const categoriaLabel: Record<ShowcaseCategoria, string> = {
