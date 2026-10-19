@@ -230,6 +230,10 @@ describe('Páginas "Sobre nós" (/sobre-nos/<slug>)', () => {
     expect(strapi.chamadaPagina()).toBeNull();
   });
 
+  it('o endereço plano /eba-cursos redireciona (308) para /eba/cursos', async () => {
+    expect((await erroDe(SlugPage(params('eba-cursos')))).digest).toMatch(/^NEXT_REDIRECT;replace;\/eba\/cursos;308;/);
+  });
+
   it('o endereço plano /sobre-nos-nossa-historia redireciona (308) para /sobre-nos/nossa-historia', async () => {
     expect((await erroDe(SlugPage(params('sobre-nos-nossa-historia')))).digest).toMatch(/^NEXT_REDIRECT;replace;\/sobre-nos\/nossa-historia;308;/);
   });

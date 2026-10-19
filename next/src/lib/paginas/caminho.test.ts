@@ -1,4 +1,4 @@
-import { caminhoDaPagina, slugDaPaginaSobreNos } from './caminho';
+import { caminhoDaPagina, caminhoDoCurso, slugDaPaginaSobreNos, slugDoCurso } from './caminho';
 
 describe('caminhoDaPagina (slug do Strapi → endereço no site)', () => {
   it('home é a raiz; páginas comuns ficam na raiz', () => {
@@ -16,5 +16,24 @@ describe('caminhoDaPagina (slug do Strapi → endereço no site)', () => {
     expect(slugDaPaginaSobreNos('nossa-historia')).toBe('sobre-nos-nossa-historia');
     expect(slugDaPaginaSobreNos('Nossa História')).toBeNull();
     expect(slugDaPaginaSobreNos('')).toBeNull();
+  });
+
+  it('"eba" é /eba e "eba-…" vira /eba/… (páginas da Escola Bíblica)', () => {
+    expect(caminhoDaPagina('eba')).toBe('/eba');
+    expect(caminhoDaPagina('eba-cursos')).toBe('/eba/cursos');
+  });
+});
+
+describe('caminhoDoCurso / slugDoCurso (cursos da EBA)', () => {
+  it('curso mora em /eba/cursos/<slug>', () => {
+    expect(caminhoDoCurso('reset')).toBe('/eba/cursos/reset');
+  });
+
+  it('segmento da URL → slug do curso; fora do padrão (maiúscula, "..", acento, vazio) → null', () => {
+    expect(slugDoCurso('reset')).toBe('reset');
+    expect(slugDoCurso('Reset')).toBeNull();
+    expect(slugDoCurso('a..b')).toBeNull();
+    expect(slugDoCurso('cdv-é')).toBeNull();
+    expect(slugDoCurso('')).toBeNull();
   });
 });

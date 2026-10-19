@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { SectionRenderer } from '@/components/sections/SectionRenderer';
 import { buildMetadata } from '@/lib/metadata';
-import { caminhoDaPagina, PREFIXO_SOBRE_NOS } from '@/lib/paginas/caminho';
+import { caminhoDaPagina, PREFIXO_EBA, PREFIXO_SOBRE_NOS } from '@/lib/paginas/caminho';
 import { getGlobal } from '@/lib/strapi/queries/global';
 import { getPageBySlug } from '@/lib/strapi/queries/page';
 
@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function StrapiPage({ params }: PageProps) {
   const { slug } = await params;
   if (slug === 'home') redirect('/');
-  // Páginas "sobre-nos-…" moram em /sobre-nos/… (sem conteúdo duplicado no endereço plano).
-  if (slug.startsWith(PREFIXO_SOBRE_NOS)) permanentRedirect(caminhoDaPagina(slug));
+  // Páginas "sobre-nos-…" e "eba-…" moram em /sobre-nos/… e /eba/… (sem conteúdo duplicado no endereço plano).
+  if (slug.startsWith(PREFIXO_SOBRE_NOS) || slug.startsWith(PREFIXO_EBA)) permanentRedirect(caminhoDaPagina(slug));
 
   const page = await getPageBySlug(slug);
   if (!page) notFound();
