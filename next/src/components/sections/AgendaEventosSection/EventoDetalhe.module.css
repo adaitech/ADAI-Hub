@@ -20,10 +20,10 @@
 .breadcrumb li + li::before { content: '/'; margin-right: var(--space-8); }
 .titulo {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: var(--font-size-h2);
-  line-height: var(--line-height-h2);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
   font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-h2);
+  letter-spacing: var(--letter-spacing-h1);
   overflow-wrap: anywhere;
 }
 .descricao {
