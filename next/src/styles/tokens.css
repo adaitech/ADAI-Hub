@@ -120,6 +120,7 @@
   --space-gutter: clamp(16px, 3vw, 57.6px);
   --space-coluna: clamp(32px, 6vw, 86.4px); /* 86,4px entre foto e texto no Figma (6%) */
   --space-section: clamp(64px, 8.333vw, 120px); /* D 120 recorrente no Figma · P mínimo */
+  --space-menu: clamp(1rem, 2.2vw, 2rem); /* P: 32 (Figma) a partir de ~1455px; encolhe para caber o 6º link do menu em 1024 */
   --space-page-margin: clamp(16px, 5.556vw, 80px); /* O 80 nas seções em 1440 · P mínimo */
   --container-max: 90rem; /* O shell de 1440 */
   --content-max: 80rem; /* O conteúdo de 1280 */
