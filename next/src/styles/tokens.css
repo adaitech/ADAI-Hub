@@ -1,4 +1,7 @@
-/* Design tokens do ADAI Hub — fonte: .agents/rules/Design-Tokens.md (manter sincronizado). */
+/* Design tokens do ADAI Hub — fonte: .agents/rules/Design-Tokens.md (manter sincronizado).
+ * Design system do Figma: docs/design-system.md · spec docs/superpowers/specs/2026-10-18-design-system-figma-design.md.
+ * Os HTMLs docs/design-system.html e templates/adai-page-template.html repetem estes nomes e valores
+ * (verificado por src/__tests__/caracteristicas/design-system.test.ts). */
 :root {
   /* ---------- Cores: primitivos (usar só aqui) ---------- */
   --black: #000000;
@@ -6,7 +9,8 @@
   --gray-900: #333333;
   --gray-600: #6b6b6b; /* acessível: 4,76:1 sobre --gray-100 (o #777 do Figma dá 4,00:1 e falha AA) */
   --gray-500: #777777; /* valor do Figma — não usar em texto sobre --gray-100 */
-  --gray-100: #f2f2f2;
+  --gray-100: #f2f2f2; /* O Figma cor/superficie */
+  --gray-200: #e8e8e8; /* O Figma cor/superficie-2 */
   --gray-300: #d9d9d9; /* 🟡 borda do card branco */
 
   /* Paleta de cards — 🟡 proposta (não está no Figma); todas com texto branco ≥ 5,4:1 (AA) */
@@ -20,6 +24,7 @@
   /* ---------- Cores: semânticos (usar nos componentes) ---------- */
   --color-bg-page: var(--white);
   --color-bg-subtle: var(--gray-100);
+  --color-bg-subtle-2: var(--gray-200); /* P uso: hover de card. Não usar --color-text-muted sobre ela (4,35:1) */
   --color-bg-inverse: var(--black);
   --color-bg-media: var(--gray-900);
   --color-text-primary: var(--black);
@@ -47,32 +52,54 @@
   --font-weight-regular: 400;
   --font-weight-bold: 700;
 
-  --font-size-mega: clamp(96px, 30vw, 432px);
-  --font-size-display: clamp(48px, 9vw, 129.6px);
-  --font-size-h2: clamp(40px, 5vw, 72px); /* 🟡 linha de 74px no Figma (Neste domingo, Primeira vez) */
-  --font-size-h3: 1.75rem; /* 🟡 linha de 32px no Figma (nome da unidade) */
+  /* Escala do Figma (estilos locais). Valor máximo = Figma 1440 (O); mínimo do clamp = proposta (P). */
+  --font-size-display: clamp(48px, 9.03vw, 130px); /* O Display 130 */
+  --font-size-h1: clamp(2.5rem, 5.417vw, 4.875rem); /* O H1 78 — títulos de seção (linha de 74px) */
+  --font-size-h2: clamp(2rem, 3.333vw, 3rem); /* O H2 48 */
+  --font-size-h3: 1.75rem; /* O H3 28 */
+  --font-size-h4: 1.25rem; /* O H4 20 */
+  --font-size-numero: clamp(4rem, 5.972vw, 5.375rem); /* O Número / Data 86 */
+  --font-size-marca: clamp(96px, 30vw, 432px); /* O Marca / Rodapé 432 */
+  --font-size-corpo: 1.125rem; /* O Corpo 18 */
+  --font-size-corpo-pequeno: 1rem; /* O Corpo pequeno 16 */
+  --font-size-legenda: 0.9375rem; /* O Legenda 15 */
+  --font-size-micro: 0.8125rem; /* O Micro 13 */
+  --font-size-botao: 1rem; /* O Botão 16 Bold */
+  --font-size-link-menu: var(--font-size-corpo-pequeno); /* D o menu do header usa Corpo pequeno */
+  --font-size-mega: var(--font-size-marca); /* alias: migrar para --font-size-marca */
   --font-size-ministerio: clamp(1.75rem, 3vw, 2.625rem); /* ✅ Figma 1:230: nome de 42px */
-  --font-size-chamada: clamp(2.5rem, 5.4vw, 4.8625rem); /* ✅ Figma 1:298: 77,8px no desktop */
+  --font-size-chamada: var(--font-size-h1); /* alias: migrar para --font-size-h1 (Figma 1:298 = H1) */
   --font-size-chamada-apoio: 1.25rem; /* ✅ Figma 1:300: 20px */
   --font-size-destaque: 2rem; /* 🟡 horários: 3 linhas em 109px no Figma */
-  --font-size-lead: 1.125rem;
+  --font-size-lead: var(--font-size-corpo); /* alias: migrar para --font-size-corpo */
   --font-size-body-lg: 1.0625rem;
-  --font-size-body: 1rem;
-  --font-size-sm: 0.875rem;
-  --font-size-xs: 0.8125rem;
+  --font-size-body: var(--font-size-corpo-pequeno); /* alias: migrar para --font-size-corpo-pequeno */
+  --font-size-sm: 0.875rem; /* P do projeto: 14px não existe na escala do Figma */
+  --font-size-xs: var(--font-size-micro); /* alias: migrar para --font-size-micro */
 
-  --line-height-mega: 0.72;
-  --line-height-display: 0.88;
-  --line-height-text: 1.5;
-  --line-height-h2: 1.03;
-  --line-height-h3: 1.15;
-  --line-height-chamada: 0.95; /* ✅ Figma 1:298: 73,87 / 77,8 */
+  --line-height-display: 0.88; /* O */
+  --line-height-h1: 0.95; /* O */
+  --line-height-h2: 0.98; /* O */
+  --line-height-h3: 1.1; /* O */
+  --line-height-h4: 1.15; /* O */
+  --line-height-numero: 0.85; /* O */
+  --line-height-marca: 0.78; /* O */
+  --line-height-legenda: 1.45; /* O Legenda e Micro */
+  --line-height-text: 1.5; /* O Corpo, Corpo pequeno e Botão */
+  --line-height-mega: var(--line-height-marca); /* alias: migrar para --line-height-marca */
+  --line-height-chamada: var(--line-height-h1); /* alias: migrar para --line-height-h1 */
   --line-height-destaque: 1.1;
 
-  --letter-spacing-mega: -0.07em;
-  --letter-spacing-display: -0.055em;
-  --letter-spacing-h2: -0.04em;
-  --letter-spacing-chamada: -0.045em; /* ✅ Figma 1:298: -3,5px */
+  /* Tracking do Figma em % = em */
+  --letter-spacing-display: -0.055em; /* O */
+  --letter-spacing-h1: -0.045em; /* O */
+  --letter-spacing-h2: -0.04em; /* O */
+  --letter-spacing-h3: -0.03em; /* O */
+  --letter-spacing-h4: -0.02em; /* O */
+  --letter-spacing-numero: -0.06em; /* O */
+  --letter-spacing-marca: -0.07em; /* O */
+  --letter-spacing-mega: var(--letter-spacing-marca); /* alias: migrar para --letter-spacing-marca */
+  --letter-spacing-chamada: var(--letter-spacing-h1); /* alias: migrar para --letter-spacing-h1 */
 
   /* ---------- Espaçamento ---------- */
   --space-4: 0.25rem;
@@ -92,17 +119,19 @@
 
   --space-gutter: clamp(16px, 3vw, 57.6px);
   --space-coluna: clamp(32px, 6vw, 86.4px); /* 86,4px entre foto e texto no Figma (6%) */
-  --space-section: clamp(64px, 9vw, 172.8px);
-  --container-max: 90rem;
+  --space-section: clamp(64px, 8.333vw, 120px); /* D 120 recorrente no Figma · P mínimo */
+  --space-page-margin: clamp(16px, 5.556vw, 80px); /* O 80 nas seções em 1440 · P mínimo */
+  --container-max: 90rem; /* O shell de 1440 */
+  --content-max: 80rem; /* O conteúdo de 1280 */
   --z-banner-cookies: 50; /* acima do conteúdo e do header fixo; abaixo do dialog do player (top layer) */
   --texto-rico-max: 46rem; /* 🟡 coluna de leitura de documentos (~75 caracteres por linha) */
   --banner-cookies-max: 40rem; /* 🟡 proposta: largura máxima do aviso de cookies (sem Figma) */
 
   /* ---------- Raios, bordas, opacidade ---------- */
-  --radius-lg: 28px;
-  --radius-md: 20px; /* ✅ fotos de Imagem e texto (Figma 20px); cards e caixas de lista: 🟡 */
-  --radius-sm: 12px; /* 🟡 foto dentro do card */
-  --radius-pill: 999px;
+  --radius-lg: 28px; /* O Figma raio/grande */
+  --radius-md: 20px; /* O Figma raio/medio */
+  --radius-sm: 14px; /* O Figma raio/pequeno */
+  --radius-pill: 999px; /* O Figma raio/pilula */
   --border-width: 1px;
   --opacity-ghost: 0.18;
 
