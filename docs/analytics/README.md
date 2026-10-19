@@ -60,6 +60,23 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 
 `origem` = `data-section` da seção (`hero`, `serie-atual`, `proximos-eventos`…), `header`, `footer` ou `pagina`.
 
+## 3.1 Eventos planejados (ainda não existem no catálogo)
+
+Decisão de 2026-10-17: **inscrição em GC** e **pedido de oração** também são conversões (eventos-chave no GA4), junto com `planejar_visita` e `contribuir`. Cada frente cria o seu evento seguindo a regra da §5 (catálogo → regra → teste → este plano → regex do GTM → dimensões no GA4). **Nunca** enviar o texto digitado nem dado pessoal: só o fato de ter enviado.
+
+| Frente | Evento | Quando dispara | Parâmetros | Conversão? |
+| --- | --- | --- | --- | --- |
+| GC (Comunhão) | `buscar_gc` | Busca/filtro aplicado | `unidade`, `dia`, `publico` (valores do filtro, sem texto livre) | — |
+| GC | `selecionar_gc` | Abrir o card de um GC | `unidade`, `gc` (nome público do GC) | — |
+| GC | `inscricao_gc_iniciada` | Primeiro campo da inscrição preenchido | `unidade` | — |
+| GC | `inscricao_gc_enviada` | Inscrição enviada com sucesso ao inChurch | `unidade` | **Sim** |
+| Cuidado | `pedido_oracao_enviado` | Pedido enviado com sucesso | `origem` | **Sim** |
+| Cuidado | `testemunho_enviado` | Testemunho enviado (vai para moderação) | `origem` | — |
+| Formulários | `erro_formulario` | Validação falhou ao enviar | `formulario`, `campo` (nome do campo, nunca o valor) | — |
+| Agenda | `filtrar_agenda` | Filtro de unidade ou tipo aplicado | `unidade`, `tipo` | — |
+| Blog | `ver_post`, `compartilhar_post` | Abrir e compartilhar um post | `categoria`, `post` | — |
+| Site | `pagina_404` | Página não encontrada exibida | `caminho` (sem query string) | — |
+
 ## 4. Configurar o Google (uma vez por container)
 
 ### 4.1 GTM — importar o container pronto
@@ -87,7 +104,7 @@ Em analytics.google.com → **Administrador**:
 
 1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
 2. **Métrica personalizada:** `valor` (Web Vitals).
-3. **Eventos-chave:** marcar `planejar_visita` e `contribuir`. O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
+3. **Eventos-chave:** marcar `planejar_visita` e `contribuir` (e, quando existirem, `inscricao_gc_enviada` e `pedido_oracao_enviado` — §3.1). O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
 
 > **Status (2026-10-02, propriedade `G-SCG09PWV8B`):** ✅ 19 dimensões personalizadas (escopo Evento) e a métrica `valor` criadas. ✅ `planejar_visita` e `contribuir` já disparados e vistos no **Tempo real**. ⏳ **Falta marcar a estrela** dos dois em Eventos recentes quando aparecerem (até 24h). Filtro de homologação: não criado.
 4. **Filtro de dados** (opcional): excluir `site_ambiente = homologacao` dos relatórios de produção — ou analisar com essa dimensão.

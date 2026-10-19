@@ -10,10 +10,10 @@
 .titulo {
   max-width: var(--intro-max);
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: var(--font-size-chamada);
+  font-size: var(--font-size-h1);
   font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-chamada);
-  letter-spacing: var(--letter-spacing-chamada);
+  line-height: var(--line-height-h1);
+  letter-spacing: var(--letter-spacing-h1);
 }
 
 .apoio {

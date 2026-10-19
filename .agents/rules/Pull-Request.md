@@ -64,7 +64,18 @@ cd next && yarn smoke
   - [ ] **sem scroll lateral** em 375 — no console: `document.documentElement.scrollWidth <= innerWidth` deve dar `true`;
   - [ ] interações do componente funcionando (teclado: Tab, Enter, Esc).
 - [ ] Se mudou componente: **5 pilares** conferidos com os dois servidores rodando (Dados no CMS, Página, Componente, SEO, Medição — `AGENTS.md`).
-- [ ] **Medição validada (obrigatório em toda página, botão ou link novo ou alterado):** com o site rodando, clicar em cada página/botão/link do PR e conferir no console que os eventos chegam ao `window.dataLayer` com os parâmetros certos, conforme o plano de `docs/analytics/README.md` §3 — no mínimo `clique_cta` (com `origem` = `data-section`, `texto` e `destino` sem dado pessoal) e o evento específico quando houver (`planejar_visita`, `como_chegar` com a `unidade` certa, `contribuir`, `selecionar_evento`…); `ver_secao` para cada seção nova. Toda seção tem `data-section`. O `dataLayer` recebe os eventos mesmo sem aceitar cookies (o GTM só carrega depois do aceite), então dá para validar sem enviar dados ao Google. Para não sair da página ao clicar: `document.querySelectorAll('a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); }))` e depois `window.dataLayer.filter(e => e.event)`. Comportamento novo de medição → teste em `lib/analytics/cliques.test.ts` ou no componente. Registrar no PR o que foi clicado e os eventos vistos.
+- [ ] **Medição validada (obrigatório em toda página, botão ou link novo ou alterado):** com o site rodando, clicar em cada página/botão/link do PR e conferir no console que os eventos chegam ao `window.dataLayer` com os parâmetros certos, conforme o plano de `docs/analytics/README.md` §3 — no mínimo `clique_cta` (com `origem` = `data-section`, `texto` e `destino` sem dado pessoal) e o evento específico quando houver (`planejar_visita`, `como_chegar` com a `unidade` certa, `contribuir`, `selecionar_evento`…); `ver_secao` para cada seção nova. Toda seção tem `data-section`. O `dataLayer` recebe os eventos mesmo sem aceitar cookies (o GTM só carrega depois do aceite), então dá para validar sem enviar dados ao Google. Para não sair da página ao clicar: `document.querySelectorAll('a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); e.stopImmediatePropagation(); }))` e depois `window.dataLayer.filter(e => e.event)`. Comportamento novo de medição → teste em `lib/analytics/cliques.test.ts` ou no componente. Registrar no PR o que foi clicado e os eventos vistos. O teste `medicao-por-pagina.test.tsx` (no `yarn quality`) já prova, para toda página do `strapi-fake`, que as seções têm `data-section` e que todo link/botão gera `clique_cta` sem dado pessoal: página nova entra no `strapi-fake`; o navegador continua valendo para o evento específico e para `ver_secao`.
+
+### A4.1 Design system (obrigatório se o PR mexe em UI, CSS, tokens ou HTML de referência)
+
+Base: [`docs/design-system.md`](../../docs/design-system.md) · style guide `docs/design-system.html` · template `templates/adai-page-template.html` · tokens `next/src/styles/tokens.css`. O teste `src/__tests__/caracteristicas/design-system.test.ts` (dentro do `yarn quality`) já cobre tokens, inventário e contraste; os itens abaixo são a conferência que o teste não faz.
+
+- [ ] **Tokens:** cor, tipografia, espaço e raio vêm de token canônico (`--font-size-h1`, `--radius-sm`, `--space-section`…). Nada de alias de migração (`--font-size-lead`, `--font-size-body`, `--font-size-xs`) em código novo; valor que não existe no `tokens.css` não é inventado no PR — vira `[VALOR NÃO ENCONTRADO]` e pergunta ao design.
+- [ ] **Tipografia do Figma:** título de seção e de página em **H1** (78 no desktop, linha 0,95); H2 (48) só para subtítulo; card em H3; data em Número / Data. Bold em títulos, números e ações; Book em textos, menus e legendas. Títulos longos quebram sem cortar em 375.
+- [ ] **Contraste WCAG 2.2 AA:** texto secundário em `--color-text-muted` (#6B6B6B), nunca o `#777` do Figma em texto; **nunca** texto suave sobre `--color-bg-subtle-2` (#E8E8E8, 4,35:1); texto sobre foto só com `--gradient-media-overlay`.
+- [ ] **Componentes do Figma:** botão, card, header, footer e barra de anúncio seguem a anatomia de `docs/design-system.md` §8 (medidas, raio, estados). Estado ou variação que não está no Figma é marcado como **Proposto** no doc do componente e na descrição do PR — nunca apresentado como Observado.
+- [ ] **Responsivo e interação:** mobile empilhado e sem scroll lateral em 375; alvos de toque ≥ 44 × 44; foco visível (anel de 3px) em todo controle; hover, ativo e desabilitado conferidos; `prefers-reduced-motion` respeitado.
+- [ ] **Doc do design system atualizado:** token, componente ou padrão novo entra em `docs/design-system.md` (com Observado / Derivado / Proposto), em `.agents/rules/Design-Tokens.md` e, se for token compartilhado, também no `:root` dos dois HTMLs de referência.
 
 ### A5. Segurança
 
@@ -101,7 +112,8 @@ cd next && yarn smoke
 
 - [ ] Li o diff inteiro contra a `main` (`git diff origin/main...HEAD`) como se fosse o revisor.
 - [ ] Revisão do superpowers (`requesting-code-review`) feita; achados críticos resolvidos.
-- [ ] Skill `pr-code-review` rodada (agente) ou checklist da §2 dela conferido (dev): arquitetura, componentes/CMS, vitrine, guia do editor, tokens/CSS, a11y, performance, dependências, visão.
+- [ ] **Autorrevisão obrigatória:** rodei `/pr-code-review` **na minha máquina** (skill §0), corrigi todo 🔴 e 🟡 e rodei de novo até sobrar só ✅/💡. Quem não tem agente confere a tabela da §2 da skill à mão (arquitetura, componentes/CMS, vitrine, guia do editor, tokens/CSS, a11y, **SEO, medição (GA4), segurança**, performance, dependências, visão).
+- [ ] A descrição do PR traz a linha *"Autorrevisão: pr-code-review rodado em <data>, veredicto 🎯 <X>"*.
 - [ ] Dependência nova? Justificada em `Stack-Fontes-e-Bibliotecas.md` §5.
 
 ### B2. Descrição do PR
@@ -137,4 +149,4 @@ gh pr create --repo adaitech/ADAI-Hub --base main --title "<tipo>(<escopo>): <re
 
 ## Resumo de uma linha (para colar no chat do agente)
 
-> Testes escritos → `yarn quality` → `yarn build` (+ strapi) → `yarn smoke` com os servidores rodando → navegador em 375/768/1440 sem erro no console nem scroll lateral → 5 pilares → sem segredo no diff → docs atualizados → `git add` explícito → commit em pt-BR → push → `documents/PR.md` → PR para a `main`.
+> Testes escritos → `/pr-code-review` local e correções → `yarn quality` → `yarn build` (+ strapi) → `yarn smoke` com os servidores rodando → navegador em 375/768/1440 sem erro no console nem scroll lateral → design system conferido (A4.1) → 5 pilares → sem segredo no diff → docs atualizados → `git add` explícito → commit em pt-BR → push → `documents/PR.md` → PR para a `main`.
