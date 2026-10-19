@@ -57,6 +57,7 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `ver_secao` | Seção 25% visível (ou ocupando metade da tela, para textos longos), uma vez por página | `secao`, `posicao` | — |
 | `web_vitals` | Core Web Vitals de usuários reais | `metrica` (LCP, CLS, INP, FCP, TTFB), `valor` (CLS × 1000), `avaliacao` | — |
 | `consentimento_cookies` | Escolha no aviso de cookies | `escolha` (aceito, recusado) | — |
+| `inscrever_curso` | Botão de inscrição de um curso da EBA (topo da página do curso ou bloco "Pronto para começar?"; link com `data-curso`) | `origem` (`curso-cabecalho`, `curso-inscricao`), `curso` (slug) | **Sim** |
 
 `origem` = `data-section` da seção (`hero`, `serie-atual`, `proximos-eventos`…), `header`, `footer` ou `pagina`.
 
@@ -72,7 +73,7 @@ Fazer em **cada** container (homologação e produção):
 4. Confirmar. Entram:
    - tag **"GA4 - Google tag (G-SCG09PWV8B)"** (dispara em "Initialization - All Pages");
    - tag **"GA4 - Eventos ADAI (DataLayer)"** (nome do evento = `{{Event}}`, com todos os parâmetros);
-   - acionador **"CE - Eventos ADAI (DataLayer)"** (evento personalizado, regex com os 13 eventos);
+   - acionador **"CE - Eventos ADAI (DataLayer)"** (evento personalizado, regex com os 14 eventos);
    - variáveis **"DLV - …"** (uma por parâmetro).
 5. **Visualizar** (Tag Assistant) → abrir o site → clicar em "Como chegar", abrir a FAQ etc. → conferir as tags disparando.
 6. **Enviar → Publicar** (versão "Eventos ADAI v1").
@@ -85,9 +86,9 @@ Se a importação falhar, criar à mão seguindo a mesma lista (uma variável "V
 
 Em analytics.google.com → **Administrador**:
 
-1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
+1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`, `curso`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
 2. **Métrica personalizada:** `valor` (Web Vitals).
-3. **Eventos-chave:** marcar `planejar_visita` e `contribuir`. O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
+3. **Eventos-chave:** marcar `planejar_visita`, `contribuir` e `inscrever_curso`. O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
 
 > **Status (2026-10-02, propriedade `G-SCG09PWV8B`):** ✅ 19 dimensões personalizadas (escopo Evento) e a métrica `valor` criadas. ✅ `planejar_visita` e `contribuir` já disparados e vistos no **Tempo real**. ⏳ **Falta marcar a estrela** dos dois em Eventos recentes quando aparecerem (até 24h). Filtro de homologação: não criado.
 4. **Filtro de dados** (opcional): excluir `site_ambiente = homologacao` dos relatórios de produção — ou analisar com essa dimensão.
@@ -122,6 +123,8 @@ O teste `lib/analytics/eventos.test.ts` falha se o catálogo, o JSON do GTM e es
 Checklist geral (Strapi, segredos, integrações, LGPD): `README.md` → "Antes de subir para produção".
 
 ## 7. Pendências
+
+- **EBA (`inscrever_curso`, 2026-10-18):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 14 eventos e variável `DLV - curso`), criar a dimensão `curso` no GA4 e marcar `inscrever_curso` como evento-chave quando aparecer em Eventos recentes.
 
 - **Eventos-chave** `planejar_visita` e `contribuir`: marcar a estrela no GA4 (§4.2).
 - **Política de Privacidade** (LGPD): página `/politica-de-privacidade` publicada no Strapi (seção `sections.texto-rico`, texto de `docs/conteudo/politica-de-privacidade.md`), com link no aviso de cookies e no rodapé. Falta a revisão jurídica e confirmar os dados da controladora e do encarregado antes de produção.

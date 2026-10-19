@@ -47,7 +47,7 @@ export function RastreadorAnalytics() {
       if (!el || el.closest('[data-analytics="manual"]')) return;
       const href = el instanceof HTMLAnchorElement ? el.href : '';
       const pagina = document.querySelector('main h1')?.textContent?.replace(/\s+/g, ' ').trim() || null;
-      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina })) {
+      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina, curso: el.getAttribute('data-curso') })) {
         registrarEvento(nome, parametros as never);
       }
     };
