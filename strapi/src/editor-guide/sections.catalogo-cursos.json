@@ -1,0 +1,63 @@
+{
+  "uid": "sections.catalogo-cursos",
+  "nome": "Catálogo de cursos",
+  "resumo": "Mostra em cards os cursos da EBA publicados no Strapi. Você escolhe só o título, a vertente e quantos mostrar: os cursos entram e saem sozinhos quando são publicados ou despublicados.",
+  "ondeAparece": "Na home da EBA (/eba) e no catálogo (/eba/cursos); pode entrar em qualquer página.",
+  "boasPraticas": [
+    "Para mudar a ordem dos cursos, edite o campo \"Ordem no catálogo\" de cada curso (menor aparece primeiro).",
+    "Na home da EBA, deixe \"Ver todos os cursos\" ligado para levar ao catálogo completo.",
+    "Se a seção for a primeira da página, o título dela vira o título principal da página."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título",
+      "descricao": "Nome da seção.",
+      "placeholder": "Ex.: Cursos",
+      "ondeAparece": "Letras grandes acima dos cards.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Cursos"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Uma frase que ajuda a escolher o curso.",
+      "placeholder": "Ex.: Escolha o próximo passo da sua caminhada.",
+      "ondeAparece": "Abaixo do título.",
+      "obrigatorio": false,
+      "limite": "Até 240 caracteres",
+      "exemplo": "Escolha o próximo passo da sua caminhada. Cada curso acompanha uma fase da vida cristã."
+    },
+    {
+      "campo": "vertente",
+      "label": "Quais cursos",
+      "descricao": "Todas as vertentes, só os cursos de integração ou só os de consolidação.",
+      "placeholder": "Todas",
+      "ondeAparece": "Define quais cursos aparecem nos cards.",
+      "obrigatorio": true,
+      "limite": "Todas, Integração ou Consolidação",
+      "exemplo": "Todas"
+    },
+    {
+      "campo": "quantidade",
+      "label": "Quantos cursos mostrar",
+      "descricao": "Deixe vazio para mostrar todos.",
+      "placeholder": "Vazio = todos",
+      "ondeAparece": "Número de cards.",
+      "obrigatorio": false,
+      "limite": "De 1 a 12",
+      "exemplo": "4"
+    },
+    {
+      "campo": "link_ver_todos",
+      "label": "Mostrar \"Ver todos os cursos\"",
+      "descricao": "Link para o catálogo completo em /eba/cursos.",
+      "placeholder": "Ligado",
+      "ondeAparece": "À direita do título (no celular, abaixo dele).",
+      "obrigatorio": false,
+      "limite": "Ligado ou desligado",
+      "exemplo": "Ligado"
+    }
+  ]
+}

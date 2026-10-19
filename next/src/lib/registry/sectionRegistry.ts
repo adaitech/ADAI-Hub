@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import { AgendaEventosSection, agendaEventosPopulate } from '@/components/sections/AgendaEventosSection';
 import { CarrosselCardsSection, carrosselCardsPopulate } from '@/components/sections/CarrosselCardsSection';
+import { CatalogoCursosSection, catalogoCursosPopulate } from '@/components/sections/CatalogoCursosSection';
 import { HeroSection, heroPopulate } from '@/components/sections/HeroSection';
 import { ImagemTextoSection, imagemTextoPopulate } from '@/components/sections/ImagemTextoSection';
 import { MinisteriosSection, ministeriosPopulate } from '@/components/sections/MinisteriosSection';
@@ -39,6 +40,7 @@ export const sectionRegistry: Record<string, SectionRegistryEntry> = {
   'sections.serie-atual': defineSection(SerieAtualSection, serieAtualPopulate),
   'sections.proximos-eventos': defineSection(ProximosEventosSection, proximosEventosPopulate),
   'sections.texto-rico': defineSection(TextoRicoSection, textoRicoPopulate),
+  'sections.catalogo-cursos': defineSection(CatalogoCursosSection, catalogoCursosPopulate),
 };
 
 export function getSection(key: string): SectionRegistryEntry | null {

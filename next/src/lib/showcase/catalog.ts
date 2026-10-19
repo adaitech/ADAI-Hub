@@ -13,6 +13,7 @@ import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/Seri
 import { textoBotoesShowcase } from '@/components/sections/TextoBotoesSection/TextoBotoesSection.showcase';
 import { textoRicoShowcase } from '@/components/sections/TextoRicoSection/TextoRicoSection.showcase';
 import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showcase';
+import { catalogoCursosShowcase } from '@/components/sections/CatalogoCursosSection/CatalogoCursosSection.showcase';
 import { cardCursoShowcase } from '@/components/ui/CardCurso/CardCurso.showcase';
 import { chipsShowcase } from '@/components/ui/Chips/Chips.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
@@ -40,6 +41,7 @@ export const showcaseCatalog: ShowcaseEntry[] = [
   chipsShowcase,
   trilhaShowcase,
   cardCursoShowcase,
+  catalogoCursosShowcase,
 ];
 
 export const categoriaLabel: Record<ShowcaseCategoria, string> = {

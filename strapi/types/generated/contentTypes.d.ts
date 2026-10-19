@@ -582,6 +582,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.texto-botoes',
         'sections.perguntas-frequentes',
         'sections.texto-rico',
+        'sections.catalogo-cursos',
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;

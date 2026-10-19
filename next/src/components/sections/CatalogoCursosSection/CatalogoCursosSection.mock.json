@@ -1,0 +1,29 @@
+{
+  "completo": {
+    "__component": "sections.catalogo-cursos",
+    "id": 31,
+    "titulo": "Cursos",
+    "texto_apoio": "Escolha o próximo passo da sua caminhada. Cada curso acompanha uma fase da vida cristã.",
+    "vertente": "todas",
+    "quantidade": null,
+    "link_ver_todos": true
+  },
+  "minimo": {
+    "__component": "sections.catalogo-cursos",
+    "id": 32,
+    "titulo": "Cursos da EBA",
+    "texto_apoio": null,
+    "vertente": null,
+    "quantidade": null,
+    "link_ver_todos": null
+  },
+  "texto_longo": {
+    "__component": "sections.catalogo-cursos",
+    "id": 33,
+    "titulo": "Formação bíblica para cada fase da sua caminhada com Jesus",
+    "texto_apoio": "Do batismo ao serviço: os cursos de integração da EBA acompanham quem acabou de chegar, quem já é batizado e quem quer descobrir seus dons para servir na igreja local.",
+    "vertente": "integracao",
+    "quantidade": 3,
+    "link_ver_todos": true
+  }
+}
