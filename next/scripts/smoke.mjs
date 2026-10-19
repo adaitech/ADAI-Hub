@@ -12,7 +12,7 @@
  */
 
 const BASE = (process.argv[2] ?? process.env.SMOKE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-const PAGINAS_DO_SITE = ['/', '/agenda', '/politica-de-privacidade'];
+const PAGINAS_DO_SITE = ['/', '/agenda', '/politica-de-privacidade', '/eba', '/eba/cursos', '/eba/cursos/reset'];
 /** Páginas internas: precisam de noindex (a /exemplos tem "Meta robots" noindex no Strapi). */
 const PAGINAS_INTERNAS = ['/exemplos'];
 const MAX_IMAGENS = 6;
@@ -141,6 +141,7 @@ async function principal() {
   for (const caminho of PAGINAS_INTERNAS) await conferirPagina(caminho, { interna: true });
   await conferirSeo();
   await esperarStatus('rota inexistente → 404', '/rota-que-nao-existe-smoke', 404);
+  await esperarStatus('curso da EBA inexistente → 404', '/eba/cursos/curso-que-nao-existe-smoke', 404);
   const { local } = await esperarStatus('/home → redireciona para /', '/home', [307, 308]);
   if (local && new URL(local, BASE).pathname !== '/') registrar(false, '/home → redireciona para /', `foi para ${local}`);
 
