@@ -12,7 +12,7 @@
   },
   "attributes": {
     "nome": { "type": "string", "required": true, "maxLength": 40 },
-    "slug": { "type": "uid", "targetField": "nome", "required": true },
+    "slug": { "type": "uid", "targetField": "nome", "required": true, "regex": "^[a-z0-9]+(-[a-z0-9]+)*$" },
     "resumo": { "type": "text", "required": true, "maxLength": 160 },
     "capa": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
     "vertente": { "type": "enumeration", "enum": ["integracao", "consolidacao"], "default": "integracao", "required": true },
