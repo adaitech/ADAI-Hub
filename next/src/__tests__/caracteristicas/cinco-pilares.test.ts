@@ -28,7 +28,10 @@ const componentesStrapi = readdirSync(join(raiz, 'strapi/src/components')).flatM
     .filter((arquivo) => arquivo.endsWith('.json'))
     .map((arquivo) => ({ uid: `${categoria}.${arquivo.replace(/\.json$/, '')}`, schema: `strapi/src/components/${categoria}/${arquivo}` })),
 );
-const tiposDeConteudo = ['page', 'global'].map((api) => ({
+// Todo tipo de conteúdo em strapi/src/api/ (page, global, unidade, curso…) precisa de guia do editor.
+const tiposDeConteudo = readdirSync(join(raiz, 'strapi/src/api'), { withFileTypes: true })
+  .filter((entrada) => entrada.isDirectory())
+  .map(({ name: api }) => ({
   uid: `api.${api}`,
   uidStrapi: `api::${api}.${api}`,
   schema: `strapi/src/api/${api}/content-types/${api}/schema.json`,

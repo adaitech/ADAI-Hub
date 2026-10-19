@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cursos",
+  "info": {
+    "singularName": "curso",
+    "pluralName": "cursos",
+    "displayName": "Cursos da EBA",
+    "description": "Cursos da Escola Bíblica ADAI: aparecem no catálogo, na home da EBA e em /eba/cursos/<endereço>."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nome": { "type": "string", "required": true, "maxLength": 40 },
+    "slug": { "type": "uid", "targetField": "nome", "required": true },
+    "resumo": { "type": "text", "required": true, "maxLength": 160 },
+    "capa": { "type": "media", "multiple": false, "required": true, "allowedTypes": ["images"] },
+    "vertente": { "type": "enumeration", "enum": ["integracao", "consolidacao"], "default": "integracao", "required": true },
+    "publico_alvo": { "type": "string", "maxLength": 80 },
+    "duracao": { "type": "string", "maxLength": 60 },
+    "formato": { "type": "enumeration", "enum": ["presencial", "online", "presencial_ou_online"] },
+    "entrada": { "type": "string", "maxLength": 60 },
+    "inscricao": { "type": "component", "repeatable": false, "component": "shared.botao" },
+    "video_apresentacao": { "type": "string", "maxLength": 300 },
+    "ordem": { "type": "integer", "min": 0, "default": 100 },
+    "secoes": {
+      "type": "dynamiczone",
+      "components": ["sections.imagem-texto", "sections.texto-rico", "sections.perguntas-frequentes", "sections.texto-botoes"]
+    },
+    "seo": { "type": "component", "repeatable": false, "component": "shared.seo" }
+  }
+}
