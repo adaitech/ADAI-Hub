@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_sections_pix",
+  "info": {
+    "displayName": "Contribuição por Pix",
+    "icon": "heart",
+    "description": "Chave Pix, instruções e contato para contribuições."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "texto_apoio": {
+      "type": "text",
+      "maxLength": 220
+    },
+    "chave_pix": {
+      "type": "string",
+      "required": true,
+      "maxLength": 140
+    },
+    "passos": {
+      "type": "text",
+      "maxLength": 600
+    },
+    "contato": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "ancora": {
+      "type": "string",
+      "maxLength": 60,
+      "regex": "^[a-z][a-z0-9-]*$"
+    }
+  }
+}

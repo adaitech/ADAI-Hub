@@ -17,6 +17,18 @@
     "conteudo": {
       "type": "richtext",
       "required": true
+    },
+    "apresentacao": {
+      "type": "enumeration",
+      "enum": [
+        "documento",
+        "destaque"
+      ]
+    },
+    "ancora": {
+      "type": "string",
+      "maxLength": 60,
+      "regex": "^[a-z][a-z0-9-]*$"
     }
   }
 }

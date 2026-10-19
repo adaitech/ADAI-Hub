@@ -27,5 +27,5 @@ export default async function StrapiPage({ params }: PageProps) {
   const page = await getPageBySlug(slug);
   if (!page) notFound();
 
-  return <SectionRenderer sections={page.sections ?? []} />;
+  return <SectionRenderer sections={page.sections ?? []} apresentacao={page.apresentacao} />;
 }

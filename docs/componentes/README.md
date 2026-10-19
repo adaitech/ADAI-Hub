@@ -18,6 +18,8 @@ Cada componente tem três artefatos coerentes entre si:
 
 | Doc | Componente | Nome técnico | Onde entra | Status |
 | --- | --- | --- | --- | --- |
+| [pix.md](./pix.md) | Contribuição por Pix | `sections.pix` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
+| [copy-button.md](./copy-button.md) | Botão de copiar | — (UI) | seção Pix | implementado |
 | [header.md](./header.md) | Header | `layout.header` | single type `global` | implementado · publicado (dev) |
 | [hero.md](./hero.md) | Hero | `sections.hero` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [carrossel-cards.md](./carrossel-cards.md) | Carrossel de cards | `sections.carrossel-cards` | dynamic zone `sections` de `page` | implementado · publicado (dev) |

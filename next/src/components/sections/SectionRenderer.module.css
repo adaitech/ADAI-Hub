@@ -1,0 +1,23 @@
+/* Moldura opcional para páginas editoriais. As seções existentes mantêm seus padrões. */
+.editorial {
+  width: 100%;
+  max-width: calc(var(--content-max) + 2 * var(--space-page-margin));
+  margin-inline: auto;
+  padding: var(--space-56) var(--space-page-margin) var(--space-section);
+  display: grid;
+  gap: var(--space-section);
+}
+
+.editorial > :global([data-section]) {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 1024px) {
+  /* Uma foto de abertura proporcional às duas colunas, sem aumentar toda a primeira dobra. */
+  .editorial > :global([data-section='imagem-texto']:not([data-sem-imagem='true'])):first-child > :first-child {
+    aspect-ratio: 1;
+  }
+}

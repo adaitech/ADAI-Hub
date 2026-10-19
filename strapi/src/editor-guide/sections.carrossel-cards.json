@@ -81,6 +81,16 @@
       "obrigatorio": false,
       "limite": "Ligado ou desligado",
       "exemplo": "Desligado"
+    },
+    {
+      "campo": "exibicao",
+      "label": "Exibição dos cards",
+      "descricao": "Carrossel com rolagem ou grade que mostra todos os cards. Sem escolha, mantém carrossel.",
+      "placeholder": "",
+      "ondeAparece": "Apresentação da seção.",
+      "obrigatorio": false,
+      "limite": "Uma opção",
+      "exemplo": "grade"
     }
   ]
 }

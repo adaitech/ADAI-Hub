@@ -13,6 +13,8 @@ export function normalizeTextoRico(data: TextoRicoData): TextoRicoView | null {
 
   return {
     titulo,
+    apresentacao: data.apresentacao === 'destaque' ? 'destaque' : 'documento',
+    ancora: data.ancora && /^[a-z][a-z0-9-]*$/.test(data.ancora) ? data.ancora : undefined,
     atualizadoEm: valida ? formatoData.format(new Date(`${iso}T00:00:00Z`)) : null,
     atualizadoEmIso: valida ? iso : null,
     conteudo,

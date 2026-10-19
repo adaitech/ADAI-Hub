@@ -25,5 +25,5 @@ export default async function SobreNosPage({ params }: PageProps) {
   const page = await getPageBySlug(slugStrapi);
   if (!page) notFound();
 
-  return <SectionRenderer sections={page.sections ?? []} />;
+  return <SectionRenderer sections={page.sections ?? []} apresentacao={page.apresentacao} />;
 }

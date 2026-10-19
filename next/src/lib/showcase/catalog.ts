@@ -13,9 +13,13 @@ import { textoRicoShowcase } from '@/components/sections/TextoRicoSection/TextoR
 import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
 import type { ShowcaseCategoria, ShowcaseEntry } from './types';
+import { pixShowcase } from '@/components/sections/PixSection/PixSection.showcase';
+import { copyButtonShowcase } from '@/components/ui/CopyButton/CopyButton.showcase';
 
 /** Todo componente criado ou alterado entra aqui (ver .agents/rules/Vitrine-de-Componentes.md). */
 export const showcaseCatalog: ShowcaseEntry[] = [
+  pixShowcase,
+  copyButtonShowcase,
   headerShowcase,
   heroShowcase,
   carrosselCardsShowcase,

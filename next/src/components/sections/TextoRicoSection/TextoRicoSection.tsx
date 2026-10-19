@@ -76,7 +76,7 @@ export function TextoRicoSection({ data, index }: SectionProps<TextoRicoData>) {
   const Secao = view.titulo ? 'section' : 'div';
 
   return (
-    <Secao className={styles.secao} aria-labelledby={view.titulo ? tituloId : undefined} data-section="texto-rico">
+    <Secao id={view.ancora} className={styles.secao} aria-labelledby={view.titulo ? tituloId : undefined} data-section="texto-rico" data-apresentacao={view.apresentacao}>
       <article className={styles.artigo}>
         {(view.titulo || view.atualizadoEm) && (
           <header className={styles.cabecalho}>

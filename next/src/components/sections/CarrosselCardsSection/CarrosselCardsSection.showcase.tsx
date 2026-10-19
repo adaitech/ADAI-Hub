@@ -52,6 +52,7 @@ export const carrosselCardsShowcase = defineShowcase<CarrosselCardsData>({
     { nome: 'texto_longo', titulo: 'Texto longo', descricao: 'Títulos, destaques e textos longos.', data: mocks.texto_longo as CarrosselCardsData },
   ],
   controles: [
+    { id: 'exibicao', tipo: 'opcoes', rotulo: 'Exibição dos cards', opcoes: [{ valor: 'carrossel', rotulo: 'Carrossel' }, { valor: 'grade', rotulo: 'Grade' }], valor: (data) => data.exibicao ?? 'carrossel', aplicar: (data, valor) => ({ ...data, exibicao: valor === 'grade' ? 'grade' : 'carrossel' }) },
     {
       id: 'cor',
       tipo: 'opcoes',

@@ -3,6 +3,12 @@ import mocks from './HeroSection/HeroSection.mock.json';
 import { SectionRenderer } from './SectionRenderer';
 
 describe('SectionRenderer', () => {
+  it('apresentação editorial agrupa seções em uma largura comum sem mudar o padrão', () => {
+    const { container, rerender } = render(<SectionRenderer sections={[mocks.completo]} apresentacao="editorial" />);
+    expect(container.querySelector('[data-page-layout="editorial"]')).toBeInTheDocument();
+    rerender(<SectionRenderer sections={[mocks.completo]} />);
+    expect(container.querySelector('[data-page-layout]')).not.toBeInTheDocument();
+  });
   it('renderiza as seções registradas na ordem do Strapi e ignora chaves desconhecidas', () => {
     render(
       <SectionRenderer

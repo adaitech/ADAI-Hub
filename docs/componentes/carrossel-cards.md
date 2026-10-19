@@ -135,3 +135,6 @@ Também cobrem este componente, sem precisar editar nada:
 - `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
 
 **Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).
+# Extensão: grade editorial
+
+O campo opcional `exibicao` aceita `carrossel` (padrão anterior) e `grade`. A grade mostra todos os cards sem controles de rolagem: uma coluna no celular, duas no tablet e até três no desktop. Dois cards ocupam duas colunas no desktop. Os cards, links e conteúdo são os mesmos nas duas apresentações. Há controle de exibição na vitrine. Medição permanece coberta por `ver_secao` e `clique_cta`.

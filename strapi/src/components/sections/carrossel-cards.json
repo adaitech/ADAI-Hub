@@ -25,13 +25,20 @@
     },
     "estilo_imagem": {
       "type": "enumeration",
-      "enum": ["foto", "arte"],
+      "enum": [
+        "foto",
+        "arte"
+      ],
       "default": "foto",
       "required": true
     },
     "posicao_imagem": {
       "type": "enumeration",
-      "enum": ["acima", "apos_titulo", "abaixo"],
+      "enum": [
+        "acima",
+        "apos_titulo",
+        "abaixo"
+      ],
       "default": "acima",
       "required": true
     },
@@ -43,6 +50,13 @@
     "preto_e_branco": {
       "type": "boolean",
       "default": true
+    },
+    "exibicao": {
+      "type": "enumeration",
+      "enum": [
+        "carrossel",
+        "grade"
+      ]
     }
   }
 }

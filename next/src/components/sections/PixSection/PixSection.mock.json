@@ -1,0 +1,38 @@
+{
+  "completo": {
+    "__component": "sections.pix",
+    "id": 1,
+    "titulo": "Como contribuir pelo Pix.",
+    "texto_apoio": "A contribuição é feita no aplicativo do seu banco. Você não informa dados bancários nesta página.",
+    "chave_pix": "nossacasa@adai.com.br",
+    "passos": "Copie a chave Pix.\nAbra o aplicativo do seu banco e escolha Pix.\nCole a chave, escolha o valor e confira o favorecido antes de confirmar.",
+    "contato": {
+      "id": 1,
+      "texto": "Falar com a equipe",
+      "url": "mailto:contato@adai.com.br",
+      "nova_aba": false
+    },
+    "ancora": "como-contribuir"
+  },
+  "minimo": {
+    "__component": "sections.pix",
+    "id": 2,
+    "titulo": "Contribua pelo Pix",
+    "chave_pix": "nossacasa@adai.com.br"
+  },
+  "texto_longo": {
+    "__component": "sections.pix",
+    "id": 3,
+    "titulo": "Sua generosidade ajuda a missão a continuar.",
+    "texto_apoio": "A contribuição é feita no aplicativo do seu banco. Você não informa dados bancários nesta página.",
+    "chave_pix": "chave-publica-para-contribuicoes@exemplo.com.br",
+    "passos": "Copie a chave Pix.\nAbra o aplicativo do seu banco e escolha Pix.\nCole a chave, escolha o valor e confira o favorecido antes de confirmar.",
+    "contato": {
+      "id": 1,
+      "texto": "Falar com a equipe",
+      "url": "mailto:contato@adai.com.br",
+      "nova_aba": false
+    },
+    "ancora": "como-contribuir"
+  }
+}

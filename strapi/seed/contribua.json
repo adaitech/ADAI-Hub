@@ -1,0 +1,142 @@
+{
+  "titulo": "Contribua",
+  "slug": "contribua",
+  "apresentacao": "editorial",
+  "seo": {
+    "metaTitle": "Contribua | ADAI",
+    "metaDescription": "Conheça a ADAI, entenda dízimos e ofertas e veja como contribuir pelo Pix para participar da missão de amar, servir e influenciar."
+  },
+  "sections": [
+    {
+      "__component": "sections.imagem-texto",
+      "imagem": null,
+      "posicao_imagem": "direita",
+      "preto_e_branco": false,
+      "rotulo": "Conheça o propósito da sua contribuição",
+      "titulo": "Generosidade\nque aproxima.\nE transforma.",
+      "texto": "Se você está conhecendo a ADAI agora, seja bem-vindo. Aqui, contribuir é uma forma de participar da missão de amar a Deus, servir as pessoas e influenciar o mundo.\n\nConheça a igreja, tire suas dúvidas e participe no seu tempo.",
+      "botao": {
+        "texto": "Quero entender melhor",
+        "url": "#sobre-a-adai",
+        "estilo": "solido"
+      },
+      "botoes_secundarios": [
+        {
+          "texto": "Já quero contribuir",
+          "url": "#como-contribuir",
+          "estilo": "contorno"
+        }
+      ]
+    },
+    {
+      "__component": "sections.texto-rico",
+      "titulo": "Somos a ADAI.\nUma igreja feita de pessoas.",
+      "ancora": "sobre-a-adai",
+      "apresentacao": "destaque",
+      "conteudo": "Somos uma comunidade cristã que se reúne para adorar a Deus, aprender sobre Jesus e caminhar junto em diferentes fases da vida.\n\nNossa missão pode ser resumida em três palavras: amar, servir e influenciar. As contribuições ajudam a manter essa missão em movimento.\n\nEsta página explica o significado de contribuir e como você pode participar."
+    },
+    {
+      "__component": "sections.carrossel-cards",
+      "titulo": "Por que uma igreja recebe contribuições?",
+      "texto_apoio": "Por trás de cada encontro existem espaços, equipes e recursos que tornam a vida da igreja possível. Contribuir é participar desse cuidado e ajudar a mensagem de Jesus a chegar a mais pessoas.",
+      "exibicao": "grade",
+      "estilo_imagem": "foto",
+      "posicao_imagem": "acima",
+      "preto_e_branco": true,
+      "cards": [
+        {
+          "titulo": "Um lugar para estar junto",
+          "texto": "Estrutura e espaços para os encontros, os cultos e a convivência da comunidade.",
+          "cor": "cinza"
+        },
+        {
+          "titulo": "Cuidado que vai além das portas",
+          "texto": "Apoio à missão da igreja de servir pessoas e compartilhar o amor de Jesus.",
+          "cor": "cinza"
+        },
+        {
+          "titulo": "A mensagem em mais lugares",
+          "texto": "Recursos para comunicar, ensinar e conectar pessoas, presencialmente e no ambiente digital.",
+          "cor": "cinza"
+        }
+      ]
+    },
+    {
+      "__component": "sections.carrossel-cards",
+      "titulo": "Dízimo e oferta. Qual é a diferença?",
+      "texto_apoio": "Talvez esses termos sejam novos para você. Os dois expressam generosidade, mas têm significados diferentes na vida cristã.",
+      "exibicao": "grade",
+      "estilo_imagem": "foto",
+      "posicao_imagem": "acima",
+      "preto_e_branco": true,
+      "cards": [
+        {
+          "titulo": "Dízimo",
+          "texto": "A palavra dízimo significa “décima parte”. Na tradição bíblica, corresponde a 10% da renda, dedicados a Deus.\nPara quem vive essa prática de fé, é uma expressão de fidelidade e uma participação constante no sustento da igreja.",
+          "cor": "cinza"
+        },
+        {
+          "titulo": "Oferta",
+          "texto": "É uma contribuição voluntária, sem percentual fixo. Uma forma de expressar gratidão e participar da missão da igreja.\nVocê decide o valor e quando contribuir, de acordo com sua vontade e suas possibilidades.",
+          "cor": "cinza"
+        }
+      ]
+    },
+    {
+      "__component": "sections.texto-rico",
+      "apresentacao": "destaque",
+      "conteudo": "> “Cada um dê conforme determinou em seu coração, não com pesar ou por obrigação.”\n>\n> 2 Coríntios 9:7"
+    },
+    {
+      "__component": "sections.pix",
+      "titulo": "Como contribuir pelo Pix.",
+      "texto_apoio": "A contribuição é feita no aplicativo do seu banco. Você não informa dados bancários nesta página.",
+      "chave_pix": "nossacasa@adai.com.br",
+      "passos": "Copie a chave Pix.\nAbra o aplicativo do seu banco e escolha a opção Pix.\nCole a chave, escolha o valor e confira o favorecido antes de confirmar.",
+      "ancora": "como-contribuir",
+      "contato": {
+        "texto": "Falar com a equipe",
+        "url": "mailto:contato@adai.com.br"
+      }
+    },
+    {
+      "__component": "sections.perguntas-frequentes",
+      "titulo": "Perguntas de quem está chegando.",
+      "texto_apoio": "Para você se sentir à vontade.",
+      "perguntas": [
+        {
+          "pergunta": "Preciso contribuir para conhecer a igreja?",
+          "resposta": "Você é bem-vindo para conhecer a ADAI e participar dos encontros. A contribuição é uma decisão pessoal e não é um ingresso para estar com a comunidade."
+        },
+        {
+          "pergunta": "Não sou membro. Posso fazer uma oferta?",
+          "resposta": "Sim. Se você deseja apoiar a missão da igreja, pode contribuir de forma voluntária. Se preferir conversar antes, escreva para contato@adai.com.br."
+        },
+        {
+          "pergunta": "Existe um valor mínimo para ofertar?",
+          "resposta": "A oferta não tem percentual fixo. Escolha um valor de acordo com sua vontade e suas possibilidades."
+        },
+        {
+          "pergunta": "Como posso saber mais antes de contribuir?",
+          "resposta": "Entre em contato pelo e-mail contato@adai.com.br. A equipe pode ajudar com dúvidas sobre a igreja e as formas de contribuição."
+        },
+        {
+          "pergunta": "O que devo conferir ao fazer o Pix?",
+          "resposta": "Use a chave nossacasa@adai.com.br e confira o nome do favorecido no aplicativo do seu banco. Se tiver qualquer dúvida sobre os dados, fale com a equipe antes de concluir."
+        }
+      ]
+    },
+    {
+      "__component": "sections.texto-botoes",
+      "titulo": "Vamos conversar?",
+      "texto_apoio": "Você não precisa conhecer todas as respostas para dar o primeiro passo. Nossa equipe pode ajudar.",
+      "botoes": [
+        {
+          "texto": "Falar com a equipe",
+          "url": "mailto:contato@adai.com.br",
+          "estilo": "contorno"
+        }
+      ]
+    }
+  ]
+}

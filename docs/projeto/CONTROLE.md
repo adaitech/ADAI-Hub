@@ -9,6 +9,7 @@
 | Dev | Frente | Squad | Entrega macro | Status | Branch / PR |
 | --- | --- | --- | --- | --- | --- |
 | **Diogo** | Página de **Agenda** | Experiência / Eventos | Página `/agenda` com os eventos da inChurch (base: seção Próximos eventos, filtro por unidade) | 🟡 em andamento | _a preencher_ |
+| **Marcelo (Bigasjunior)** | Página **Contribua** | Experiência / Contribuição | `/contribua` editorial, Pix, explicações e componentes reutilizáveis | 🔵 em revisão | `codex/contribua` → `main`; revisão solicitada ao Jonatan |
 | **Jefter** | **GC** — Encontre seu GC | Comunhão | Busca por unidade, bairro, dia e público; card do GC; inscrição enviada ao inChurch | 🟡 em andamento | _a preencher_ |
 | **Yuri** | **Dados** | Dados | Decisão Power BI × admin web na camada Silver; 3–5 indicadores | 🟡 em andamento | _a preencher_ |
 | **Euires** | **Dados** | Dados | Idem (dupla com o Yuri) | 🟡 em andamento | _a preencher_ |
