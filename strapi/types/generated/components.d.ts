@@ -352,6 +352,28 @@ export interface SectionsImagemTexto extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsListaTestes extends Struct.ComponentSchema {
+  collectionName: 'components_sections_listas_testes';
+  info: {
+    description: 'Lista autom\u00E1tica dos testes da EBA publicados (tipo Testes da EBA), cada um com explica\u00E7\u00E3o e bot\u00E3o para fazer o teste.';
+    displayName: 'Lista de testes';
+    icon: 'check';
+  };
+  attributes: {
+    mostrar_atalhos: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 240;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+  };
+}
+
 export interface SectionsMinisterios extends Struct.ComponentSchema {
   collectionName: 'components_sections_ministerios';
   info: {
@@ -607,6 +629,7 @@ declare module '@strapi/strapi' {
       'sections.catalogo-cursos': SectionsCatalogoCursos;
       'sections.hero': SectionsHero;
       'sections.imagem-texto': SectionsImagemTexto;
+      'sections.lista-testes': SectionsListaTestes;
       'sections.ministerios': SectionsMinisterios;
       'sections.perguntas-frequentes': SectionsPerguntasFrequentes;
       'sections.proximos-eventos': SectionsProximosEventos;

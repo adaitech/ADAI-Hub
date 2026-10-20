@@ -55,3 +55,41 @@ export interface CursoView extends CursoResumoView {
   seo: StrapiSeo | null;
   atualizadoEm: string | null;
 }
+
+/** JSON cru de um teste do CDV (`api::teste.teste`) como a API do Strapi entrega. */
+export interface StrapiTeste {
+  id: number;
+  documentId: string;
+  nome?: string | null;
+  slug?: string | null;
+  aula?: string | null;
+  resumo?: string | null;
+  o_que_e?: string | null;
+  itens_titulo?: string | null;
+  /** Um item por linha. */
+  itens?: string | null;
+  perguntas?: string | null;
+  resposta?: string | null;
+  como_responder?: string | null;
+  como_ler_resultado?: string | null;
+  link_teste?: string | null;
+  ordem?: number | null;
+}
+
+/** O que a Lista de testes precisa de cada teste. Parte vazia = null (não aparece). */
+export interface TesteView {
+  slug: string;
+  nome: string;
+  resumo: string;
+  aula: string | null;
+  oQueE: string | null;
+  itensTitulo: string | null;
+  itens: string[];
+  perguntas: string | null;
+  resposta: string | null;
+  comoResponder: string | null;
+  comoLerResultado: string | null;
+  /** Onde a pessoa faz o teste (https ou caminho interno); null = sem botão. */
+  link: string | null;
+  ordem: number;
+}

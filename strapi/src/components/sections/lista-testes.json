@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_sections_listas_testes",
+  "info": {
+    "displayName": "Lista de testes",
+    "icon": "check",
+    "description": "Lista automática dos testes da EBA publicados (tipo Testes da EBA), cada um com explicação e botão para fazer o teste."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": { "type": "string", "required": true, "maxLength": 80 },
+    "texto_apoio": { "type": "text", "maxLength": 240 },
+    "mostrar_atalhos": { "type": "boolean", "default": true }
+  }
+}

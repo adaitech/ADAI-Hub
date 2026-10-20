@@ -1,6 +1,6 @@
 import type { Core } from '@strapi/strapi';
 
-/** Conteúdo publicado do site é público: o Next lê page, global, unidades e cursos sem token. */
+/** Conteúdo publicado do site é público: o Next lê page, global, unidades, cursos e testes sem token. */
 const PUBLIC_ACTIONS = [
   'api::page.page.find',
   'api::page.page.findOne',
@@ -9,6 +9,8 @@ const PUBLIC_ACTIONS = [
   'api::unidade.unidade.findOne',
   'api::curso.curso.find',
   'api::curso.curso.findOne',
+  'api::teste.teste.find',
+  'api::teste.teste.findOne',
 ];
 
 export async function ensurePublicPermissions(strapi: Core.Strapi) {

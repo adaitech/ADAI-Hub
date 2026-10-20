@@ -1,6 +1,7 @@
 import apiCurso from './api.curso.json';
 import apiGlobal from './api.global.json';
 import apiPage from './api.page.json';
+import apiTeste from './api.teste.json';
 import apiUnidade from './api.unidade.json';
 import itemsCard from './items.card.json';
 import itemsColunaLinks from './items.coluna-links.json';
@@ -14,6 +15,7 @@ import sectionsCatalogoCursos from './sections.catalogo-cursos.json';
 import sectionsAgendaEventos from './sections.agenda-eventos.json';
 import sectionsHero from './sections.hero.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
+import sectionsListaTestes from './sections.lista-testes.json';
 import sectionsMinisterios from './sections.ministerios.json';
 import sectionsPerguntasFrequentes from './sections.perguntas-frequentes.json';
 import sectionsTextoBotoes from './sections.texto-botoes.json';
@@ -50,6 +52,7 @@ export const editorGuides: EditorGuide[] = [
   apiGlobal,
   apiUnidade,
   apiCurso,
+  apiTeste,
   sectionsHero,
   sectionsCarrosselCards,
   sectionsAgendaEventos,
@@ -61,6 +64,7 @@ export const editorGuides: EditorGuide[] = [
   sectionsPerguntasFrequentes,
   sectionsTextoRico,
   sectionsCatalogoCursos,
+  sectionsListaTestes,
   layoutHeader,
   layoutFooter,
   itemsCard,
@@ -78,6 +82,7 @@ export const mainFields: Record<string, string> = {
   'api::page.page': 'titulo',
   'api::unidade.unidade': 'nome',
   'api::curso.curso': 'nome',
+  'api::teste.teste': 'nome',
   'shared.botao': 'texto',
   'shared.link': 'texto',
   'items.coluna-links': 'titulo',

@@ -16,6 +16,7 @@ import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showca
 import { cursoCabecalhoShowcase } from '@/components/layout/CursoCabecalho/CursoCabecalho.showcase';
 import { catalogoCursosShowcase } from '@/components/sections/CatalogoCursosSection/CatalogoCursosSection.showcase';
 import { cardCursoShowcase } from '@/components/ui/CardCurso/CardCurso.showcase';
+import { listaTestesShowcase } from '@/components/sections/ListaTestesSection/ListaTestesSection.showcase';
 import { chipsShowcase } from '@/components/ui/Chips/Chips.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
 import { trilhaShowcase } from '@/components/ui/Trilha/Trilha.showcase';
@@ -44,6 +45,7 @@ export const showcaseCatalog: ShowcaseEntry[] = [
   cardCursoShowcase,
   catalogoCursosShowcase,
   cursoCabecalhoShowcase,
+  listaTestesShowcase,
 ];
 
 export const categoriaLabel: Record<ShowcaseCategoria, string> = {

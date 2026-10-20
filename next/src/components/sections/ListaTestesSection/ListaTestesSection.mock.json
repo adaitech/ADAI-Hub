@@ -1,0 +1,23 @@
+{
+  "completo": {
+    "__component": "sections.lista-testes",
+    "id": 41,
+    "titulo": "Os 5 testes",
+    "texto_apoio": "Na ordem em que aparecem no curso. Você pode ir direto a um deles:",
+    "mostrar_atalhos": true
+  },
+  "minimo": {
+    "__component": "sections.lista-testes",
+    "id": 42,
+    "titulo": "Testes do CDV",
+    "texto_apoio": null,
+    "mostrar_atalhos": null
+  },
+  "texto_longo": {
+    "__component": "sections.lista-testes",
+    "id": 43,
+    "titulo": "Conheça cada um dos testes de dons, talentos, estilo e temperamento do CDV",
+    "texto_apoio": "Os testes não dão nota nem dizem se você é melhor ou pior. Cada um mostra uma parte de como Deus fez você, e a consultoria do fim do curso junta os cinco resultados.",
+    "mostrar_atalhos": false
+  }
+}
