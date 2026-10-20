@@ -77,7 +77,7 @@ Os originais estão em `eba-adai/public/assets/testes/` e somam cerca de 90 MB (
 | --- | --- | --- |
 | `/eba/testes/[slug]` | Página do Next (Server Component + ilha cliente do questionário) | Só os 5 slugs; outro slug → 404. `noindex, nofollow`; fora do sitemap. |
 | `/eba/testes` | Página do Strapi (já existe) | O "Fazer o teste" passa a apontar para `/eba/testes/<slug>`: o seed troca o `link_teste` para o caminho interno. |
-| `eba.adai.com.br/teste/:slug` | Redirecionamento 301 no site atual | Fica em `redirecionamentos.mjs` (branch `feat/redirecionar-para-hub`), desligado até o lançamento. |
+| `eba.adai.com.br/teste/:slug` | Redirecionamento **307 (temporário)** no site atual | Fica em `redirecionamentos.mjs` (branch `feat/redirecionar-para-hub`), desligado até o lançamento. Temporário porque o destino é `noindex` e o rollback é desligar o redirecionamento: um 301 ficaria no cache dos celulares que já leram o QR code. Home e cursos seguem com 301. |
 
 A rota `/eba/testes/[slug]` é mais específica que `/eba/[slug]` e tem precedência.
 
@@ -168,6 +168,8 @@ A tela tem os estados do protótipo:
 | Turmas não carregam no Primeiro acesso | Mensagem com "Tentar de novo"; sem cadastro. |
 | A API recusa o envio (400) | "Algumas respostas não foram aceitas." O código da API vai para o log. As respostas são mantidas. |
 | Falha de rede ou 5xx no envio | Estado **Erro no envio**, com "Tentar de novo". |
+| A API grava (2xx), mas o resultado vem fora do formato | Estado de resultado com "Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.", sem "Tentar de novo" (reenviar duplicaria a gravação). O progresso é apagado e `concluir_teste` dispara. |
+| Aluno (Student) fora do formato (sem `id`/`idClass`) | Identificação e cadastro respondem como API indisponível; nenhuma sessão é aberta. |
 | Muitas tentativas de e-mail | "Muitas tentativas. Aguarde um minuto." |
 | Variáveis ausentes | "Testes indisponíveis no momento." |
 
@@ -233,7 +235,7 @@ Os testes são o objetivo da área, então ganham **2 eventos novos**, sem dado 
   - nenhuma variável `EBA_` com `NEXT_PUBLIC_`.
 - **Smoke:** `/eba/testes/dons-servico` responde 200 com a abertura. O smoke não envia respostas.
 - **Seed:** `link_teste` aponta para o caminho interno.
-- **Redirecionamentos** (`eba-adai-hub`): `/teste/:slug` → `/eba/testes/:slug` com 301 quando ligado.
+- **Redirecionamentos** (`eba-adai-hub`): `/teste/:slug` → `/eba/testes/:slug` com 307 quando ligado (home e cursos com 301).
 
 ## 10. Pré-requisitos externos (cada um com aprovação do usuário)
 
@@ -246,7 +248,7 @@ Os testes são o objetivo da área, então ganham **2 eventos novos**, sem dado 
 - **Homologação:** variáveis configuradas, teste de ponta a ponta com o aluno de teste e conferência no painel atual.
 - **Lançamento:** junto com o Hub, ligando `REDIRECIONAR_PARA_HUB` no site atual; os QR codes passam a cair no Hub.
 - **Rollback:**
-  - desligar o redirecionamento devolve os QR codes ao site atual, que continua funcionando;
+  - desligar o redirecionamento devolve os QR codes ao site atual, que continua funcionando (o redirecionamento dos testes é 307, temporário, para os celulares não o guardarem em cache);
   - voltar o `link_teste` no Strapi para o site atual.
 
 ## 12. Riscos

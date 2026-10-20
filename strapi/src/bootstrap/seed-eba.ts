@@ -34,7 +34,8 @@ const teste = (dados: Omit<TesteSeed, 'link_teste'>): TesteSeed => ({ ...dados, 
 
 /**
  * Os 5 testes do CDV, resumidos da apostila do curso (CDV, EBA 2023: aulas 5, 6, 7, 10 e 11), na ordem
- * em que aparecem nela. O link é o do site atual, o mesmo dos QR codes, até a entrega 2.
+ * em que aparecem nela. O link é a página do teste no Hub (`/eba/testes/<slug>`); os QR codes do
+ * site atual redirecionam para ela.
  */
 export const TESTES_EBA: TesteSeed[] = [
   teste({
