@@ -1,8 +1,9 @@
 import 'server-only';
-import { ebaFetch } from './client';
+import { z } from 'zod';
+import { ebaFetch, EbaApiRespostaInvalida } from './client';
 import { descricaoDoEstilo, descricaoDoTemperamento } from './conteudo-local';
 import { definicaoDoTeste, type SlugTeste } from './testes';
-import type { EbaResultadoEstiloApi, EbaResultadoItemApi, EbaSurveyResponseEnvioApi } from './tipos';
+import type { EbaSurveyResponseEnvioApi } from './tipos';
 
 export interface ItemResultado {
   nome: string;
@@ -12,16 +13,30 @@ export interface ItemResultado {
 
 export type Resultado =
   | { tipo: 'pontuacao'; itens: ItemResultado[]; maximo: number }
-  | { tipo: 'estilo'; combinacao: string; descricao: string | null; motivacao: number; organizacao: number };
+  | { tipo: 'estilo'; combinacao: string; descricao: string | null; motivacao: number; organizacao: number }
+  /**
+   * A API gravou as respostas (2xx), mas devolveu um resultado fora do formato esperado: a tela
+   * avisa que as respostas foram enviadas, sem "Tentar de novo" (reenviar duplicaria a gravação).
+   */
+  | { tipo: 'sem-resultado' };
 
 /** Máximo por item nos testes de nota (5 por pergunta × 5 perguntas do dom). */
 const MAXIMO_NOTA = 25;
 /** A API guarda 0/1 por talento. */
 const MAXIMO_TALENTO = 1;
 
+/** Itens de pontuação (nota, talentos, temperamento): `message` é opcional. */
+const esquemaItens = z.array(
+  z.object({ name: z.string(), totalRate: z.number(), message: z.string().nullish().catch(null) }),
+);
+const esquemaMensagem = z.object({ message: z.string() });
+/** Estilo: `{message}` ou `[{message}]` (a forma real do POST ainda não foi observada). */
+const esquemaEstilo = z.union([esquemaMensagem, z.tuple([esquemaMensagem], esquemaMensagem)]);
+
 /**
  * Envia as respostas (já no formato da API: a UI agrega) e devolve o resultado do teste.
- * Nunca registra dados do aluno.
+ * Nunca registra dados do aluno. Corpo 2xx fora do formato → `EbaApiRespostaInvalida` (as respostas
+ * já foram gravadas pela API: quem chama não deve reenviar).
  */
 export async function enviarRespostas(e: {
   slug: SlugTeste;
@@ -41,13 +56,12 @@ export async function enviarRespostas(e: {
       rate: r.nota,
     })),
   };
-  const retorno = await ebaFetch<EbaResultadoItemApi[] | EbaResultadoEstiloApi | EbaResultadoEstiloApi[]>(
-    'SurveyResponse',
-    { metodo: 'POST', corpo },
-  );
+  const retorno = await ebaFetch<unknown>('SurveyResponse', { metodo: 'POST', corpo });
 
   if (teste.tipo === 'estilo') {
-    const { message } = Array.isArray(retorno) ? (retorno[0] as EbaResultadoEstiloApi) : (retorno as EbaResultadoEstiloApi);
+    const valido = esquemaEstilo.safeParse(retorno);
+    if (!valido.success) throw new EbaApiRespostaInvalida('SurveyResponse (estilo) sem message');
+    const { message } = Array.isArray(valido.data) ? valido.data[0] : valido.data;
     const nota = (numero: number) => e.respostas.find((r) => r.numero === numero)?.nota ?? 0;
     return {
       tipo: 'estilo',
@@ -58,7 +72,9 @@ export async function enviarRespostas(e: {
     };
   }
 
-  const itens: ItemResultado[] = (retorno as EbaResultadoItemApi[])
+  const valido = esquemaItens.safeParse(retorno);
+  if (!valido.success) throw new EbaApiRespostaInvalida('SurveyResponse sem lista de name/totalRate');
+  const itens: ItemResultado[] = valido.data
     .map((i) => ({
       nome: i.name,
       total: i.totalRate,

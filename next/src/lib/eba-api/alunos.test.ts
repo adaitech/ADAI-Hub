@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import aluno from './__fixtures__/student-por-email.json';
 import { alunoPorEmail, cadastrarAluno, normalizarEmail } from './alunos';
-import { ebaFetch, EbaApiError } from './client';
+import { ebaFetch, EbaApiError, EbaApiRespostaInvalida } from './client';
 
 jest.mock('./client', () => ({ ...jest.requireActual('./client'), ebaFetch: jest.fn() }));
 const ebaFetchMock = jest.mocked(ebaFetch);
@@ -44,5 +44,30 @@ describe('alunos', () => {
       corpo: { name: 'Ana Exemplo', email: 'ana@exemplo.com', room: 'campestre', idClass: aluno.idClass },
     });
     expect(r).toEqual({ idStudent: aluno.id, idClass: aluno.idClass });
+  });
+
+  describe('Student com formato inesperado → EbaApiRespostaInvalida', () => {
+    const invalidos = [
+      ['null', null],
+      ['sem id', { ...aluno, id: undefined }],
+      ['id vazio', { ...aluno, id: '' }],
+      ['idClass vazio', { ...aluno, idClass: '  ' }],
+      ['idClass numérico', { ...aluno, idClass: 7 }],
+      ['array', [aluno]],
+    ] as const;
+
+    it.each(invalidos)('GET: %s', async (_n, retorno) => {
+      ebaFetchMock.mockResolvedValue(retorno);
+      const erro = await alunoPorEmail('ana@exemplo.com').catch((e: unknown) => e);
+      expect(erro).toBeInstanceOf(EbaApiRespostaInvalida);
+      expect((erro as Error).message).not.toContain('ana@exemplo.com');
+    });
+
+    it.each(invalidos)('POST: %s', async (_n, retorno) => {
+      ebaFetchMock.mockResolvedValue(retorno);
+      await expect(
+        cadastrarAluno({ nome: 'Ana Exemplo', email: 'ana@exemplo.com', unidade: 'campestre', idTurma: aluno.idClass }),
+      ).rejects.toBeInstanceOf(EbaApiRespostaInvalida);
+    });
   });
 });

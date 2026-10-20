@@ -18,6 +18,7 @@ export const questionarioShowcase = defineShowcase<QuestionarioVitrineProps>({
     { nome: 'estilo', titulo: 'Escala 1 a 5 (estilo)', data: { teste: 'estilo-pessoal', tela: 'pergunta' } },
     { nome: 'temperamento', titulo: 'Marcar itens (temperamento)', data: { teste: 'temperamento-pessoal', tela: 'pergunta' } },
     { nome: 'resultado', titulo: 'Resultado', data: { teste: 'dons-servico', tela: 'resultado' } },
+    { nome: 'sem-resultado', titulo: 'Respostas enviadas, sem resultado', data: { teste: 'dons-servico', tela: 'sem-resultado' } },
     { nome: 'erro', titulo: 'Erro no envio', data: { teste: 'dons-servico', tela: 'erro' } },
   ],
   controles: [

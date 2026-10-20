@@ -13,7 +13,7 @@ import {
   type SessaoAluno,
 } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno, normalizarEmail } from '@/lib/eba-api/alunos';
-import { EbaApiError, EbaApiIndisponivel, ebaApiConfigurada } from '@/lib/eba-api/client';
+import { EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida, ebaApiConfigurada } from '@/lib/eba-api/client';
 import { perguntasDoTeste } from '@/lib/eba-api/perguntas';
 import { enviarRespostas, type Resultado } from '@/lib/eba-api/respostas';
 import { definicaoDoTeste, UNIDADES, type SlugTeste } from '@/lib/eba-api/testes';
@@ -45,8 +45,8 @@ function configuracao(): { segredo: string } | null {
 function registrarFalha(acao: string, erro: unknown): void {
   if (erro instanceof EbaApiError) {
     console.warn(`[eba-testes] ${acao}: EbaApiError status=${erro.status} codigo=${erro.codigo ?? '-'}`);
-  } else if (erro instanceof EbaApiIndisponivel) {
-    console.warn(`[eba-testes] ${acao}: EbaApiIndisponivel`);
+  } else if (erro instanceof EbaApiIndisponivel || erro instanceof EbaApiRespostaInvalida) {
+    console.warn(`[eba-testes] ${acao}: ${erro.name}`);
   } else {
     console.warn(`[eba-testes] ${acao}: ${erro instanceof Error ? erro.name : 'erro desconhecido'}`);
   }
@@ -66,6 +66,25 @@ async function abrirSessao(aluno: { idStudent: string; idClass: string }, email:
 }
 
 const esquemaEmail = z.string().trim().max(254).pipe(z.email());
+
+/**
+ * Sessão do cookie, ou null. Cookie presente mas vencido ou adulterado é apagado (spec §5.3).
+ * Na renderização do Server Component o cookie é só leitura: a tentativa é ignorada e o
+ * próximo `enviar` (Server Action) apaga.
+ */
+async function sessaoDoCookie(segredo: string): Promise<SessaoAluno | null> {
+  const cofre = await cookies();
+  const valor = cofre.get(COOKIE_SESSAO)?.value;
+  const sessao = lerSessao(valor, segredo, Date.now());
+  if (!sessao && valor) {
+    try {
+      cofre.delete({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
+    } catch {
+      // Renderização (cookies só leitura): fica para a próxima Server Action.
+    }
+  }
+  return sessao;
+}
 
 export async function identificar(
   email: string,
@@ -93,7 +112,8 @@ export async function identificar(
 
 const esquemaCadastro = z.object({
   email: esquemaEmail,
-  nome: z.string().trim().min(3).max(100),
+  // Sem caracteres de controle (quebra de linha, tabulação, nulo…): o nome vai para o painel da EBA.
+  nome: z.string().trim().min(3).max(100).refine((nome) => !/\p{Cc}/u.test(nome)),
   unidade: z.enum(UNIDADES.map((u) => u.valor) as [string, ...string[]]),
   idTurma: z.string().min(1).max(100),
 });
@@ -114,6 +134,12 @@ export async function cadastrar(dados: {
   const email = normalizarEmail(valido.data.email);
 
   try {
+    // E-mail já cadastrado (outra aba, clique duplo, cadastro feito em outro aparelho): abre a
+    // sessão como no `identificar`, sem criar um aluno duplicado.
+    const existente = await alunoPorEmail(email);
+    if (existente) {
+      return { ok: true, dados: { emailMascarado: await abrirSessao(existente, email, config.segredo) } };
+    }
     const turmas = await turmasAtivas();
     if (!turmas.some((t) => t.id === idTurma)) return falha('invalido');
     const aluno = await cadastrarAluno({ nome, email, unidade, idTurma });
@@ -121,7 +147,7 @@ export async function cadastrar(dados: {
     return { ok: true, dados: { emailMascarado } };
   } catch (erro) {
     registrarFalha('cadastrar', erro);
-    return falha('indisponivel');
+    return falha(erro instanceof EbaApiError && erro.status === 400 ? 'recusado' : 'indisponivel');
   }
 }
 
@@ -178,7 +204,7 @@ export async function enviar(
   const config = configuracao();
   if (!config) return falha('indisponivel');
 
-  const sessao = lerSessao((await cookies()).get(COOKIE_SESSAO)?.value, config.segredo, Date.now());
+  const sessao = await sessaoDoCookie(config.segredo);
   if (!sessao) return falha('sessao');
 
   const teste = definicaoDoTeste(typeof slug === 'string' ? slug : '');
@@ -196,6 +222,9 @@ export async function enviar(
     return { ok: true, dados: resultado };
   } catch (erro) {
     registrarFalha('enviar', erro);
+    // 2xx com corpo fora do formato: a API já gravou as respostas. Sucesso sem resultado, para a
+    // tela não oferecer "Tentar de novo" (reenviar duplicaria a gravação).
+    if (erro instanceof EbaApiRespostaInvalida) return { ok: true, dados: { tipo: 'sem-resultado' } };
     return falha(erro instanceof EbaApiError && erro.status === 400 ? 'recusado' : 'indisponivel');
   }
 }
@@ -207,6 +236,6 @@ export async function sair(): Promise<void> {
 export async function sessaoAtual(): Promise<{ emailMascarado: string } | null> {
   const config = configuracao();
   if (!config) return null;
-  const sessao = lerSessao((await cookies()).get(COOKIE_SESSAO)?.value, config.segredo, Date.now());
+  const sessao = await sessaoDoCookie(config.segredo);
   return sessao ? { emailMascarado: sessao.emailMascarado } : null;
 }

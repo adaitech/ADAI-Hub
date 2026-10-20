@@ -106,22 +106,32 @@ function Estilo({ resultado }: { resultado: Extract<ResultadoApi, { tipo: 'estil
   );
 }
 
-/** Resultado do teste: itens em ordem (já vêm ordenados), próximo teste e "Sair". */
+function Conteudo({ teste, resultado }: { teste: DefinicaoTeste; resultado: Exclude<ResultadoApi, { tipo: 'sem-resultado' }> }) {
+  if (resultado.tipo === 'estilo') return <Estilo resultado={resultado} />;
+  if (teste.tipo === 'talentos') return <Talentos itens={resultado.itens} />;
+  return <Pontuacao itens={resultado.itens} maximo={resultado.maximo} porcentagem={teste.tipo === 'temperamento'} />;
+}
+
+/**
+ * Resultado do teste: itens em ordem (já vêm ordenados), próximo teste e "Sair".
+ * `sem-resultado`: a API gravou as respostas, mas o resultado não pôde ser lido; sem "Tentar de novo".
+ */
 export function Resultado({ teste, resultado, emailMascarado, saiu, onSair, tituloRef }: ResultadoProps) {
   const proximo = proximoTeste(teste.slug);
+  const semResultado = resultado.tipo === 'sem-resultado';
   return (
     <>
       <h2 ref={tituloRef} tabIndex={-1} className={styles.subtitulo}>
-        Seu resultado
+        {semResultado ? 'Respostas enviadas' : 'Seu resultado'}
       </h2>
-      {resultado.tipo === 'estilo' ? (
-        <Estilo resultado={resultado} />
-      ) : teste.tipo === 'talentos' ? (
-        <Talentos itens={resultado.itens} />
+      {semResultado ? (
+        <p className={styles.texto}>Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.</p>
       ) : (
-        <Pontuacao itens={resultado.itens} maximo={resultado.maximo} porcentagem={teste.tipo === 'temperamento'} />
+        <>
+          <Conteudo teste={teste} resultado={resultado} />
+          <p className={styles.texto}>Seu resultado foi enviado para a equipe da EBA.</p>
+        </>
       )}
-      <p className={styles.texto}>Seu resultado foi enviado para a equipe da EBA.</p>
       <div className={styles.botoes}>
         {proximo && <ButtonLink href={`/eba/testes/${proximo.slug}`}>{`Próximo teste: ${proximo.nome}`}</ButtonLink>}
         <ButtonLink href="/eba/testes" estilo="contorno">

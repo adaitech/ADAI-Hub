@@ -5,6 +5,7 @@ import {
   criarEstado,
   lerProgresso,
   paginaTemperamento,
+  progressoPertenceA,
   parEstilo,
   podeEnviar,
   progressoDe,
@@ -129,10 +130,35 @@ describe('reducer — transições', () => {
 
   it('sessão encerrada → expirou, com as respostas mantidas e volta para o envio', () => {
     const e = aplicar(nota({ estado: 'pergunta', emailMascarado: 'a***@x.com' }), { tipo: 'responder', chave: 1, valor: 2 }, { tipo: 'enviar' }, { tipo: 'falhou', erro: 'sessao' });
-    expect(e).toMatchObject({ estado: 'expirou', respostas: { 1: 2 }, emailMascarado: null, retorno: 'enviando' });
+    expect(e).toMatchObject({ estado: 'expirou', respostas: { 1: 2 }, emailMascarado: null, retorno: 'enviando', respondidoComo: 'a***@x.com' });
     const email = reducer(e, { tipo: 'informarEmail' });
     expect(email.estado).toBe('email');
-    expect(reducer(email, { tipo: 'identificado', emailMascarado: 'b***@x.com' }).estado).toBe('enviando');
+    expect(reducer(email, { tipo: 'identificado', emailMascarado: 'a***@x.com' })).toMatchObject({ estado: 'enviando', respostas: { 1: 2 } });
+  });
+
+  it('sessão encerrada e outra pessoa se identifica: descarta as respostas e recomeça (sem reenviar)', () => {
+    const e = aplicar(
+      nota({ estado: 'pergunta', emailMascarado: 'a***@x.com', respondidoComo: 'a***@x.com' }),
+      { tipo: 'responder', chave: 1, valor: 2 },
+      { tipo: 'avancar' },
+      { tipo: 'enviar' },
+      { tipo: 'falhou', erro: 'sessao' },
+      { tipo: 'informarEmail' },
+    );
+    expect(progressoPertenceA(e, 'b***@y.com')).toBe(false);
+    expect(progressoPertenceA(e, 'a***@x.com')).toBe(true);
+    const b = reducer(e, { tipo: 'identificado', emailMascarado: 'b***@y.com' });
+    expect(b).toMatchObject({ estado: 'pergunta', passo: 0, respostas: {}, marcadas: [], escolhidas: [], retorno: 'pergunta', emailMascarado: 'b***@y.com', respondidoComo: 'b***@y.com' });
+  });
+
+  it('identificado sem progresso: assume o e-mail da sessão', () => {
+    const e = reducer(nota({ estado: 'email' }), { tipo: 'identificado', emailMascarado: 'b***@y.com' });
+    expect(progressoPertenceA(nota(), 'qualquer')).toBe(true);
+    expect(e).toMatchObject({ estado: 'pergunta', respondidoComo: 'b***@y.com' });
+  });
+
+  it('começar com sessão: as respostas passam a ser dessa sessão', () => {
+    expect(reducer(nota({ emailMascarado: 'a***@x.com' }), { tipo: 'comecar' })).toMatchObject({ estado: 'pergunta', respondidoComo: 'a***@x.com' });
   });
 
   it.each(['indisponivel', 'recusado'] as const)('%s → erro, com as respostas mantidas', (erro) => {
@@ -144,9 +170,34 @@ describe('reducer — transições', () => {
     expect(reducer(nota({ estado: 'erro', passo: 2 }), { tipo: 'revisar' })).toMatchObject({ estado: 'pergunta', passo: 0, erroEnvio: null });
   });
 
-  it('trocar e-mail esquece a sessão e volta às perguntas depois', () => {
-    const e = reducer(nota({ estado: 'pergunta', emailMascarado: 'a***@x.com' }), { tipo: 'trocarEmail' });
-    expect(e).toMatchObject({ estado: 'email', emailMascarado: null, retorno: 'pergunta' });
+  it('trocar e-mail esquece a sessão, apaga o progresso e recomeça da primeira pergunta', () => {
+    const respondido = aplicar(
+      nota({ estado: 'pergunta', emailMascarado: 'a***@x.com', respondidoComo: 'a***@x.com' }),
+      { tipo: 'responder', chave: 1, valor: 2 },
+      { tipo: 'avancar' },
+      { tipo: 'responder', chave: 2, valor: 4 },
+    );
+    const e = reducer(respondido, { tipo: 'trocarEmail' });
+    expect(e).toMatchObject({ estado: 'email', emailMascarado: null, retorno: 'pergunta', passo: 0, respostas: {}, marcadas: [], escolhidas: [], respondidoComo: null });
+    expect(temProgresso(e)).toBe(false);
+    expect(reducer(e, { tipo: 'identificado', emailMascarado: 'b***@y.com' })).toMatchObject({ estado: 'pergunta', passo: 0, respostas: {} });
+  });
+
+  it('trocar e-mail no erro de envio também apaga as respostas', () => {
+    const e = aplicar(
+      nota({ estado: 'pergunta', emailMascarado: 'a***@x.com', respondidoComo: 'a***@x.com' }),
+      { tipo: 'responder', chave: 1, valor: 2 },
+      { tipo: 'enviar' },
+      { tipo: 'falhou', erro: 'indisponivel' },
+      { tipo: 'trocarEmail' },
+    );
+    expect(e).toMatchObject({ estado: 'email', respostas: {}, erroEnvio: null });
+  });
+
+  it('trocar e-mail com talentos apaga marcadas e escolhidas', () => {
+    const t = { ...criarEstado({ tipo: 'talentos', perguntas, sessao: { emailMascarado: 'a***@x.com' } }), estado: 'pergunta' as const };
+    const e = aplicar(t, { tipo: 'marcar', id: 1 }, { tipo: 'avancar' }, { tipo: 'escolher', id: 1 }, { tipo: 'trocarEmail' });
+    expect(e).toMatchObject({ passo: 0, marcadas: [], escolhidas: [] });
   });
 
   it('sair esquece a sessão', () => {
@@ -154,9 +205,35 @@ describe('reducer — transições', () => {
   });
 
   it('restaurar aplica o progresso salvo e marca como carregado', () => {
-    const e = reducer(nota(), { tipo: 'restaurar', progresso: { passo: 2, respostas: { 1: 3, 2: 1 }, marcadas: [], escolhidas: [] } });
-    expect(e).toMatchObject({ carregado: true, passo: 2, respostas: { 1: 3, 2: 1 } });
+    const e = reducer(nota(), { tipo: 'restaurar', progresso: { passo: 2, respostas: { 1: 3, 2: 1 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@x.com' } });
+    expect(e).toMatchObject({ carregado: true, passo: 2, respostas: { 1: 3, 2: 1 }, respondidoComo: 'a***@x.com' });
     expect(reducer(nota(), { tipo: 'restaurar', progresso: null })).toMatchObject({ carregado: true, passo: 0 });
+  });
+
+  it('restaurar com a mesma sessão mantém o progresso', () => {
+    const progresso = { passo: 2, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@x.com' };
+    expect(reducer(nota({ emailMascarado: 'a***@x.com' }), { tipo: 'restaurar', progresso })).toMatchObject({ passo: 2, respostas: { 1: 3 } });
+  });
+
+  it('restaurar com sessão de outra pessoa descarta o progresso', () => {
+    const progresso = { passo: 2, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@x.com' };
+    const e = reducer(nota({ emailMascarado: 'b***@y.com' }), { tipo: 'restaurar', progresso });
+    expect(e).toMatchObject({ carregado: true, passo: 0, respostas: {}, respondidoComo: 'b***@y.com' });
+  });
+
+  it('restaurar progresso sem o e-mail das respostas (formato antigo ou adulterado) descarta', () => {
+    const progresso = { passo: 2, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: null };
+    expect(reducer(nota(), { tipo: 'restaurar', progresso })).toMatchObject({ carregado: true, passo: 0, respostas: {} });
+  });
+
+  it('restaurar sem sessão mantém o progresso até a identificação decidir', () => {
+    const progresso = { passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@x.com' };
+    const e = reducer(nota(), { tipo: 'restaurar', progresso });
+    expect(e).toMatchObject({ passo: 1, respostas: { 1: 3 } });
+    const outra = reducer(reducer(e, { tipo: 'comecar' }), { tipo: 'identificado', emailMascarado: 'b***@y.com' });
+    expect(outra).toMatchObject({ estado: 'pergunta', passo: 0, respostas: {} });
+    const mesma = reducer(reducer(e, { tipo: 'comecar' }), { tipo: 'identificado', emailMascarado: 'a***@x.com' });
+    expect(mesma).toMatchObject({ estado: 'pergunta', passo: 1, respostas: { 1: 3 } });
   });
 });
 
@@ -170,7 +247,7 @@ describe('lerProgresso (sessionStorage)', () => {
 
   it('nota: passo dentro do teste, só perguntas que existem e notas inteiras de 0 a 5', () => {
     const texto = salvo({ passo: 99, respostas: { 1: 3, 2: 'x', 3: 2.5, 4: 1, 0: 0 }, marcadas: [1], escolhidas: [1] });
-    expect(lerProgresso(texto, ctxNota)).toEqual({ passo: 2, respostas: { 1: 3 }, marcadas: [], escolhidas: [] });
+    expect(lerProgresso(texto, ctxNota)).toEqual({ passo: 2, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: null });
     expect(lerProgresso(salvo({ respostas: { 1: 6, 2: -1, 3: 5 } }), ctxNota)?.respostas).toEqual({ 3: 5 });
   });
 
@@ -189,21 +266,27 @@ describe('lerProgresso (sessionStorage)', () => {
   it('talentos: marcadas só entre as perguntas, escolhidas entre as marcadas e até 3', () => {
     const ctx = { tipo: 'talentos' as const, total: 2, perguntas: [...perguntas, { numero: 4, texto: 'Quarta' }] };
     const texto = salvo({ respostas: { 1: 1 }, marcadas: [2, 2, 'a', 1, 3, 4, 99], escolhidas: [1, 1, 2, 3, 4, 7] });
-    expect(lerProgresso(texto, ctx)).toEqual({ passo: 0, respostas: {}, marcadas: [1, 2, 3, 4], escolhidas: [1, 2, 3] });
+    expect(lerProgresso(texto, ctx)).toEqual({ passo: 0, respostas: {}, marcadas: [1, 2, 3, 4], escolhidas: [1, 2, 3], respondidoComo: null });
   });
 
   it('temperamento: ids de 0 a 199, sem escolhidas', () => {
     const ctx = { tipo: 'temperamento' as const, total: 20, perguntas: [] };
-    expect(lerProgresso(salvo({ marcadas: [-1, 0, 199, 200], escolhidas: [0] }), ctx)).toEqual({ passo: 0, respostas: {}, marcadas: [0, 199], escolhidas: [] });
+    expect(lerProgresso(salvo({ marcadas: [-1, 0, 199, 200], escolhidas: [0] }), ctx)).toEqual({ passo: 0, respostas: {}, marcadas: [0, 199], escolhidas: [], respondidoComo: null });
   });
 
   it('campos ausentes viram vazios', () => {
-    expect(lerProgresso('{"passo":1}', ctxNota)).toEqual({ passo: 1, respostas: {}, marcadas: [], escolhidas: [] });
+    expect(lerProgresso('{"passo":1}', ctxNota)).toEqual({ passo: 1, respostas: {}, marcadas: [], escolhidas: [], respondidoComo: null });
+  });
+
+  it('lê o e-mail mascarado das respostas (só texto não vazio; o resto vira null)', () => {
+    expect(lerProgresso(salvo({ respondidoComo: 'a***@x.com' }), ctxNota)?.respondidoComo).toBe('a***@x.com');
+    expect(lerProgresso(salvo({ respondidoComo: 7 }), ctxNota)?.respondidoComo).toBeNull();
+    expect(lerProgresso(salvo({ respondidoComo: '' }), ctxNota)?.respondidoComo).toBeNull();
   });
 
   it('progressoDe e temProgresso', () => {
-    const e = aplicar(nota({ estado: 'pergunta' }), { tipo: 'responder', chave: 1, valor: 0 }, { tipo: 'avancar' });
-    expect(progressoDe(e)).toEqual({ passo: 1, respostas: { 1: 0 }, marcadas: [], escolhidas: [] });
+    const e = aplicar(nota({ estado: 'pergunta', respondidoComo: 'a***@x.com' }), { tipo: 'responder', chave: 1, valor: 0 }, { tipo: 'avancar' });
+    expect(progressoDe(e)).toEqual({ passo: 1, respostas: { 1: 0 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@x.com' });
     expect(temProgresso(e)).toBe(true);
     expect(temProgresso(nota())).toBe(false);
   });

@@ -19,12 +19,18 @@ export type Estado = 'abertura' | 'email' | 'cadastro' | 'pergunta' | 'enviando'
 /** Erros de envio que mantêm a pessoa na tela de erro (sessão encerrada vira `expirou`). */
 export type ErroEnvio = 'indisponivel' | 'recusado';
 
-/** O que fica no `sessionStorage`: só respostas, nunca dado pessoal. */
+/**
+ * O que fica no `sessionStorage`: as respostas e o e-mail **mascarado** da sessão em que foram dadas
+ * (`a***@email.com`), nunca o e-mail inteiro nem outro dado pessoal. O e-mail mascarado impede que as
+ * respostas de uma pessoa sejam enviadas como de outra que use o mesmo aparelho.
+ */
 export interface Progresso {
   passo: number;
   respostas: Record<number, number>;
   marcadas: number[];
   escolhidas: number[];
+  /** E-mail mascarado da sessão em que as respostas foram dadas; null = ainda sem dono. */
+  respondidoComo: string | null;
 }
 
 export interface EstadoQuestionario extends Progresso {
@@ -108,6 +114,7 @@ export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perg
     respostas: {},
     marcadas: [],
     escolhidas: [],
+    respondidoComo: null,
     emailMascarado: sessao?.emailMascarado ?? null,
     cadastro: null,
     retorno: 'pergunta',
@@ -118,37 +125,66 @@ export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perg
   };
 }
 
+const SEM_PROGRESSO = { passo: 0, respostas: {}, marcadas: [], escolhidas: [] } satisfies Omit<Progresso, 'respondidoComo'>;
+
+/**
+ * O progresso atual pode seguir com a sessão de `emailMascarado`: foi respondido nela, ainda não tem
+ * dono (nenhuma resposta dada com sessão) ou está vazio.
+ */
+export function progressoPertenceA(s: EstadoQuestionario, emailMascarado: string): boolean {
+  return s.respondidoComo === null || s.respondidoComo === emailMascarado || !temProgresso(s);
+}
+
+/** Cada resposta fica marcada com a sessão em que foi dada. */
+const comDono = (s: EstadoQuestionario) => s.respondidoComo ?? s.emailMascarado;
+
+/** A sessão de `emailMascarado` assume o progresso; respostas de outra pessoa são descartadas. */
+function assumir(s: EstadoQuestionario, emailMascarado: string): EstadoQuestionario {
+  return progressoPertenceA(s, emailMascarado)
+    ? { ...s, respondidoComo: emailMascarado }
+    : { ...s, ...SEM_PROGRESSO, respondidoComo: emailMascarado, retorno: 'pergunta' };
+}
+
 const ordenados = (lista: number[]) => [...new Set(lista)].sort((a, b) => a - b);
 const alternar = (lista: number[], id: number) => (lista.includes(id) ? lista.filter((x) => x !== id) : ordenados([...lista, id]));
 
 export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
   switch (a.tipo) {
-    case 'restaurar':
-      return { ...s, ...(a.progresso ?? {}), carregado: true };
+    case 'restaurar': {
+      // Progresso sem o e-mail das respostas (formato antigo ou adulterado) não tem dono: descarta.
+      const progresso = a.progresso?.respondidoComo ? a.progresso : null;
+      const restaurado = { ...s, ...(progresso ?? {}), carregado: true };
+      return s.emailMascarado ? assumir(restaurado, s.emailMascarado) : restaurado;
+    }
     case 'comecar':
-      return { ...s, estado: s.emailMascarado ? 'pergunta' : 'email' };
-    case 'identificado':
-      return { ...s, estado: s.retorno, emailMascarado: a.emailMascarado, cadastro: null, saiu: false };
+      return s.emailMascarado ? assumir({ ...s, estado: 'pergunta' }, s.emailMascarado) : { ...s, estado: 'email' };
+    case 'identificado': {
+      // Outra pessoa (e-mail mascarado diferente): recomeça da primeira pergunta, sem reenviar.
+      const estado = progressoPertenceA(s, a.emailMascarado) ? s.retorno : 'pergunta';
+      return assumir({ ...s, estado, emailMascarado: a.emailMascarado, cadastro: null, saiu: false }, a.emailMascarado);
+    }
     case 'novoAluno':
       return { ...s, estado: 'cadastro', cadastro: { email: a.email, turmas: a.turmas } };
     case 'voltarEmail':
       return { ...s, estado: 'email', cadastro: null };
+    // "Não é você?": a sessão é encerrada e o progresso, apagado; depois de identificar, o teste
+    // recomeça da primeira pergunta. (Sessão vencida usa `falhou` → `expirou` e mantém as respostas.)
     case 'trocarEmail':
-      return { ...s, estado: 'email', emailMascarado: null, retorno: 'pergunta' };
+      return { ...s, ...SEM_PROGRESSO, respondidoComo: null, estado: 'email', emailMascarado: null, retorno: 'pergunta', erroEnvio: null };
     case 'informarEmail':
       return { ...s, estado: 'email' };
     // Só registra: quem avança é a tela (escolha com ponteiro ou 'Próxima pergunta'), para o
     // teclado poder percorrer a escala com as setas sem pular de pergunta.
     case 'responder':
-      return { ...s, respostas: { ...s.respostas, [a.chave]: a.valor } };
+      return { ...s, respostas: { ...s.respostas, [a.chave]: a.valor }, respondidoComo: comDono(s) };
     case 'marcar': {
       const marcadas = alternar(s.marcadas, a.id);
-      return { ...s, marcadas, escolhidas: s.escolhidas.filter((id) => marcadas.includes(id)) };
+      return { ...s, marcadas, escolhidas: s.escolhidas.filter((id) => marcadas.includes(id)), respondidoComo: comDono(s) };
     }
     case 'escolher': {
       if (s.escolhidas.includes(a.id)) return { ...s, escolhidas: s.escolhidas.filter((id) => id !== a.id) };
       if (!s.marcadas.includes(a.id) || s.escolhidas.length >= MAXIMO_ESCOLHIDAS) return s;
-      return { ...s, escolhidas: ordenados([...s.escolhidas, a.id]) };
+      return { ...s, escolhidas: ordenados([...s.escolhidas, a.id]), respondidoComo: comDono(s) };
     }
     case 'avancar':
       if (s.tipo === 'talentos' && s.passo === 0 && s.marcadas.length === 0) return s;
@@ -171,7 +207,7 @@ export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
 }
 
 export function progressoDe(s: EstadoQuestionario): Progresso {
-  return { passo: s.passo, respostas: s.respostas, marcadas: s.marcadas, escolhidas: s.escolhidas };
+  return { passo: s.passo, respostas: s.respostas, marcadas: s.marcadas, escolhidas: s.escolhidas, respondidoComo: s.respondidoComo };
 }
 
 export function temProgresso(s: EstadoQuestionario): boolean {
@@ -205,7 +241,7 @@ export function lerProgresso(texto: string | null, { tipo, total, perguntas }: C
     return null;
   }
   if (!dado || typeof dado !== 'object' || Array.isArray(dado)) return null;
-  const { passo, respostas, marcadas, escolhidas } = dado as Record<string, unknown>;
+  const { passo, respostas, marcadas, escolhidas, respondidoComo } = dado as Record<string, unknown>;
   if (!inteiro(passo)) return null;
 
   const numeros = new Set(perguntas.map((p) => p.numero));
@@ -225,6 +261,7 @@ export function lerProgresso(texto: string | null, { tipo, total, perguntas }: C
     ),
     marcadas: listaMarcadas,
     escolhidas: listaEscolhidas,
+    respondidoComo: typeof respondidoComo === 'string' && respondidoComo !== '' ? respondidoComo : null,
   };
 }
 

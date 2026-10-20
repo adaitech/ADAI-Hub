@@ -7,7 +7,7 @@ import type { EstadoQuestionario } from './estado';
 import mock from './Questionario.mock.json';
 import { Questionario, type QuestionarioProps } from './Questionario';
 
-export type TelaVitrine = 'abertura' | 'pergunta' | 'resultado' | 'erro';
+export type TelaVitrine = 'abertura' | 'pergunta' | 'resultado' | 'sem-resultado' | 'erro';
 
 export interface QuestionarioVitrineProps {
   teste: SlugTeste;
@@ -42,6 +42,7 @@ export function QuestionarioVitrine({ teste, tela }: QuestionarioVitrineProps) {
     abertura: {},
     pergunta: { estado: 'pergunta' },
     resultado: { estado: 'resultado', resultado },
+    'sem-resultado': { estado: 'resultado', resultado: { tipo: 'sem-resultado' } },
     erro: { estado: 'erro', erroEnvio: 'indisponivel' },
   };
   const dados = mock.testes[teste];

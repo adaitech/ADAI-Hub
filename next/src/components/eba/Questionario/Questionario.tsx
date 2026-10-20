@@ -18,6 +18,7 @@ import {
   parEstilo,
   podeEnviar,
   progressoDe,
+  progressoPertenceA,
   reducer,
   respondidas,
   respostasParaApi,
@@ -51,7 +52,8 @@ export interface QuestionarioProps {
 
 const ROTULO_TELA = { nota: 'Pergunta', estilo: 'Pergunta', talentos: 'Etapa', temperamento: 'Página' } as const;
 const UNIDADE_TELA = { nota: 'perguntas', estilo: 'perguntas', talentos: 'etapas', temperamento: 'páginas' } as const;
-const COM_SESSAO_VISIVEL = new Set(['pergunta', 'erro']);
+/** Onde aparece "Respondendo como … · Trocar e-mail" (na abertura, antes de responder num aparelho emprestado). */
+const COM_SESSAO_VISIVEL = new Set(['abertura', 'pergunta', 'erro']);
 
 function Progresso({ atual, total, rotulo }: { atual: number; total: number; rotulo: string }) {
   const porcentagem = Math.round((atual / total) * 100);
@@ -108,7 +110,8 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
     foco.current?.focus();
   }, [s.estado, s.passo]);
 
-  // Progresso: lê uma vez a chave deste teste; depois grava a cada resposta e apaga no resultado.
+  // Progresso: lê uma vez a chave deste teste; depois grava a cada resposta e apaga no resultado
+  // ou quando não há mais progresso (trocar e-mail, respostas de outra pessoa descartadas).
   useEffect(() => {
     if (demonstracao) return;
     let salvo: string | null = null;
@@ -127,6 +130,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
     try {
       if (s.estado === 'resultado') sessionStorage.removeItem(chave);
       else if (temProgresso(s)) sessionStorage.setItem(chave, JSON.stringify(progressoDe(s)));
+      else sessionStorage.removeItem(chave);
     } catch {
       // Sem storage, o teste continua; só não sobrevive a um recarregamento.
     }
@@ -166,7 +170,8 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
   }
 
   function aoIdentificar(emailMascarado: string) {
-    const reenviar = s.retorno === 'enviando';
+    // Só reenvia as respostas da própria pessoa; de outra, o reducer descarta e recomeça.
+    const reenviar = s.retorno === 'enviando' && progressoPertenceA(s, emailMascarado);
     dispatch({ tipo: 'identificado', emailMascarado });
     if (reenviar) void enviarRespostas();
   }
@@ -179,8 +184,16 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
     dispatch({ tipo: 'comecar' });
   }
 
+  /** "Não é você?": encerra a sessão e apaga o progresso (estado e storage); o teste recomeça. */
   async function trocarEmail() {
     dispatch({ tipo: 'trocarEmail' });
+    if (!demonstracao) {
+      try {
+        sessionStorage.removeItem(chave);
+      } catch {
+        // Sem storage não há o que apagar.
+      }
+    }
     try {
       await acoes.sair();
     } catch {
@@ -367,7 +380,9 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
             email={s.cadastro?.email ?? ''}
             turmas={s.cadastro?.turmas ?? []}
             cadastrar={acoes.cadastrar}
+            identificar={acoes.identificar}
             onIdentificado={aoIdentificar}
+            onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })}
             onOutroEmail={() => dispatch({ tipo: 'voltarEmail' })}
             tituloRef={focar}
           />

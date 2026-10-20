@@ -23,6 +23,17 @@ export class EbaApiIndisponivel extends Error {
   }
 }
 
+/**
+ * A API respondeu 2xx, mas o corpo não tem o formato esperado. A mensagem traz só o motivo:
+ * nunca o corpo recebido, e-mail, nome ou ids.
+ */
+export class EbaApiRespostaInvalida extends Error {
+  constructor(motivo: string) {
+    super(`[eba-api] resposta inválida: ${motivo}`);
+    this.name = 'EbaApiRespostaInvalida';
+  }
+}
+
 function configuracao(): { url: string; chave: string } | null {
   const url = process.env.EBA_API_URL?.trim();
   const chave = process.env.EBA_API_KEY?.trim();

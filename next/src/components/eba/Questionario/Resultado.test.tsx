@@ -33,6 +33,17 @@ describe('Resultado', () => {
     expect(screen.getByRole('link', { name: 'Ver todos os testes' })).toHaveAttribute('href', '/eba/testes');
   });
 
+  it('sem resultado (respostas gravadas, formato inesperado): avisa o envio, sem lista nem "Tentar de novo"', () => {
+    const { container } = montar('dons-servico', { tipo: 'sem-resultado' });
+    expect(screen.getByRole('heading', { level: 2, name: 'Respostas enviadas' })).toBeInTheDocument();
+    expect(screen.getByText('Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.')).toBeInTheDocument();
+    expect(screen.queryByText('Seu resultado foi enviado para a equipe da EBA.')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Próximo teste: Dons ministeriais' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
+    expect(auditarAcessibilidade(container)).toEqual([]);
+  });
+
   it('no último teste não há "Próximo teste"', () => {
     montar('temperamento-pessoal', mock.resultados.temperamento as ResultadoApi);
     expect(screen.queryByRole('link', { name: /Próximo teste/ })).toBeNull();

@@ -1,12 +1,12 @@
 /** @jest-environment node */
-import { ebaFetch } from './client';
+import { ebaFetch, EbaApiRespostaInvalida } from './client';
 import { enviarRespostas } from './respostas';
 import estilo from './__fixtures__/survey-response-estilo.json';
 import nota from './__fixtures__/survey-response-nota.json';
 import talentos from './__fixtures__/survey-response-talentos.json';
 import temperamento from './__fixtures__/survey-response-temperamento.json';
 
-jest.mock('./client');
+jest.mock('./client', () => ({ ...jest.requireActual('./client'), ebaFetch: jest.fn() }));
 const ebaFetchMock = jest.mocked(ebaFetch);
 
 const base = { idStudent: 'aluno-1', idClass: 'turma-1' };
@@ -110,5 +110,48 @@ describe('enviarRespostas', () => {
     ebaFetchMock.mockResolvedValue({ message: 'Outra' });
     const r = await enviarRespostas({ ...base, slug: 'estilo-pessoal', respostas: [] });
     expect(r).toMatchObject({ tipo: 'estilo', combinacao: 'Outra', descricao: null, motivacao: 0, organizacao: 0 });
+  });
+
+  describe('formato inesperado da API → EbaApiRespostaInvalida (sem dados na mensagem)', () => {
+    const pontuacao = [
+      ['null', null],
+      ['objeto em vez de array', { name: 'Ensino', totalRate: 3 }],
+      ['item sem name', [{ totalRate: 3, message: 'x' }]],
+      ['totalRate em texto', [{ name: 'Ensino', totalRate: '3', message: 'x' }]],
+      ['item nulo', [null]],
+    ] as const;
+    it.each(pontuacao)('nota: %s', async (_n, retorno) => {
+      ebaFetchMock.mockResolvedValue(retorno);
+      const erro = await enviarRespostas({ ...base, slug: 'dons-servico', respostas: [{ numero: 1, nota: 3 }] }).catch((e: unknown) => e);
+      expect(erro).toBeInstanceOf(EbaApiRespostaInvalida);
+      expect((erro as Error).message).not.toMatch(/Ensino|aluno-1|turma-1/);
+    });
+
+    it.each(pontuacao)('temperamento: %s', async (_n, retorno) => {
+      ebaFetchMock.mockResolvedValue(retorno);
+      await expect(
+        enviarRespostas({ ...base, slug: 'temperamento-pessoal', respostas: [1, 2, 3, 4].map((numero) => ({ numero, nota: 1 })) }),
+      ).rejects.toBeInstanceOf(EbaApiRespostaInvalida);
+    });
+
+    it.each([
+      ['null', null],
+      ['objeto sem message', {}],
+      ['message numérica', { message: 3 }],
+      ['array vazio', []],
+      ['array com message inválida', [{ message: null }]],
+      ['texto', 'Tarefa Estruturado'],
+    ])('estilo: %s', async (_n, retorno) => {
+      ebaFetchMock.mockResolvedValue(retorno);
+      await expect(
+        enviarRespostas({ ...base, slug: 'estilo-pessoal', respostas: [{ numero: 1, nota: 10 }, { numero: 2, nota: 10 }] }),
+      ).rejects.toBeInstanceOf(EbaApiRespostaInvalida);
+    });
+
+    it('item sem message continua válido (mensagem null)', async () => {
+      ebaFetchMock.mockResolvedValue([{ name: 'Ensino', totalRate: 3 }]);
+      const r = await enviarRespostas({ ...base, slug: 'dons-servico', respostas: [{ numero: 1, nota: 3 }] });
+      expect(r).toEqual({ tipo: 'pontuacao', maximo: 25, itens: [{ nome: 'Ensino', total: 3, mensagem: null }] });
+    });
   });
 });

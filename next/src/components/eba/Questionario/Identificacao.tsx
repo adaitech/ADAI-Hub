@@ -9,6 +9,8 @@ import styles from './Questionario.module.css';
 type CodigoErro = Extract<RespostaAcao, { ok: false }>['erro'];
 
 const VERIFICAR_DEPOIS = 'Não conseguimos verificar agora. Tente em alguns minutos.';
+/** Caracteres de controle (quebra de linha, tabulação, nulo…): o servidor também recusa. */
+const CONTROLE = /\p{Cc}/u;
 
 /** Mensagem de cada erro das ações de identificação (sessão/recusa não se aplicam aqui). */
 const MENSAGENS: Record<CodigoErro, string> = {
@@ -19,12 +21,22 @@ const MENSAGENS: Record<CodigoErro, string> = {
   recusado: VERIFICAR_DEPOIS,
 };
 
-function Erro({ id, erro }: { id: string; erro: CodigoErro | null }) {
+function Erro({ id, erro, mensagens = MENSAGENS }: { id: string; erro: CodigoErro | null; mensagens?: Record<CodigoErro, string> }) {
   if (!erro) return null;
   return (
     <p id={id} role="alert" className={styles.erro}>
-      {MENSAGENS[erro]}
+      {mensagens[erro]}
     </p>
+  );
+}
+
+/** Indisponível (API fora, turmas que não carregam): botão que refaz a identificação (spec §6). */
+function TentarDeNovo({ visivel, pendente, onClick }: { visivel: boolean; pendente: boolean; onClick: () => void }) {
+  if (!visivel) return null;
+  return (
+    <button type="button" className={buttonClassName({ estilo: 'contorno' })} disabled={pendente} onClick={onClick}>
+      Tentar de novo
+    </button>
   );
 }
 
@@ -45,6 +57,10 @@ export function Identificacao({ identificar, onIdentificado, onNovo, tituloRef }
 
   async function enviar(evento: FormEvent) {
     evento.preventDefault();
+    await verificar();
+  }
+
+  async function verificar() {
     const valor = email.trim();
     if (!valor.includes('@')) {
       setErro('invalido');
@@ -97,6 +113,7 @@ export function Identificacao({ identificar, onIdentificado, onNovo, tituloRef }
           <button type="submit" className={buttonClassName()} disabled={pendente}>
             Continuar
           </button>
+          <TentarDeNovo visivel={erro === 'indisponivel'} pendente={pendente} onClick={() => void verificar()} />
         </div>
         <p className={styles.legal}>
           Usamos seu e-mail só para ligar suas respostas à sua turma. <Link href="/politica-de-privacidade">Política de Privacidade</Link>.
@@ -110,13 +127,22 @@ export interface CadastroProps {
   email: string;
   turmas: Turma[];
   cadastrar: typeof cadastrarAcao;
+  /** "Tentar de novo" refaz a identificação (turmas atualizadas ou e-mail já cadastrado). */
+  identificar: typeof identificarAcao;
   onIdentificado: (emailMascarado: string) => void;
+  onNovo: (email: string, turmas: Turma[]) => void;
   onOutroEmail: () => void;
   tituloRef: RefCallback<HTMLElement>;
 }
 
+/** No cadastro, a recusa da API (400) pede para conferir os dados. */
+const MENSAGENS_CADASTRO: Record<CodigoErro, string> = {
+  ...MENSAGENS,
+  recusado: 'Não conseguimos concluir o cadastro com esses dados. Confira os campos ou fale com a equipe da EBA.',
+};
+
 /** Primeiro acesso: nome, unidade e turma (uma vez só; nos próximos testes basta o e-mail). */
-export function Cadastro({ email, turmas, cadastrar, onIdentificado, onOutroEmail, tituloRef }: CadastroProps) {
+export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado, onNovo, onOutroEmail, tituloRef }: CadastroProps) {
   const id = useId();
   const [nome, setNome] = useState('');
   const [unidade, setUnidade] = useState('');
@@ -146,8 +172,29 @@ export function Cadastro({ email, turmas, cadastrar, onIdentificado, onOutroEmai
     );
   }
 
-  const invalido = { nome: nome.trim().length < 3, unidade: !unidade, turma: !idTurma };
+  const nomeLimpo = nome.trim();
+  const invalido = { nome: nomeLimpo.length < 3 || nomeLimpo.length > 100 || CONTROLE.test(nomeLimpo), unidade: !unidade, turma: !idTurma };
   const marcar = (campo: keyof typeof invalido) => (destacar && invalido[campo]) || undefined;
+  const idErroCampo = (campo: keyof typeof invalido) => (marcar(campo) ? `${id}-${campo}-erro` : undefined);
+
+  /** Refaz a identificação: o e-mail pode já existir, ou as turmas voltaram. */
+  async function tentarDeNovo() {
+    setPendente(true);
+    setErro(null);
+    try {
+      const resposta = await identificar(email);
+      if (resposta.ok && resposta.dados) {
+        if ('novo' in resposta.dados) onNovo(email, resposta.dados.turmas);
+        else onIdentificado(resposta.dados.emailMascarado);
+        return;
+      }
+      setErro(resposta.ok ? 'indisponivel' : resposta.erro);
+    } catch {
+      setErro('indisponivel');
+    } finally {
+      setPendente(false);
+    }
+  }
 
   async function enviar(evento: FormEvent) {
     evento.preventDefault();
@@ -191,7 +238,13 @@ export function Cadastro({ email, turmas, cadastrar, onIdentificado, onOutroEmai
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             aria-invalid={marcar('nome')}
+            aria-describedby={idErroCampo('nome')}
           />
+          {marcar('nome') && (
+            <p id={`${id}-nome-erro`} className={styles.erroCampo}>
+              Informe seu nome completo.
+            </p>
+          )}
         </div>
         <fieldset
           className={marcar('unidade') ? `${styles.grupo} ${styles.grupoInvalido}` : styles.grupo}
@@ -226,7 +279,15 @@ export function Cadastro({ email, turmas, cadastrar, onIdentificado, onOutroEmai
           <label className={styles.rotulo} htmlFor={`${id}-turma`}>
             Turma
           </label>
-          <select id={`${id}-turma`} className={styles.campo} required value={idTurma} onChange={(e) => setIdTurma(e.target.value)} aria-invalid={marcar('turma')}>
+          <select
+            id={`${id}-turma`}
+            className={styles.campo}
+            required
+            value={idTurma}
+            onChange={(e) => setIdTurma(e.target.value)}
+            aria-invalid={marcar('turma')}
+            aria-describedby={idErroCampo('turma')}
+          >
             <option value="">Selecione sua turma</option>
             {turmas.map((t) => (
               <option key={t.id} value={t.id}>
@@ -234,12 +295,18 @@ export function Cadastro({ email, turmas, cadastrar, onIdentificado, onOutroEmai
               </option>
             ))}
           </select>
+          {marcar('turma') && (
+            <p id={`${id}-turma-erro`} className={styles.erroCampo}>
+              Escolha sua turma.
+            </p>
+          )}
         </div>
-        <Erro id={`${id}-erro`} erro={erro} />
+        <Erro id={`${id}-erro`} erro={erro} mensagens={MENSAGENS_CADASTRO} />
         <div className={styles.botoes}>
           <button type="submit" className={buttonClassName()} disabled={pendente}>
             Cadastrar e começar
           </button>
+          <TentarDeNovo visivel={erro === 'indisponivel'} pendente={pendente} onClick={() => void tentarDeNovo()} />
           {outroEmail}
         </div>
       </form>

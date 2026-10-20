@@ -22,7 +22,11 @@ Não está no Strapi: o fluxo, as escalas e a agregação das respostas são reg
 
 ## Estados
 
-`abertura → email | cadastro → pergunta → enviando → resultado`, mais `erro` (envio falhou; "Tentar de novo") e `expirou` (sessão encerrada; pede o e-mail e reenvia sozinho depois). Com sessão válida, "Começar o teste" pula a identificação. O reducer puro fica em `estado.ts`.
+`abertura → email | cadastro → pergunta → enviando → resultado`, mais `erro` (envio falhou; "Tentar de novo") e `expirou` (sessão encerrada; pede o e-mail e reenvia sozinho depois, se for a mesma pessoa). Com sessão válida, "Começar o teste" pula a identificação. O reducer puro fica em `estado.ts`.
+
+- **Respondendo como:** "Respondendo como a***@… · Não é você? Trocar e-mail" aparece na abertura (com sessão válida), nas perguntas e no erro de envio. "Trocar e-mail" encerra a sessão (`sair`), **apaga o progresso** (estado e `sessionStorage`) e volta para a identificação; depois, o teste recomeça da primeira pergunta.
+- **Identificação indisponível:** API fora ou turmas que não carregam (no e-mail ou no Primeiro acesso) mostram "Tentar de novo", que refaz a identificação; no Primeiro acesso o formulário preenchido é mantido e a lista de turmas é atualizada. Nome e turma inválidos têm mensagem própria ligada por `aria-describedby`, como a unidade; nome com caractere de controle é recusado.
+- **Sem resultado:** se a API grava as respostas (2xx) mas devolve um resultado fora do formato, a tela mostra "Respostas enviadas" e "Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.", sem "Tentar de novo" (reenviar duplicaria a gravação); o progresso é apagado e `concluir_teste` dispara.
 
 - **Nota (0–5):** radios nativos. Escolher com mouse ou toque avança; pelo teclado (setas, espaço) só marca, e "Próxima pergunta" segue (WCAG 2.1.1 e 3.2.2). Voltar mostra a resposta escolhida. Nome acessível "N — Rótulo".
 - **Talentos:** etapa 1 marca as habilidades (sem limite); etapa 2 escolhe até 3 entre as marcadas ("Concluir" exige uma). Envia 1 para as escolhidas e 0 para as demais.
@@ -30,7 +34,7 @@ Não está no Strapi: o fluxo, as escalas e a agregação das respostas são reg
 - **Temperamento:** 20 páginas de 10 opções, com "Próximo". Envia quantas foram marcadas em cada grupo (`numero` 1 a 4).
 - **Resultado:** barras proporcionais a `maximo`, 3 primeiros em destaque e a mensagem do primeiro; temperamento em porcentagem (máximo 0 → 0%); talentos como lista; estilo com a combinação, os dois totais e a descrição. "Próximo teste" some no último. "Sair" encerra a sessão no servidor.
 - **Foco:** vai para o enunciado (`legend`) a cada pergunta e para o título de cada estado.
-- **Progresso:** `sessionStorage`, chave `eba-teste:<slug>`, só respostas (nunca e-mail ou nome); apagado ao mostrar o resultado. Ao restaurar, descarta o que não cabe no teste (pergunta inexistente, nota fora da escala, id inválido, mais de 3 escolhidas).
+- **Progresso:** `sessionStorage`, chave `eba-teste:<slug>`: as respostas e `respondidoComo`, o e-mail **mascarado** da sessão em que foram dadas (nunca o e-mail inteiro nem o nome); apagado ao mostrar o resultado. Ao restaurar, descarta o que não cabe no teste (pergunta inexistente, nota fora da escala, id inválido, mais de 3 escolhidas) e o progresso sem `respondidoComo`. Se a sessão atual (na abertura ou depois de uma identificação) tem outro e-mail mascarado, o progresso é descartado e o teste recomeça: as respostas de uma pessoa nunca são enviadas como de outra.
 - **Fotos:** capa na abertura, identificação no e-mail/cadastro/sessão encerrada, uma por pergunta (página no temperamento, par no estilo; sem foto própria → capa) e resultado no envio. A da próxima pergunta é pré-carregada (`preload` do React).
 
 ## Layout
@@ -45,7 +49,7 @@ Dois eventos novos, sem dado pessoal: **`iniciar_teste`** (`teste` = slug), uma 
 
 - `estado.test.ts`: transições do reducer, leitura do progresso salvo, agregação das respostas por tipo.
 - `Questionario.test.tsx`: cada estado, avançar/voltar mantendo a resposta, restauração só da chave do slug sem duplicar (Foco 2), envio único com botão desabilitado (Foco 4), sessão encerrada e erro, talentos com a 4ª escolha desabilitada (Foco 5), nomes acessíveis, foco, fotos e eventos.
-- `Resultado.test.tsx`: barras, destaque, porcentagem com máximo 0, talentos, estilo, próximo teste e sair.
+- `Resultado.test.tsx`: barras, destaque, porcentagem com máximo 0, talentos, estilo, sem resultado, próximo teste e sair.
 - Vitrine: `lib/showcase/catalog.test.tsx` e `__tests__/caracteristicas/acessibilidade-e-seo.test.tsx` (todas as variantes e o controle "Tipo de teste").
 
 ## Status

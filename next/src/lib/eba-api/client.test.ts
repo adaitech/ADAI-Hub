@@ -1,5 +1,5 @@
 /** @jest-environment node */
-import { ebaApiConfigurada, ebaFetch, EbaApiError, EbaApiIndisponivel } from './client';
+import { ebaApiConfigurada, ebaFetch, EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida } from './client';
 
 const URL_BASE = 'https://eba-adai-api.azure-api.net';
 const KEY = 'chave-apim-teste';
@@ -128,5 +128,14 @@ describe('ebaFetch', () => {
     const erro = (await ebaFetch('Student', { metodo: 'POST', corpo: { email: 'ana@exemplo.com' } }).catch((e: unknown) => e)) as Error;
     expect(erro.message).not.toContain('ana@exemplo.com');
     expect(erro.message).not.toContain(KEY);
+  });
+});
+
+describe('EbaApiRespostaInvalida', () => {
+  it('é um Error com nome próprio e só o motivo na mensagem', () => {
+    const erro = new EbaApiRespostaInvalida('Student sem id');
+    expect(erro).toBeInstanceOf(Error);
+    expect(erro.name).toBe('EbaApiRespostaInvalida');
+    expect(erro.message).toBe('[eba-api] resposta inválida: Student sem id');
   });
 });

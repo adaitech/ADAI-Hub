@@ -2,7 +2,7 @@
 import { cadastrar, enviar, identificar, sair, sessaoAtual } from './acoes';
 import { assinarSessao, COOKIE_SESSAO, OPCOES_COOKIE } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno } from '@/lib/eba-api/alunos';
-import { EbaApiError, EbaApiIndisponivel, ebaApiConfigurada } from '@/lib/eba-api/client';
+import { EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida, ebaApiConfigurada } from '@/lib/eba-api/client';
 import { perguntasDoTeste } from '@/lib/eba-api/perguntas';
 import { enviarRespostas, type Resultado } from '@/lib/eba-api/respostas';
 import { turmasAtivas } from '@/lib/eba-api/turmas';
@@ -128,6 +128,12 @@ describe('identificar', () => {
     expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
   });
 
+  it('Student com formato inválido → indisponivel, sem cookie', async () => {
+    alunoPorEmailMock.mockRejectedValue(new EbaApiRespostaInvalida('Student (GET) sem id/idClass'));
+    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(cookieSet).not.toHaveBeenCalled();
+  });
+
   it.each([undefined, '', 'curto'])('segredo ausente ou curto (%p) → indisponivel, sem cookie', async (segredo) => {
     if (segredo === undefined) delete process.env.EBA_SESSAO_SEGREDO;
     else process.env.EBA_SESSAO_SEGREDO = segredo;
@@ -145,6 +151,40 @@ describe('identificar', () => {
 
 describe('cadastrar', () => {
   const dados = { email: EMAIL, nome: '  Ana Silva ', unidade: 'colorado', idTurma: 'turma-1' };
+  beforeEach(() => alunoPorEmailMock.mockResolvedValue(null));
+
+  it('confere o e-mail (normalizado) antes do POST', async () => {
+    cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
+    await cadastrar({ ...dados, email: ` ${EMAIL.toUpperCase()} ` });
+    expect(alunoPorEmailMock).toHaveBeenCalledWith(EMAIL);
+    expect(alunoPorEmailMock.mock.invocationCallOrder[0]).toBeLessThan(cadastrarAlunoMock.mock.invocationCallOrder[0]);
+  });
+
+  it('e-mail que já existe: abre a sessão do aluno encontrado e não faz o POST', async () => {
+    alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
+    const r = await cadastrar(dados);
+    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(cadastrarAlunoMock).not.toHaveBeenCalled();
+    expect(cookieSet).toHaveBeenCalledWith(COOKIE_SESSAO, expect.any(String), OPCOES_COOKIE);
+  });
+
+  it('conferência do e-mail falhando → indisponivel, sem POST', async () => {
+    alunoPorEmailMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
+    expect(await cadastrar(dados)).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(cadastrarAlunoMock).not.toHaveBeenCalled();
+  });
+
+  it('cadastrarAluno com 400 → recusado', async () => {
+    cadastrarAlunoMock.mockRejectedValue(new EbaApiError(400, 'X'));
+    expect(await cadastrar(dados)).toEqual({ ok: false, erro: 'recusado' });
+    expect(cookieSet).not.toHaveBeenCalled();
+  });
+
+  it('Student do POST com formato inválido → indisponivel, sem cookie', async () => {
+    cadastrarAlunoMock.mockRejectedValue(new EbaApiRespostaInvalida('Student (POST) sem id/idClass'));
+    expect(await cadastrar(dados)).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(cookieSet).not.toHaveBeenCalled();
+  });
 
   it('cadastra, grava o cookie e devolve só o e-mail mascarado', async () => {
     cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
@@ -164,6 +204,10 @@ describe('cadastrar', () => {
     ['e-mail com mais de 254', { email: `${'a'.repeat(250)}@x.com` }],
     ['nome curto', { nome: ' ab ' }],
     ['nome longo', { nome: 'a'.repeat(101) }],
+    ['nome com quebra de linha', { nome: 'Ana\nSilva' }],
+    ['nome com tabulação', { nome: 'Ana\tSilva' }],
+    ['nome com caractere nulo', { nome: 'Ana\u0000Silva' }],
+    ['nome com DEL', { nome: 'Ana\u007fSilva' }],
     ['unidade fora da lista', { unidade: 'marte' }],
     ['turma fora de turmasAtivas()', { idTurma: 'outra' }],
   ])('%s → invalido', async (_n, alteracao) => {
@@ -230,6 +274,26 @@ describe('enviar', () => {
     expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'sessao' });
     expect(enviarMock).not.toHaveBeenCalled();
     expect(perguntasMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['cookie adulterado', 'a.b'],
+    ['sessão expirada', sessaoValida(Date.now() - 7_200_001)],
+  ])('%s: apaga o cookie no mesmo path', async (_n, valor) => {
+    comSessao(valor);
+    await enviar('dons-servico', notas(3, 1));
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
+  });
+
+  it('sem cookie: nada a apagar', async () => {
+    comSessao(undefined);
+    await enviar('dons-servico', notas(3, 1));
+    expect(cookieDelete).not.toHaveBeenCalled();
+  });
+
+  it('sessão válida: não apaga o cookie', async () => {
+    await enviar('dons-servico', notas(3, 1));
+    expect(cookieDelete).not.toHaveBeenCalled();
   });
 
   it('segredo ausente → indisponivel', async () => {
@@ -346,6 +410,10 @@ describe('enviar', () => {
       enviarMock.mockRejectedValue(new EbaApiIndisponivel('timeout'));
       expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
     });
+    it('2xx com resultado fora do formato: as respostas já foram gravadas → sucesso sem-resultado', async () => {
+      enviarMock.mockRejectedValue(new EbaApiRespostaInvalida('SurveyResponse sem lista de name/totalRate'));
+      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: true, dados: { tipo: 'sem-resultado' } });
+    });
     it('erro inesperado → indisponivel', async () => {
       enviarMock.mockRejectedValue(new Error('boom'));
       expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
@@ -370,6 +438,30 @@ describe('sair e sessaoAtual', () => {
   ])('sessaoAtual %s → null', async (_n, valor) => {
     comSessao(valor);
     expect(await sessaoAtual()).toBeNull();
+  });
+
+  it.each([
+    ['expirada', sessaoValida(Date.now() - 7_200_001)],
+    ['adulterada', 'a.b'],
+  ])('sessaoAtual %s: apaga o cookie', async (_n, valor) => {
+    comSessao(valor);
+    expect(await sessaoAtual()).toBeNull();
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
+  });
+
+  it('sessaoAtual sem cookie ou com sessão válida: não apaga', async () => {
+    await sessaoAtual();
+    comSessao(sessaoValida());
+    await sessaoAtual();
+    expect(cookieDelete).not.toHaveBeenCalled();
+  });
+
+  it('sessaoAtual durante a renderização (cookie só leitura): devolve null sem lançar', async () => {
+    comSessao('a.b');
+    cookieDelete.mockImplementation(() => {
+      throw new Error('Cookies can only be modified in a Server Action or Route Handler.');
+    });
+    await expect(sessaoAtual()).resolves.toBeNull();
   });
 
   it('sessaoAtual com segredo ausente → null', async () => {
