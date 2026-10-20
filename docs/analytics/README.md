@@ -51,7 +51,7 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `selecionar_evento` | Link de um card em Próximos eventos | `evento` (nome), `acao` (Inscreva-se, Participar online) | — |
 | `ver_faq` | Abrir uma pergunta da FAQ | `pergunta` | — |
 | `selecionar_ministerio` | Clique em um ministério de "Encontre seu lugar" | `ministerio` | — |
-| `contribuir` | Link para `/contribua` ou texto com contribuir/dízimo/oferta/doação | `origem`, `texto` | **Sim** |
+| `contribuir` | Navegação para contribuição (exceto âncora na mesma página) ou cópia Pix concluída (`origem: pix`) | `origem`, `texto` | **Sim** |
 | `baixar_app` | Link da App Store ou do Google Play | `origem`, `loja` (app_store, google_play) | — |
 | `clique_cta` | **Todo** clique em link/botão (inclusive os acima) | `origem`, `texto`, `destino` (sem query string; e-mail/telefone só `mailto:`/`tel:`) | — |
 | `ver_secao` | Seção 25% visível (ou ocupando metade da tela, para textos longos), uma vez por página | `secao`, `posicao` | — |

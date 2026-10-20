@@ -8,6 +8,14 @@
   margin-inline: auto;
 }
 
+.secao[data-apresentacao='destaque'] { padding-inline: var(--space-page-margin); scroll-margin-top: var(--space-96); }
+.secao[data-apresentacao='destaque'] .artigo { max-width: var(--content-max); border-radius: var(--radius-lg); padding: var(--space-24); background: var(--color-bg-subtle); }
+.secao[data-apresentacao='destaque'] .conteudo { max-width: var(--intro-max); font-size: var(--font-size-corpo); color: var(--color-text-muted); }
+.conteudo blockquote { border-left: var(--border-width) solid var(--color-border-strong); padding-left: var(--space-24); }
+@media (min-width: 769px) {
+  .secao[data-apresentacao='destaque'] .artigo { padding: var(--space-40); }
+}
+
 .cabecalho {
   display: flex;
   flex-direction: column;

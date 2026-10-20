@@ -16,5 +16,5 @@ export default async function HomePage() {
   const page = await getPageBySlug(HOME_SLUG);
   if (!page) notFound();
 
-  return <SectionRenderer sections={page.sections ?? []} />;
+  return <SectionRenderer sections={page.sections ?? []} apresentacao={page.apresentacao} />;
 }

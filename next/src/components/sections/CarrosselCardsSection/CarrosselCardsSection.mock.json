@@ -89,7 +89,8 @@
       }
     ],
     "link": null,
-    "preto_e_branco": true
+    "preto_e_branco": true,
+    "exibicao": "carrossel"
   },
   "minimo": {
     "__component": "sections.carrossel-cards",

@@ -62,3 +62,6 @@ Também cobrem este componente, sem precisar editar nada:
 - `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
 
 **Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).
+# Extensão: destaque editorial e âncora
+
+O campo opcional `apresentacao` aceita `documento` (comportamento anterior) ou `destaque` (caixa cinza com os tokens do site). `ancora` aceita identificador de até 60 caracteres, sem espaços, acentos ou # e começando por letra. Ambos possuem controles na vitrine. A ausência dos campos preserva as páginas existentes. Medição permanece coberta por `ver_secao` e `clique_cta`.

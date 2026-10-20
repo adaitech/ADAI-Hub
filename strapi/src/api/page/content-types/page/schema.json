@@ -11,6 +11,10 @@
     "draftAndPublish": true
   },
   "attributes": {
+    "apresentacao": {
+      "type": "enumeration",
+      "enum": ["padrao", "editorial"]
+    },
     "titulo": {
       "type": "string",
       "required": true,
@@ -28,7 +32,19 @@
     },
     "sections": {
       "type": "dynamiczone",
-      "components": ["sections.hero", "sections.carrossel-cards", "sections.imagem-texto", "sections.serie-atual", "sections.proximos-eventos", "sections.agenda-eventos", "sections.ministerios", "sections.texto-botoes", "sections.perguntas-frequentes", "sections.texto-rico"]
+      "components": [
+        "sections.hero",
+        "sections.carrossel-cards",
+        "sections.imagem-texto",
+        "sections.serie-atual",
+        "sections.proximos-eventos",
+        "sections.ministerios",
+        "sections.texto-botoes",
+        "sections.perguntas-frequentes",
+        "sections.texto-rico",
+        "sections.pix",
+        "sections.agenda-eventos"
+      ]
     }
   }
 }

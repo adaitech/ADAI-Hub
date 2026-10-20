@@ -23,6 +23,12 @@ describe('normalizeTextoRico', () => {
 });
 
 describe('TextoRicoSection', () => {
+  it('destaque editorial com âncora preserva o documento como padrão', () => {
+    const { container, rerender } = render(<TextoRicoSection data={{ ...base, apresentacao: 'destaque', ancora: 'sobre-a-adai' }} index={1} />);
+    expect(container.querySelector('#sobre-a-adai')).toHaveAttribute('data-apresentacao', 'destaque');
+    rerender(<TextoRicoSection data={base} index={1} />);
+    expect(container.querySelector('[data-apresentacao="documento"]')).toBeInTheDocument();
+  });
   it('Política de Privacidade: h1, data, seções h2 e tabelas acessíveis', () => {
     render(<TextoRicoSection data={politica} index={0} />);
     expect(screen.getByRole('heading', { level: 1, name: 'Política de Privacidade e Cookies' })).toBeInTheDocument();

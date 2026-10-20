@@ -3,6 +3,13 @@ import { eventosDoClique } from './cliques';
 const nomes = (eventos: ReturnType<typeof eventosDoClique>) => eventos.map(([nome]) => nome);
 
 describe('eventosDoClique', () => {
+  it.each(['#como-contribuir', 'http://localhost:3000/contribua#como-contribuir'])('âncora na mesma página não é conversão (%s)', (destino) => {
+    const eventos = eventosDoClique({ secao: 'imagem-texto', texto: 'Já quero contribuir', destino, card: null, paginaUrl: 'http://localhost:3000/contribua' });
+    expect(nomes(eventos)).toEqual(['clique_cta']);
+  });
+  it('âncora em outra página continua sendo navegação para contribuir', () => {
+    expect(nomes(eventosDoClique({ secao: 'hero', texto: 'Contribuir', destino: 'http://localhost:3000/contribua#como-contribuir', card: null, paginaUrl: 'http://localhost:3000/' }))).toContain('contribuir');
+  });
   it('CTA explícito de evento gera conversão e remove parâmetros privados do destino', () => {
     const eventos = eventosDoClique({ secao: 'evento-detalhe', texto: 'Acessar evento', destino: 'https://example.com/inscricao?token=privado', card: null, evento: 'Encontro', eventoId: 1, acaoEvento: true });
     expect(eventos).toContainEqual(['acessar_evento', { origem: 'evento-detalhe', evento: 'Encontro', evento_id: 1, destino: 'https://example.com/inscricao' }]);

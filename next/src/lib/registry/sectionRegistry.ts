@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { PixSection, pixPopulate } from '@/components/sections/PixSection';
 import { AgendaEventosSection, agendaEventosPopulate } from '@/components/sections/AgendaEventosSection';
 import { CarrosselCardsSection, carrosselCardsPopulate } from '@/components/sections/CarrosselCardsSection';
 import { HeroSection, heroPopulate } from '@/components/sections/HeroSection';
@@ -29,6 +30,7 @@ function defineSection<TData extends StrapiSection>(
  * Nova seção: adicionar aqui + na dynamic zone `sections` de `page` no Strapi + vitrine.
  */
 export const sectionRegistry: Record<string, SectionRegistryEntry> = {
+  'sections.pix': defineSection(PixSection, pixPopulate),
   'sections.agenda-eventos': defineSection(AgendaEventosSection, agendaEventosPopulate),
   'sections.hero': defineSection(HeroSection, heroPopulate),
   'sections.carrossel-cards': defineSection(CarrosselCardsSection, carrosselCardsPopulate),

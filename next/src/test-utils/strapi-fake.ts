@@ -10,6 +10,7 @@ import proximosEventos from '@/components/sections/ProximosEventosSection/Proxim
 import serieAtual from '@/components/sections/SerieAtualSection/SerieAtualSection.mock.json';
 import textoBotoes from '@/components/sections/TextoBotoesSection/TextoBotoesSection.mock.json';
 import textoRico from '@/components/sections/TextoRicoSection/TextoRicoSection.mock.json';
+import contribua from '../../../strapi/seed/contribua.json';
 
 /**
  * Strapi simulado para testes de integração e de característica: responde `/api/pages` e
@@ -62,6 +63,7 @@ export const unidadesFake = [
 ];
 
 export interface PaginaFake {
+  apresentacao?: 'padrao' | 'editorial' | null;
   id: number;
   documentId: string;
   titulo: string;
@@ -71,7 +73,14 @@ export interface PaginaFake {
 }
 
 export function criarStrapiFake() {
+  let idContribua = 500;
+  const paginaContribua = JSON.parse(JSON.stringify(contribua), (_key: string, value: unknown) =>
+    value && typeof value === 'object' && !Array.isArray(value) ? { ...value, id: idContribua++ } : value,
+  ) as PaginaFake;
+  paginaContribua.documentId = 'contribua';
+  Object.assign(paginaContribua.sections[0], { imagem: imagemTexto.completo.imagem });
   const paginas: Record<string, PaginaFake> = {
+    contribua: paginaContribua,
     home: { id: 1, documentId: 'home', titulo: 'Home', slug: 'home', seo: seo('ADAI — Amar. Servir. Influenciar.'), sections: secoesHome() },
     'politica-de-privacidade': {
       id: 2,

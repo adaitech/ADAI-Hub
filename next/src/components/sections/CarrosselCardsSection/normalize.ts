@@ -40,6 +40,7 @@ export function normalizeCarrosselCards(data: CarrosselCardsData): CarrosselCard
   return {
     titulo,
     textoApoio: data.texto_apoio?.trim() || undefined,
+    exibicao: data.exibicao === 'grade' ? 'grade' : 'carrossel',
     cards,
     link: normalizeLink(data.link),
     temImagem: cards.some((card) => card.imagem !== null),

@@ -127,3 +127,7 @@ Spec com cada decisão e o motivo: `docs/superpowers/specs/2026-10-03-seguranca-
 `yarn quality` (713 testes) e `yarn build` verdes; `yarn smoke` 31/31. No navegador, em `next dev` e em `next start` (produção), **zero violação de CSP**: Home hidrata, aviso de cookies → GTM e GA4 (`g/collect`) carregam com o nonce herdado, player do YouTube toca, vitrine renderiza os iframes. Strapi: origem estranha não recebe `Access-Control-Allow-Origin`; o site recebe; painel abre.
 
 **Falta conferir (humano):** pré-visualização do rascunho dentro do painel do Strapi (exige login) e Lighthouse mobile ≥ 80 com a renderização dinâmica.
+
+## Proteção dos dados de contribuição
+
+Páginas com a seção Pix têm escrita restrita a Super Admin por middleware do Document Service. Detalhes e limites: [Escrita da seção Pix](pix.md).

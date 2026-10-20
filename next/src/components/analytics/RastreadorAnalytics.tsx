@@ -51,7 +51,7 @@ export function RastreadorAnalytics() {
       const href = el instanceof HTMLAnchorElement ? el.href : '';
       const pagina = document.querySelector('main h1')?.textContent?.replace(/\s+/g, ' ').trim() || null;
       const contexto = el.closest<HTMLElement>('[data-evento]')?.dataset;
-      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina,
+      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina, paginaUrl: window.location.href,
         evento: contexto?.evento, eventoId: Number(contexto?.eventoId), local: contexto?.local, unidade: contexto?.unidade,
         acaoEvento: Boolean(el.closest('[data-acao-evento="acessar"]')) })) {
         registrarEvento(nome, parametros as never);

@@ -23,6 +23,7 @@ export interface CardData {
 
 /** JSON cru de `sections.carrossel-cards`. */
 export interface CarrosselCardsData {
+  exibicao?: 'carrossel' | 'grade' | null;
   __component: 'sections.carrossel-cards';
   id: number;
   titulo?: string | null;
@@ -53,6 +54,7 @@ export interface CardView {
 }
 
 export interface CarrosselCardsView {
+  exibicao: 'carrossel' | 'grade';
   titulo: string;
   textoApoio?: string;
   cards: CardView[];

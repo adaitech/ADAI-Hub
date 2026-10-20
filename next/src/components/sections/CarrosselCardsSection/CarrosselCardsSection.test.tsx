@@ -21,6 +21,13 @@ function simularLayout(trilha: HTMLElement) {
 }
 
 describe('CarrosselCardsSection', () => {
+  it('grade exibe todos os cards sem controles de carrossel', () => {
+    render(<CarrosselCardsSection data={{ ...completo, exibicao: 'grade' }} index={1} />);
+    expect(screen.getByRole('list', { name: 'Neste domingo: 5 cards' })).toHaveAttribute('data-exibicao', 'grade');
+    expect(screen.getByRole('list', { name: 'Neste domingo: 5 cards' })).toHaveAttribute('role', 'list');
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(5);
+    expect(screen.queryByRole('button', { name: /Próximo/ })).not.toBeInTheDocument();
+  });
   it('renderiza título, cards como lista e links acessíveis', () => {
     render(<CarrosselCardsSection data={completo} index={1} />);
     expect(screen.getByRole('heading', { level: 2, name: 'Neste domingo' })).toBeInTheDocument();

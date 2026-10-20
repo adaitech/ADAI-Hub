@@ -37,6 +37,8 @@ export const textoRicoShowcase = defineShowcase<TextoRicoData>({
     },
   ],
   controles: [
+    { id: 'apresentacao', tipo: 'opcoes', rotulo: 'Apresentação', opcoes: [{ valor: 'documento', rotulo: 'Documento' }, { valor: 'destaque', rotulo: 'Destaque editorial' }], valor: (data) => data.apresentacao ?? 'documento', aplicar: (data, valor) => ({ ...data, apresentacao: valor === 'destaque' ? 'destaque' : 'documento' }) },
+    alternarCampo<TextoRicoData, 'ancora'>('ancora', 'Âncora', 'sobre-a-adai'),
     alternarCampo<TextoRicoData, 'atualizado_em'>('atualizado_em', 'Data de atualização', '2026-10-02', 'Aparece como "Última atualização: …" abaixo do título.'),
   ],
 });

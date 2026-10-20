@@ -16,6 +16,8 @@ export interface ContextoClique {
   card: string | null;
   /** Título (h1) da página: nas páginas de unidade, o nome da unidade. */
   pagina?: string | null;
+  /** URL atual, usada apenas para distinguir navegação de rolagem por âncora. Nunca enviada ao GA4. */
+  paginaUrl?: string;
   evento?: string;
   eventoId?: number;
   unidade?: string;
@@ -46,10 +48,15 @@ function destinoSeguro(u: URL | null, destino: string): string {
   return /^https?:$/.test(u.protocol) ? `${u.origin}${u.pathname}` : u.protocol;
 }
 
-export function eventosDoClique({ secao, texto, destino, card, pagina = null, evento = '', eventoId, unidade = '', local = '', acaoEvento = false }: ContextoClique): EventoGerado[] {
+export function eventosDoClique({ secao, texto, destino, card, pagina = null, paginaUrl, evento = '', eventoId, unidade = '', local = '', acaoEvento = false }: ContextoClique): EventoGerado[] {
   const u = url(destino);
   const caminho = u?.pathname ?? '';
   const eventos: EventoGerado[] = [];
+  const atual = paginaUrl ? url(paginaUrl) : null;
+  const ancoraLocal = destino.startsWith('#') || Boolean(u?.hash && atual && u.origin === atual.origin && u.pathname === atual.pathname && u.search === atual.search);
+  if (ancoraLocal) {
+    return [['clique_cta', { origem: secao, texto, destino: destinoSeguro(u, destino.startsWith('#') ? '' : destino) }]];
+  }
 
   if (caminho.startsWith('/planeje-sua-visita') || /planej\w* (sua )?visita/i.test(texto)) {
     eventos.push(['planejar_visita', { origem: secao, texto }]);

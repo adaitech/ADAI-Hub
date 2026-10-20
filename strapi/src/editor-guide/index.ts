@@ -11,6 +11,7 @@ import layoutHeader from './layout.header.json';
 import sectionsCarrosselCards from './sections.carrossel-cards.json';
 import sectionsAgendaEventos from './sections.agenda-eventos.json';
 import sectionsHero from './sections.hero.json';
+import sectionsPix from './sections.pix.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
 import sectionsMinisterios from './sections.ministerios.json';
 import sectionsPerguntasFrequentes from './sections.perguntas-frequentes.json';
@@ -48,6 +49,7 @@ export const editorGuides: EditorGuide[] = [
   apiGlobal,
   apiUnidade,
   sectionsHero,
+  sectionsPix,
   sectionsCarrosselCards,
   sectionsAgendaEventos,
   sectionsSerieAtual,

@@ -486,6 +486,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    apresentacao: Schema.Attribute.Enumeration<['padrao', 'editorial']>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -500,11 +501,12 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.imagem-texto',
         'sections.serie-atual',
         'sections.proximos-eventos',
-        'sections.agenda-eventos',
         'sections.ministerios',
         'sections.texto-botoes',
         'sections.perguntas-frequentes',
         'sections.texto-rico',
+        'sections.pix',
+        'sections.agenda-eventos',
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;
