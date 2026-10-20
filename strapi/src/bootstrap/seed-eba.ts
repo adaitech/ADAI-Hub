@@ -416,6 +416,7 @@ export async function ensureCursos(strapi: StrapiSeed, imagem: Imagem, reconstru
 export async function ebaSections(strapi: StrapiSeed, imagem: Imagem) {
   const hero = await imagem(strapi, 'eba/eba-hero.webp', 'Professora da EBA sorri no palco diante dos alunos.');
   const biblia = await imagem(strapi, 'eba/eba-biblia.webp', 'Mão segura uma Bíblia aberta no Evangelho de João, capítulo 3.');
+  const testes = await imagem(strapi, 'eba/testes-dons.webp', 'Alunos sorriem segurando placas: "É proibida a entrada de pessoas perfeitas" e "Bem-vindo".');
   // Logo da EBA (branco, fundo transparente) fica na Biblioteca de Mídia para o time usar.
   await imagem(strapi, 'eba/logo-eba.webp', 'EBA — Escola Bíblica ADAI');
   return [
@@ -452,9 +453,20 @@ export async function ebaSections(strapi: StrapiSeed, imagem: Imagem) {
       link_ver_todos: true,
     },
     {
-      __component: 'sections.texto-rico',
+      // Mesma seção do "Formar discípulos maduros", espelhada (foto à direita, colorida).
+      __component: 'sections.imagem-texto',
+      imagem: testes,
+      posicao_imagem: 'direita',
+      preto_e_branco: false,
+      rotulo: 'Testes do CDV',
       titulo: 'Descubra seus dons e talentos',
-      conteudo: `Os testes da EBA ajudam você a entender seu temperamento, seu estilo pessoal, seus talentos naturais e seus dons para servir na igreja.\n\n${listaDeTestes}\n\n[Conhecer os testes](/eba/testes)`,
+      texto: 'Os testes da EBA ajudam você a entender quem você é e onde servir na igreja.',
+      lista: [
+        { titulo: 'Dons', texto: 'Dons de serviço prático e dons ministeriais: como Deus capacitou você para servir.' },
+        { titulo: 'Talentos naturais', texto: 'As habilidades que você já tem e pode colocar a serviço do Reino.' },
+        { titulo: 'Estilo e temperamento', texto: 'Como você se relaciona, decide e trabalha melhor com outras pessoas.' },
+      ],
+      botao: { texto: 'Conhecer os testes', url: '/eba/testes', estilo: 'solido' },
     },
     faq('Perguntas frequentes', [
       [
