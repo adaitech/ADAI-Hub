@@ -30,7 +30,7 @@ const COBERTO_POR: Record<string, { teste: string; motivo: string }> = {
 };
 
 /** Só tipos, dados ou configuração: nada a executar. */
-const SEM_COMPORTAMENTO = /(^|\/)(types|index)\.ts$|\.mock\.json$|\.module\.css$|\.showcase\.tsx$|^app\/fonts\.ts$|^test-utils\//;
+const SEM_COMPORTAMENTO = /(^|\/)(types|tipos|index)\.ts$|\.mock\.json$|\.module\.css$|\.showcase\.tsx$|^app\/fonts\.ts$|^test-utils\//;
 
 describe('todo módulo tem teste', () => {
   const modulos = todos.filter((a) => /\.(ts|tsx)$/.test(a) && !/\.test\.tsx?$/.test(a) && !SEM_COMPORTAMENTO.test(rel(a)) && !/\.d\.ts$/.test(a));
