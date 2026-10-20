@@ -9,6 +9,9 @@
     telas.forEach(function (tela) { tela.hidden = tela.getAttribute('data-tela') !== estado; });
     abas.forEach(function (aba) { aba.setAttribute('aria-pressed', String(aba.getAttribute('data-estado') === estado)); });
     if (trocar) trocar.hidden = comSessao.indexOf(estado) === -1;
+    var tela = document.querySelector('[data-tela="' + estado + '"]');
+    var imagem = document.querySelector('[data-imagem-teste]');
+    if (tela && imagem && tela.getAttribute('data-imagem')) imagem.src = tela.getAttribute('data-imagem');
     var foco = document.querySelector('[data-tela="' + estado + '"] h1, [data-tela="' + estado + '"] h2, [data-tela="' + estado + '"] legend');
     if (foco) { foco.setAttribute('tabindex', '-1'); foco.focus({ preventScroll: true }); }
   }

@@ -103,9 +103,10 @@
 </div>
 
 <section class="container teste-tela" aria-labelledby="teste-tela-titulo" data-anotada>
+  <div class="teste-tela__grade">
   <div class="teste-tela__caixa">
 
-    <div data-tela="abertura">
+    <div data-imagem="assets/testes/dons-capa.webp" data-tela="abertura">
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome" id="teste-tela-titulo">Dons de serviço prático</h1>
       <p class="t-corpo">Mostra quais dons espirituais aparecem com mais força no seu jeito de servir no dia a dia da igreja.</p>
@@ -114,7 +115,7 @@
       <div class="botoes"><button type="button" class="botao botao--primario" data-ir="email">Começar o teste</button></div>
     </div>
 
-    <div data-tela="email" hidden>
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="email" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <h2 class="t-h3">Antes de começar</h2>
@@ -126,20 +127,20 @@
       </form>
     </div>
 
-    <div data-tela="cadastro" hidden>
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="cadastro" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <h2 class="t-h3">Primeiro acesso</h2>
       <p class="t-corpo-pequeno">Não encontramos o e-mail <strong>ana@email.com</strong>. Complete seu cadastro uma vez; nos próximos testes basta o e-mail.</p>
       <form class="formulario" onsubmit="return false">
         <div class="grupo"><label class="rotulo" for="nome">Nome completo</label><input class="campo" id="nome" autocomplete="name" required></div>
-        <fieldset class="grupo"><legend class="rotulo">Unidade</legend><ul class="lista-marcar lista-marcar--duas" role="list"><li><label class="marcar marcar--radio"><input type="radio" name="unidade" checked><span>Campestre</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Anália Franco</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>São Bernardo do Campo</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Santos</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>ADAI On</span></label></li></ul></fieldset>
+        <fieldset class="grupo"><legend class="rotulo">Unidade</legend><p class="ajuda">De qual ADAI você é? Se é de outra igreja ou está visitando, escolha a opção correspondente.</p><ul class="lista-marcar lista-marcar--duas" role="list"><li><label class="marcar marcar--radio"><input type="radio" name="unidade" checked><span>Campestre</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Anália Franco</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>São Bernardo do Campo</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Santos</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>ADAI On</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Outra igreja</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Visitante</span></label></li></ul></fieldset>
         <div class="grupo"><label class="rotulo" for="turma">Turma</label><select class="campo" id="turma"><option>Selecione sua turma</option><option>CDV · Campestre · quinta 20h</option><option>CDV · On-line · sábado 9h</option></select></div>
         <div class="botoes"><button type="button" class="botao botao--primario" data-ir="pergunta">Cadastrar e começar</button><button type="button" class="botao botao--contorno-escuro" data-ir="email">Usar outro e-mail</button></div>
       </form>
     </div>
 
-    <div data-tela="pergunta" hidden>
+    <div data-imagem="assets/testes/dons-12.webp" data-tela="pergunta" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <div class="progresso">
@@ -154,7 +155,7 @@
       <div class="pergunta__navegacao"><button type="button" class="link-seta link-seta--voltar">Pergunta anterior</button><span class="t-micro t-suave">Ao escolher, vai para a próxima</span></div>
     </div>
 
-    <div data-tela="marcar" hidden>
+    <div data-imagem="assets/testes/temperamento-1.webp" data-tela="marcar" hidden>
       <p class="teste__numero t-micro"><span>Teste 5 de 5</span><span>Aula 11 do CDV</span></p>
       <h1 class="t-h2 teste-tela__nome">Temperamento pessoal</h1>
       <div class="progresso">
@@ -169,7 +170,7 @@
       <div class="pergunta__navegacao"><button type="button" class="link-seta link-seta--voltar">Anterior</button><button type="button" class="botao botao--primario">Próximo</button></div>
     </div>
 
-    <div data-tela="estilo" hidden>
+    <div data-imagem="assets/testes/estilo-3.webp" data-tela="estilo" hidden>
       <p class="teste__numero t-micro"><span>Teste 4 de 5</span><span>Aula 10 do CDV</span></p>
       <h1 class="t-h2 teste-tela__nome">Estilo pessoal</h1>
       <div class="progresso">
@@ -185,7 +186,7 @@
       <div class="pergunta__navegacao"><button type="button" class="link-seta link-seta--voltar">Pergunta anterior</button></div>
     </div>
 
-    <div data-tela="enviando" hidden>
+    <div data-imagem="assets/testes/dons-resultado.webp" data-tela="enviando" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <div class="progresso">
@@ -195,7 +196,7 @@
       <div class="aviso-teste" role="status"><span class="girando" aria-hidden="true"></span><p class="t-corpo">Calculando seu resultado…</p></div>
     </div>
 
-    <div data-tela="resultado" hidden>
+    <div data-imagem="assets/testes/dons-resultado.webp" data-tela="resultado" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <h2 class="t-h3">Seu resultado</h2>
@@ -207,7 +208,7 @@
       <p class="sair">Usou um aparelho emprestado? <button type="button" class="link" data-ir="expirou">Sair</button></p>
     </div>
 
-    <div data-tela="erro" hidden>
+    <div data-imagem="assets/testes/dons-resultado.webp" data-tela="erro" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <div class="aviso-teste aviso-teste--erro" role="alert">
@@ -217,7 +218,7 @@
       </div>
     </div>
 
-    <div data-tela="expirou" hidden>
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="expirou" hidden>
       <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
         <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
       <div class="aviso-teste" role="status">
@@ -227,10 +228,12 @@
       </div>
     </div>
 
-    <p class="trocar" data-mostra-trocar hidden>Respondendo como <strong>ana@email.com</strong> · <button type="button" class="link" data-ir="email">Não é você? Trocar e-mail</button></p>
+    <p class="trocar" data-mostra-trocar hidden>Respondendo como <strong>a***@email.com</strong> · <button type="button" class="link" data-ir="email">Não é você? Trocar e-mail</button></p>
+  </div>
+  <div class="teste-tela__midia"><img data-imagem-teste src="assets/testes/dons-capa.webp" alt="" width="1200" height="797" fetchpriority="high"></div>
   </div>
 </section>
-<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Rota /eba/testes/<slug> (noindex): uma tela, estados no cliente; abertura vem do tipo “Testes da EBA” do Strapi</span><span class="selo selo--p">Proposto</span><span>Perguntas, turmas e cálculo vêm da API atual, chamada só pelo servidor do Hub via APIM</span><span class="selo selo--p">Proposto</span><span>Identificação por e-mail em sessão de até 2 h (cookie httpOnly assinado); progresso no sessionStorage</span><span class="selo selo--p">Proposto</span><span>Resposta 0–5 como radio: escolher avança; voltar mantém a resposta anterior marcada</span><span class="selo selo--d">Derivado</span><span>Resultado ordenado como no site atual; os 3 primeiros em destaque</span></p>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Rota /eba/testes/<slug> (noindex): uma tela, estados no cliente; abertura vem do tipo “Testes da EBA” do Strapi</span><span class="selo selo--p">Proposto</span><span>Perguntas, turmas e cálculo vêm da API atual, chamada só pelo servidor do Hub via APIM</span><span class="selo selo--p">Proposto</span><span>Identificação por e-mail em sessão de até 2 h (cookie httpOnly assinado); progresso no sessionStorage</span><span class="selo selo--p">Proposto</span><span>Resposta 0–5 como radio: escolher avança; voltar mantém a resposta anterior marcada</span><span class="selo selo--d">Derivado</span><span>Resultado ordenado como no site atual; os 3 primeiros em destaque</span><span class="selo selo--d">Derivado</span><span>Fotos do site atual (capa, uma por pergunta, resultado), decorativas: alt vazio; ao lado no desktop, faixa acima no celular</span></p>
 </main>
 <footer class="footer">
   <div class="container">

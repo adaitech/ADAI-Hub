@@ -57,6 +57,16 @@ O caminho completo que precisa funcionar:
 
 **Unidades** gravadas no campo `room`: `campestre`, `sbc`, `santos` e as demais da lista atual. Os valores exatos são copiados do `form-complete.tsx`.
 
+**Unidades novas (pedido de 2026-10-20):** o Primeiro acesso ganha **"Outra igreja"** (`outra-igreja`) e **"Visitante"** (`visitante`), além das 5 ADAIs. O campo `room` é texto livre na API, mas o painel da equipe pode filtrar ou exibir por esses valores. Antes do lançamento, é preciso confirmar no painel atual como aparecem os dois valores novos. Se o painel tiver uma lista fixa, ajustá-la fica para a entrega 4.
+
+**Imagens:** o site atual mostra uma foto decorativa por estado:
+- capa;
+- uma foto por pergunta (55 em dons de serviço, 25 em dons ministeriais, 20 em temperamento, 14 em estilo pessoal e 1 em talentos);
+- foto do resultado;
+- foto da identificação (`login-student.jpg`).
+
+Os originais estão em `eba-adai/public/assets/testes/` e somam cerca de 90 MB (os JPGs de dons têm 2048 px).
+
 ## 5. Arquitetura
 
 ### 5.1 Rotas
@@ -140,6 +150,13 @@ A tela tem os estados do protótipo:
 - O tipo `teste` (entrega 1) continua sendo a fonte dos textos da abertura.
 - O seed muda o `link_teste` dos 5 testes para `/eba/testes/<slug>` e sobe para o v21.
 - Perguntas, escalas e tabelas locais (estilo pessoal e temperamento) são copiadas do site atual para `lib/eba-api/testes.ts`, como **dados**, com teste de que o total bate com o site atual.
+- **Fotos dos testes:**
+  - **Origem e formato:** copiadas do site atual e convertidas para WebP com no máximo 1200 px (cerca de 20 a 50 KB cada), em `next/public/eba/testes/<slug>/` (`capa`, `1`…`N`, `resultado`), mais `identificacao.webp`. Ficam fora do Strapi porque estão ligadas ao número da pergunta, não ao conteúdo editorial.
+  - **Acessibilidade:** são decorativas (`alt=""`).
+  - **Posição:** no desktop (≥ 1024 px), coluna à direita fixa com raio grande; no celular e no tablet, faixa 16:9 acima do questionário.
+  - **Troca:** acompanha o estado e a pergunta. A foto da próxima pergunta é pré-carregada.
+  - **Teste do mapa:** cada slug tem capa, resultado e uma foto por pergunta, ou cai na capa.
+  - **Script de conversão:** reprodutível em `next/scripts/`, sem novas dependências; usa `sharp`, que já vem com o Next.
 
 ## 6. Erros
 
@@ -239,7 +256,8 @@ Os testes são o objetivo da área, então ganham **2 eventos novos**, sem dado 
 
 ## 13. Critérios de aceite
 
-- Os 5 testes funcionam em `/eba/testes/<slug>` em 375, 768 e 1440, com todos os estados do protótipo.
+- Os 5 testes funcionam em `/eba/testes/<slug>` em 375, 768 e 1440, com todos os estados do protótipo e as fotos de cada pergunta.
+- O Primeiro acesso oferece as 5 ADAIs, "Outra igreja" e "Visitante".
 - Um resultado feito no Hub aparece no painel atual para a equipe, conferido em homologação.
 - Nenhuma chamada à API sai do navegador. A aba Network mostra só chamadas ao Hub.
 - `yarn quality`, `yarn build` (Next e Strapi) e `yarn smoke` passam.
