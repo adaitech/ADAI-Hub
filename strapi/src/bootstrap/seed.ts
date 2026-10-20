@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
-import { ensureCursos, ensurePaginasEba, ensureTestes } from './seed-eba';
+import { ensureCursos, ensurePaginasEba, ensureTestes, type Imagem, type StrapiSeed } from './seed-eba';
 
 /**
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
@@ -762,9 +762,12 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   }
 
   // EBA (Escola Bíblica ADAI): cursos, testes do CDV + páginas /eba, /eba/cursos e /eba/testes (entrega 1 da migração).
-  await ensureCursos(strapi, image, storedVersion < SEED_VERSION);
-  await ensureTestes(strapi, storedVersion < SEED_VERSION);
-  await ensurePaginasEba(strapi, image, storedVersion < SEED_VERSION);
+  // seed-eba.ts tipa só o pedaço do Strapi que usa (sem @strapi/strapi, para o typecheck do Next).
+  const strapiEba = strapi as unknown as StrapiSeed;
+  const imagemEba: Imagem = (_strapi, arquivo, alt) => image(strapi, arquivo, alt);
+  await ensureCursos(strapiEba, imagemEba, storedVersion < SEED_VERSION);
+  await ensureTestes(strapiEba, storedVersion < SEED_VERSION);
+  await ensurePaginasEba(strapiEba, imagemEba, storedVersion < SEED_VERSION);
 
   for (const p of PAGINAS_INSTITUCIONAIS) {
     const existente = await pages.findFirst({ filters: { slug: p.slug } });

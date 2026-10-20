@@ -2,6 +2,8 @@
  * Seed de desenvolvimento da EBA (strapi/src/bootstrap/seed-eba.ts) com um Strapi simulado:
  * as páginas só são montadas (e as imagens buscadas) quando vão ser criadas ou reconstruídas.
  */
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { CURSOS_EBA, TESTES_EBA, ebaSections, ebaTestesSections, ensureCursos, ensurePaginasEba, ensureTestes } from '../../../../strapi/src/bootstrap/seed-eba';
 
 function strapiFake(existentes: string[]) {
@@ -139,5 +141,12 @@ describe('home da EBA e CDV apontam para /eba/testes', () => {
     expect(texto).toContain('/eba/testes#temperamento-pessoal');
     expect(texto).not.toContain('eba.adai.com.br/teste/');
     expect(CURSOS_EBA.filter((c) => c.testes).map((c) => c.slug)).toEqual(['cdv']);
+  });
+});
+
+describe('seed-eba.ts no typecheck do Next', () => {
+  it('não importa pacotes do Strapi (o CI do Next não instala as dependências do Strapi)', () => {
+    const fonte = readFileSync(join(process.cwd(), '..', 'strapi/src/bootstrap/seed-eba.ts'), 'utf8');
+    expect(fonte).not.toMatch(/from ['"]@strapi\//);
   });
 });
