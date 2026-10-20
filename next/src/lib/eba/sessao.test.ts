@@ -1,9 +1,12 @@
+import { createHmac } from 'node:crypto';
+
 import {
   assinarSessao,
   COOKIE_SESSAO,
   lerSessao,
   mascararEmail,
   OPCOES_COOKIE,
+  TAMANHO_MINIMO_SEGREDO,
   VALIDADE_SESSAO_MS,
   type SessaoAluno,
 } from './sessao';
@@ -92,7 +95,6 @@ describe('assinarSessao / lerSessao', () => {
   });
 
   it('devolve null para JSON inválido, campos ausentes ou tipos errados mesmo com assinatura válida', () => {
-    const { createHmac } = jest.requireActual<typeof import('node:crypto')>('node:crypto');
     const fabricar = (conteudo: string) => {
       const payload = Buffer.from(conteudo).toString('base64url');
       const assinatura = createHmac('sha256', SEGREDO).update(payload).digest('base64url');
@@ -107,6 +109,47 @@ describe('assinarSessao / lerSessao', () => {
     expect(
       lerSessao(fabricar(JSON.stringify({ ...sessao, idClass: 7 })), SEGREDO, AGORA),
     ).toBeNull();
+  });
+});
+
+describe('segredo mínimo', () => {
+  const curto = 'x'.repeat(31);
+
+  it('exige 32 caracteres ou mais', () => {
+    expect(TAMANHO_MINIMO_SEGREDO).toBe(32);
+  });
+
+  it.each([['vazio', ''], ['31 caracteres', curto]])(
+    'segredo %s: assinar lança sem vazar o segredo e ler devolve null',
+    (_nome, segredo) => {
+      expect(() => assinarSessao(sessao, segredo)).toThrow('segredo da sessão ausente ou curto');
+      const payload = Buffer.from(JSON.stringify(sessao)).toString('base64url');
+      const forjado = `${payload}.${createHmac('sha256', segredo).update(payload).digest('base64url')}`;
+      expect(lerSessao(forjado, segredo, AGORA)).toBeNull();
+    },
+  );
+
+  it('segredo de 32 caracteres funciona', () => {
+    const segredo = 'x'.repeat(32);
+    expect(lerSessao(assinarSessao(sessao, segredo), segredo, AGORA)).toEqual(sessao);
+  });
+});
+
+describe('forma da sessão lida', () => {
+  const fabricar = (obj: unknown) => {
+    const payload = Buffer.from(JSON.stringify(obj)).toString('base64url');
+    return `${payload}.${createHmac('sha256', SEGREDO).update(payload).digest('base64url')}`;
+  };
+
+  it('não devolve propriedades extras', () => {
+    const lida = lerSessao(fabricar({ ...sessao, extra: 'x' }), SEGREDO, AGORA);
+    expect(lida).toEqual(sessao);
+    expect(lida).not.toHaveProperty('extra');
+  });
+
+  it('rejeita idStudent ou idClass vazios', () => {
+    expect(lerSessao(fabricar({ ...sessao, idStudent: '' }), SEGREDO, AGORA)).toBeNull();
+    expect(lerSessao(fabricar({ ...sessao, idClass: '' }), SEGREDO, AGORA)).toBeNull();
   });
 });
 

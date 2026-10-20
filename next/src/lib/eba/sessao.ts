@@ -11,6 +11,8 @@ export interface SessaoAluno {
 export const COOKIE_SESSAO = 'eba_sessao';
 /** Validade de 2 h, conferida no servidor (o cookie é de sessão, sem maxAge). */
 export const VALIDADE_SESSAO_MS = 7_200_000;
+/** Tamanho mínimo do segredo (EBA_SESSAO_SEGREDO); abaixo disso a assinatura é forjável. */
+export const TAMANHO_MINIMO_SEGREDO = 32;
 /** Tolerância para relógios dessincronizados: emissão no futuro além disso é rejeitada. */
 const TOLERANCIA_RELOGIO_MS = 60_000;
 
@@ -35,6 +37,7 @@ function assinar(payload: string, segredo: string): string {
 
 /** `base64url(json).base64url(hmac-sha256)`. */
 export function assinarSessao(s: SessaoAluno, segredo: string): string {
+  if (segredo.length < TAMANHO_MINIMO_SEGREDO) throw new Error('segredo da sessão ausente ou curto');
   const payload = Buffer.from(JSON.stringify(s)).toString('base64url');
   return `${payload}.${assinar(payload, segredo)}`;
 }
@@ -44,7 +47,9 @@ function ehSessao(v: unknown): v is SessaoAluno {
   const o = v as Record<string, unknown>;
   return (
     typeof o.idStudent === 'string' &&
+    o.idStudent !== '' &&
     typeof o.idClass === 'string' &&
+    o.idClass !== '' &&
     typeof o.emailMascarado === 'string' &&
     typeof o.emitidoEm === 'number' &&
     Number.isFinite(o.emitidoEm)
@@ -57,7 +62,7 @@ export function lerSessao(
   segredo: string,
   agora: number,
 ): SessaoAluno | null {
-  if (!valor) return null;
+  if (!valor || segredo.length < TAMANHO_MINIMO_SEGREDO) return null;
   const partes = valor.split('.');
   if (partes.length !== 2) return null;
   const [payload, assinatura] = partes;
@@ -72,7 +77,12 @@ export function lerSessao(
 
     const idade = agora - sessao.emitidoEm;
     if (idade > VALIDADE_SESSAO_MS || idade < -TOLERANCIA_RELOGIO_MS) return null;
-    return sessao;
+    return {
+      idStudent: sessao.idStudent,
+      idClass: sessao.idClass,
+      emailMascarado: sessao.emailMascarado,
+      emitidoEm: sessao.emitidoEm,
+    };
   } catch {
     return null;
   }
