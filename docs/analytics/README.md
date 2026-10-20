@@ -107,7 +107,7 @@ Em analytics.google.com → **Administrador**:
 
 1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`, `curso`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
 2. **Métrica personalizada:** `valor` (Web Vitals).
-3. **Eventos-chave:** marcar `planejar_visita`, `contribuir` e `inscrever_curso` (e, quando existirem, `inscricao_gc_enviada` e `pedido_oracao_enviado` — §3.1). O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
+3. **Eventos-chave:** marcar `planejar_visita`, `contribuir`, `inscrever_curso` e `concluir_teste` (e, quando existirem, `inscricao_gc_enviada` e `pedido_oracao_enviado` — §3.1). O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
 
 > **Status (2026-10-02, propriedade `G-SCG09PWV8B`):** ✅ 19 dimensões personalizadas (escopo Evento) e a métrica `valor` criadas. ✅ `planejar_visita` e `contribuir` já disparados e vistos no **Tempo real**. ⏳ **Falta marcar a estrela** dos dois em Eventos recentes quando aparecerem (até 24h). Filtro de homologação: não criado.
 4. **Filtro de dados** (opcional): excluir `site_ambiente = homologacao` dos relatórios de produção — ou analisar com essa dimensão.
@@ -144,6 +144,7 @@ Checklist geral (Strapi, segredos, integrações, LGPD): `README.md` → "Antes 
 ## 7. Pendências
 
 - **EBA (`inscrever_curso`, 2026-10-18):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 17 eventos e variável `DLV - curso`), criar a dimensão `curso` no GA4 e marcar `inscrever_curso` como evento-chave quando aparecer em Eventos recentes.
+- **EBA (`iniciar_teste` e `concluir_teste`, 2026-10-20):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 19 eventos e variável `DLV - teste`), criar a dimensão `teste` no GA4 e marcar `concluir_teste` como evento-chave quando aparecer em Eventos recentes. Nenhum dado pessoal é enviado: só o slug do teste. O `data-section="teste-eba"` da tela dá a origem a `clique_cta` e `ver_secao`.
 
 ### Agenda e detalhes — atualização de 18/10/2026
 
