@@ -12,9 +12,9 @@
  */
 
 const BASE = (process.argv[2] ?? process.env.SMOKE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-const PAGINAS_DO_SITE = ['/', '/agenda', '/contribua', '/politica-de-privacidade', '/eba', '/eba/cursos', '/eba/cursos/reset', '/eba/testes', '/eba/testes/dons-servico'];
-/** Páginas internas: precisam de noindex (a /exemplos tem "Meta robots" noindex no Strapi). */
-const PAGINAS_INTERNAS = ['/exemplos'];
+const PAGINAS_DO_SITE = ['/', '/agenda', '/contribua', '/politica-de-privacidade', '/eba', '/eba/cursos', '/eba/cursos/reset', '/eba/testes'];
+/** Páginas internas (e testes da EBA): precisam de noindex (a /exemplos tem "Meta robots" noindex no Strapi; a página do teste é noindex no código). */
+const PAGINAS_INTERNAS = ['/exemplos', '/eba/testes/dons-servico'];
 const MAX_IMAGENS = 6;
 
 const resultados = [];
