@@ -3,9 +3,9 @@
   width: 100%;
   max-width: calc(var(--content-max) + 2 * var(--space-page-margin));
   margin-inline: auto;
-  padding: var(--space-56) var(--space-page-margin) var(--space-section);
+  padding: var(--space-56) var(--space-page-margin);
   display: grid;
-  gap: var(--space-section);
+  gap: var(--space-40);
 }
 
 .editorial > :global([data-section]) {
@@ -17,7 +17,14 @@
 
 /* A citação continua o assunto dos cards anteriores, com um intervalo menor. */
 .editorial > :global([data-section='carrossel-cards']) + :global([data-section='texto-rico']:not(section)) {
-  margin-top: calc(var(--space-40) - var(--space-section));
+  margin-top: calc(var(--space-32) - var(--space-40));
+}
+
+@media (min-width: 769px) {
+  .editorial { gap: var(--space-56); }
+  .editorial > :global([data-section='carrossel-cards']) + :global([data-section='texto-rico']:not(section)) {
+    margin-top: calc(var(--space-32) - var(--space-56));
+  }
 }
 
 @media (min-width: 1024px) {

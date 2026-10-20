@@ -1,5 +1,3 @@
-import { errors } from '@strapi/utils';
-
 const PAGE_UID = 'api::page.page';
 const MUTATIONS = new Set(['create', 'update', 'delete', 'publish', 'unpublish', 'clone', 'discardDraft']);
 
@@ -30,7 +28,7 @@ function isSuperAdmin(request: unknown): boolean {
 }
 
 /** Additional restriction only: existing Strapi route/RBAC permissions still apply. */
-export function createPixWriteGuard(strapi: GuardDependencies) {
+export function createPixWriteGuard(strapi: GuardDependencies, forbidden: (message: string) => Error) {
   return async function guard<T>(context: GuardContext, next: () => Promise<T>): Promise<T> {
     if (context.uid !== PAGE_UID || !MUTATIONS.has(context.action)) return next();
     const request = strapi.requestContext.get();
@@ -49,7 +47,7 @@ export function createPixWriteGuard(strapi: GuardDependencies) {
       protectedPage = entries.some(containsPix);
     }
     if (protectedPage) {
-      throw new errors.ForbiddenError('Somente Super Admin pode alterar páginas com a seção Pix.');
+      throw forbidden('Somente Super Admin pode alterar páginas com a seção Pix.');
     }
     return next();
   };

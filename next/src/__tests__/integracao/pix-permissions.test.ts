@@ -4,15 +4,21 @@ import { createPixWriteGuard } from '../../../../strapi/src/security/pix-permiss
 const pix = { sections: [{ __component: 'sections.pix' }] };
 const ordinary = { sections: [{ __component: 'sections.hero' }] };
 const admin = { state: { auth: { strategy: { name: 'admin' } }, user: { roles: [{ code: 'strapi-super-admin' }] } } };
+const forbidden = (message: string) => Object.assign(new Error(message), { name: 'ForbiddenError' });
 
 function setup(request: unknown = { state: {} }, entries: unknown[] = []) {
   const findMany = jest.fn(async () => entries);
-  const guard = createPixWriteGuard({ requestContext: { get: () => request }, db: { query: () => ({ findMany }) } });
+  const guard = createPixWriteGuard({ requestContext: { get: () => request }, db: { query: () => ({ findMany }) } }, forbidden);
   const next = jest.fn(async () => 'executado');
   return { guard, next, findMany };
 }
 
 describe('proteção de escrita do Pix no Document Service', () => {
+  it('usa o erro fornecido pelo servidor sem depender do runtime do Strapi', async () => {
+    const erro = forbidden('Acesso restrito');
+    const guard = createPixWriteGuard({ requestContext: { get: () => ({ state: {} }) }, db: { query: () => ({ findMany: async () => [] }) } }, () => erro);
+    await expect(guard({ uid: 'api::page.page', action: 'create', params: { data: pix } }, async () => 'não deve executar')).rejects.toBe(erro);
+  });
   it.each(['create', 'update', 'clone'])('nega %s com Pix recebido por editor, author ou token', async (action) => {
     for (const request of [{ state: {} }, { state: { user: { roles: [{ code: 'strapi-editor' }] } } }, { state: { user: { roles: [{ code: 'strapi-author' }] } } }]) {
       const { guard, next } = setup(request);
@@ -33,7 +39,7 @@ describe('proteção de escrita do Pix no Document Service', () => {
       const { guard, next } = setup(request);
       // undefined explicitly represents bootstrap rather than the default HTTP fixture.
       if (request === undefined) {
-        const internal = createPixWriteGuard({ requestContext: { get: () => undefined }, db: { query: () => ({ findMany: async () => [pix] }) } });
+        const internal = createPixWriteGuard({ requestContext: { get: () => undefined }, db: { query: () => ({ findMany: async () => [pix] }) } }, forbidden);
         await expect(internal({ uid: 'api::page.page', action: 'create', params: { data: pix } }, next)).resolves.toBe('executado');
       } else {
         await expect(guard({ uid: 'api::page.page', action: 'delete', params: { documentId: 'documento' } }, next)).resolves.toBe('executado');
