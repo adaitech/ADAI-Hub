@@ -13,15 +13,113 @@ export type Imagem = (strapi: Core.Strapi, arquivo: string, alt: string) => Prom
 const SITE_ATUAL = 'https://eba.adai.com.br';
 const CONTATO = 'mailto:contato@adai.com.br';
 
-const TESTES = [
-  ['Temperamento pessoal', 'temperamento-pessoal'],
-  ['Talentos naturais', 'talentos-naturais'],
-  ['Estilo pessoal', 'estilo-pessoal'],
-  ['Dons de serviço prático', 'dons-servico'],
-  ['Dons ministeriais', 'dons-ministerio'],
-] as const;
+interface TesteSeed {
+  slug: string;
+  nome: string;
+  aula: string;
+  resumo: string;
+  o_que_e: string;
+  itens_titulo: string;
+  /** Um item por linha. */
+  itens: string;
+  perguntas: string;
+  resposta: string;
+  como_responder: string;
+  como_ler_resultado: string;
+  link_teste: string;
+  ordem: number;
+}
 
-const listaDeTestes = TESTES.map(([nome, slug]) => `- [${nome}](${SITE_ATUAL}/teste/${slug})`).join('\n');
+const teste = (dados: Omit<TesteSeed, 'link_teste'>): TesteSeed => ({ ...dados, link_teste: `${SITE_ATUAL}/teste/${dados.slug}` });
+
+/**
+ * Os 5 testes do CDV, resumidos da apostila do curso (CDV, EBA 2023: aulas 5, 6, 7, 10 e 11), na ordem
+ * em que aparecem nela. O link é o do site atual, o mesmo dos QR codes, até a entrega 2.
+ */
+export const TESTES_EBA: TesteSeed[] = [
+  teste({
+    slug: 'dons-servico',
+    nome: 'Dons de serviço prático',
+    aula: 'Aula 5',
+    ordem: 10,
+    resumo: 'Mostra quais dons espirituais aparecem com mais força no seu jeito de servir no dia a dia da igreja.',
+    o_que_e:
+      'Dom é uma capacidade dada pelo Espírito Santo para edificar a igreja. Não se aprende como uma técnica: se reconhece, se desenvolve e se coloca a serviço dos outros. O teste ajuda a perceber quais desses dons já se manifestam na sua vida.',
+    itens_titulo: 'Os 11 dons do teste',
+    itens: ['Profecia', 'Serviço', 'Ensino', 'Exortação', 'Contribuição', 'Presidir (liderança)', 'Misericórdia', 'Administração', 'Socorro', 'Hospitalidade', 'Intercessão'].join('\n'),
+    perguntas: '55 afirmações',
+    resposta: 'nota de 0 a 5',
+    como_responder: 'Para cada afirmação, pergunte-se: “isso tem sido a minha experiência?”. Responda pelo que você vive hoje, não pelo que gostaria de viver.',
+    como_ler_resultado:
+      'Cada dom soma as notas de 5 afirmações e vai de 0 a 25. Quanto maior a soma, mais esse dom aparece na sua vida. Os dons com as maiores somas são os seus pontos de partida.',
+  }),
+  teste({
+    slug: 'dons-ministerio',
+    nome: 'Dons ministeriais',
+    aula: 'Aula 6',
+    ordem: 20,
+    resumo: 'Identifica qual dos cinco ministérios de Efésios 4.11 tem mais a ver com o seu chamado.',
+    o_que_e:
+      'São os dons dados para preparar a igreja para o serviço e fazê-la crescer. Eles não são cargos: descrevem o tipo de contribuição que cada pessoa traz para o corpo de Cristo.',
+    itens_titulo: 'Os 5 dons do teste',
+    itens: ['Apóstolo', 'Profeta', 'Evangelista', 'Pastor', 'Mestre (professor)'].join('\n'),
+    perguntas: '25 afirmações',
+    resposta: 'nota de 0 a 5',
+    como_responder: 'Funciona como o teste de dons de serviço: dê uma nota para cada afirmação, com sinceridade, pensando na sua experiência real.',
+    como_ler_resultado: 'Cada dom soma as notas de 5 afirmações, de 0 a 25. A maior soma indica o dom ministerial mais presente em você.',
+  }),
+  teste({
+    slug: 'talentos-naturais',
+    nome: 'Talentos naturais',
+    aula: 'Aula 7',
+    ordem: 30,
+    resumo: 'Ajuda a reconhecer as habilidades que você já tem e que podem servir a Deus junto com os seus dons.',
+    o_que_e:
+      'Talento não é dom. Talento é uma habilidade que a pessoa aprende e aperfeiçoa com a prática, como cantar, ensinar ou consertar. Dom é dado pelo Espírito. Os dois funcionam melhor juntos: cantar pode ser talento; encorajar pessoas pelo louvor é dom.',
+    itens_titulo: 'Alguns dos 26 talentos da lista',
+    itens: ['Ensinar', 'Planejar', 'Aconselhar', 'Escrever', 'Música', 'Hospitalidade', 'Reparar', 'Contabilidade', 'Artes e fotografia', 'Decoração'].join('\n'),
+    perguntas: 'lista de 26 habilidades',
+    resposta: 'marcar as que você tem',
+    como_responder:
+      'Marque as habilidades que você reconhece em si. Muita gente tem habilidades que não percebe: vale lembrar do que faz no trabalho, em casa e com os amigos.',
+    como_ler_resultado: 'Escolha as 3 habilidades mais fortes. Elas mostram onde os seus talentos podem somar com os seus dons no ministério.',
+  }),
+  teste({
+    slug: 'estilo-pessoal',
+    nome: 'Estilo pessoal',
+    aula: 'Aula 10',
+    ordem: 40,
+    resumo: 'Revela o que te motiva e como você prefere se organizar para servir.',
+    o_que_e:
+      'Deus fez cada pessoa única. O estilo pessoal é o jeito como você usa a sua energia: algumas pessoas se animam com tarefas cumpridas, outras com pessoas por perto; algumas preferem planejar tudo, outras preferem flexibilidade.',
+    itens_titulo: 'Os dois eixos do teste',
+    itens: ['Motivado por tarefas', 'Motivado por pessoas', 'Estruturado', 'Não estruturado'].join('\n'),
+    perguntas: 'pares de frases opostas',
+    resposta: 'escala de 1 a 5',
+    como_responder: 'Em cada par de frases, marque na escala de 1 a 5 o ponto mais próximo de como você é. Não há resposta certa: os dois lados são bons.',
+    como_ler_resultado:
+      'A soma de cada parte mostra a sua posição em dois eixos: motivação (tarefas ou pessoas) e organização (estruturado ou não estruturado). Juntos, eles mostram em que ambiente você rende mais.',
+  }),
+  teste({
+    slug: 'temperamento-pessoal',
+    nome: 'Temperamento pessoal',
+    aula: 'Aula 11',
+    ordem: 50,
+    resumo: 'Mostra a mistura de temperamentos que influencia como você reage, decide e se relaciona.',
+    o_que_e:
+      'O temperamento é o jeito natural de cada pessoa e acompanha a vida toda. O Espírito Santo transforma o caráter, mas não troca o temperamento. Conhecer o seu ajuda a entender suas forças e fraquezas e a conviver melhor com quem é diferente.',
+    itens_titulo: 'Os 4 temperamentos',
+    itens: ['Sanguíneo', 'Colérico', 'Melancólico', 'Fleumático'].join('\n'),
+    perguntas: '4 listas de características',
+    resposta: 'marcar as que descrevem você',
+    como_responder:
+      'Em cada temperamento, marque as características (forças e fraquezas) que descrevem você. Seja honesto também com as fraquezas: todo temperamento tem as suas.',
+    como_ler_resultado: 'O resultado mostra a porcentagem de cada temperamento em você. Quase todo mundo é uma mistura, com um temperamento predominante.',
+  }),
+];
+
+/** Links para a parte de cada teste na página /eba/testes (Markdown). */
+const listaDeTestes = TESTES_EBA.map((t) => `- [${t.nome}](/eba/testes#${t.slug})`).join('\n');
 
 type Pergunta = [pergunta: string, resposta: string];
 const faq = (titulo: string, perguntas: Pergunta[]) => ({
@@ -255,7 +353,7 @@ async function dadosDoCurso(strapi: Core.Strapi, c: CursoSeed, imagem: Imagem) {
         {
           __component: 'sections.texto-rico',
           titulo: 'Os testes do CDV',
-          conteudo: `Durante o curso você faz os testes de temperamento, estilo pessoal, talentos naturais e dons. Eles podem ser feitos pelo celular, a partir do QR code da sala.\n\n${listaDeTestes}`,
+          conteudo: `Durante o curso você faz os testes de temperamento, estilo pessoal, talentos naturais e dons. Eles podem ser feitos pelo celular, a partir do QR code da sala. Veja como cada um funciona:\n\n${listaDeTestes}`,
         },
       ]
     : [];
@@ -311,7 +409,7 @@ export async function ebaSections(strapi: Core.Strapi, imagem: Imagem) {
       preto_e_branco: false,
       botoes: [
         { texto: 'Ver cursos', url: '/eba/cursos', estilo: 'solido' },
-        { texto: 'Fazer um teste', url: `${SITE_ATUAL}/teste/temperamento-pessoal`, estilo: 'contorno' },
+        { texto: 'Conhecer os testes', url: '/eba/testes', estilo: 'contorno' },
       ],
     },
     {
@@ -338,7 +436,7 @@ export async function ebaSections(strapi: Core.Strapi, imagem: Imagem) {
     {
       __component: 'sections.texto-rico',
       titulo: 'Descubra seus dons e talentos',
-      conteudo: `Os testes da EBA ajudam você a entender seu temperamento, seu estilo pessoal, seus talentos naturais e seus dons para servir na igreja.\n\n${listaDeTestes}`,
+      conteudo: `Os testes da EBA ajudam você a entender seu temperamento, seu estilo pessoal, seus talentos naturais e seus dons para servir na igreja.\n\n${listaDeTestes}\n\n[Conhecer os testes](/eba/testes)`,
     },
     faq('Perguntas frequentes', [
       [
@@ -358,9 +456,10 @@ export async function ebaSections(strapi: Core.Strapi, imagem: Imagem) {
     ]),
     {
       __component: 'sections.texto-botoes',
-      titulo: 'Área do aluno e da equipe',
-      texto_apoio: 'Alunos assistem às aulas gravadas e a equipe da EBA acompanha as turmas.',
-      botoes: [{ texto: 'Entrar', url: `${SITE_ATUAL}/login`, estilo: 'contorno' }],
+      // Não existe área do aluno: o login é só da equipe da EBA (fica no site atual até a entrega 4).
+      titulo: 'Área da equipe da EBA',
+      texto_apoio: 'Acesso restrito a professores e coordenadores da EBA, para acompanhar as turmas.',
+      botoes: [{ texto: 'Entrar na área da equipe', url: `${SITE_ATUAL}/login`, estilo: 'contorno' }],
     },
   ];
 }
@@ -395,7 +494,80 @@ export function ebaCursosSections() {
   ];
 }
 
-const PAGINAS_EBA = [
+/** Cria ou atualiza (na subida de versão do seed) os testes do CDV e publica. Idempotente pelo slug. */
+export async function ensureTestes(strapi: Core.Strapi, reconstruir: boolean): Promise<void> {
+  const testes = strapi.documents('api::teste.teste');
+  for (const t of TESTES_EBA) {
+    const existente = await testes.findFirst({ filters: { slug: t.slug } });
+    if (existente && !reconstruir) continue;
+    const data = t as never;
+    const doc = existente ? await testes.update({ documentId: existente.documentId, data }) : await testes.create({ data });
+    const documentId = existente?.documentId ?? doc?.documentId;
+    if (!documentId) continue;
+    await testes.publish({ documentId });
+    strapi.log.info(`[seed] Teste da EBA "${t.slug}" ${existente ? 'reconstruído' : 'criado'} e publicado.`);
+  }
+}
+
+/** Página `eba-testes` (/eba/testes): explicação dos 5 testes do CDV (protótipo docs/prototipo/eba/testes.html). */
+export async function ebaTestesSections(strapi: Core.Strapi, imagem: Imagem) {
+  const foto = await imagem(strapi, 'eba/cdv-info.webp', 'Alunos durante uma aula do CDV.');
+  return [
+    {
+      __component: 'sections.imagem-texto',
+      imagem: foto,
+      posicao_imagem: 'direita',
+      preto_e_branco: false,
+      rotulo: 'Parte do curso CDV',
+      titulo: 'Testes de dons e talentos',
+      texto:
+        'Cinco testes para você se conhecer melhor: seus dons espirituais, seus talentos, seu estilo e seu temperamento. Juntos, eles ajudam a encontrar o seu lugar para servir na igreja.',
+      botao: { texto: 'Ver os testes', url: '#os-testes', estilo: 'solido' },
+      botoes_secundarios: [{ texto: 'Conhecer o CDV', url: '/eba/cursos/cdv', estilo: 'contorno' }],
+    },
+    {
+      __component: 'sections.texto-rico',
+      titulo: 'Como funciona',
+      conteudo: [
+        'Os testes não dão nota nem dizem se você é melhor ou pior. Eles são um retrato de como Deus fez você.',
+        '',
+        '1. **Responda com sinceridade** — pense em como você é hoje, não em como gostaria de ser. Na dúvida, lembre do que as pessoas próximas dizem de você.',
+        '2. **Veja o resultado** — cada teste mostra quais dons, talentos e características aparecem com mais força em você.',
+        '3. **Converse na consultoria** — no fim do CDV, você revisa os resultados com a equipe da EBA e indica dois ministérios em que deseja servir.',
+      ].join('\n'),
+    },
+    {
+      __component: 'sections.lista-testes',
+      titulo: 'Os 5 testes',
+      texto_apoio: 'Na ordem em que aparecem no curso. Você pode ir direto a um deles:',
+      mostrar_atalhos: true,
+    },
+    faq('Perguntas frequentes', [
+      [
+        'Dom e talento são a mesma coisa?',
+        'Não. Talento é uma habilidade que se aprende e se aperfeiçoa. Dom é uma capacidade dada pelo Espírito Santo para edificar a igreja. Por isso há testes separados para cada um.',
+      ],
+      [
+        'O resultado diz em qual ministério vou servir?',
+        'Sozinho, não. Os resultados são o ponto de partida da consultoria no fim do CDV, quando você conversa com a equipe da EBA e indica dois ministérios.',
+      ],
+      ['Preciso fazer todos os testes?', 'Sim. Cada teste mostra uma parte de quem você é, e a consultoria usa os cinco resultados juntos.'],
+      ['Posso fazer os testes sem estar no CDV?', 'Os testes fazem parte do CDV e são explicados em aula. Para entender bem o resultado, faça o curso.'],
+    ]),
+    {
+      __component: 'sections.texto-botoes',
+      titulo: 'Faça os testes no CDV',
+      texto_apoio: 'No curso, cada teste é explicado em aula e, no fim, você recebe a orientação da equipe para encontrar o seu ministério.',
+      botoes: [{ texto: 'Conhecer o CDV', url: '/eba/cursos/cdv', estilo: 'solido' }],
+    },
+  ];
+}
+
+/**
+ * Páginas da EBA. `titulo` é o nome no painel e o último item da trilha (ADAI › EBA › <titulo>);
+ * `tituloSeo`, quando existe, é o título na aba e no Google (padrão: o próprio `titulo`).
+ */
+const PAGINAS_EBA: { slug: string; titulo: string; tituloSeo?: string; descricao: string; secoes: (strapi: Core.Strapi, imagem: Imagem) => Promise<unknown[]> }[] = [
   {
     slug: 'eba',
     titulo: 'EBA — Escola Bíblica ADAI',
@@ -408,10 +580,17 @@ const PAGINAS_EBA = [
     descricao: 'Reset, Start, CDV e Talmidim: conheça os cursos da Escola Bíblica ADAI.',
     secoes: async () => ebaCursosSections(),
   },
+  {
+    slug: 'eba-testes',
+    titulo: 'Testes',
+    tituloSeo: 'Testes de dons e talentos — EBA',
+    descricao: 'Dons de serviço, dons ministeriais, talentos naturais, estilo pessoal e temperamento: conheça os testes do CDV.',
+    secoes: (strapi: Core.Strapi, imagem: Imagem) => ebaTestesSections(strapi, imagem),
+  },
 ];
 
 /**
- * Cria (banco novo) ou reconstrói (versão nova do seed) as páginas `eba` e `eba-cursos` e publica.
+ * Cria (banco novo) ou reconstrói (versão nova do seed) as páginas `eba`, `eba-cursos` e `eba-testes` e publica.
  * Fora desses casos não monta nada: as imagens só são buscadas quando a página vai ser gravada.
  */
 export async function ensurePaginasEba(strapi: Core.Strapi, imagem: Imagem, reconstruir: boolean): Promise<void> {
@@ -419,10 +598,14 @@ export async function ensurePaginasEba(strapi: Core.Strapi, imagem: Imagem, reco
   for (const p of PAGINAS_EBA) {
     const existente = await pages.findFirst({ filters: { slug: p.slug } });
     if (existente && !reconstruir) continue;
-    const data = { seo: { metaTitle: `${p.titulo} | ADAI`, metaDescription: p.descricao }, sections: await p.secoes(strapi, imagem) };
+    const data = {
+      titulo: p.titulo,
+      seo: { metaTitle: `${p.tituloSeo ?? p.titulo} | ADAI`, metaDescription: p.descricao },
+      sections: await p.secoes(strapi, imagem),
+    };
     const doc = existente
       ? await pages.update({ documentId: existente.documentId, data: data as never })
-      : await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...data } as never });
+      : await pages.create({ data: { slug: p.slug, ...data } as never });
     const documentId = existente?.documentId ?? doc?.documentId;
     if (!documentId) continue;
     await pages.publish({ documentId });

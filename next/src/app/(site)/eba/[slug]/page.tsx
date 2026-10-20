@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SectionRenderer } from '@/components/sections/SectionRenderer';
+import { Trilha, type TrilhaItem } from '@/components/ui/Trilha';
+import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { buildMetadata } from '@/lib/metadata';
 import { caminhoDaPagina, slugDaPaginaEba } from '@/lib/paginas/caminho';
+import { jsonLdSeguro, origemDoSite } from '@/lib/seo/json-ld';
 import { getGlobal } from '@/lib/strapi/queries/global';
 import { getPageBySlug } from '@/lib/strapi/queries/page';
+import styles from '../eba.module.css';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -17,7 +21,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return buildMetadata(page.seo, global?.seo, caminhoDaPagina(slugStrapi));
 }
 
-/** /eba/<slug> → página "eba-<slug>" do Strapi (o catálogo /eba/cursos tem rota própria, que tem precedência). */
+/**
+ * /eba/<slug> → página "eba-<slug>" do Strapi (o catálogo /eba/cursos tem rota própria, que tem precedência).
+ * Trilha ADAI › EBA › <título da página no Strapi>, com BreadcrumbList.
+ */
 export default async function EbaSubPage({ params }: PageProps) {
   const slugStrapi = slugDaPaginaEba((await params).slug);
   if (!slugStrapi) notFound();
@@ -25,5 +32,14 @@ export default async function EbaSubPage({ params }: PageProps) {
   const page = await getPageBySlug(slugStrapi);
   if (!page) notFound();
 
-  return <SectionRenderer sections={page.sections ?? []} />;
+  const trilha: TrilhaItem[] = [{ texto: 'ADAI', href: '/' }, { texto: 'EBA', href: '/eba' }, { texto: page.titulo }];
+  return (
+    <>
+      <script type="application/ld+json">{jsonLdSeguro(schemaDaTrilha(trilha, origemDoSite()))}</script>
+      <div className={styles.trilha}>
+        <Trilha itens={trilha} />
+      </div>
+      <SectionRenderer sections={page.sections ?? []} />
+    </>
+  );
 }

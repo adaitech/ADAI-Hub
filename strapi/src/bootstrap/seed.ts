@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
-import { ensureCursos, ensurePaginasEba } from './seed-eba';
+import { ensureCursos, ensurePaginasEba, ensureTestes } from './seed-eba';
 
 /**
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 19;
+const SEED_VERSION = 20;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
@@ -713,8 +713,9 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     strapi.log.warn(`[seed] Política de Privacidade reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
   }
 
-  // EBA (Escola Bíblica ADAI): cursos + páginas /eba e /eba/cursos (entrega 1 da migração).
+  // EBA (Escola Bíblica ADAI): cursos, testes do CDV + páginas /eba, /eba/cursos e /eba/testes (entrega 1 da migração).
   await ensureCursos(strapi, image, storedVersion < SEED_VERSION);
+  await ensureTestes(strapi, storedVersion < SEED_VERSION);
   await ensurePaginasEba(strapi, image, storedVersion < SEED_VERSION);
 
   for (const p of PAGINAS_INSTITUCIONAIS) {

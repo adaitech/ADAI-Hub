@@ -57,6 +57,15 @@ describe('/eba/<slug> — outras páginas da EBA no Strapi ("eba-<slug>")', () =
     expect((await metadataEbaSub(params('sobre'))).alternates?.canonical).toMatch(/\/eba\/sobre$/);
   });
 
+  it('trilha ADAI › EBA › <título da página> e BreadcrumbList (ex.: /eba/testes)', async () => {
+    strapi.paginas['eba-testes'] = { ...strapi.paginas.eba, id: 9, documentId: 'eba-testes', slug: 'eba-testes', titulo: 'Testes' };
+    const { container } = await renderizarServidor(await EbaSubPage(params('testes')));
+    const trilha = screen.getByRole('navigation', { name: 'Trilha' });
+    expect(within(trilha).getByRole('link', { name: 'EBA' })).toHaveAttribute('href', '/eba');
+    expect(within(trilha).getByText('Testes')).toHaveAttribute('aria-current', 'page');
+    expect(jsonLd(container).map((d) => d['@type'])).toContain('BreadcrumbList');
+  });
+
   it('inexistente ou fora do padrão → 404', async () => {
     expect((await erroDe(EbaSubPage(params('nao-existe')))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
     expect((await erroDe(EbaSubPage(params('Sobre')))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
