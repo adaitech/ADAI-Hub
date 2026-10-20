@@ -30,6 +30,7 @@
       <li><a href="reset.html">Reset</a></li>
       <li><a href="start.html">Start</a></li>
       <li><a href="cdv.html">CDV</a></li>
+      <li><a href="testes.html">/eba/testes</a></li>
       <li><a href="estados.html">Estados</a></li>
     </ul>
   </nav>
@@ -85,12 +86,12 @@
       <ul role="list">
         <li><a href="index.html">Início</a></li>
         <li><a href="cursos.html" aria-current="true">Cursos</a></li>
-        <li><a href="https://eba.adai.com.br/teste/temperamento-pessoal" class="externo" data-externo>Testes<span class="sr-only"> (no site atual da EBA)</span></a></li>
-        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Entrar<span class="sr-only"> (no site atual da EBA)</span></a></li>
+        <li><a href="testes.html">Testes</a></li>
+        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Área da equipe<span class="sr-only"> (no site atual da EBA)</span></a></li>
       </ul>
     </div>
   </nav>
-  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes e Entrar levam ao site atual até as entregas 2 e 4</span></p>
+  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes vira página do Hub (/eba/testes); Área da equipe leva ao login do site atual até a entrega 4</span></p>
 <main id="conteudo" tabindex="-1">
 <nav class="trilha container" aria-label="Trilha" data-anotada>
       <ol role="list"><li><a href="/">ADAI</a></li><li><a href="index.html">EBA</a></li><li><a href="cursos.html">Cursos</a></li><li><span aria-current="page">Reset</span></li></ol>
@@ -166,35 +167,35 @@
         <div class="card-curso__texto">
           <p class="t-micro t-suave">Curso de integração</p>
           <h3 class="t-h3"><a href="start.html">Start</a></h3>
-          <p class="t-corpo-pequeno">Porta de entrada para a vida cristã na igreja local.</p>
-          <ul class="chips" role="list"><li><strong>Para quem</strong>Novos membros e novos convertidos batizados</li><li><strong>Duração</strong>8 aulas</li></ul>
-          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+          <p class="t-corpo-pequeno t-suave">Porta de entrada para a vida cristã na igreja local.</p>
         </div>
+        <dl class="card-curso__meta"><div><dt>Para quem</dt><dd>Novos membros e novos convertidos batizados</dd></div><div><dt>Duração</dt><dd>8 aulas</dd></div></dl>
+        <span class="card-curso__mais" aria-hidden="true">Conhecer o curso</span>
       </li>
       <li class="card-curso">
         <img class="card-curso__foto" src="assets/cdv-capa.webp" alt="" width="1600" height="1066" loading="lazy">
         <div class="card-curso__texto">
           <p class="t-micro t-suave">Curso de integração</p>
           <h3 class="t-h3"><a href="cdv.html">CDV</a></h3>
-          <p class="t-corpo-pequeno">Conhecendo os seus dons e talentos para servir a Deus.</p>
-          <ul class="chips" role="list"><li><strong>Para quem</strong>Quem concluiu o Start</li><li><strong>Duração</strong>8 aulas</li></ul>
-          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+          <p class="t-corpo-pequeno t-suave">Conhecendo os seus dons e talentos para servir a Deus.</p>
         </div>
+        <dl class="card-curso__meta"><div><dt>Para quem</dt><dd>Quem concluiu o Start</dd></div><div><dt>Duração</dt><dd>8 aulas</dd></div></dl>
+        <span class="card-curso__mais" aria-hidden="true">Conhecer o curso</span>
       </li>
       <li class="card-curso">
         <img class="card-curso__foto" src="assets/talmidim-capa.webp" alt="" width="1600" height="1066" loading="lazy">
         <div class="card-curso__texto">
           <p class="t-micro t-suave">Curso de integração</p>
           <h3 class="t-h3"><a href="talmidim.html">Talmidim</a></h3>
-          <p class="t-corpo-pequeno">Acompanhamento do adolescente no início de uma nova caminhada com Jesus.</p>
-          <ul class="chips" role="list"><li><strong>Para quem</strong>Adolescentes de 12 a 15 anos</li><li><strong>Duração</strong>13 aulas de 1 hora, semanais</li></ul>
-          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+          <p class="t-corpo-pequeno t-suave">Acompanhamento do adolescente no início de uma nova caminhada com Jesus.</p>
         </div>
+        <dl class="card-curso__meta"><div><dt>Para quem</dt><dd>Adolescentes de 12 a 15 anos</dd></div><div><dt>Duração</dt><dd>13 aulas de 1 hora, semanais</dd></div></dl>
+        <span class="card-curso__mais" aria-hidden="true">Conhecer o curso</span>
       </li>
     </ul>
   </div>
 </section>
-<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Seção nova “Catálogo de cursos” (sections.catalogo-cursos): lista automática dos cursos publicados, pela ordem do Strapi</span><span class="selo selo--d">Derivado</span><span>Card de curso a partir do Card / Página relacionada (raio 20, título H3)</span><span class="selo selo--p">Proposto</span><span>Card inteiro clicável com um único link; nome acessível = nome do curso</span></p>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Seção nova “Catálogo de cursos” (sections.catalogo-cursos): lista automática dos cursos publicados, pela ordem do Strapi</span><span class="selo selo--d">Derivado</span><span>Card de curso no padrão Card / Unidade e Carrossel de cards: caixa cinza, padding 24, raio 20, foto 3:2 dentro (raio 14)</span><span class="selo selo--p">Proposto</span><span>Para quem e Duração numa lista de rótulo + valor, separada por linha; linhas alinhadas entre os cards (subgrid)</span><span class="selo selo--p">Proposto</span><span>Card inteiro clicável com um único link; nome acessível = nome do curso</span></p>
 </main>
 <footer class="footer">
   <div class="container">

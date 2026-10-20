@@ -50,22 +50,57 @@
 .inverso .chips li { background: rgba(255, 255, 255, 0.12); }
 .inverso .chips strong { color: var(--cor-texto-inverso); }
 
-/* Card de curso [D] da anatomia do Card / Página relacionada; foto colorida (fotos da EBA) */
-.grade-cursos { display: grid; gap: var(--espaco-40) var(--espaco-24); margin-top: var(--espaco-40); }
-.card-curso { position: relative; display: flex; flex-direction: column; gap: var(--espaco-16); }
-.card-curso__foto { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--raio-medio); background: var(--cor-grafite); }
+/* Card de curso [D] no padrão Card / Unidade e Carrossel de cards do Hub:
+   caixa cinza, padding 24, raio 20, foto 3:2 dentro (raio 14). Linhas alinhadas entre cards (subgrid) [P] */
+.grade-cursos { display: grid; gap: var(--espaco-12); margin-top: var(--espaco-40); }
+.card-curso {
+  position: relative; display: grid; grid-template-rows: auto 1fr auto auto; gap: var(--espaco-20);
+  padding: var(--espaco-24); border-radius: var(--raio-medio); background: var(--cor-fundo-sutil);
+  transition: background-color var(--duracao) var(--curva);
+}
+@supports (grid-template-rows: subgrid) {
+  .grade-cursos { grid-auto-rows: auto; }
+  .card-curso { grid-row: span 4; grid-template-rows: subgrid; row-gap: var(--espaco-20); }
+}
+.card-curso:hover { background: var(--cor-fundo-sutil-2); }
+.card-curso__foto { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: var(--raio-pequeno); background: var(--cor-grafite); }
 .card-curso__sem-foto {
-  display: flex; align-items: flex-end; aspect-ratio: 4 / 3; padding: var(--espaco-24); border-radius: var(--raio-medio);
-  background: var(--cor-fundo-sutil); font-size: var(--fs-h2); font-weight: var(--peso-bold); line-height: var(--lh-h2); letter-spacing: var(--ls-h2);
+  display: flex; align-items: flex-end; aspect-ratio: 3 / 2; padding: var(--espaco-20); border-radius: var(--raio-pequeno);
+  background: var(--cor-fundo-sutil-2); font-size: var(--fs-h3); font-weight: var(--peso-bold); line-height: var(--lh-h3);
 }
 .card-curso__texto { display: flex; flex-direction: column; gap: var(--espaco-8); }
 .card-curso a { text-decoration: none; }
-.card-curso a::after { content: ""; position: absolute; inset: 0; }
-.card-curso:has(a:focus-visible) { outline: 3px solid var(--cor-foco); outline-offset: 4px; border-radius: var(--raio-medio); }
+.card-curso a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.card-curso:has(a:focus-visible) { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
 .card-curso a:focus-visible { outline: none; }
-.card-curso:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
-.card-curso__mais { font-weight: var(--peso-bold); }
-.card-curso .chips { margin-top: var(--espaco-4); }
+.card-curso:hover h2, .card-curso:hover h3 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+/* Para quem / Duração: rótulo + valor, separados do texto por uma linha [P] */
+.card-curso__meta { display: grid; gap: var(--espaco-8); align-content: start; padding-top: var(--espaco-16); border-top: var(--borda) solid var(--cor-fundo-sutil-2); font-size: var(--fs-legenda); line-height: var(--lh-legenda); }
+.card-curso:hover .card-curso__meta { border-top-color: var(--cor-borda-campo); }
+.card-curso__meta div { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--espaco-8); }
+.card-curso__meta dt { color: var(--cor-texto-suave); }
+.card-curso__mais {
+  justify-self: start; display: inline-flex; align-items: center; gap: var(--espaco-8); min-height: var(--alvo-minimo);
+  font-weight: var(--peso-bold); border-bottom: var(--borda) solid currentColor;
+}
+.card-curso__mais::after { content: "→"; }
+
+/* Página de testes [P] */
+.testes { display: grid; gap: var(--espaco-12); margin-top: var(--espaco-40); }
+.teste {
+  display: grid; gap: var(--espaco-32); padding: var(--espaco-24); border-radius: var(--raio-grande);
+  background: var(--cor-fundo-sutil); scroll-margin-top: var(--espaco-24);
+}
+.teste__abertura { display: flex; flex-direction: column; gap: var(--espaco-16); align-self: start; }
+.teste__numero { display: flex; flex-wrap: wrap; gap: var(--espaco-4) var(--espaco-16); color: var(--cor-texto-suave); font-weight: var(--peso-bold); }
+.teste__formato { border-top-color: var(--cor-fundo-sutil-2); }
+.teste__corpo { display: grid; gap: var(--espaco-10); }
+.teste__parte { display: grid; gap: var(--espaco-8); align-content: start; padding: var(--espaco-20); border-radius: var(--raio-medio); background: var(--cor-fundo); }
+.etiquetas { display: flex; flex-wrap: wrap; gap: var(--espaco-8); }
+.etiquetas li { padding: var(--espaco-4) var(--espaco-12); border-radius: var(--raio-pilula); background: var(--cor-fundo-sutil); font-size: var(--fs-legenda); line-height: var(--lh-legenda); }
+.cabecalho-secao .cta__links { margin-top: var(--espaco-8); }
+.cabecalho-secao .cta__links a { background: var(--cor-fundo-sutil); text-decoration: none; }
+.cabecalho-secao .cta__links a:hover { background: var(--cor-fundo-sutil-2); text-decoration: underline; }
 
 /* Topo do curso (CursoCabecalho) [P] */
 .curso-topo { display: grid; gap: var(--espaco-32); padding-block: var(--espaco-32) var(--secao-y); }
@@ -146,6 +181,8 @@
   .grade-cursos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .blocos--duas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .curso-topo .botoes .botao { flex: 0 0 auto; }
+  .teste { padding: var(--espaco-40); }
+  .teste__corpo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* tier: desktop */
@@ -159,8 +196,9 @@
   .curso-topo { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--coluna-gap); padding-top: var(--espaco-40); }
   .blocos--tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .caminho { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .teste { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: var(--espaco-56); padding: var(--espaco-56); }
 }
 
 @media (prefers-contrast: more) {
-  .chips li, .bloco, .faq details, .caminho li { outline: 1px solid var(--cor-preto); }
+  .chips li, .bloco, .faq details, .caminho li, .card-curso, .teste, .teste__parte, .etiquetas li { outline: 1px solid var(--cor-preto); }
 }

@@ -30,6 +30,7 @@
       <li><a href="reset.html">Reset</a></li>
       <li><a href="start.html">Start</a></li>
       <li><a href="cdv.html">CDV</a></li>
+      <li><a href="testes.html">/eba/testes</a></li>
       <li><a href="estados.html">Estados</a></li>
     </ul>
   </nav>
@@ -85,12 +86,12 @@
       <ul role="list">
         <li><a href="index.html">Início</a></li>
         <li><a href="cursos.html" aria-current="page">Cursos</a></li>
-        <li><a href="https://eba.adai.com.br/teste/temperamento-pessoal" class="externo" data-externo>Testes<span class="sr-only"> (no site atual da EBA)</span></a></li>
-        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Entrar<span class="sr-only"> (no site atual da EBA)</span></a></li>
+        <li><a href="testes.html">Testes</a></li>
+        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Área da equipe<span class="sr-only"> (no site atual da EBA)</span></a></li>
       </ul>
     </div>
   </nav>
-  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes e Entrar levam ao site atual até as entregas 2 e 4</span></p>
+  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes vira página do Hub (/eba/testes); Área da equipe leva ao login do site atual até a entrega 4</span></p>
 <main id="conteudo" tabindex="-1">
 <section class="secao" aria-labelledby="estados-titulo">
   <div class="container">
@@ -111,19 +112,20 @@
         <div class="card-curso__texto">
           <p class="t-micro t-suave">Curso de consolidação</p>
           <h3 class="t-h3"><a href="#e1">Novo curso</a></h3>
-          <p class="t-corpo-pequeno">Exemplo de curso cadastrado no Strapi sem imagem de capa e com um resumo um pouco mais longo que o normal, para conferir a quebra de linhas no card.</p>
-          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+          <p class="t-corpo-pequeno t-suave">Exemplo de curso cadastrado no Strapi sem imagem de capa e com um resumo um pouco mais longo que o normal, para conferir a quebra de linhas no card.</p>
         </div>
+        <dl class="card-curso__meta"><div><dt>Para quem</dt><dd>Líderes de célula</dd></div><div><dt>Duração</dt><dd>10 aulas</dd></div></dl>
+        <span class="card-curso__mais" aria-hidden="true">Conhecer o curso</span>
       </li>
       <li class="card-curso">
         <img class="card-curso__foto" src="assets/reset-capa.webp" alt="" width="1600" height="1066" loading="lazy">
         <div class="card-curso__texto">
           <p class="t-micro t-suave">Curso de integração</p>
           <h3 class="t-h3"><a href="reset.html">Reset</a></h3>
-          <p class="t-corpo-pequeno">Um passo de fé e obediência, transformação interior e início de uma nova caminhada com Jesus.</p>
-          <ul class="chips" role="list"><li><strong>Para quem</strong>A partir de 16 anos</li><li><strong>Duração</strong>7 aulas de 1 hora, semanais</li></ul>
-          <p class="card-curso__mais" aria-hidden="true">Conhecer o curso →</p>
+          <p class="t-corpo-pequeno t-suave">Um passo de fé e obediência, transformação interior e início de uma nova caminhada com Jesus.</p>
         </div>
+        <dl class="card-curso__meta"><div><dt>Para quem</dt><dd>A partir de 16 anos</dd></div><div><dt>Duração</dt><dd>7 aulas de 1 hora, semanais</dd></div></dl>
+        <span class="card-curso__mais" aria-hidden="true">Conhecer o curso</span>
       </li>
     </ul>
     <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Sem capa → bloco cinza com o nome; capa sem alt não aparece (normalize)</span></p>
