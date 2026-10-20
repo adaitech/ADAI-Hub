@@ -5,10 +5,14 @@ import type { PixData } from './types';
 export function normalizePix(data: PixData) {
   const titulo = data.titulo?.trim();
   const chave = data.chave_pix?.trim();
-  if (!titulo || !chave) return null;
+  const favorecido = data.favorecido?.trim();
+  const cnpj = data.cnpj?.trim();
+  if (!titulo || !chave || !favorecido || !cnpj) return null;
   return {
     titulo,
     chave,
+    favorecido,
+    cnpj,
     apoio: data.texto_apoio?.trim() || null,
     passos: splitLines(data.passos),
     contato: normalizeLink(data.contato),

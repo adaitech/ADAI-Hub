@@ -1,4 +1,7 @@
 {
+  "outros_eventos": {
+    "__component": "sections.proximos-eventos", "id": 9030, "titulo": "Outros eventos", "quantidade": 3
+  },
   "completo": {
     "__component": "sections.proximos-eventos",
     "id": 12,

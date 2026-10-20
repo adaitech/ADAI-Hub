@@ -15,6 +15,11 @@
   padding: 0;
 }
 
+/* A citação continua o assunto dos cards anteriores, com um intervalo menor. */
+.editorial > :global([data-section='carrossel-cards']) + :global([data-section='texto-rico']:not(section)) {
+  margin-top: calc(var(--space-40) - var(--space-section));
+}
+
 @media (min-width: 1024px) {
   /* Uma foto de abertura proporcional às duas colunas, sem aumentar toda a primeira dobra. */
   .editorial > :global([data-section='imagem-texto']:not([data-sem-imagem='true'])):first-child > :first-child {

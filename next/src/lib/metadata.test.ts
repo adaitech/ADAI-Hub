@@ -16,6 +16,12 @@ const padrao: StrapiSeo = {
 };
 
 describe('buildMetadata', () => {
+  it('imagem social prefere SEO da página, depois Hero, depois padrão', () => {
+    const hero = { __component: 'sections.hero', id: 1, imagem: { id: 4, url: '/uploads/hero.jpg' } };
+    expect(buildMetadata(null, padrao, '/agenda', [hero]).openGraph).toMatchObject({ images: [{ url: `${STRAPI_URL}/uploads/hero.jpg` }] });
+    expect(buildMetadata(pagina, padrao, '/agenda', [hero]).openGraph).toMatchObject({ images: [{ url: `${STRAPI_URL}/uploads/og.jpg` }] });
+    expect(buildMetadata(null, padrao, '/agenda', []).openGraph).toMatchObject({ images: [{ url: `${STRAPI_URL}/uploads/padrao.jpg` }] });
+  });
   it('usa o SEO da página: título, descrição, canonical do caminho e Open Graph em pt-BR', () => {
     const meta = buildMetadata(pagina, padrao, '/politica-de-privacidade');
     expect(meta).toMatchObject({

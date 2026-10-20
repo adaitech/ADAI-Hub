@@ -1,0 +1,10 @@
+{
+  "id": 1646183,
+  "name": "HACKATHON ADAI HUB",
+  "show_on_site": false,
+  "tertiarygroup": { "id": 30146, "name": "ADAI CAMPESTRE" },
+  "units": [{ "id": 34726, "name": "ADAI CAMPESTRE", "related_obj": { "id": 30146, "model": "inradartertiarygroup", "name": "ADAI CAMPESTRE" } }],
+  "published_for": "Igreja: ADAI CAMPESTRE",
+  "responsible_church": null,
+  "event_schedule": [{ "id": 43305, "event_date": "2026-10-17T00:00:00", "start": "15:50:00", "end": "16:15:00", "title": "Abertura: oração, devocional e visão", "description": "", "venue": "" }]
+}

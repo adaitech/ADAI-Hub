@@ -506,6 +506,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.perguntas-frequentes',
         'sections.texto-rico',
         'sections.pix',
+        'sections.agenda-eventos',
       ]
     >;
     seo: Schema.Attribute.Component<'shared.seo', false>;

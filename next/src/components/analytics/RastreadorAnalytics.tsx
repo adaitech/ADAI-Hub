@@ -6,6 +6,15 @@ import { useEffect } from 'react';
 import { eventosDoClique } from '@/lib/analytics/cliques';
 import { registrarEvento } from '@/lib/analytics/datalayer';
 
+/** Identidade estável: re-renderizações não registram novos observers de métricas. */
+const reportarWebVitals: Parameters<typeof useReportWebVitals>[0] = (metric) => {
+  registrarEvento('web_vitals', {
+    metrica: metric.name,
+    valor: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+    avaliacao: metric.rating,
+  });
+};
+
 /** Texto acessível do elemento, sem os avisos para leitor de tela ("(abre em nova aba)"). */
 function textoDe(el: Element): string {
   const texto = el.getAttribute('aria-label') ?? el.textContent ?? '';
@@ -33,13 +42,7 @@ function cardDe(el: Element): string | null {
 export function RastreadorAnalytics() {
   const pathname = usePathname();
 
-  useReportWebVitals((metric) => {
-    registrarEvento('web_vitals', {
-      metrica: metric.name,
-      valor: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-      avaliacao: metric.rating,
-    });
-  });
+  useReportWebVitals(reportarWebVitals);
 
   useEffect(() => {
     const aoClicar = (event: MouseEvent) => {
@@ -47,7 +50,10 @@ export function RastreadorAnalytics() {
       if (!el || el.closest('[data-analytics="manual"]')) return;
       const href = el instanceof HTMLAnchorElement ? el.href : '';
       const pagina = document.querySelector('main h1')?.textContent?.replace(/\s+/g, ' ').trim() || null;
-      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina })) {
+      const contexto = el.closest<HTMLElement>('[data-evento]')?.dataset;
+      for (const [nome, parametros] of eventosDoClique({ secao: secaoDe(el), texto: textoDe(el), destino: href, card: cardDe(el), pagina, paginaUrl: window.location.href,
+        evento: contexto?.evento, eventoId: Number(contexto?.eventoId), local: contexto?.local, unidade: contexto?.unidade,
+        acaoEvento: Boolean(el.closest('[data-acao-evento="acessar"]')) })) {
         registrarEvento(nome, parametros as never);
       }
     };

@@ -2,6 +2,9 @@ import type { MetadataRoute } from 'next';
 import { montarSitemap } from '@/lib/seo/sitemap';
 import { configuracaoSeo } from '@/lib/seo/site';
 import { listarPaginasPublicadas } from '@/lib/strapi/queries/paginas';
+import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
+import { eventosDaAgenda } from '@/lib/inchurch/eventos';
+import { urlDoEvento } from '@/lib/inchurch/detalhes';
 
 /**
  * `/sitemap.xml` — páginas publicadas no Strapi. Segue o cache do Strapi (60 s + webhook de
@@ -11,5 +14,6 @@ import { listarPaginasPublicadas } from '@/lib/strapi/queries/paginas';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { indexavel, url } = configuracaoSeo();
   if (!indexavel || !url) return [];
-  return montarSitemap(await listarPaginasPublicadas(), url);
+  const [paginas, eventos] = await Promise.all([listarPaginasPublicadas(), getEventosInchurch()]);
+  return [...montarSitemap(paginas, url), ...(eventos ? eventosDaAgenda(eventos).map((evento) => ({ url: `${url}${urlDoEvento(evento)}`, priority: 0.7 })) : [])];
 }

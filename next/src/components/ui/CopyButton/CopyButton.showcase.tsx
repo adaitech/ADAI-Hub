@@ -8,7 +8,10 @@ export const copyButtonShowcase = defineShowcase<CopyButtonProps>({
   doc: 'docs/componentes/copy-button.md',
   render: (data) => <div><p>{data.valor}</p><CopyButton {...data} /></div>,
   variantes: [
-    { nome: 'pix', titulo: 'Chave Pix', data: { valor: 'nossacasa@adai.com.br', rotulo: 'Copiar chave Pix' } },
+    { nome: 'pix', titulo: 'Chave Pix', data: { valor: 'nossacasa@adai.com.br', rotulo: 'Copiar chave Pix', conversao: 'pix' } },
     { nome: 'codigo', titulo: 'Código público', data: { valor: 'ADAI-2026', rotulo: 'Copiar código' } },
+  ],
+  controles: [
+    { id: 'conversao', tipo: 'alternar', rotulo: 'Conversão de contribuição', valor: (data) => data.conversao === 'pix', aplicar: (data, ligado) => ({ ...data, conversao: ligado ? 'pix' : undefined }) },
   ],
 });

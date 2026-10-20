@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { PixSection, pixPopulate } from '@/components/sections/PixSection';
+import { AgendaEventosSection, agendaEventosPopulate } from '@/components/sections/AgendaEventosSection';
 import { CarrosselCardsSection, carrosselCardsPopulate } from '@/components/sections/CarrosselCardsSection';
 import { HeroSection, heroPopulate } from '@/components/sections/HeroSection';
 import { ImagemTextoSection, imagemTextoPopulate } from '@/components/sections/ImagemTextoSection';
@@ -30,6 +31,7 @@ function defineSection<TData extends StrapiSection>(
  */
 export const sectionRegistry: Record<string, SectionRegistryEntry> = {
   'sections.pix': defineSection(PixSection, pixPopulate),
+  'sections.agenda-eventos': defineSection(AgendaEventosSection, agendaEventosPopulate),
   'sections.hero': defineSection(HeroSection, heroPopulate),
   'sections.carrossel-cards': defineSection(CarrosselCardsSection, carrosselCardsPopulate),
   'sections.imagem-texto': defineSection(ImagemTextoSection, imagemTextoPopulate),

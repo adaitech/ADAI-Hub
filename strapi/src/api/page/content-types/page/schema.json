@@ -42,7 +42,8 @@
         "sections.texto-botoes",
         "sections.perguntas-frequentes",
         "sections.texto-rico",
-        "sections.pix"
+        "sections.pix",
+        "sections.agenda-eventos"
       ]
     }
   }

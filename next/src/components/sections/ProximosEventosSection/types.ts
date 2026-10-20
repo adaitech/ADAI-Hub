@@ -18,6 +18,8 @@ export interface ProximosEventosData {
 
 /** Exemplo da vitrine: configuração do Strapi + eventos normalizados da inChurch + "agora". */
 export interface ProximosEventosExemplo {
+  detalhes?: boolean;
+  excluirId?: number;
   strapi: ProximosEventosData;
   inchurch: EventosInchurch;
   agora: string;

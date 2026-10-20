@@ -6,7 +6,8 @@
   "boasPraticas": [
     "Confira a chave Pix com a equipe antes de publicar.",
     "Não coloque senhas ou dados de acesso ao banco.",
-    "Separe os passos com uma quebra de linha."
+    "Separe os passos com uma quebra de linha.",
+    "Dados do Pix somente podem ser alterados pela coordenação com perfil Super Admin. Confira favorecido e CNPJ."
   ],
   "campos": [
     {
@@ -69,6 +70,26 @@
       "obrigatorio": false,
       "limite": "Até 60 caracteres",
       "exemplo": "como-contribuir"
+    },
+    {
+      "campo": "favorecido",
+      "label": "Favorecido",
+      "descricao": "Nome oficial que deve aparecer no banco ao usar a chave Pix. Validar com a equipe financeira.",
+      "placeholder": "Igreja Evangélica Assembleia de Deus Ministério Alto do Ipiranga",
+      "ondeAparece": "Ao lado da chave Pix para conferência no banco.",
+      "obrigatorio": true,
+      "limite": "Até 160 caracteres",
+      "exemplo": "Igreja Evangélica Assembleia de Deus Ministério Alto do Ipiranga"
+    },
+    {
+      "campo": "cnpj",
+      "label": "CNPJ do favorecido",
+      "descricao": "CNPJ que deve aparecer no aplicativo do banco. Use o formato 00.000.000/0000-00.",
+      "placeholder": "08.020.296/0001-14",
+      "ondeAparece": "Ao lado da chave Pix para conferência no banco.",
+      "obrigatorio": true,
+      "limite": "18 caracteres",
+      "exemplo": "08.020.296/0001-14"
     }
   ]
 }

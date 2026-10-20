@@ -2,15 +2,15 @@
 
 Seção `sections.pix`, com chave pública, instruções numeradas e contato da equipe. Todos os dados editoriais vêm do Strapi. Nenhum dado bancário do visitante é solicitado.
 
-Campos: `titulo` (obrigatório, 80 caracteres), `chave_pix` (obrigatório, 140), `texto_apoio` (220), `passos` (600, um por linha), `contato` (`shared.link`) e `ancora` (60, letras minúsculas, números e hífens, iniciando por letra).
+Campos obrigatórios: `titulo` (80 caracteres), `chave_pix` (140), `favorecido` (160) e `cnpj` (18, no formato 00.000.000/0000-00). Opcionais: `texto_apoio` (220), `passos` (600, um por linha), `contato` (`shared.link`) e `ancora` (60, letras minúsculas, números e hífens, iniciando por letra).
 
-Sem título ou chave a seção é omitida. Links passam pela sanitização compartilhada. A chave fica visível e selecionável; a cópia usa `CopyButton`, com sucesso anunciado apenas após confirmação do navegador. Sem acesso à área de transferência, a mensagem orienta a cópia manual.
+Sem título, chave ou identificação do favorecido, a seção é omitida. Links passam pela sanitização compartilhada. A chave fica visível e selecionável; a cópia usa `CopyButton`, com sucesso anunciado apenas após confirmação do navegador. Sem acesso à área de transferência, a mensagem orienta a cópia manual. Favorecido e CNPJ devem ser conferidos no aplicativo do banco. Páginas que contêm Pix só podem ser alteradas por Super Admin: proteção em `strapi/src/security/pix-permissions.ts`, detalhada em `docs/seguranca/pix.md`.
 
 Vitrine: `/componentes/pix`, com variantes completa, mínima e texto longo, e controles dos campos opcionais. Guia: `strapi/src/editor-guide/sections.pix.json`.
 
 ## Medição (DataLayer)
 
-Coberto por `ver_secao` e `clique_cta` no botão de copiar e no contato. Os links de contribuição da página também disparam `contribuir`. Não se registra o valor da chave nem se presume uma transferência concluída. Nenhum evento novo é necessário.
+Coberto por `ver_secao` e `clique_cta` no botão de copiar e no contato. Somente a cópia bem-sucedida gera `contribuir` com origem `pix`; cópia negada e rolagem por âncora não geram conversão. Não se registra o valor da chave nem se presume uma transferência concluída. Nenhum nome de evento novo é necessário.
 
 ## Testes
 

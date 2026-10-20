@@ -40,24 +40,24 @@ Validadas com a API real e comparadas com a tela "Próximos Eventos" do painel (
 
 | Regra | Decisão |
 | --- | --- |
-| Aparecer no site | `active && enabled && show_on_site` ("Mostrar no site" no painel manda) |
+| Aparecer no site | `active && enabled`; `show_on_site` não participa do filtro |
 | GCs | Nunca aparecem: categoria "Grupo de Conexão" (id 8776, buscada por `category_id`) **ou** nome começando com "GC". A categoria nem sempre é preenchida no painel |
 | Recorrência | `recurrence_model: true` é o modelo (ignorado); as datas vêm como eventos próprios e viram **um** card com todas as datas |
 | Cópias | Mesmo nome + mesmo início = uma só (ex.: GC recriado) |
 | Datas | A API manda horário local sem fuso → tratado como America/Sao_Paulo (−03:00) |
 | Ordem | Destaques do painel (`highlighted`) primeiro; depois do mais próximo para o mais distante |
 | Passado | A cada renderização, datas já encerradas somem; evento sem data futura some |
-| Link do card | Inscrição externa ("Inscreva-se") → link online ("Participar online", ex.: Zoom aberto de oração) → nenhum. Só `http(s)` (bloqueia `javascript:`) |
+| Link do card | Detalhes internos `/agenda/<nome>-<id>`. Ações externas opcionais de inscrição ou participação permanecem separadas, apenas HTTP(S). |
 | Imagem | `image_webp` → `image` (arte 1280×720) com `alt=""` (o nome do evento já é o título do card) |
 | Unidade | O JSON do evento não traz a igreja (`responsible_church` vem `null`, verificado em 03/10/2026), mas o filtro `church_id` funciona: uma busca por igreja cadastrada em Unidades grava `igrejaId` no evento. Evento sem igreja = **geral**. Agrupamento por nome **e** igreja: "Batismo" do Campestre e "Batismo" de Santos são cards separados, cada um na sua unidade (a Home mostra os dois) |
 | Filtro por unidade | Seção com Unidade: eventos da igreja dela + gerais; eventos de outras unidades saem. Sem Unidade (Home) ou ID inválido: todos |
 
-**Card** (`normalize.ts` `paraCarrossel`): foto = arte; título = nome; destaques = data + hora ("14 de Outubro · 20h", "05 a 09 de Outubro · 5h", ou a próxima data + "Também em …"); texto = primeiro parágrafo da descrição (≤ 140 caracteres); link; cor do CMS. O Carrossel recebe `estilo_imagem: 'arte'` (16:9, colorida) e `posicao_imagem: 'apos_titulo'` (arte logo após o título do card, Home e unidades; decisão de 04/10/2026) — opção criada no Carrossel para artes de divulgação (ver `carrossel-cards.md`).
+**Card** (`normalize.ts` `paraCarrossel`): foto = arte; título = nome; destaques = data + hora ("14 de Outubro · 20h", "05 a 09 de Outubro · 5h", ou a próxima data + "Também em …"); texto = primeiro parágrafo da descrição (≤ 140 caracteres); URL interna dos detalhes; link externo opcional; cor do CMS. O Carrossel recebe `estilo_imagem: 'arte'` (16:9, colorida) e `posicao_imagem: 'apos_titulo'` (arte logo após o título do card, Home e unidades; decisão de 04/10/2026) — opção criada no Carrossel para artes de divulgação (ver `carrossel-cards.md`).
 
 ## 4. Integração e cache
 
 - `client.ts` `inchurchFetch`: `Authorization: Basic base64(INCHURCH_API_KEY:INCHURCH_API_SECRET)` só no servidor (header, nunca URL), `INCHURCH_API_BASE_PUBLIC`, timeout 8 s, `InchurchError` (`config` · `limite` 429 · `http` · `timeout` · `rede` · `resposta`) sem credenciais na mensagem.
-- `eventos-cache.ts` `getEventosInchurch(igrejas)`: busca os eventos a partir de hoje (paginado, 100 por página) + os da categoria GC + um `church_id` por igreja (IDs das Unidades, via `lib/strapi/queries/unidades.ts`; entram na chave do cache) → `normalizeEventos` → `unstable_cache` **30 min**, tag `inchurch`, formato v2. ~2 + 1 por unidade chamadas por atualização (limite: 200/min). Se a busca de uma igreja falhar, a atualização inteira falha (nunca mapa parcial). Falha → versão anterior (stale-if-error do Next) → último válido em memória → `null` (seção some). Log só em cache miss: `[inchurch] Eventos atualizados: N futuros → M no site.`
+- `eventos-cache.ts` `getEventosInchurch(igrejas)`: busca os eventos a partir de hoje (paginado, 100 por página) + os da categoria GC + um `church_id` por igreja (IDs das Unidades, via `lib/strapi/queries/unidades.ts`; entram na chave do cache) → `normalizeEventos` → `unstable_cache` **30 min**, tag `inchurch`, formato v7. Consultas públicas paginadas por período/categoria/unidade, complementadas pela projeção administrativa por evento com cache compartilhado de 30 min e até quatro requisições simultâneas (limite: 200/min). Se a busca de uma igreja falhar, a atualização inteira falha (nunca mapa parcial). Falha → versão anterior (stale-if-error do Next) → último válido em memória → `null` (seção some). Log só em cache miss: `[inchurch] Eventos atualizados: N futuros → M no site.`
 - Mudanças no Strapi usam o webhook atual (tag `strapi`); mudanças na inChurch aparecem em até 30 min.
 
 ## 5. Variações
@@ -77,11 +77,11 @@ Controles na vitrine: quantidade, cor dos cards, texto de apoio, link. Dados: fi
 | Nenhum evento futuro no site | Seção não aparece |
 | inChurch fora, sem cache | Seção não aparece; página normal |
 | Evento sem arte | Card sem imagem (alinhamento mantido) |
-| Evento sem link | Card sem link |
+| Evento sem link externo | Card abre os detalhes em `/agenda/<nome>-<id>`, sem CTA externo. |
 
 ## 7. Pendências
 
-- Link público da página do evento na inChurch: a API traz `public_url`/`short_url_code`, mas a documentação não informa o formato do endereço. Quando confirmado, vira o link padrão do card.
+- Home e páginas de unidades: todos os cards abrem os detalhes internos `/agenda/<nome>-<id>`, utilizando `urlDoEvento`, também usado pela Agenda. O título e a imagem usam o link esticado existente; a navegação ocorre na mesma aba. Links externos explícitos já disponíveis continuam como ações secundárias.
 - Link "Agenda completa": definir o destino (app ou página de eventos da ADAI).
 - ⏳ Validação do design (cards com arte 16:9 no lugar do bloco de data do Figma).
 
@@ -105,3 +105,5 @@ Também cobrem este componente, sem precisar editar nada:
 - `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
 
 **Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).
+
+Nos detalhes, `eventosExternos` evita qualquer consulta ao CMS e à API pela seção. Com `detalhes`, são exibidos até três eventos que ainda não terminaram, excluindo `excluirId`, em ordem crescente do próximo início, sem priorizar destaque ou unidade. Os cards abrem /agenda/nome-id e exibem três colunas desktop. Outros usos preservam a seleção anterior. Vitrine: variante outros_eventos; testes cobrem exclusão, eventos em andamento, ordem e limite.

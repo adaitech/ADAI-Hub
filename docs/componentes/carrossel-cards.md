@@ -138,3 +138,6 @@ Também cobrem este componente, sem precisar editar nada:
 # Extensão: grade editorial
 
 O campo opcional `exibicao` aceita `carrossel` (padrão anterior) e `grade`. A grade mostra todos os cards sem controles de rolagem: uma coluna no celular, duas no tablet e até três no desktop. Dois cards ocupam duas colunas no desktop. Os cards, links e conteúdo são os mesmos nas duas apresentações. Há controle de exibição na vitrine. Medição permanece coberta por `ver_secao` e `clique_cta`.
+
+
+A prop opcional `colunasDesktop={3}` atende Outros eventos, preservando o padrão de cinco colunas dos demais usos. Exemplo na vitrine de Próximos eventos (outros_eventos).

@@ -21,7 +21,12 @@ export function PixSection({ data, index }: SectionProps<PixData>) {
         <div className={styles.card}>
           <h3 className={styles.subtitulo}>Dízimos e ofertas</h3>
           <p className={styles.chave}>{view.chave}</p>
-          <CopyButton valor={view.chave} rotulo="Copiar chave Pix" />
+          <dl className={styles.favorecido}>
+            <div><dt>Favorecido</dt><dd>{view.favorecido}</dd></div>
+            <div><dt>CNPJ</dt><dd>{view.cnpj}</dd></div>
+          </dl>
+          <p className={styles.apoio}>Confira o favorecido e o CNPJ no aplicativo do banco antes de confirmar.</p>
+          <CopyButton valor={view.chave} rotulo="Copiar chave Pix" conversao="pix" />
           {view.contato && <div className={styles.contato}><p>Outras formas de contribuir</p><TextLink href={view.contato.href} novaAba={view.contato.novaAba}>{view.contato.label}</TextLink></div>}
         </div>
       </div>

@@ -3,6 +3,20 @@ import { eventosDoClique } from './cliques';
 const nomes = (eventos: ReturnType<typeof eventosDoClique>) => eventos.map(([nome]) => nome);
 
 describe('eventosDoClique', () => {
+  it.each(['#como-contribuir', 'http://localhost:3000/contribua#como-contribuir'])('âncora na mesma página não é conversão (%s)', (destino) => {
+    const eventos = eventosDoClique({ secao: 'imagem-texto', texto: 'Já quero contribuir', destino, card: null, paginaUrl: 'http://localhost:3000/contribua' });
+    expect(nomes(eventos)).toEqual(['clique_cta']);
+  });
+  it('âncora em outra página continua sendo navegação para contribuir', () => {
+    expect(nomes(eventosDoClique({ secao: 'hero', texto: 'Contribuir', destino: 'http://localhost:3000/contribua#como-contribuir', card: null, paginaUrl: 'http://localhost:3000/' }))).toContain('contribuir');
+  });
+  it('CTA explícito de evento gera conversão e remove parâmetros privados do destino', () => {
+    const eventos = eventosDoClique({ secao: 'evento-detalhe', texto: 'Acessar evento', destino: 'https://example.com/inscricao?token=privado', card: null, evento: 'Encontro', eventoId: 1, acaoEvento: true });
+    expect(eventos).toContainEqual(['acessar_evento', { origem: 'evento-detalhe', evento: 'Encontro', evento_id: 1, destino: 'https://example.com/inscricao' }]);
+  });
+  it.each([['Local físico', 'Campus', 'Local físico'], ['', 'Campus', 'Campus'], ['', '', '']])('Maps no detalhe prioriza local e nunca usa h1: %s', (local, unidade, esperado) => {
+    expect(eventosDoClique({ secao: 'evento-detalhe', texto: 'Ver no Google Maps', destino: 'https://www.google.com/maps/search/?query=x', card: null, pagina: 'Título evento', evento: 'Título evento', local, unidade })[0]).toEqual(['como_chegar', { origem: 'evento-detalhe', local: esperado, unidade, evento: 'Título evento' }]);
+  });
   it('Planeje sua visita (conversão) + clique_cta', () => {
     const eventos = eventosDoClique({ secao: 'hero', texto: 'Planeje sua visita', destino: 'http://localhost:3000/planeje-sua-visita', card: null });
     expect(eventos[0]).toEqual(['planejar_visita', { origem: 'hero', texto: 'Planeje sua visita' }]);
@@ -35,7 +49,7 @@ describe('eventosDoClique', () => {
   it('Próximos eventos, ministérios e "Todas as mensagens"', () => {
     expect(eventosDoClique({ secao: 'proximos-eventos', texto: 'Participar online', destino: 'https://zoom.us/j/1', card: 'Semana de Jejum & Oração' })[0]).toEqual([
       'selecionar_evento',
-      { evento: 'Semana de Jejum & Oração', acao: 'Participar online' },
+      { origem: 'proximos-eventos', evento: 'Semana de Jejum & Oração', acao: 'Participar online' },
     ]);
     expect(eventosDoClique({ secao: 'ministerios', texto: 'KIDS Crianças', destino: 'http://localhost:3000/ministerios/kids', card: 'KIDS' })[0]).toEqual([
       'selecionar_ministerio',

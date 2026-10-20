@@ -128,3 +128,5 @@ Também cobrem este componente, sem precisar editar nada:
 - `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
 
 **Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).
+
+Uso por código nos detalhes de eventos: a prop opcional `somenteImagem` mantém o Hero existente em 16:9, colorido, sem título, degradê ou botões, com fundo de fallback. Não é um campo novo do CMS. Vitrine: variante imagem_evento; testes em HeroSection.test.tsx.

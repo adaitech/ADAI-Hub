@@ -14,6 +14,11 @@
   overflow: hidden;
 }
 
+.secao:has(.tresColunas) {
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
 .intro {
   grid-area: intro;
   display: flex;
@@ -290,6 +295,9 @@
 
   .trilha {
     grid-auto-columns: calc((100% - 4 * var(--space-12)) / 5);
+  }
+  .trilha.tresColunas {
+    grid-auto-columns: calc((100% - 2 * var(--space-12)) / 3);
   }
 }
 

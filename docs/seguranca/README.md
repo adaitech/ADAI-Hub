@@ -28,6 +28,18 @@ Spec e plano da entrega 1: `docs/superpowers/specs/2026-10-03-seguranca-1-atuali
 | `next/` | 2 altas | **0** |
 | `strapi/` | 605 (13 críticas, 306 altas) | **66 (0 críticas, 12 altas)** — todas em risco aceito (§3) |
 
+### Revalidação em 2026-10-18
+
+Os lockfiles receberam os patches transitivos publicados, sem atualização de versão principal:
+
+| Pacote | Versão aplicada | Resultado |
+| --- | --- | --- |
+| `source-map-js` | 1.2.2 | removeu a alta do Next e do Strapi |
+| `handlebars` | 4.7.10 | removeu as 8 críticas do Strapi |
+| `sharp` | 0.35.5 | removeu a alta do Strapi |
+
+`yarn audit --groups dependencies` passou a indicar **0 vulnerabilidades no Next** e, no Strapi, **0 críticas, 12 altas, 46 moderadas e 12 baixas**. As 12 altas restantes correspondem a `braces`, `nodemailer`, `vite` e `webpack-dev-middleware`, descritos em §3. O teste de característica também confere os pisos desses patches no `package.json` e no `yarn.lock`.
+
 A API do Strapi foi comparada antes e depois (Home, Política, exemplos e configurações do site): **conteúdo idêntico**; a única diferença é o campo novo `focalPoint: null` nas mídias (recurso da 5.x, ignorado pelo site).
 
 ## 2. O que foi feito no Strapi
@@ -40,6 +52,9 @@ A API do Strapi foi comparada antes e depois (Home, Política, exemplos e config
 | `axios` | `^1.20.0` | Redirecionamento/DoS (painel) |
 | `lodash` | `^4.18.1` | Injeção de código via `_.template` |
 | `nodemailer` | `^9.1.1` | Troca de falhas, com saldo menor: corrige 1 alta e 3 moderadas da 9.0.1, mas a linha 9.1–10.0.4 tem 1 alta própria (endereços juntados por comentários) e 1 moderada. Ver §3 |
+| `handlebars` | `4.7.10` | Correções de execução de código em templates transitivos fixados pelo Strapi |
+| `sharp` | `0.35.5` | Correções de libvips/libheif transitivas fixadas pelo Strapi |
+| `source-map-js` | `1.2.2` | Correção de alta transitiva no compilador |
 | `postcss` | `^8.5.28` | Leitura de arquivo via source map |
 | `@remix-run/router` | `^1.23.4` | XSS por redirecionamento aberto (painel) |
 | `@swc/core` | `1.15.47` | **Não é falha de segurança:** a 1.16 recusa o cache nativo quando `C:\Users\<usuário>\AppData\Local` herda permissão de uma identidade de sandbox (`S-1-15-3-…`), o que quebra o build do painel no Windows. Só ferramenta de build. Rever quando o ambiente mudar |
@@ -112,3 +127,7 @@ Spec com cada decisão e o motivo: `docs/superpowers/specs/2026-10-03-seguranca-
 `yarn quality` (713 testes) e `yarn build` verdes; `yarn smoke` 31/31. No navegador, em `next dev` e em `next start` (produção), **zero violação de CSP**: Home hidrata, aviso de cookies → GTM e GA4 (`g/collect`) carregam com o nonce herdado, player do YouTube toca, vitrine renderiza os iframes. Strapi: origem estranha não recebe `Access-Control-Allow-Origin`; o site recebe; painel abre.
 
 **Falta conferir (humano):** pré-visualização do rascunho dentro do painel do Strapi (exige login) e Lighthouse mobile ≥ 80 com a renderização dinâmica.
+
+## Proteção dos dados de contribuição
+
+Páginas com a seção Pix têm escrita restrita a Super Admin por middleware do Document Service. Detalhes e limites: [Escrita da seção Pix](pix.md).

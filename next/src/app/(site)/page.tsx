@@ -9,7 +9,7 @@ const HOME_SLUG = 'home';
 
 export async function generateMetadata(): Promise<Metadata> {
   const [page, global] = await Promise.all([getPageBySlug(HOME_SLUG), getGlobal()]);
-  return buildMetadata(page?.seo, global?.seo, '/');
+  return buildMetadata(page?.seo, global?.seo, '/', page?.sections);
 }
 
 export default async function HomePage() {

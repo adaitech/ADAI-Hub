@@ -7,6 +7,8 @@ export interface PixData {
   titulo?: string | null;
   texto_apoio?: string | null;
   chave_pix?: string | null;
+  favorecido?: string | null;
+  cnpj?: string | null;
   passos?: string | null;
   contato?: StrapiLink | null;
   ancora?: string | null;

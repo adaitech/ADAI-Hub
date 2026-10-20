@@ -8,7 +8,7 @@ Vitrine: `/componentes/copy-button`.
 
 ## Medição (DataLayer)
 
-Coberto por `clique_cta` pelo rastreador geral; não envia o valor copiado ao DataLayer. Não requer evento novo.
+Coberto por `clique_cta` pelo rastreador geral; não envia o valor copiado ao DataLayer. A prop opcional `conversao="pix"` registra `contribuir` com origem `pix` somente após a confirmação da Clipboard API. Sem a prop não registra conversão. Não requer nome de evento novo.
 
 ## Testes
 

@@ -9,6 +9,7 @@ import itemsPerguntaFrequente from './items.pergunta-frequente.json';
 import layoutFooter from './layout.footer.json';
 import layoutHeader from './layout.header.json';
 import sectionsCarrosselCards from './sections.carrossel-cards.json';
+import sectionsAgendaEventos from './sections.agenda-eventos.json';
 import sectionsHero from './sections.hero.json';
 import sectionsPix from './sections.pix.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
@@ -50,6 +51,7 @@ export const editorGuides: EditorGuide[] = [
   sectionsHero,
   sectionsPix,
   sectionsCarrosselCards,
+  sectionsAgendaEventos,
   sectionsSerieAtual,
   sectionsProximosEventos,
   sectionsImagemTexto,

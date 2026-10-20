@@ -97,7 +97,9 @@
       "contato": {
         "texto": "Falar com a equipe",
         "url": "mailto:contato@adai.com.br"
-      }
+      },
+      "favorecido": "Igreja Evangélica Assembleia de Deus Ministério Alto do Ipiranga",
+      "cnpj": "08.020.296/0001-14"
     },
     {
       "__component": "sections.perguntas-frequentes",
