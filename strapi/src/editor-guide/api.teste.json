@@ -123,12 +123,12 @@
     {
       "campo": "link_teste",
       "label": "Link do teste",
-      "descricao": "Endereço onde a pessoa faz o teste (hoje, o site atual da EBA). Use um endereço que comece com https://. Sem link, o botão não aparece.",
-      "placeholder": "Ex.: https://eba.adai.com.br/teste/dons-servico",
+      "descricao": "Endereço onde a pessoa faz o teste, dentro do Hub. Use o caminho do teste, que começa com /eba/testes/. Sem link, o botão não aparece.",
+      "placeholder": "Ex.: /eba/testes/dons-servico",
       "ondeAparece": "Botão \"Fazer o teste\".",
       "obrigatorio": false,
       "limite": "Até 300 caracteres",
-      "exemplo": "https://eba.adai.com.br/teste/temperamento-pessoal"
+      "exemplo": "/eba/testes/temperamento-pessoal"
     },
     {
       "campo": "ordem",

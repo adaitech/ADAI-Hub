@@ -30,7 +30,7 @@ interface TesteSeed {
   ordem: number;
 }
 
-const teste = (dados: Omit<TesteSeed, 'link_teste'>): TesteSeed => ({ ...dados, link_teste: `${SITE_ATUAL}/teste/${dados.slug}` });
+const teste = (dados: Omit<TesteSeed, 'link_teste'>): TesteSeed => ({ ...dados, link_teste: `/eba/testes/${dados.slug}` });
 
 /**
  * Os 5 testes do CDV, resumidos da apostila do curso (CDV, EBA 2023: aulas 5, 6, 7, 10 e 11), na ordem

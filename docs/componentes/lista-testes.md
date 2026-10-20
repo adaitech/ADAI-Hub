@@ -4,7 +4,7 @@
 
 A seção lista sozinha os testes do CDV publicados no Strapi (tipo **Testes da EBA**) e explica cada um. O editor escolhe só o título, o texto de apoio e se os atalhos aparecem. Publicar um teste faz ele aparecer; despublicar tira.
 
-Os testes continuam sendo feitos no site atual da EBA (`eba.adai.com.br/teste/<slug>`), nas mesmas URLs dos QR codes. Trazer os testes para o Hub é a entrega 2.
+O botão "Fazer o teste" abre o teste dentro do Hub (`/eba/testes/<slug>`). Os QR codes impressos (`eba.adai.com.br/teste/<slug>`) redirecionam para esse endereço quando o redirecionamento do site atual está ligado.
 
 ## Edição no Strapi
 
@@ -29,7 +29,7 @@ Os testes continuam sendo feitos no site atual da EBA (`eba.adai.com.br/teste/<s
 | `perguntas` / `resposta` | Perguntas / Resposta | Lista "Perguntas · Resposta" na abertura. |
 | `como_responder` | Como responder | Caixa "Como responder". |
 | `como_ler_resultado` | Como ler o resultado | Caixa "Como ler o resultado". |
-| `link_teste` | Link do teste | Botão "Fazer o teste". Aceita só `https://` ou um caminho do site. |
+| `link_teste` | Link do teste | Botão "Fazer o teste". Aceita só `https://` ou um caminho do site (ex.: `/eba/testes/dons-servico`). |
 | `ordem` | Ordem na lista | Menor primeiro; em caso de empate, ordem alfabética. |
 
 | Se… | Na página acontece |

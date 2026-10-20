@@ -12,7 +12,7 @@
  */
 
 const BASE = (process.argv[2] ?? process.env.SMOKE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-const PAGINAS_DO_SITE = ['/', '/agenda', '/contribua', '/politica-de-privacidade', '/eba', '/eba/cursos', '/eba/cursos/reset', '/eba/testes'];
+const PAGINAS_DO_SITE = ['/', '/agenda', '/contribua', '/politica-de-privacidade', '/eba', '/eba/cursos', '/eba/cursos/reset', '/eba/testes', '/eba/testes/dons-servico'];
 /** Páginas internas: precisam de noindex (a /exemplos tem "Meta robots" noindex no Strapi). */
 const PAGINAS_INTERNAS = ['/exemplos'];
 const MAX_IMAGENS = 6;

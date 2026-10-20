@@ -84,10 +84,10 @@ describe('ensureTestes', () => {
 });
 
 describe('conteúdo dos testes (apostila do CDV)', () => {
-  it('5 testes, na ordem da apostila, com o link atual (o mesmo dos QR codes)', () => {
+  it('5 testes, na ordem da apostila, com o link do teste no Hub', () => {
     expect(TESTES_EBA.map((t) => t.slug)).toEqual(['dons-servico', 'dons-ministerio', 'talentos-naturais', 'estilo-pessoal', 'temperamento-pessoal']);
     for (const t of TESTES_EBA) {
-      expect(t.link_teste).toBe(`https://eba.adai.com.br/teste/${t.slug}`);
+      expect(t.link_teste).toBe(`/eba/testes/${t.slug}`);
       expect(t.resumo.length).toBeLessThanOrEqual(200);
       expect(t.o_que_e.length).toBeLessThanOrEqual(600);
       expect(t.como_responder.length).toBeLessThanOrEqual(400);
