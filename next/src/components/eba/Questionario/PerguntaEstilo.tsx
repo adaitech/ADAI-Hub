@@ -1,5 +1,6 @@
 import type { RefCallback } from 'react';
 import type { ParEstilo } from '@/lib/eba-api/conteudo-local';
+import { useEscolhaPorPonteiro } from './PerguntaNota';
 import styles from './Questionario.module.css';
 
 export interface PerguntaEstiloProps {
@@ -7,6 +8,8 @@ export interface PerguntaEstiloProps {
   par: ParEstilo;
   valor: number | undefined;
   onEscolher: (nota: number) => void;
+  /** Só depois de uma escolha com ponteiro (ver `useEscolhaPorPonteiro`). */
+  onAvancar: () => void;
   legendaRef: RefCallback<HTMLElement>;
 }
 
@@ -29,7 +32,8 @@ function rotulo(valor: number, par: ParEstilo): string {
 const ESCALA = [1, 2, 3, 4, 5];
 
 /** Par de frases do Estilo pessoal: 1 = totalmente a da esquerda, 5 = totalmente a da direita. */
-export function PerguntaEstilo({ nome, par, valor, onEscolher, legendaRef }: PerguntaEstiloProps) {
+export function PerguntaEstilo({ nome, par, valor, onEscolher, onAvancar, legendaRef }: PerguntaEstiloProps) {
+  const { aoApertar, aoClicar } = useEscolhaPorPonteiro(onAvancar);
   return (
     <fieldset className={styles.pergunta}>
       <legend ref={legendaRef} tabIndex={-1} className={styles.enunciado}>
@@ -42,8 +46,8 @@ export function PerguntaEstilo({ nome, par, valor, onEscolher, legendaRef }: Per
       <ul role="list" className={`${styles.opcoes} ${styles.opcoesEstilo}`}>
         {ESCALA.map((n) => (
           <li key={n}>
-            <label className={`${styles.opcao} ${styles.opcaoEstilo}`}>
-              <input type="radio" name={nome} value={n} checked={valor === n} onChange={() => onEscolher(n)} />
+            <label className={`${styles.opcao} ${styles.opcaoEstilo}`} onPointerDown={aoApertar}>
+              <input type="radio" name={nome} value={n} checked={valor === n} onChange={() => onEscolher(n)} onClick={aoClicar} />
               <span className={styles.opcaoNumero} aria-hidden="true">
                 {n}
               </span>

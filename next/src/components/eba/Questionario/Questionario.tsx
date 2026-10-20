@@ -49,7 +49,7 @@ export interface QuestionarioProps {
 
 const ROTULO_TELA = { nota: 'Pergunta', estilo: 'Pergunta', talentos: 'Etapa', temperamento: 'Página' } as const;
 const UNIDADE_TELA = { nota: 'perguntas', estilo: 'perguntas', talentos: 'etapas', temperamento: 'páginas' } as const;
-const COM_SESSAO_VISIVEL = new Set(['pergunta', 'enviando', 'erro']);
+const COM_SESSAO_VISIVEL = new Set(['pergunta', 'erro']);
 
 function Progresso({ atual, total, rotulo }: { atual: number; total: number; rotulo: string }) {
   const porcentagem = Math.round((atual / total) * 100);
@@ -115,7 +115,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, acoes, estado
     } catch {
       // Storage bloqueado (modo privado, política do navegador): segue sem restaurar.
     }
-    dispatch({ tipo: 'restaurar', progresso: lerProgresso(salvo, s.total) });
+    dispatch({ tipo: 'restaurar', progresso: lerProgresso(salvo, { tipo: teste.tipo, total: s.total, perguntas }) });
     // Só na montagem: restaurar depois apagaria respostas novas.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chave, demonstracao]);
@@ -229,12 +229,13 @@ export function Questionario({ teste, abertura, perguntas, sessao, acoes, estado
         const chaveResposta = teste.tipo === 'nota' ? perguntas[s.passo].numero : s.passo + 1;
         const valor = s.respostas[chaveResposta];
         const responder = (nota: number) => dispatch({ tipo: 'responder', chave: chaveResposta, valor: nota });
+        const avancar = () => dispatch({ tipo: 'avancar' });
         return (
           <>
             {teste.tipo === 'nota' ? (
-              <PerguntaNota key={nome} nome={nome} texto={perguntas[s.passo].texto} valor={valor} onEscolher={responder} legendaRef={focar} />
+              <PerguntaNota key={nome} nome={nome} texto={perguntas[s.passo].texto} valor={valor} onEscolher={responder} onAvancar={avancar} legendaRef={focar} />
             ) : (
-              <PerguntaEstilo key={nome} nome={nome} par={parEstilo(s.passo)} valor={valor} onEscolher={responder} legendaRef={focar} />
+              <PerguntaEstilo key={nome} nome={nome} par={parEstilo(s.passo)} valor={valor} onEscolher={responder} onAvancar={avancar} legendaRef={focar} />
             )}
             <div className={styles.navegacao}>
               {voltar('Pergunta anterior')}
@@ -245,7 +246,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, acoes, estado
                   Próxima pergunta
                 </button>
               ) : (
-                <span className={styles.dica}>Ao escolher, vai para a próxima</span>
+                <span className={styles.dica}>Ao clicar numa opção, vai para a próxima</span>
               )}
             </div>
           </>
@@ -380,7 +381,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, acoes, estado
         return (
           <>
             <Progresso atual={s.total} total={s.total} rotulo={ROTULO_TELA[teste.tipo]} />
-            <div className={styles.aviso} role="status">
+            <div ref={focar} tabIndex={-1} className={styles.aviso} role="status">
               <span className={styles.girando} aria-hidden="true" />
               <p className={styles.corpo}>Calculando seu resultado…</p>
             </div>

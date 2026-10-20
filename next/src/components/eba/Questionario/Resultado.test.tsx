@@ -29,7 +29,7 @@ describe('Resultado', () => {
 
   it('"Próximo teste" na ordem da apostila e "Ver todos os testes"', () => {
     montar('dons-servico', mock.resultados.nota as ResultadoApi);
-    expect(screen.getByRole('link', { name: 'Próximo teste: Segundo teste dos dons espirituais' })).toHaveAttribute('href', '/eba/testes/dons-ministerio');
+    expect(screen.getByRole('link', { name: 'Próximo teste: Dons ministeriais' })).toHaveAttribute('href', '/eba/testes/dons-ministerio');
     expect(screen.getByRole('link', { name: 'Ver todos os testes' })).toHaveAttribute('href', '/eba/testes');
   });
 

@@ -85,6 +85,7 @@
 }
 
 .subtitulo:focus:not(:focus-visible),
+.aviso:focus:not(:focus-visible),
 .enunciado:focus:not(:focus-visible) {
   outline: none;
 }
@@ -193,6 +194,18 @@
 .campo[aria-invalid='true'] {
   border-color: var(--color-border-strong);
   border-width: calc(2 * var(--border-width));
+}
+
+/* Fieldset da unidade com erro: barra lateral, como o resumo do erro (radios não aceitam aria-invalid). */
+.grupoInvalido {
+  padding-left: var(--space-12);
+  box-shadow: inset var(--space-4) 0 0 var(--color-text-primary);
+}
+
+.erroCampo {
+  margin: 0;
+  font-size: var(--font-size-legenda);
+  font-weight: var(--font-weight-bold);
 }
 
 .erro {

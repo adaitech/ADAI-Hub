@@ -74,12 +74,12 @@ describe('reducer — transições', () => {
     expect(reducer(e, { tipo: 'voltarEmail' })).toMatchObject({ estado: 'email', cadastro: null });
   });
 
-  it('responder guarda a nota e avança; na última fica', () => {
+  it('responder só guarda a nota (quem avança é a tela); trocar a nota não duplica', () => {
     let e = nota({ estado: 'pergunta' });
     e = reducer(e, { tipo: 'responder', chave: 1, valor: 4 });
-    expect(e).toMatchObject({ passo: 1, respostas: { 1: 4 } });
-    e = aplicar(e, { tipo: 'responder', chave: 2, valor: 0 }, { tipo: 'responder', chave: 3, valor: 5 });
-    expect(e).toMatchObject({ passo: 2, respostas: { 1: 4, 2: 0, 3: 5 } });
+    expect(e).toMatchObject({ passo: 0, respostas: { 1: 4 } });
+    e = aplicar(e, { tipo: 'responder', chave: 1, valor: 2 }, { tipo: 'avancar' }, { tipo: 'responder', chave: 2, valor: 0 });
+    expect(e).toMatchObject({ passo: 1, respostas: { 1: 2, 2: 0 } });
   });
 
   it('voltar mantém a resposta marcada; no começo não volta', () => {
@@ -161,22 +161,48 @@ describe('reducer — transições', () => {
 });
 
 describe('lerProgresso (sessionStorage)', () => {
-  const total = 3;
+  const ctxNota = { tipo: 'nota' as const, total: 3, perguntas };
+  const salvo = (dado: object) => JSON.stringify({ passo: 0, ...dado });
+
   it.each([null, '', 'não é json', '[]', '{"passo":"x"}', 'null'])('valor inválido %p → null', (texto) => {
-    expect(lerProgresso(texto, total)).toBeNull();
+    expect(lerProgresso(texto, ctxNota)).toBeNull();
   });
 
-  it('normaliza: passo dentro do teste, notas inteiras, sem repetição', () => {
-    const texto = JSON.stringify({ passo: 99, respostas: { 1: 3, 2: 'x', 3: 2.5, 4: 1 }, marcadas: [2, 2, 'a', 1], escolhidas: [1, 1] });
-    expect(lerProgresso(texto, total)).toEqual({ passo: 2, respostas: { 1: 3, 4: 1 }, marcadas: [1, 2], escolhidas: [1] });
+  it('nota: passo dentro do teste, só perguntas que existem e notas inteiras de 0 a 5', () => {
+    const texto = salvo({ passo: 99, respostas: { 1: 3, 2: 'x', 3: 2.5, 4: 1, 0: 0 }, marcadas: [1], escolhidas: [1] });
+    expect(lerProgresso(texto, ctxNota)).toEqual({ passo: 2, respostas: { 1: 3 }, marcadas: [], escolhidas: [] });
+    expect(lerProgresso(salvo({ respostas: { 1: 6, 2: -1, 3: 5 } }), ctxNota)?.respostas).toEqual({ 3: 5 });
+  });
+
+  it('adulterado não infla as respondidas nem libera o envio', () => {
+    const texto = salvo({ respostas: { 1: 9, 2: 9, 3: 9, 50: 1 } });
+    const e = reducer(nota(), { tipo: 'restaurar', progresso: lerProgresso(texto, ctxNota) });
+    expect(respondidas(e)).toBe(0);
+    expect(podeEnviar(e, perguntas)).toBe(false);
+  });
+
+  it('estilo: telas 1–14, notas de 1 a 5', () => {
+    const ctx = { tipo: 'estilo' as const, total: 14, perguntas: [] };
+    expect(lerProgresso(salvo({ respostas: { 1: 1, 2: 0, 14: 5, 15: 3 } }), ctx)?.respostas).toEqual({ 1: 1, 14: 5 });
+  });
+
+  it('talentos: marcadas só entre as perguntas, escolhidas entre as marcadas e até 3', () => {
+    const ctx = { tipo: 'talentos' as const, total: 2, perguntas: [...perguntas, { numero: 4, texto: 'Quarta' }] };
+    const texto = salvo({ respostas: { 1: 1 }, marcadas: [2, 2, 'a', 1, 3, 4, 99], escolhidas: [1, 1, 2, 3, 4, 7] });
+    expect(lerProgresso(texto, ctx)).toEqual({ passo: 0, respostas: {}, marcadas: [1, 2, 3, 4], escolhidas: [1, 2, 3] });
+  });
+
+  it('temperamento: ids de 0 a 199, sem escolhidas', () => {
+    const ctx = { tipo: 'temperamento' as const, total: 20, perguntas: [] };
+    expect(lerProgresso(salvo({ marcadas: [-1, 0, 199, 200], escolhidas: [0] }), ctx)).toEqual({ passo: 0, respostas: {}, marcadas: [0, 199], escolhidas: [] });
   });
 
   it('campos ausentes viram vazios', () => {
-    expect(lerProgresso('{"passo":1}', total)).toEqual({ passo: 1, respostas: {}, marcadas: [], escolhidas: [] });
+    expect(lerProgresso('{"passo":1}', ctxNota)).toEqual({ passo: 1, respostas: {}, marcadas: [], escolhidas: [] });
   });
 
   it('progressoDe e temProgresso', () => {
-    const e = aplicar(nota({ estado: 'pergunta' }), { tipo: 'responder', chave: 1, valor: 0 });
+    const e = aplicar(nota({ estado: 'pergunta' }), { tipo: 'responder', chave: 1, valor: 0 }, { tipo: 'avancar' });
     expect(progressoDe(e)).toEqual({ passo: 1, respostas: { 1: 0 }, marcadas: [], escolhidas: [] });
     expect(temProgresso(e)).toBe(true);
     expect(temProgresso(nota())).toBe(false);

@@ -137,10 +137,10 @@ export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
       return { ...s, estado: 'email', emailMascarado: null, retorno: 'pergunta' };
     case 'informarEmail':
       return { ...s, estado: 'email' };
-    case 'responder': {
-      const respostas = { ...s.respostas, [a.chave]: a.valor };
-      return { ...s, respostas, passo: Math.min(s.passo + 1, s.total - 1) };
-    }
+    // Só registra: quem avança é a tela (escolha com ponteiro ou 'Próxima pergunta'), para o
+    // teclado poder percorrer a escala com as setas sem pular de pergunta.
+    case 'responder':
+      return { ...s, respostas: { ...s.respostas, [a.chave]: a.valor } };
     case 'marcar': {
       const marcadas = alternar(s.marcadas, a.id);
       return { ...s, marcadas, escolhidas: s.escolhidas.filter((id) => marcadas.includes(id)) };
@@ -181,8 +181,22 @@ export function temProgresso(s: EstadoQuestionario): boolean {
 const inteiro = (valor: unknown): valor is number => typeof valor === 'number' && Number.isInteger(valor);
 const listaDeInteiros = (valor: unknown) => ordenados(Array.isArray(valor) ? valor.filter(inteiro) : []);
 
-/** Lê o progresso salvo; qualquer coisa fora do formato é descartada (nunca quebra a tela). */
-export function lerProgresso(texto: string | null, total: number): Progresso | null {
+/** O que pode existir num progresso deste teste (respostas e ids válidos). */
+export interface ContextoProgresso {
+  tipo: TipoTeste;
+  total: number;
+  perguntas: Pergunta[];
+}
+
+/** Escala de cada tipo: nota 0–5, estilo 1–5; marcar não usa as respostas. */
+const ESCALA: Partial<Record<TipoTeste, [number, number]>> = { nota: [0, 5], estilo: [1, 5] };
+
+/**
+ * Lê o progresso salvo; qualquer coisa fora do formato ou do teste (número de pergunta que não
+ * existe, nota fora da escala, id de opção inválido, mais de 3 escolhidas) é descartada, para um
+ * storage antigo ou adulterado não inflar as respondidas nem liberar o envio. Nunca quebra a tela.
+ */
+export function lerProgresso(texto: string | null, { tipo, total, perguntas }: ContextoProgresso): Progresso | null {
   if (!texto) return null;
   let dado: unknown;
   try {
@@ -193,12 +207,24 @@ export function lerProgresso(texto: string | null, total: number): Progresso | n
   if (!dado || typeof dado !== 'object' || Array.isArray(dado)) return null;
   const { passo, respostas, marcadas, escolhidas } = dado as Record<string, unknown>;
   if (!inteiro(passo)) return null;
-  const notas = respostas && typeof respostas === 'object' ? Object.entries(respostas) : [];
+
+  const numeros = new Set(perguntas.map((p) => p.numero));
+  const chaveValida = (chave: number) => (tipo === 'nota' ? numeros.has(chave) : chave >= 1 && chave <= PARES.length);
+  const escala = ESCALA[tipo];
+  const notas = escala && respostas && typeof respostas === 'object' ? Object.entries(respostas) : [];
+  const idValido = (id: number) => (tipo === 'talentos' ? numeros.has(id) : tipo === 'temperamento' && id >= 0 && id < OPCOES_TEMPERAMENTO.length);
+  const listaMarcadas = listaDeInteiros(marcadas).filter(idValido);
+  const listaEscolhidas = tipo === 'talentos' ? listaDeInteiros(escolhidas).filter((id) => listaMarcadas.includes(id)).slice(0, MAXIMO_ESCOLHIDAS) : [];
+
   return {
     passo: Math.min(Math.max(passo, 0), total - 1),
-    respostas: Object.fromEntries(notas.filter(([chave, nota]) => inteiro(Number(chave)) && inteiro(nota)).map(([chave, nota]) => [Number(chave), nota as number])),
-    marcadas: listaDeInteiros(marcadas),
-    escolhidas: listaDeInteiros(escolhidas),
+    respostas: Object.fromEntries(
+      notas
+        .map(([chave, nota]) => [Number(chave), nota] as const)
+        .filter(([chave, nota]) => inteiro(chave) && chaveValida(chave) && inteiro(nota) && nota >= escala![0] && nota <= escala![1]),
+    ),
+    marcadas: listaMarcadas,
+    escolhidas: listaEscolhidas,
   };
 }
 

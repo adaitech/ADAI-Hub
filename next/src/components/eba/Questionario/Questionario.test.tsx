@@ -47,7 +47,10 @@ function montar(slug: SlugTeste = 'dons-servico', extra: Partial<QuestionarioPro
 
 const botao = (nome: string | RegExp) => screen.getByRole('button', { name: nome });
 const comecar = () => fireEvent.click(botao(/começar o teste|continuar o teste/i));
-const escolherNota = (rotulo: string) => fireEvent.click(screen.getByRole('radio', { name: rotulo }));
+/** Escolha com mouse (clique com detail 1), que avança. */
+const escolherNota = (rotulo: string) => fireEvent.click(screen.getByRole('radio', { name: rotulo }), { detail: 1 });
+/** Escolha pelo teclado: as setas marcam o radio e geram change + clique com detail 0. */
+const escolherPeloTeclado = (rotulo: string) => fireEvent.click(screen.getByRole('radio', { name: rotulo }), { detail: 0 });
 const foto = (container: HTMLElement) => container.querySelector('img')!;
 /** Deixa as promessas das ações (fakes) resolverem dentro do act. */
 const esperarAcoes = () => act(async () => {});
@@ -60,7 +63,7 @@ beforeEach(() => {
 describe('Questionario — abertura', () => {
   it('mostra o teste, a posição na apostila, a aula e a foto de capa (decorativa)', () => {
     const { container } = montar('dons-servico', { sessao: null });
-    expect(screen.getByRole('heading', { level: 1, name: 'Primeiro teste dos dons espirituais' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Dons de serviço prático' })).toBeInTheDocument();
     expect(screen.getByText('Teste 1 de 5')).toBeInTheDocument();
     expect(screen.getByText('Aula 5 do CDV')).toBeInTheDocument();
     expect(screen.getByText('55 afirmações')).toBeInTheDocument();
@@ -119,6 +122,41 @@ describe('Questionario — perguntas de nota (0 a 5)', () => {
     expect(screen.getByRole('radio', { name: '4 — Muito' })).toBeChecked();
     fireEvent.click(botao('Próxima pergunta'));
     expect(screen.getByText(perguntasCurtas[1].texto)).toBeInTheDocument();
+  });
+
+  it('teclado: as setas só marcam (não pulam de pergunta); "Próxima pergunta" segue', () => {
+    montar();
+    comecar();
+    escolherPeloTeclado('0 — Nunca');
+    escolherPeloTeclado('1 — Raramente');
+    escolherPeloTeclado('2 — Às vezes');
+    expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '2 — Às vezes' })).toBeChecked();
+    fireEvent.click(botao('Próxima pergunta'));
+    expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
+    fireEvent.click(botao('Pergunta anterior'));
+    expect(screen.getByRole('radio', { name: '2 — Às vezes' })).toBeChecked();
+  });
+
+  it('toque/mouse: pointerdown no rótulo + clique avança, mesmo se o navegador mandar detail 0', () => {
+    montar();
+    comecar();
+    const opcao = screen.getByRole('radio', { name: '3 — Frequentemente' });
+    fireEvent.pointerDown(opcao.closest('label')!);
+    fireEvent.click(opcao, { detail: 0 });
+    expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
+    // O pointerdown não "vaza" para a próxima escolha pelo teclado.
+    escolherPeloTeclado('1 — Raramente');
+    expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
+  });
+
+  it('clicar de novo na opção já marcada avança', () => {
+    montar();
+    comecar();
+    escolherNota('4 — Muito');
+    fireEvent.click(botao('Pergunta anterior'));
+    escolherNota('4 — Muito');
+    expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
   });
 
   it('a foto troca com a pergunta e a da próxima é pré-carregada', () => {
@@ -189,12 +227,15 @@ describe('Questionario — progresso no sessionStorage (Foco 2)', () => {
     const setItem = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('bloqueado');
     });
-    montar();
-    comecar();
-    escolherNota('0 — Nunca');
-    expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
-    getItem.mockRestore();
-    setItem.mockRestore();
+    try {
+      montar();
+      comecar();
+      escolherNota('0 — Nunca');
+      expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
+    } finally {
+      getItem.mockRestore();
+      setItem.mockRestore();
+    }
   });
 });
 
@@ -232,6 +273,8 @@ describe('Questionario — envio (Foco 4)', () => {
     ]);
     expect(botao('Enviar respostas')).toBeDisabled();
     expect(screen.getByRole('status')).toHaveTextContent('Calculando seu resultado…');
+    expect(screen.getByRole('status')).toHaveFocus();
+    expect(screen.queryByRole('button', { name: 'Não é você? Trocar e-mail' })).toBeNull();
     await act(async () => concluir({ ok: true, dados: resultadoNota }));
     expect(screen.getByRole('heading', { level: 2, name: 'Seu resultado' })).toBeInTheDocument();
   });
@@ -357,7 +400,9 @@ describe('Questionario — estilo pessoal (1 a 5)', () => {
     expect(screen.getByRole('radio', { name: '1 — mais perto de: Fazendo algo para as pessoas' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: '3 — entre as duas' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: '5 — mais perto de: Conversando com as pessoas' })).toBeInTheDocument();
-    for (let i = 0; i < 14; i++) fireEvent.click(screen.getByRole('radio', { name: i < 7 ? /^2 —/ : /^4 —/ }));
+    escolherPeloTeclado('5 — mais perto de: Conversando com as pessoas');
+    expect(screen.getByText('Pergunta 1 de 14')).toBeInTheDocument();
+    for (let i = 0; i < 14; i++) fireEvent.click(screen.getByRole('radio', { name: i < 7 ? /^2 —/ : /^4 —/ }), { detail: 1 });
     expect(screen.getByText('Pergunta 14 de 14')).toBeInTheDocument();
     fireEvent.click(botao('Enviar respostas'));
     await esperarAcoes();
@@ -496,6 +541,11 @@ describe('Questionario — identificação', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('Confira os campos destacados.');
       expect(screen.getByLabelText('Nome completo')).toHaveAttribute('aria-invalid', 'true');
       expect(screen.getByLabelText('Turma')).toHaveAttribute('aria-invalid', 'true');
+      const unidade = screen.getByRole('group', { name: 'Unidade' });
+      expect(unidade).toHaveAttribute('data-invalido', 'true');
+      expect(unidade).toHaveAccessibleDescription('Escolha sua unidade.');
+      fireEvent.click(screen.getByRole('radio', { name: 'Santos' }));
+      expect(unidade).not.toHaveAttribute('data-invalido');
     });
 
     it.each([
@@ -523,10 +573,18 @@ describe('Questionario — identificação', () => {
   });
 });
 
-describe('Questionario — estados iniciais (vitrine)', () => {
-  it('aceita um estado inicial, sem perder a restauração', () => {
+describe('Questionario — estado inicial (vitrine)', () => {
+  it('abre no estado pedido, sem ler nem gravar o sessionStorage e sem eventos', () => {
+    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [] }));
+    montar('dons-servico', { estadoInicial: { estado: 'pergunta' } });
+    expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+    escolherNota('0 — Nunca');
+    expect(JSON.parse(sessionStorage.getItem(chaveProgresso('dons-servico'))!).respostas).toEqual({ 1: 3, 2: 5 });
+    expect(registrarEvento).not.toHaveBeenCalled();
+  });
+
+  it('erro de envio como estado inicial mostra "Tentar de novo"', () => {
     montar('dons-servico', { estadoInicial: { estado: 'erro', erroEnvio: 'indisponivel' } });
-    const alerta = screen.getByRole('alert');
-    expect(within(alerta).getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
+    expect(within(screen.getByRole('alert')).getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
   });
 });

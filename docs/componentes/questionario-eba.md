@@ -19,13 +19,13 @@ Não está no Strapi: o fluxo, as escalas e a agregação das respostas são reg
 
 `abertura → email | cadastro → pergunta → enviando → resultado`, mais `erro` (envio falhou; "Tentar de novo") e `expirou` (sessão encerrada; pede o e-mail e reenvia sozinho depois). Com sessão válida, "Começar o teste" pula a identificação. O reducer puro fica em `estado.ts`.
 
-- **Nota (0–5):** radios nativos, escolher avança, voltar mostra a resposta escolhida. Nome acessível "N — Rótulo".
+- **Nota (0–5):** radios nativos. Escolher com mouse ou toque avança; pelo teclado (setas, espaço) só marca, e "Próxima pergunta" segue (WCAG 2.1.1 e 3.2.2). Voltar mostra a resposta escolhida. Nome acessível "N — Rótulo".
 - **Talentos:** etapa 1 marca as habilidades (sem limite); etapa 2 escolhe até 3 entre as marcadas ("Concluir" exige uma). Envia 1 para as escolhidas e 0 para as demais.
 - **Estilo (1–5):** 14 pares (motivação 1–7, organização 8–14); nome acessível "1 — mais perto de: <frase da esquerda>". Envia a soma de cada eixo (`numero` 1 e 2).
 - **Temperamento:** 20 páginas de 10 opções, com "Próximo". Envia quantas foram marcadas em cada grupo (`numero` 1 a 4).
 - **Resultado:** barras proporcionais a `maximo`, 3 primeiros em destaque e a mensagem do primeiro; temperamento em porcentagem (máximo 0 → 0%); talentos como lista; estilo com a combinação, os dois totais e a descrição. "Próximo teste" some no último. "Sair" encerra a sessão no servidor.
 - **Foco:** vai para o enunciado (`legend`) a cada pergunta e para o título de cada estado.
-- **Progresso:** `sessionStorage`, chave `eba-teste:<slug>`, só respostas (nunca e-mail ou nome); apagado ao mostrar o resultado.
+- **Progresso:** `sessionStorage`, chave `eba-teste:<slug>`, só respostas (nunca e-mail ou nome); apagado ao mostrar o resultado. Ao restaurar, descarta o que não cabe no teste (pergunta inexistente, nota fora da escala, id inválido, mais de 3 escolhidas).
 - **Fotos:** capa na abertura, identificação no e-mail/cadastro/sessão encerrada, uma por pergunta (página no temperamento, par no estilo; sem foto própria → capa) e resultado no envio. A da próxima pergunta é pré-carregada (`preload` do React).
 
 ## Layout

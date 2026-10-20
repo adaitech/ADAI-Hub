@@ -11,8 +11,8 @@ describe('TESTES', () => {
     ]);
   });
 
-  it('todos têm nome preenchido', () => {
-    for (const t of TESTES) expect(t.nome.trim()).not.toBe('');
+  it('nomes que o aluno vê (os mesmos da página /eba/testes)', () => {
+    expect(TESTES.map((t) => t.nome)).toEqual(['Dons de serviço prático', 'Dons ministeriais', 'Talentos naturais', 'Estilo pessoal', 'Temperamento pessoal']);
   });
 });
 

@@ -193,9 +193,18 @@ export function Cadastro({ email, turmas, cadastrar, onIdentificado, onOutroEmai
             aria-invalid={marcar('nome')}
           />
         </div>
-        <fieldset className={styles.grupo} aria-describedby={marcar('unidade') && erro ? `${id}-erro` : undefined}>
+        <fieldset
+          className={marcar('unidade') ? `${styles.grupo} ${styles.grupoInvalido}` : styles.grupo}
+          data-invalido={marcar('unidade')}
+          aria-describedby={marcar('unidade') ? `${id}-unidade-erro` : undefined}
+        >
           <legend className={styles.rotulo}>Unidade</legend>
           <p className={styles.ajuda}>De qual ADAI você é? Se é de outra igreja ou está visitando, escolha a opção correspondente.</p>
+          {marcar('unidade') && (
+            <p id={`${id}-unidade-erro`} className={styles.erroCampo}>
+              Escolha sua unidade.
+            </p>
+          )}
           <ul role="list" className={`${styles.listaMarcar} ${styles.duasColunas}`}>
             {UNIDADES.map((u) => (
               <li key={u.valor}>
