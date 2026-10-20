@@ -168,8 +168,9 @@ A tela tem os estados do protótipo:
 | Turmas não carregam no Primeiro acesso | Mensagem com "Tentar de novo"; sem cadastro. |
 | A API recusa o envio (400) | "Algumas respostas não foram aceitas." O código da API vai para o log. As respostas são mantidas. |
 | Falha de rede ou 5xx no envio | Estado **Erro no envio**, com "Tentar de novo". |
-| A API grava (2xx), mas o resultado vem fora do formato | Estado de resultado com "Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.", sem "Tentar de novo" (reenviar duplicaria a gravação). O progresso é apagado e `concluir_teste` dispara. |
+| A API grava (2xx), mas o resultado vem fora do formato, vazio (`[]`) ou ilegível (corpo vazio, HTML, timeout na leitura do POST) | Estado de resultado com "Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.", sem "Tentar de novo" (reenviar duplicaria a gravação). O progresso é apagado e `concluir_teste` dispara. |
 | Aluno (Student) fora do formato (sem `id`/`idClass`) | Identificação e cadastro respondem como API indisponível; nenhuma sessão é aberta. |
+| Envio com a sessão de outra pessoa (trocada em outra aba): o `respondidoComo` do cliente difere do e-mail mascarado do cookie | `enviar` devolve `sessao` sem chamar a API; a tela mostra "Sua sessão foi encerrada" e, se quem se identifica é outra pessoa, o teste recomeça sem reenviar. E-mails com a mesma máscara não se distinguem (risco aceito). |
 | Muitas tentativas de e-mail | "Muitas tentativas. Aguarde um minuto." |
 | Variáveis ausentes | "Testes indisponíveis no momento." |
 

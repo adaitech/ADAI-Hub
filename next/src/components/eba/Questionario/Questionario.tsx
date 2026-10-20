@@ -152,12 +152,14 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
 
   // Envio: uma chamada por vez (dois cliques rápidos não duplicam).
   const enviandoAgora = useRef(false);
-  async function enviarRespostas() {
+  async function enviarRespostas(dono: string | null = s.respondidoComo ?? s.emailMascarado) {
     if (enviandoAgora.current) return;
     enviandoAgora.current = true;
     dispatch({ tipo: 'enviar' });
     try {
-      const resposta = await acoes.enviar(teste.slug, respostasParaApi(s, perguntas));
+      // O dono das respostas vai junto: se o cookie for de outra pessoa (trocada em outra aba), o
+      // servidor devolve `sessao` sem gravar, e a identificação seguinte descarta o que não é dela.
+      const resposta = await acoes.enviar(teste.slug, respostasParaApi(s, perguntas), dono ?? '');
       if (resposta.ok && resposta.dados) dispatch({ tipo: 'enviado', resultado: resposta.dados });
       else if (!resposta.ok && resposta.erro === 'sessao') dispatch({ tipo: 'falhou', erro: 'sessao' });
       else if (!resposta.ok && (resposta.erro === 'recusado' || resposta.erro === 'invalido')) dispatch({ tipo: 'falhou', erro: 'recusado' });
@@ -173,7 +175,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
     // Só reenvia as respostas da própria pessoa; de outra, o reducer descarta e recomeça.
     const reenviar = s.retorno === 'enviando' && progressoPertenceA(s, emailMascarado);
     dispatch({ tipo: 'identificado', emailMascarado });
-    if (reenviar) void enviarRespostas();
+    if (reenviar) void enviarRespostas(s.respondidoComo ?? emailMascarado);
   }
 
   function comecar() {

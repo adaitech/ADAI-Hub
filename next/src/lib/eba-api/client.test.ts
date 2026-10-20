@@ -74,17 +74,44 @@ describe('ebaFetch', () => {
     espiao.mockRestore();
   });
 
-  it('2xx com corpo vazio ou não JSON vira EbaApiIndisponivel', async () => {
+  it('GET 2xx com corpo vazio ou não JSON vira EbaApiIndisponivel (nada foi gravado)', async () => {
     fetchMock.mockResolvedValue(new Response('', { status: 200 }));
     await expect(ebaFetch('x')).rejects.toBeInstanceOf(EbaApiIndisponivel);
   });
 
-  it('timeout durante a leitura do corpo vira EbaApiIndisponivel', async () => {
+  it('GET: timeout durante a leitura do corpo vira EbaApiIndisponivel', async () => {
     const resposta = { ok: true, status: 200, json: () => Promise.reject(Object.assign(new Error('x'), { name: 'TimeoutError' })) };
     fetchMock.mockResolvedValue(resposta);
     const erro = (await ebaFetch('x').catch((e: unknown) => e)) as Error;
     expect(erro).toBeInstanceOf(EbaApiIndisponivel);
     expect(erro.message).toContain('timeout');
+  });
+
+  it.each([
+    ['vazio 200', '', 200],
+    ['vazio 201', '', 201],
+    ['HTML 200', '<html>APIM</html>', 200],
+    ['texto 200', 'ok', 200],
+  ])('POST 2xx com corpo ilegível (%s) vira EbaApiRespostaInvalida: a API já gravou', async (_caso, corpo, status) => {
+    fetchMock.mockResolvedValue(new Response(corpo, { status }));
+    const erro = await ebaFetch('SurveyResponse', { metodo: 'POST', corpo: {} }).catch((e: unknown) => e);
+    expect(erro).toBeInstanceOf(EbaApiRespostaInvalida);
+    expect(erro).not.toBeInstanceOf(EbaApiIndisponivel);
+  });
+
+  it('POST 204 (sem corpo) vira EbaApiRespostaInvalida', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    await expect(ebaFetch('SurveyResponse', { metodo: 'POST', corpo: {} })).rejects.toBeInstanceOf(EbaApiRespostaInvalida);
+  });
+
+  it('POST 2xx com timeout na leitura do corpo vira EbaApiRespostaInvalida, sem vazar dados', async () => {
+    const resposta = { ok: true, status: 200, json: () => Promise.reject(Object.assign(new Error('x'), { name: 'TimeoutError' })) };
+    fetchMock.mockResolvedValue(resposta);
+    const erro = (await ebaFetch('Student', { metodo: 'POST', corpo: { email: 'ana@exemplo.com' } }).catch((e: unknown) => e)) as Error;
+    expect(erro).toBeInstanceOf(EbaApiRespostaInvalida);
+    expect(erro.message).toContain('timeout');
+    expect(erro.message).not.toContain('ana@exemplo.com');
+    expect(erro.message).not.toContain(KEY);
   });
 
   it('falha de rede vira EbaApiIndisponivel', async () => {

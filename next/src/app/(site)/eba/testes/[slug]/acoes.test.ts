@@ -30,6 +30,8 @@ jest.mock('@/lib/eba-api/turmas', () => ({ turmasAtivas: jest.fn() }));
 
 const SEGREDO = 'segredo-de-teste-com-mais-de-32-caracteres';
 const EMAIL = 'ana.silva@exemplo.com';
+/** E-mail mascarado da sessão de `sessaoValida()`: dono das respostas enviadas. */
+const COMO = 'a***@exemplo.com';
 const TURMAS = [{ id: 'turma-1', nome: 'Turma 1' }];
 const resultado: Resultado = { tipo: 'pontuacao', itens: [], maximo: 25 };
 
@@ -247,7 +249,7 @@ describe('enviar', () => {
   });
 
   it('usa idStudent/idClass da sessão e devolve o resultado', async () => {
-    const r = await enviar('dons-servico', notas(3, 4));
+    const r = await enviar('dons-servico', notas(3, 4), COMO);
     expect(r).toEqual({ ok: true, dados: resultado });
     expect(enviarMock).toHaveBeenCalledWith({
       slug: 'dons-servico',
@@ -259,7 +261,7 @@ describe('enviar', () => {
 
   it('ignora ids que o cliente tente mandar dentro das respostas', async () => {
     const maliciosas = notas(3, 1).map((r) => ({ ...r, idStudent: 'outro', idClass: 'outra' }));
-    await enviar('dons-servico', maliciosas);
+    await enviar('dons-servico', maliciosas, COMO);
     expect(enviarMock).toHaveBeenCalledWith(
       expect.objectContaining({ idStudent: 'aluno-1', idClass: 'turma-1', respostas: notas(3, 1) }),
     );
@@ -271,7 +273,7 @@ describe('enviar', () => {
     ['sessão expirada', sessaoValida(Date.now() - 7_200_001)],
   ])('%s → sessao, sem chamar a API', async (_n, valor) => {
     comSessao(valor);
-    expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'sessao' });
+    expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'sessao' });
     expect(enviarMock).not.toHaveBeenCalled();
     expect(perguntasMock).not.toHaveBeenCalled();
   });
@@ -281,28 +283,55 @@ describe('enviar', () => {
     ['sessão expirada', sessaoValida(Date.now() - 7_200_001)],
   ])('%s: apaga o cookie no mesmo path', async (_n, valor) => {
     comSessao(valor);
-    await enviar('dons-servico', notas(3, 1));
+    await enviar('dons-servico', notas(3, 1), COMO);
     expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
   });
 
   it('sem cookie: nada a apagar', async () => {
     comSessao(undefined);
-    await enviar('dons-servico', notas(3, 1));
+    await enviar('dons-servico', notas(3, 1), COMO);
     expect(cookieDelete).not.toHaveBeenCalled();
   });
 
   it('sessão válida: não apaga o cookie', async () => {
-    await enviar('dons-servico', notas(3, 1));
+    await enviar('dons-servico', notas(3, 1), COMO);
     expect(cookieDelete).not.toHaveBeenCalled();
+  });
+
+  it('respostas de outra pessoa (sessão trocada em outra aba) → sessao, sem chamar a API', async () => {
+    // Aba 1 respondeu como A; na aba 2 entrou B e o cookie agora é de B.
+    const r = await enviar('dons-servico', notas(3, 1), 'b***@exemplo.com');
+    expect(r).toEqual({ ok: false, erro: 'sessao' });
+    expect(enviarMock).not.toHaveBeenCalled();
+    expect(perguntasMock).not.toHaveBeenCalled();
+    // O cookie é válido (é de B, da outra aba): não é apagado.
+    expect(cookieDelete).not.toHaveBeenCalled();
+  });
+
+  it('o dono das respostas é comparado com a sessão sem normalizar (máscara exata)', async () => {
+    expect(await enviar('dons-servico', notas(3, 1), 'A***@exemplo.com')).toEqual({ ok: false, erro: 'sessao' });
+    expect(await enviar('dons-servico', notas(3, 1), ` ${COMO}`)).toEqual({ ok: false, erro: 'sessao' });
+    expect(enviarMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['vazio', ''],
+    ['só espaços', '   '],
+    ['mais de 260 caracteres', `${'a'.repeat(250)}@exemplo.com`],
+    ['número', 3],
+    ['ausente', undefined],
+  ])('respondidoComo %s → invalido, sem chamar a API', async (_n, valor) => {
+    expect(await enviar('dons-servico', notas(3, 1), valor as unknown as string)).toEqual({ ok: false, erro: 'invalido' });
+    expect(enviarMock).not.toHaveBeenCalled();
   });
 
   it('segredo ausente → indisponivel', async () => {
     delete process.env.EBA_SESSAO_SEGREDO;
-    expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
   });
 
   it('slug desconhecido → invalido', async () => {
-    expect(await enviar('nao-existe', notas(3, 1))).toEqual({ ok: false, erro: 'invalido' });
+    expect(await enviar('nao-existe', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'invalido' });
     expect(enviarMock).not.toHaveBeenCalled();
   });
 
@@ -318,7 +347,7 @@ describe('enviar', () => {
       ['não é array', 'x' as unknown as []],
       ['item malformado', [...notas(2, 3), null as unknown as { numero: number; nota: number }]],
     ])('%s → invalido', async (_n, respostas) => {
-      expect(await enviar('dons-ministerio', respostas)).toEqual({ ok: false, erro: 'invalido' });
+      expect(await enviar('dons-ministerio', respostas, COMO)).toEqual({ ok: false, erro: 'invalido' });
       expect(enviarMock).not.toHaveBeenCalled();
     });
 
@@ -327,19 +356,19 @@ describe('enviar', () => {
         { numero: 3, nota: 5 },
         { numero: 1, nota: 0 },
         { numero: 2, nota: 2 },
-      ]);
+      ], COMO);
       expect(r.ok).toBe(true);
     });
 
     it('55 itens nos dons de serviço', async () => {
       perguntasMock.mockResolvedValue(perguntas(55));
-      expect((await enviar('dons-servico', notas(55, 3))).ok).toBe(true);
-      expect(await enviar('dons-servico', notas(54, 3))).toEqual({ ok: false, erro: 'invalido' });
+      expect((await enviar('dons-servico', notas(55, 3), COMO)).ok).toBe(true);
+      expect(await enviar('dons-servico', notas(54, 3), COMO)).toEqual({ ok: false, erro: 'invalido' });
     });
 
     it('perguntasDoTeste falhando → indisponivel', async () => {
       perguntasMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
-      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
+      expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
     });
   });
 
@@ -349,8 +378,8 @@ describe('enviar', () => {
     beforeEach(() => perguntasMock.mockResolvedValue(perguntas(5)));
 
     it('aceita de 1 a 3 marcados', async () => {
-      expect((await enviar('talentos-naturais', marcar([1]))).ok).toBe(true);
-      expect((await enviar('talentos-naturais', marcar([1, 2, 3]))).ok).toBe(true);
+      expect((await enviar('talentos-naturais', marcar([1]), COMO)).ok).toBe(true);
+      expect((await enviar('talentos-naturais', marcar([1, 2, 3]), COMO)).ok).toBe(true);
     });
     it.each([
       ['nenhum marcado', marcar([])],
@@ -359,13 +388,13 @@ describe('enviar', () => {
       ['incompleto', marcar([1]).slice(0, 4)],
       ['repetido', [...marcar([1]).slice(0, 4), { numero: 4, nota: 0 }]],
     ])('%s → invalido', async (_n, respostas) => {
-      expect(await enviar('talentos-naturais', respostas)).toEqual({ ok: false, erro: 'invalido' });
+      expect(await enviar('talentos-naturais', respostas, COMO)).toEqual({ ok: false, erro: 'invalido' });
     });
   });
 
   describe('tipo estilo', () => {
     it('aceita numeros 1 e 2 com nota 7–35', async () => {
-      expect((await enviar('estilo-pessoal', [{ numero: 1, nota: 7 }, { numero: 2, nota: 35 }])).ok).toBe(true);
+      expect((await enviar('estilo-pessoal', [{ numero: 1, nota: 7 }, { numero: 2, nota: 35 }], COMO)).ok).toBe(true);
       expect(perguntasMock).not.toHaveBeenCalled();
     });
     it.each([
@@ -376,15 +405,15 @@ describe('enviar', () => {
       ['número 3', [{ numero: 1, nota: 20 }, { numero: 3, nota: 20 }]],
       ['repetido', [{ numero: 1, nota: 20 }, { numero: 1, nota: 20 }]],
     ])('%s → invalido', async (_n, respostas) => {
-      expect(await enviar('estilo-pessoal', respostas)).toEqual({ ok: false, erro: 'invalido' });
+      expect(await enviar('estilo-pessoal', respostas, COMO)).toEqual({ ok: false, erro: 'invalido' });
     });
   });
 
   describe('tipo temperamento', () => {
     const quatro = (nota: number) => notas(4, nota);
     it('aceita 4 grupos com nota 0–50', async () => {
-      expect((await enviar('temperamento-pessoal', quatro(0))).ok).toBe(true);
-      expect((await enviar('temperamento-pessoal', quatro(50))).ok).toBe(true);
+      expect((await enviar('temperamento-pessoal', quatro(0), COMO)).ok).toBe(true);
+      expect((await enviar('temperamento-pessoal', quatro(50), COMO)).ok).toBe(true);
     });
     it.each([
       ['nota 51', [...quatro(10).slice(0, 3), { numero: 4, nota: 51 }]],
@@ -393,30 +422,50 @@ describe('enviar', () => {
       ['5 grupos', [...quatro(10), { numero: 5, nota: 1 }]],
       ['repetido', [...quatro(10).slice(0, 3), { numero: 3, nota: 1 }]],
     ])('%s → invalido', async (_n, respostas) => {
-      expect(await enviar('temperamento-pessoal', respostas)).toEqual({ ok: false, erro: 'invalido' });
+      expect(await enviar('temperamento-pessoal', respostas, COMO)).toEqual({ ok: false, erro: 'invalido' });
     });
   });
 
   describe('erros da API', () => {
     it('400 → recusado', async () => {
       enviarMock.mockRejectedValue(new EbaApiError(400, 'X'));
-      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'recusado' });
+      expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'recusado' });
     });
     it.each([[500], [503], [404], [401]])('status %i → indisponivel', async (status) => {
       enviarMock.mockRejectedValue(new EbaApiError(status, null));
-      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
+      expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
     });
     it('EbaApiIndisponivel → indisponivel', async () => {
       enviarMock.mockRejectedValue(new EbaApiIndisponivel('timeout'));
-      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
+      expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
     });
     it('2xx com resultado fora do formato: as respostas já foram gravadas → sucesso sem-resultado', async () => {
       enviarMock.mockRejectedValue(new EbaApiRespostaInvalida('SurveyResponse sem lista de name/totalRate'));
-      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: true, dados: { tipo: 'sem-resultado' } });
+      expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: true, dados: { tipo: 'sem-resultado' } });
+    });
+    it.each([
+      ['vazio 201', '', 201],
+      ['HTML do APIM 200', '<html>ok</html>', 200],
+    ])('2xx com corpo não JSON (%s), pelo client real → sem-resultado, sem indisponivel', async (_caso, corpo, status) => {
+      const { enviarRespostas: real } = jest.requireActual<typeof import('@/lib/eba-api/respostas')>('@/lib/eba-api/respostas');
+      enviarMock.mockImplementation(real);
+      const fetchOriginal = global.fetch;
+      const envOriginal = { ...process.env };
+      Object.assign(process.env, { EBA_API_URL: 'https://eba.exemplo.test', EBA_API_KEY: 'chave-teste' });
+      const fetchMock = jest.fn().mockResolvedValue(new Response(corpo, { status }));
+      global.fetch = fetchMock;
+      try {
+        expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: true, dados: { tipo: 'sem-resultado' } });
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        expect(fetchMock.mock.calls[0][1].method).toBe('POST');
+      } finally {
+        global.fetch = fetchOriginal;
+        process.env = envOriginal;
+      }
     });
     it('erro inesperado → indisponivel', async () => {
       enviarMock.mockRejectedValue(new Error('boom'));
-      expect(await enviar('dons-servico', notas(3, 1))).toEqual({ ok: false, erro: 'indisponivel' });
+      expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
     });
   });
 });
@@ -492,9 +541,9 @@ describe('privacidade dos logs', () => {
     comSessao(sessaoValida());
     perguntasMock.mockResolvedValue(perguntas(3));
     enviarMock.mockRejectedValueOnce(new EbaApiError(400, 'COD'));
-    await enviar('dons-servico', notas(3, 1));
+    await enviar('dons-servico', notas(3, 1), COMO);
     enviarMock.mockRejectedValueOnce(new EbaApiError(500, 'COD'));
-    await enviar('dons-servico', notas(3, 1));
+    await enviar('dons-servico', notas(3, 1), COMO);
     await sessaoAtual();
     await sair();
 

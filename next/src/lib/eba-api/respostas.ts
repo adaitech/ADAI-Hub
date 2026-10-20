@@ -25,10 +25,13 @@ const MAXIMO_NOTA = 25;
 /** A API guarda 0/1 por talento. */
 const MAXIMO_TALENTO = 1;
 
-/** Itens de pontuação (nota, talentos, temperamento): `message` é opcional. */
-const esquemaItens = z.array(
-  z.object({ name: z.string(), totalRate: z.number(), message: z.string().nullish().catch(null) }),
-);
+/**
+ * Itens de pontuação (nota, talentos, temperamento): `message` é opcional. Lista vazia não tem
+ * resultado para mostrar: vira `EbaApiRespostaInvalida` (sem-resultado na tela).
+ */
+const esquemaItens = z
+  .array(z.object({ name: z.string(), totalRate: z.number(), message: z.string().nullish().catch(null) }))
+  .min(1);
 const esquemaMensagem = z.object({ message: z.string() });
 /** Estilo: `{message}` ou `[{message}]` (a forma real do POST ainda não foi observada). */
 const esquemaEstilo = z.union([esquemaMensagem, z.tuple([esquemaMensagem], esquemaMensagem)]);

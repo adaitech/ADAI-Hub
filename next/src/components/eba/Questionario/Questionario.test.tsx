@@ -354,7 +354,7 @@ describe('Questionario — envio (Foco 4)', () => {
       { numero: 1, nota: 1 },
       { numero: 2, nota: 2 },
       { numero: 3, nota: 3 },
-    ]);
+    ], 'a***@email.com');
     expect(botao('Enviar respostas')).toBeDisabled();
     expect(screen.getByRole('status')).toHaveTextContent('Calculando seu resultado…');
     expect(screen.getByRole('status')).toHaveFocus();
@@ -391,6 +391,35 @@ describe('Questionario — envio (Foco 4)', () => {
     expect(enviar).toHaveBeenCalledTimes(2);
     expect(enviar.mock.calls[1]).toEqual(enviar.mock.calls[0]);
     expect(screen.getByRole('heading', { level: 2, name: 'Seu resultado' })).toBeInTheDocument();
+  });
+
+  it('envio com dono A e sessão B (trocada em outra aba): sessao → sessão encerrada → identifica B → recomeça na pergunta 1, sem reenvio', async () => {
+    // O servidor compara o dono das respostas com o cookie (agora de B) e devolve `sessao`.
+    const enviar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'sessao' }).mockResolvedValue({ ok: true, dados: resultadoNota });
+    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com' } }));
+    montar('dons-servico', { acoes: criarAcoes({ enviar, identificar }) });
+    responderTudo();
+    fireEvent.click(botao('Enviar respostas'));
+    await esperarAcoes();
+    expect(enviar).toHaveBeenCalledTimes(1);
+    expect(enviar).toHaveBeenLastCalledWith('dons-servico', expect.any(Array), 'a***@email.com');
+    expect(screen.getByRole('heading', { level: 2, name: 'Sua sessão foi encerrada' })).toBeInTheDocument();
+    fireEvent.click(botao('Informar e-mail'));
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'bruno@outro.com' } });
+    fireEvent.click(botao('Continuar'));
+    await esperarAcoes();
+    // As respostas de A não são reenviadas: B recomeça do zero.
+    expect(enviar).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+    for (const radio of screen.getAllByRole('radio')) expect(radio).not.toBeChecked();
+    // B responde e envia como B.
+    escolherNota('1 — Raramente');
+    escolherNota('2 — Às vezes');
+    escolherNota('3 — Frequentemente');
+    fireEvent.click(botao('Enviar respostas'));
+    await esperarAcoes();
+    expect(enviar).toHaveBeenCalledTimes(2);
+    expect(enviar).toHaveBeenLastCalledWith('dons-servico', expect.any(Array), 'b***@outro.com');
   });
 
   it('sessão encerrada e outra pessoa se identifica: não reenvia as respostas de quem saiu e recomeça', async () => {
@@ -524,7 +553,7 @@ describe('Questionario — estilo pessoal (1 a 5)', () => {
     expect(acoes.enviar).toHaveBeenCalledWith('estilo-pessoal', [
       { numero: 1, nota: 14 },
       { numero: 2, nota: 28 },
-    ]);
+    ], 'a***@email.com');
   });
 });
 
@@ -550,7 +579,7 @@ describe('Questionario — temperamento (páginas de 10)', () => {
       { numero: 2, nota: 0 },
       { numero: 3, nota: 0 },
       { numero: 4, nota: 1 },
-    ]);
+    ], 'a***@email.com');
   });
 });
 

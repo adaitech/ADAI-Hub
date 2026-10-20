@@ -197,15 +197,28 @@ async function respostasValidas(slug: SlugTeste, respostas: RespostaTeste[]): Pr
   }
 }
 
+/** E-mail mascarado do dono das respostas, como o cliente guardou no progresso. */
+const esquemaRespondidoComo = z.string().max(260).refine((v) => v.trim() !== '');
+
+/**
+ * Envia as respostas com os ids da sessão. `respondidoComo` é o e-mail mascarado da sessão em que as
+ * respostas foram dadas: se a sessão do cookie for de outra pessoa (trocada em outra aba), devolve
+ * `sessao` sem chamar a API, para as respostas de uma pessoa não serem gravadas como de outra.
+ */
 export async function enviar(
   slug: string,
   respostas: { numero: number; nota: number }[],
+  respondidoComo: string,
 ): Promise<RespostaAcao<Resultado>> {
   const config = configuracao();
   if (!config) return falha('indisponivel');
 
   const sessao = await sessaoDoCookie(config.segredo);
   if (!sessao) return falha('sessao');
+
+  const dono = esquemaRespondidoComo.safeParse(respondidoComo);
+  if (!dono.success) return falha('invalido');
+  if (dono.data !== sessao.emailMascarado) return falha('sessao');
 
   const teste = definicaoDoTeste(typeof slug === 'string' ? slug : '');
   const lista = z.array(esquemaResposta).safeParse(respostas);

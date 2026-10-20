@@ -119,6 +119,7 @@ describe('enviarRespostas', () => {
       ['item sem name', [{ totalRate: 3, message: 'x' }]],
       ['totalRate em texto', [{ name: 'Ensino', totalRate: '3', message: 'x' }]],
       ['item nulo', [null]],
+      ['array vazio (sem resultado para mostrar)', []],
     ] as const;
     it.each(pontuacao)('nota: %s', async (_n, retorno) => {
       ebaFetchMock.mockResolvedValue(retorno);
@@ -145,6 +146,13 @@ describe('enviarRespostas', () => {
       ebaFetchMock.mockResolvedValue(retorno);
       await expect(
         enviarRespostas({ ...base, slug: 'estilo-pessoal', respostas: [{ numero: 1, nota: 10 }, { numero: 2, nota: 10 }] }),
+      ).rejects.toBeInstanceOf(EbaApiRespostaInvalida);
+    });
+
+    it('talentos: 2xx com [] vira EbaApiRespostaInvalida (sem-resultado na tela)', async () => {
+      ebaFetchMock.mockResolvedValue([]);
+      await expect(
+        enviarRespostas({ ...base, slug: 'talentos-naturais', respostas: [{ numero: 1, nota: 1 }] }),
       ).rejects.toBeInstanceOf(EbaApiRespostaInvalida);
     });
 

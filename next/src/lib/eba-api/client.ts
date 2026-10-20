@@ -85,6 +85,10 @@ export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Pro
     return (await response.json()) as T;
   } catch (error) {
     const timeout = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
-    throw new EbaApiIndisponivel(timeout ? 'timeout' : 'resposta');
+    const motivo = timeout ? 'timeout' : 'resposta';
+    // POST com 2xx: a API já gravou. Corpo ilegível (vazio, HTML do APIM) ou timeout na leitura não
+    // pode virar "indisponível", senão a tela oferece "Tentar de novo" e reenvia o que já foi gravado.
+    if (metodo === 'POST') throw new EbaApiRespostaInvalida(`corpo 2xx ilegível (${motivo})`);
+    throw new EbaApiIndisponivel(motivo);
   }
 }
