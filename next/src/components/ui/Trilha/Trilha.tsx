@@ -15,7 +15,7 @@ export function Trilha({ itens }: { itens: TrilhaItem[] }) {
     <nav aria-label="Trilha" className={styles.trilha}>
       <ol className={styles.lista}>
         {itens.map((item, i) => (
-          <li key={item.texto} className={i === ultimo - 1 ? styles.anterior : styles.item}>
+          <li key={`${i}-${item.texto}`} className={i === ultimo - 1 ? styles.anterior : styles.item}>
             {i === ultimo || !item.href ? (
               <span aria-current="page" className={styles.atual}>
                 {item.texto}

@@ -1,5 +1,6 @@
 import { CardCurso } from '@/components/ui/CardCurso';
 import { TextLink } from '@/components/ui/TextLink';
+import { EMAIL_EBA } from '@/lib/eba/contato';
 import type { CursoResumoView } from '@/lib/eba/types';
 import styles from './CatalogoCursosSection.module.css';
 
@@ -13,10 +14,12 @@ export interface CatalogoCursosProps {
   nivelTitulo: 1 | 2;
   /** Sem cursos: mostra "Novos cursos em breve" em vez de sumir. */
   mostrarVazio: boolean;
+  /** E-mail do estado vazio (padrão: o da EBA). */
+  contato?: string;
 }
 
 /** Apresentação do catálogo (sem fetch): título, apoio, "Ver todos" e a grade de cards. */
-export function CatalogoCursos({ id, titulo, textoApoio, cursos, verTodos, nivelTitulo, mostrarVazio }: CatalogoCursosProps) {
+export function CatalogoCursos({ id, titulo, textoApoio, cursos, verTodos, nivelTitulo, mostrarVazio, contato = EMAIL_EBA }: CatalogoCursosProps) {
   if (cursos.length === 0 && !mostrarVazio) return null;
   const Titulo = nivelTitulo === 1 ? 'h1' : 'h2';
   const tituloId = `catalogo-cursos-${id}-titulo`;
@@ -45,7 +48,7 @@ export function CatalogoCursos({ id, titulo, textoApoio, cursos, verTodos, nivel
           <p className={styles.vazioTitulo}>Novos cursos em breve</p>
           <p>
             Enquanto isso, fale com a equipe da EBA da sua unidade ou escreva para{' '}
-            <a href="mailto:contato@adai.com.br">contato@adai.com.br</a>.
+            <a href={`mailto:${contato}`}>{contato}</a>.
           </p>
         </div>
       )}

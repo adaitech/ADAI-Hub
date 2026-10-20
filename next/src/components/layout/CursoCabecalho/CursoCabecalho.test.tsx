@@ -58,5 +58,15 @@ describe('CursoCabecalho', () => {
     rerender(<CursoInscricao curso={start} />);
     expect(screen.queryByText('Pronto para começar?')).toBeNull();
   });
+
+  it('inscrição por e-mail (mailto) não é conversão: sem data-curso, e o bloco final convida a falar com a EBA', () => {
+    const porEmail = { ...talmidim, inscricao: { label: 'Falar com a EBA', href: 'mailto:contato@adai.com.br', novaAba: false, estilo: 'solido' as const } };
+    render(<CursoCabecalho curso={porEmail} trilha={trilha} />);
+    expect(screen.getByRole('link', { name: 'Falar com a EBA' })).not.toHaveAttribute('data-curso');
+    render(<CursoInscricao curso={porEmail} />);
+    expect(screen.getByText('Fale com a equipe da EBA para combinar sua inscrição.')).toBeInTheDocument();
+    expect(screen.queryByText(/Faça sua inscrição/)).toBeNull();
+    expect(screen.getAllByRole('link', { name: 'Falar com a EBA' }).every((a) => !a.hasAttribute('data-curso'))).toBe(true);
+  });
 });
 

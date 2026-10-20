@@ -11,6 +11,9 @@ export interface CursoCabecalhoProps {
   trilha: TrilhaItem[];
 }
 
+/** Inscrição por e-mail é um contato, não uma conversão: não leva `data-curso` (sem `inscrever_curso`). */
+const ehEmail = (href: string) => href.startsWith('mailto:');
+
 /** Âncora da seção Perguntas frequentes no corpo do curso. */
 export const ANCORA_PERGUNTAS = 'perguntas-frequentes';
 
@@ -32,7 +35,7 @@ export function CursoCabecalho({ curso, trilha }: CursoCabecalhoProps) {
           {(inscricao || curso.temPerguntasFrequentes || video) && (
             <div className={styles.acoes}>
               {inscricao && (
-                <ButtonLink href={inscricao.href} novaAba={inscricao.novaAba} curso={curso.slug}>
+                <ButtonLink href={inscricao.href} novaAba={inscricao.novaAba} curso={ehEmail(inscricao.href) ? undefined : curso.slug}>
                   {inscricao.label}
                 </ButtonLink>
               )}
@@ -78,9 +81,13 @@ export function CursoInscricao({ curso }: { curso: CursoView }) {
         <h2 id={tituloId} className={styles.inscricaoTitulo}>
           Pronto para começar?
         </h2>
-        <p className={styles.resumo}>Faça sua inscrição e a equipe da EBA entra em contato com os próximos passos.</p>
+        <p className={styles.resumo}>
+          {ehEmail(inscricao.href)
+            ? 'Fale com a equipe da EBA para combinar sua inscrição.'
+            : 'Faça sua inscrição e a equipe da EBA entra em contato com os próximos passos.'}
+        </p>
         <div className={styles.acoes}>
-          <ButtonLink href={inscricao.href} novaAba={inscricao.novaAba} curso={curso.slug}>
+          <ButtonLink href={inscricao.href} novaAba={inscricao.novaAba} curso={ehEmail(inscricao.href) ? undefined : curso.slug}>
             {inscricao.label}
           </ButtonLink>
         </div>

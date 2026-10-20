@@ -8,7 +8,7 @@ import type { CatalogoCursosData } from './types';
 
 /**
  * Catálogo de cursos da EBA. Server Component: Strapi = título/vertente/quantidade;
- * tipo Cursos da EBA = os cursos publicados. Falha do Strapi na lista → a seção some.
+ * tipo Cursos da EBA = os cursos publicados. Falha do Strapi na lista → a seção some (ou, abrindo a página, erro).
  * Abrindo a página (index 0), sem cursos mostra "Novos cursos em breve" em vez de sumir.
  */
 export async function CatalogoCursosSection({ data, index }: SectionProps<CatalogoCursosData>) {
@@ -19,6 +19,8 @@ export async function CatalogoCursosSection({ data, index }: SectionProps<Catalo
   try {
     publicados = await listarCursosPublicados();
   } catch (erro) {
+    // Abrindo a página (/eba/cursos), o catálogo é o conteúdo principal: o erro vai para o error.tsx.
+    if (index === 0) throw erro;
     console.warn('[catalogo-cursos] falha ao listar cursos', erro instanceof Error ? erro.message : erro);
     return null;
   }

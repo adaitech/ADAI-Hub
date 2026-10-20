@@ -5,14 +5,14 @@ import { sectionsPopulate } from '@/lib/registry/sectionRegistry';
 import type { PaginaSitemap } from '@/lib/seo/sitemap';
 import { strapiFetch } from '../client';
 import type { StrapiCollectionResponse } from '../types';
+import { listarPaginado } from './paginado';
 
 /** Seções que o editor pode usar no corpo de um curso (dynamic zone `secoes`). */
 export const SECOES_DO_CURSO = ['sections.imagem-texto', 'sections.texto-rico', 'sections.perguntas-frequentes', 'sections.texto-botoes'];
 
 const TAG_CURSOS = 'cursos';
-/** Um catálogo de cursos cabe numa página; a trava evita laço com paginação errada. */
+/** Um catálogo de cursos cabe numa página. */
 const POR_PAGINA = 100;
-const MAX_PAGINAS = 20;
 
 function populateDasSecoes() {
   const todas = sectionsPopulate();
@@ -51,26 +51,11 @@ export async function getCursoBySlug(slug: string): Promise<CursoView | null> {
   return curso ? normalizeCurso(curso) : null;
 }
 
-interface RespostaPaginada<T> {
-  data: T[];
-  meta: { pagination?: { page: number; pageCount: number } };
-}
-
 /** Cursos publicados, só com o que o sitemap usa. */
 export async function listarCursosParaSitemap(): Promise<PaginaSitemap[]> {
-  const cursos: PaginaSitemap[] = [];
-  for (let page = 1; page <= MAX_PAGINAS; page++) {
-    const resposta = await strapiFetch<RespostaPaginada<PaginaSitemap>>(
-      'cursos',
-      {
-        fields: ['slug', 'updatedAt'],
-        populate: { seo: { fields: ['metaRobots', 'canonicalURL'] } },
-        pagination: { page, pageSize: POR_PAGINA },
-      },
-      { tags: [TAG_CURSOS] },
-    );
-    cursos.push(...resposta.data);
-    if (page >= (resposta.meta.pagination?.pageCount ?? 1)) break;
-  }
-  return cursos;
+  return listarPaginado<PaginaSitemap>(
+    'cursos',
+    { fields: ['slug', 'updatedAt'], populate: { seo: { fields: ['metaRobots', 'canonicalURL'] } } },
+    [TAG_CURSOS],
+  );
 }

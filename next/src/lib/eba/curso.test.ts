@@ -91,6 +91,9 @@ describe('videoDoYoutube (só YouTube vira player)', () => {
     ['https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=30'],
     ['https://m.youtube.com/shorts/dQw4w9WgXcQ'],
     ['https://youtube.com/embed/dQw4w9WgXcQ'],
+    ['https://www.youtube.com/live/dQw4w9WgXcQ?si=abc'],
+    ['www.youtube.com/watch?v=dQw4w9WgXcQ'],
+    ['youtu.be/dQw4w9WgXcQ'],
   ])('%s → vídeo dQw4w9WgXcQ no youtube-nocookie', (url) => {
     expect(videoDoYoutube(url)).toEqual({
       videoId: 'dQw4w9WgXcQ',

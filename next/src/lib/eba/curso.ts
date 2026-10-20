@@ -72,11 +72,15 @@ export function normalizeCurso(curso: StrapiCurso): CursoView | null {
   };
 }
 
-/** Link do YouTube (watch, youtu.be, shorts, embed) → vídeo no player do site. Outro endereço → null. */
+/** Link colado sem "https://" (ex.: "youtu.be/ID") ganha o esquema; outros textos ficam como estão. */
+const SEM_ESQUEMA_YOUTUBE = /^((www|m)\.)?(youtube\.com|youtu\.be)\//i;
+
+/** Link do YouTube (watch, youtu.be, shorts, embed, live) → vídeo no player do site. Outro endereço → null. */
 export function videoDoYoutube(url: string | null | undefined): VideoSerie | null {
+  const bruto = url?.trim() ?? '';
   let endereco: URL;
   try {
-    endereco = new URL(url?.trim() ?? '');
+    endereco = new URL(SEM_ESQUEMA_YOUTUBE.test(bruto) ? `https://${bruto}` : bruto);
   } catch {
     return null;
   }
@@ -88,7 +92,7 @@ export function videoDoYoutube(url: string | null | undefined): VideoSerie | nul
       ? partes[0]
       : partes[0] === 'watch'
         ? endereco.searchParams.get('v')
-        : ['shorts', 'embed'].includes(partes[0]) ? partes[1] : null;
+        : ['shorts', 'embed', 'live'].includes(partes[0]) ? partes[1] : null;
   if (!id || !ID_YOUTUBE.test(id)) return null;
 
   return {

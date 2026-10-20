@@ -43,7 +43,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     metaDescription: curso.resumo,
     metaImage: curso.capa ? { id: 0, url: curso.capa.url, alternativeText: curso.capa.alt, width: curso.capa.width, height: curso.capa.height } : null,
   };
-  return buildMetadata(curso.seo ?? padrao, global?.seo, caminhoDoCurso(curso.slug));
+  // SEO do Strapi vale campo a campo; o que faltar (ex.: imagem) vem do próprio curso.
+  const preenchidos = Object.fromEntries(Object.entries(curso.seo ?? {}).filter(([, valor]) => valor !== null && valor !== undefined && valor !== ''));
+  const seo = { ...padrao, ...preenchidos };
+  return buildMetadata(seo, global?.seo, caminhoDoCurso(curso.slug));
 }
 
 /** /eba/cursos/<slug> — topo do curso (campos fixos) + corpo do Strapi + inscrição + outros cursos. */

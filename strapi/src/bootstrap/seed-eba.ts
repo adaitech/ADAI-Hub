@@ -289,7 +289,9 @@ export async function ensureCursos(strapi: Core.Strapi, imagem: Imagem, reconstr
     if (existente && !reconstruir) continue;
     const data = (await dadosDoCurso(strapi, c, imagem)) as never;
     const doc = existente ? await cursos.update({ documentId: existente.documentId, data }) : await cursos.create({ data });
-    await cursos.publish({ documentId: doc.documentId });
+    const documentId = existente?.documentId ?? doc?.documentId;
+    if (!documentId) continue;
+    await cursos.publish({ documentId });
     strapi.log.info(`[seed] Curso da EBA "${c.slug}" ${existente ? 'reconstruído' : 'criado'} e publicado.`);
   }
 }
@@ -391,4 +393,39 @@ export function ebaCursosSections() {
       botoes: [{ texto: 'Escrever para a EBA', url: CONTATO, estilo: 'solido' }],
     },
   ];
+}
+
+const PAGINAS_EBA = [
+  {
+    slug: 'eba',
+    titulo: 'EBA — Escola Bíblica ADAI',
+    descricao: 'Cursos e testes da Escola Bíblica ADAI: formação para cada fase da caminhada cristã.',
+    secoes: (strapi: Core.Strapi, imagem: Imagem) => ebaSections(strapi, imagem),
+  },
+  {
+    slug: 'eba-cursos',
+    titulo: 'Cursos da EBA',
+    descricao: 'Reset, Start, CDV e Talmidim: conheça os cursos da Escola Bíblica ADAI.',
+    secoes: async () => ebaCursosSections(),
+  },
+];
+
+/**
+ * Cria (banco novo) ou reconstrói (versão nova do seed) as páginas `eba` e `eba-cursos` e publica.
+ * Fora desses casos não monta nada: as imagens só são buscadas quando a página vai ser gravada.
+ */
+export async function ensurePaginasEba(strapi: Core.Strapi, imagem: Imagem, reconstruir: boolean): Promise<void> {
+  const pages = strapi.documents('api::page.page');
+  for (const p of PAGINAS_EBA) {
+    const existente = await pages.findFirst({ filters: { slug: p.slug } });
+    if (existente && !reconstruir) continue;
+    const data = { seo: { metaTitle: `${p.titulo} | ADAI`, metaDescription: p.descricao }, sections: await p.secoes(strapi, imagem) };
+    const doc = existente
+      ? await pages.update({ documentId: existente.documentId, data: data as never })
+      : await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...data } as never });
+    const documentId = existente?.documentId ?? doc?.documentId;
+    if (!documentId) continue;
+    await pages.publish({ documentId });
+    strapi.log.info(`[seed] Página "${p.slug}" ${existente ? 'reconstruída' : 'criada'} e publicada.`);
+  }
 }

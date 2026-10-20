@@ -54,6 +54,17 @@ describe('/sitemap.xml', () => {
     ]);
   });
 
+  it('falha só nos cursos da EBA não derruba o sitemap: páginas continuam, cursos ficam de fora', async () => {
+    producao();
+    const normal = strapi.fetch.getMockImplementation()!;
+    strapi.fetch.mockImplementation((url: string) =>
+      decodeURIComponent(url).includes('/api/cursos') ? Promise.resolve({ ok: false, status: 500, json: async () => ({}) } as Response) : normal(url),
+    );
+    const urls = (await sitemap()).map((e) => e.url);
+    expect(urls).toContain('https://adai.com.br/eba/cursos');
+    expect(urls.some((u) => u.includes('/eba/cursos/'))).toBe(false);
+  });
+
   it('página nova publicada no Strapi entra sozinha; "exemplos" e noindex ficam de fora', async () => {
     producao();
     const base = strapi.paginas.home;

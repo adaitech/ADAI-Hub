@@ -101,6 +101,18 @@ describe('/eba/cursos/[slug] — página do curso', () => {
     expect((await metadataCurso(params('talmidim'))).robots).toMatchObject({ index: false });
   });
 
+  it('SEO parcial (sem imagem) → o compartilhamento usa a capa do curso', async () => {
+    strapi.cursos.find((c) => c.slug === 'talmidim')!.seo = { id: 1, metaTitle: 'Talmidim — EBA', metaDescription: 'Curso para adolescentes.' } as never;
+    const meta = await metadataCurso(params('talmidim'));
+    expect(String(meta.title)).toContain('Talmidim — EBA');
+    expect(JSON.stringify(meta.openGraph?.images)).toContain('talmidim_capa.webp');
+  });
+
+  it('SEO com título vazio no Strapi → usa o título padrão do curso', async () => {
+    strapi.cursos.find((c) => c.slug === 'talmidim')!.seo = { id: 1, metaTitle: null, metaDescription: 'Curso para adolescentes.' } as never;
+    expect(String((await metadataCurso(params('talmidim'))).title)).toContain('Talmidim — Cursos da EBA');
+  });
+
   it.each([['Reset'], ['a..b'], ['cdv-é']])('endereço fora do padrão (%p) → 404 sem chamar o Strapi', async (slug) => {
     expect((await erroDe(CursoPage(params(slug)))).digest).toBe('NEXT_HTTP_ERROR_FALLBACK;404');
     expect(strapi.fetch).not.toHaveBeenCalled();

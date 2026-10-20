@@ -3,7 +3,9 @@ import fixture from '@/lib/eba/__fixtures__/cursos.json';
 import { normalizeCursoResumo } from '@/lib/eba/curso';
 import type { CursoResumoView, StrapiCurso } from '@/lib/eba/types';
 import { listarCursosPublicados } from '@/lib/strapi/queries/cursos';
+import { render } from '@testing-library/react';
 import { renderizarServidor } from '@/test-utils/servidor';
+import { CatalogoCursos } from './CatalogoCursos';
 import { CatalogoCursosSection } from './CatalogoCursosSection';
 import mocks from './CatalogoCursosSection.mock.json';
 import type { CatalogoCursosData } from './types';
@@ -58,4 +60,15 @@ describe('CatalogoCursosSection', () => {
     const { container } = await renderizarServidor(<CatalogoCursosSection data={completo} index={2} />);
     expect(container.querySelector('[data-section="catalogo-cursos"]')).toBeNull();
   });
+
+  it('Strapi falha e o catálogo abre a página (index 0) → erro para o error.tsx, não página vazia', async () => {
+    listar.mockRejectedValue(new Error('Strapi fora'));
+    await expect(CatalogoCursosSection({ data: minimo, index: 0 })).rejects.toThrow('Strapi fora');
+  });
+
+  it('estado vazio usa o contato recebido (padrão: e-mail da EBA)', () => {
+    render(<CatalogoCursos id="x" titulo="Cursos" cursos={[]} verTodos={false} nivelTitulo={1} mostrarVazio contato="eba@adai.com.br" />);
+    expect(screen.getByRole('link', { name: 'eba@adai.com.br' })).toHaveAttribute('href', 'mailto:eba@adai.com.br');
+  });
 });
+

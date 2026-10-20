@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
-import { ebaCursosSections, ebaSections, ensureCursos } from './seed-eba';
+import { ensureCursos, ensurePaginasEba } from './seed-eba';
 
 /**
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
@@ -715,23 +715,7 @@ export async function seedInitialContent(strapi: Core.Strapi) {
 
   // EBA (Escola Bíblica ADAI): cursos + páginas /eba e /eba/cursos (entrega 1 da migração).
   await ensureCursos(strapi, image, storedVersion < SEED_VERSION);
-  const paginasEba = [
-    { slug: 'eba', titulo: 'EBA — Escola Bíblica ADAI', descricao: 'Cursos e testes da Escola Bíblica ADAI: formação para cada fase da caminhada cristã.', secoes: () => ebaSections(strapi, image) },
-    { slug: 'eba-cursos', titulo: 'Cursos da EBA', descricao: 'Reset, Start, CDV e Talmidim: conheça os cursos da Escola Bíblica ADAI.', secoes: async () => ebaCursosSections() },
-  ];
-  for (const p of paginasEba) {
-    const existente = await pages.findFirst({ filters: { slug: p.slug } });
-    const data = { seo: { metaTitle: `${p.titulo} | ADAI`, metaDescription: p.descricao }, sections: await p.secoes() };
-    if (!existente) {
-      const created = await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...data } as never });
-      await publishPage(strapi, created.documentId);
-      strapi.log.info(`[seed] Página "${p.slug}" criada e publicada.`);
-    } else if (storedVersion < SEED_VERSION) {
-      await pages.update({ documentId: existente.documentId, data: data as never });
-      await publishPage(strapi, existente.documentId);
-      strapi.log.warn(`[seed] Página "${p.slug}" reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
-    }
-  }
+  await ensurePaginasEba(strapi, image, storedVersion < SEED_VERSION);
 
   for (const p of PAGINAS_INSTITUCIONAIS) {
     const existente = await pages.findFirst({ filters: { slug: p.slug } });

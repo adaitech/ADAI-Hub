@@ -19,8 +19,9 @@ Ordem dos cursos: campo **Ordem no catálogo** de cada curso (menor primeiro); e
 | Se… | Na página acontece |
 | --- | --- |
 | nenhum curso publicado (ou nenhum na vertente) e a seção **não** abre a página | a seção some |
-| nenhum curso publicado e a seção abre a página (`/eba/cursos`) | aparece "Novos cursos em breve" com o e-mail da EBA |
-| o Strapi falha ao listar os cursos | a seção some; o resto da página continua |
+| nenhum curso publicado e a seção abre a página (`/eba/cursos`) | aparece "Novos cursos em breve" com o e-mail da EBA (`EMAIL_EBA` em `next/src/lib/eba/contato.ts`) |
+| o Strapi falha ao listar os cursos e a seção **não** abre a página | a seção some; o resto da página continua |
+| o Strapi falha ao listar os cursos e a seção abre a página (`/eba/cursos`) | erro da página (`error.tsx`): o catálogo é o conteúdo principal |
 | curso sem capa ou com capa sem texto alternativo | card sem foto: o nome ocupa o lugar da imagem |
 
 Cada card é um **Card de curso** (`next/src/components/ui/CardCurso/`): foto 4:3, vertente, nome (único link do card), resumo e as duas primeiras informações (Para quem, Duração).

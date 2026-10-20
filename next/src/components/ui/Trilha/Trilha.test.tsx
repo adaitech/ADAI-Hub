@@ -21,4 +21,12 @@ describe('Trilha', () => {
     const { container } = render(<Trilha itens={[{ texto: 'EBA' }]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('textos repetidos (curso chamado "Cursos") não geram chave duplicada no React', () => {
+    const erro = jest.spyOn(console, 'error').mockImplementation(() => {});
+    render(<Trilha itens={[{ texto: 'ADAI', href: '/' }, { texto: 'Cursos', href: '/eba/cursos' }, { texto: 'Cursos' }]} />);
+    expect(erro.mock.calls.flat().join(' ')).not.toMatch(/same key/);
+    erro.mockRestore();
+  });
 });
+

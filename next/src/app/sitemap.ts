@@ -12,9 +12,19 @@ import { urlDoEvento } from '@/lib/inchurch/detalhes';
  * publicação); se o Strapi falhar, o Next continua servindo o último sitemap gerado.
  * Fora de produção, vazio (o robots.txt também bloqueia tudo).
  */
+/** Falha só nos cursos (ex.: tipo ainda não publicado no Strapi) não derruba o sitemap das páginas. */
+async function cursosOuNada() {
+  try {
+    return await listarCursosParaSitemap();
+  } catch (erro) {
+    console.warn('[sitemap] cursos da EBA fora do sitemap:', erro instanceof Error ? erro.message : erro);
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { indexavel, url } = configuracaoSeo();
   if (!indexavel || !url) return [];
-  const [paginas, cursos, eventos] = await Promise.all([listarPaginasPublicadas(), listarCursosParaSitemap(), getEventosInchurch()]);
+  const [paginas, cursos, eventos] = await Promise.all([listarPaginasPublicadas(), cursosOuNada(), getEventosInchurch()]);
   return [...montarSitemap(paginas, url), ...montarSitemapCursos(cursos, url), ...(eventos ? eventosDaAgenda(eventos).map((evento) => ({ url: `${url}${urlDoEvento(evento)}`, priority: 0.7 })) : [])];
 }

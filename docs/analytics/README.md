@@ -57,7 +57,7 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `ver_secao` | Seção 25% visível (ou ocupando metade da tela, para textos longos), uma vez por página | `secao`, `posicao` | — |
 | `web_vitals` | Core Web Vitals de usuários reais | `metrica` (LCP, CLS, INP, FCP, TTFB), `valor` (CLS × 1000), `avaliacao` | — |
 | `consentimento_cookies` | Escolha no aviso de cookies | `escolha` (aceito, recusado) | — |
-| `inscrever_curso` | Botão de inscrição de um curso da EBA (topo da página do curso ou bloco "Pronto para começar?"; link com `data-curso`) | `origem` (`curso-cabecalho`, `curso-inscricao`), `curso` (slug) | **Sim** |
+| `inscrever_curso` | Botão de inscrição de um curso da EBA (topo da página do curso ou bloco "Pronto para começar?"; link com `data-curso`). Inscrição por e-mail (`mailto:`) não conta | `origem` (`curso-cabecalho`, `curso-inscricao`), `curso` (slug) | **Sim** |
 
 `origem` = `data-section` da seção (`hero`, `serie-atual`, `proximos-eventos`…), `header`, `footer` ou `pagina`.
 
