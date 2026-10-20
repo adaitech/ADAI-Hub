@@ -39,6 +39,26 @@
       "obrigatorio": true,
       "limite": "Sem limite (texto longo)",
       "exemplo": "## 1. Quem é responsável pelos seus dados — seguido do texto da seção"
+    },
+    {
+      "campo": "apresentacao",
+      "label": "Apresentação",
+      "descricao": "Documento mantém a coluna de leitura. Destaque usa uma caixa editorial cinza.",
+      "placeholder": "",
+      "ondeAparece": "Apresentação da seção.",
+      "obrigatorio": false,
+      "limite": "Uma opção",
+      "exemplo": "destaque"
+    },
+    {
+      "campo": "ancora",
+      "label": "Âncora",
+      "descricao": "Identificador sem espaços, acentos ou # para links que levam a esta seção.",
+      "placeholder": "",
+      "ondeAparece": "Apresentação da seção.",
+      "obrigatorio": false,
+      "limite": "Uma opção",
+      "exemplo": "sobre-a-adai"
     }
   ]
 }

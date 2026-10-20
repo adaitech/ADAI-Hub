@@ -221,6 +221,7 @@ export interface SectionsCarrosselCards extends Struct.ComponentSchema {
     estilo_imagem: Schema.Attribute.Enumeration<['foto', 'arte']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'foto'>;
+    exibicao: Schema.Attribute.Enumeration<['carrossel', 'grade']>;
     link: Schema.Attribute.Component<'shared.link', false>;
     posicao_imagem: Schema.Attribute.Enumeration<
       ['acima', 'apos_titulo', 'abaixo']
@@ -437,6 +438,50 @@ export interface SectionsPerguntasFrequentes extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsPix extends Struct.ComponentSchema {
+  collectionName: 'components_sections_pix';
+  info: {
+    description: 'Chave Pix, instru\u00E7\u00F5es e contato para contribui\u00E7\u00F5es.';
+    displayName: 'Contribui\u00E7\u00E3o por Pix';
+    icon: 'heart';
+  };
+  attributes: {
+    ancora: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    chave_pix: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 140;
+      }>;
+    cnpj: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 18;
+      }>;
+    contato: Schema.Attribute.Component<'shared.link', false>;
+    favorecido: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    passos: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 600;
+      }>;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 220;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+  };
+}
+
 export interface SectionsProximosEventos extends Struct.ComponentSchema {
   collectionName: 'components_sections_proximos_eventos';
   info: {
@@ -532,6 +577,11 @@ export interface SectionsTextoRico extends Struct.ComponentSchema {
     icon: 'file';
   };
   attributes: {
+    ancora: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    apresentacao: Schema.Attribute.Enumeration<['documento', 'destaque']>;
     atualizado_em: Schema.Attribute.Date;
     conteudo: Schema.Attribute.RichText & Schema.Attribute.Required;
     titulo: Schema.Attribute.String &
@@ -632,6 +682,7 @@ declare module '@strapi/strapi' {
       'sections.lista-testes': SectionsListaTestes;
       'sections.ministerios': SectionsMinisterios;
       'sections.perguntas-frequentes': SectionsPerguntasFrequentes;
+      'sections.pix': SectionsPix;
       'sections.proximos-eventos': SectionsProximosEventos;
       'sections.serie-atual': SectionsSerieAtual;
       'sections.texto-botoes': SectionsTextoBotoes;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { registrarEvento } from '@/lib/analytics/datalayer';
 import { AgendaEventoCard } from './AgendaEventoCard';
 import styles from './AgendaEventosSection.module.css';
 import type { AgendaEventoCardView, AgendaEventosView } from './types';
@@ -16,7 +17,8 @@ export function filtrarEventosDaAgenda(
 ): AgendaEventoCardView[] {
   const termo = textoParaBusca(busca);
   return cards.filter((card) => {
-    const correspondeUnidade = unidadeId === null || (card.unidadeIds?.includes(unidadeId) ?? card.unidadeId === unidadeId);
+    const ids = card.unidadeIds ?? (card.unidadeId === null ? [] : [card.unidadeId]);
+    const correspondeUnidade = unidadeId === null || ids.length === 0 || ids.includes(unidadeId);
     const conteudo = textoParaBusca(`${card.titulo} ${card.descricao ?? ''}`);
     return correspondeUnidade && (!termo || conteudo.includes(termo));
   });
@@ -35,9 +37,23 @@ export function AgendaEventosListaClient({ view, sectionId }: AgendaEventosLista
   const cards = useMemo(() => filtrarEventosDaAgenda(view.cards, { unidadeId, busca }), [busca, unidadeId, view.cards]);
   const filtrosAtivos = Boolean(unidadeSelecionada || busca.trim());
 
+  useEffect(() => {
+    const termo = textoParaBusca(busca);
+    if (termo.length < 3) return;
+    const timer = setTimeout(() => registrarEvento('buscar_evento', { caracteres: Math.min(termo.length, 100), resultados: cards.length }), 1000);
+    return () => clearTimeout(timer);
+  }, [busca, cards.length]);
+
+  function selecionarUnidade(valor: string) {
+    setUnidadeSelecionada(valor);
+    registrarEvento('filtrar_agenda', { filtro: 'unidade', valor_filtro: view.unidades.find((u) => String(u.igrejaId) === valor)?.nome ?? 'Todas as unidades',
+      resultados: filtrarEventosDaAgenda(view.cards, { unidadeId: valor ? Number(valor) : null, busca }).length });
+  }
+
   function limparFiltros() {
     setUnidadeSelecionada('');
     setBusca('');
+    registrarEvento('filtrar_agenda', { filtro: 'unidade', valor_filtro: 'Todas as unidades', resultados: view.cards.length });
   }
 
   return (
@@ -51,7 +67,7 @@ export function AgendaEventosListaClient({ view, sectionId }: AgendaEventosLista
             id={`${sectionId}-unidade`}
             className={styles.controleFiltro}
             value={unidadeSelecionada}
-            onChange={(event) => setUnidadeSelecionada(event.target.value)}
+            onChange={(event) => selecionarUnidade(event.target.value)}
           >
             <option value="">Todas as unidades</option>
             {view.unidades.map((unidade) => (

@@ -30,7 +30,7 @@ export function normalizeAgendaEventos(data: AgendaEventosData, eventos: EventoS
   const nomesDasUnidades = new Map(unidades.map((unidade) => [unidade.igrejaId, unidade.nome]));
   const cards = eventos.map((evento) => {
     const datas = formatarDatasDoEvento(evento);
-    const unidadeIds = igrejasDoEvento(evento);
+    const unidadeIds = igrejasDoEvento(evento).filter((id) => nomesDasUnidades.has(id));
     const badges = unidadeIds.map((id) => nomesDasUnidades.get(id)).filter((nome): nome is string => Boolean(nome));
     return {
       id: evento.id,

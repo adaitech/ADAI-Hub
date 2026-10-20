@@ -8,6 +8,7 @@
 }
 
 .principal { min-width: 0; }
+.aviso { margin-top: var(--space-24); padding: var(--space-24); background: var(--color-bg-subtle); border-radius: var(--radius-md); }
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { RastreadorAnalytics } from './RastreadorAnalytics';
+import { useReportWebVitals } from 'next/web-vitals';
 
 jest.mock('next/navigation', () => ({ usePathname: () => '/' }));
 jest.mock('next/web-vitals', () => ({ useReportWebVitals: jest.fn() }));
@@ -7,6 +8,27 @@ jest.mock('next/web-vitals', () => ({ useReportWebVitals: jest.fn() }));
 const eventos = () => (window.dataLayer ?? []).map((e) => e.event);
 
 describe('RastreadorAnalytics', () => {
+  it('callback de métricas permanece estável após rerender e mantém valor das métricas', () => {
+    const { rerender } = render(<RastreadorAnalytics />);
+    const hook = jest.mocked(useReportWebVitals);
+    const callback = hook.mock.calls.at(-1)![0];
+    rerender(<RastreadorAnalytics />);
+    expect(hook.mock.calls.at(-1)![0]).toBe(callback);
+    callback({ name: 'CLS', value: 0.125, rating: 'good' } as Parameters<typeof callback>[0]);
+    expect(window.dataLayer).toContainEqual(expect.objectContaining({ event: 'web_vitals', metrica: 'cls', valor: 125 }));
+  });
+  it('lê contexto explícito do detalhe para Maps e CTA, preservando clique base', () => {
+    render(<section data-section="evento-detalhe" data-evento="Encontro" data-evento-id="123" data-local="Auditório" data-unidade="Campus">
+      <a href="https://www.google.com/maps/search/">Ver no Google Maps</a>
+      <div data-acao-evento="acessar"><a href="https://example.com/evento?token=privado">Acessar evento</a></div>
+      <RastreadorAnalytics />
+    </section>);
+    fireEvent.click(screen.getByText('Ver no Google Maps'));
+    expect(window.dataLayer).toContainEqual(expect.objectContaining({ event: 'como_chegar', local: 'auditorio', unidade: 'campus', evento: 'encontro' }));
+    fireEvent.click(screen.getByText('Acessar evento'));
+    expect(window.dataLayer).toContainEqual(expect.objectContaining({ event: 'acessar_evento', evento_id: 123, destino: 'https://example.com/evento' }));
+    expect(window.dataLayer?.filter(e => e.event === 'clique_cta')).toHaveLength(2);
+  });
   beforeEach(() => {
     window.dataLayer = [];
   });

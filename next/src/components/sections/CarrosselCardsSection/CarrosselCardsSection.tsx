@@ -90,9 +90,24 @@ export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards', 
 
   const Titulo = index === 0 ? 'h1' : 'h2';
   const tituloId = `carrossel-${data.id}-titulo`;
+  const classesTrilha = clsx(
+    styles.trilha,
+    colunasDesktop === 3 && styles.tresColunas,
+    view.temImagem && styles.comImagem,
+    view.temImagem && view.posicaoImagem === 'abaixo' && styles.imagemAbaixo,
+    view.temImagem && view.posicaoImagem === 'apos_titulo' && styles.imagemAposTitulo,
+    view.temImagem && !view.pretoEBranco && styles.colorida,
+    view.temImagem && view.estiloImagem === 'arte' && styles.arte,
+  );
+  const cards = view.cards.map((card) => (
+    <Card key={card.id} card={card} nivelTitulo={Titulo === 'h1' ? 'h2' : 'h3'} />
+  ));
+  const acessorio = view.link && (
+    <TextLink href={view.link.href} novaAba={view.link.novaAba}>{view.link.label}</TextLink>
+  );
 
   return (
-    <section className={styles.secao} aria-labelledby={tituloId} data-section={secao}>
+    <section className={styles.secao} aria-labelledby={tituloId} data-section={secao} data-exibicao={view.exibicao}>
       <div className={styles.intro}>
         <Titulo id={tituloId} className={styles.tituloSecao}>
           {view.titulo}
@@ -100,30 +115,18 @@ export function CarrosselCardsSection({ data, index, secao = 'carrossel-cards', 
         {view.textoApoio && <p className={styles.apoio}>{view.textoApoio}</p>}
       </div>
 
-      <Carrossel
-        rotulo={view.titulo}
-        total={view.cards.length}
-        trilhaClassName={clsx(
-          styles.trilha,
-          colunasDesktop === 3 && styles.tresColunas,
-          view.temImagem && styles.comImagem,
-          view.temImagem && view.posicaoImagem === 'abaixo' && styles.imagemAbaixo,
-          view.temImagem && view.posicaoImagem === 'apos_titulo' && styles.imagemAposTitulo,
-          view.temImagem && !view.pretoEBranco && styles.colorida,
-          view.temImagem && view.estiloImagem === 'arte' && styles.arte,
-        )}
-        acessorio={
-          view.link && (
-            <TextLink href={view.link.href} novaAba={view.link.novaAba}>
-              {view.link.label}
-            </TextLink>
-          )
-        }
-      >
-        {view.cards.map((card) => (
-          <Card key={card.id} card={card} nivelTitulo={Titulo === 'h1' ? 'h2' : 'h3'} />
-        ))}
-      </Carrossel>
+      {view.exibicao === 'grade' ? (
+        <>
+          <ul role="list" className={clsx(styles.grade, classesTrilha)} aria-label={`${view.titulo}: ${view.cards.length} cards`} data-exibicao="grade">
+            {cards}
+          </ul>
+          {acessorio}
+        </>
+      ) : (
+        <Carrossel rotulo={view.titulo} total={view.cards.length} trilhaClassName={classesTrilha} acessorio={acessorio}>
+          {cards}
+        </Carrossel>
+      )}
     </section>
   );
 }

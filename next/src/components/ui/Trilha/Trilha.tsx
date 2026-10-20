@@ -12,7 +12,8 @@ export function Trilha({ itens }: { itens: TrilhaItem[] }) {
   if (itens.length < 2) return null;
   const ultimo = itens.length - 1;
   return (
-    <nav aria-label="Trilha" className={styles.trilha}>
+    // data-section: cliques na trilha saem com origem "trilha" no DataLayer.
+    <nav aria-label="Trilha" className={styles.trilha} data-section="trilha">
       <ol className={styles.lista}>
         {itens.map((item, i) => (
           <li key={`${i}-${item.texto}`} className={i === ultimo - 1 ? styles.anterior : styles.item}>

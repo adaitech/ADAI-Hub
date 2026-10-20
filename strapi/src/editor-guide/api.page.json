@@ -9,6 +9,16 @@
   ],
   "campos": [
     {
+      "campo": "apresentacao",
+      "label": "Apresentação da página",
+      "descricao": "Editorial alinha todas as seções em uma largura comum. Padrão mantém o layout próprio de cada seção.",
+      "placeholder": "",
+      "ondeAparece": "Margens e espaçamento do conteúdo entre cabeçalho e rodapé.",
+      "obrigatorio": false,
+      "limite": "Padrão ou editorial",
+      "exemplo": "editorial"
+    },
+    {
       "campo": "titulo",
       "label": "Nome da página",
       "descricao": "Nome interno da página. Também gera o endereço (URL) automaticamente.",

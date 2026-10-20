@@ -1,0 +1,95 @@
+{
+  "uid": "sections.pix",
+  "nome": "Contribuição por Pix",
+  "resumo": "Chave pública para dízimos e ofertas, com instruções e contato da equipe.",
+  "ondeAparece": "Seção de contribuição da página, com instruções ao lado da chave.",
+  "boasPraticas": [
+    "Confira a chave Pix com a equipe antes de publicar.",
+    "Não coloque senhas ou dados de acesso ao banco.",
+    "Separe os passos com uma quebra de linha.",
+    "Dados do Pix somente podem ser alterados pela coordenação com perfil Super Admin. Confira favorecido e CNPJ."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título",
+      "descricao": "Título que explica a contribuição por Pix.",
+      "placeholder": "",
+      "ondeAparece": "Seção Pix.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Como contribuir pelo Pix."
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Explicação breve do processo no aplicativo do banco.",
+      "placeholder": "",
+      "ondeAparece": "Seção Pix.",
+      "obrigatorio": false,
+      "limite": "Até 220 caracteres",
+      "exemplo": "A contribuição é feita no aplicativo do seu banco. Você não informa dados bancários nesta página."
+    },
+    {
+      "campo": "chave_pix",
+      "label": "Chave Pix",
+      "descricao": "Chave pública que será exibida e copiada. Confira os dados antes de publicar.",
+      "placeholder": "Ex.: nossacasa@adai.com.br",
+      "ondeAparece": "Seção Pix.",
+      "obrigatorio": true,
+      "limite": "Até 140 caracteres",
+      "exemplo": "nossacasa@adai.com.br"
+    },
+    {
+      "campo": "passos",
+      "label": "Passo a passo",
+      "descricao": "Um passo por linha. Aparece como uma lista numerada.",
+      "placeholder": "",
+      "ondeAparece": "Seção Pix.",
+      "obrigatorio": false,
+      "limite": "Até 600 caracteres",
+      "exemplo": "Copie a chave Pix.\nAbra o aplicativo do seu banco e escolha Pix.\nCole a chave, escolha o valor e confira o favorecido antes de confirmar."
+    },
+    {
+      "campo": "contato",
+      "label": "Contato da equipe",
+      "descricao": "Link para conversar sobre outras formas de contribuir.",
+      "placeholder": "",
+      "ondeAparece": "Seção Pix.",
+      "obrigatorio": false,
+      "limite": "Um link",
+      "exemplo": "Falar com a equipe",
+      "componente": "shared.link"
+    },
+    {
+      "campo": "ancora",
+      "label": "Âncora",
+      "descricao": "Identificador sem acentos, espaços ou #, usado nos links desta página.",
+      "placeholder": "",
+      "ondeAparece": "Destino do link na página.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "como-contribuir"
+    },
+    {
+      "campo": "favorecido",
+      "label": "Favorecido",
+      "descricao": "Nome oficial que deve aparecer no banco ao usar a chave Pix. Validar com a equipe financeira.",
+      "placeholder": "Igreja Evangélica Assembleia de Deus Ministério Alto do Ipiranga",
+      "ondeAparece": "Ao lado da chave Pix para conferência no banco.",
+      "obrigatorio": true,
+      "limite": "Até 160 caracteres",
+      "exemplo": "Igreja Evangélica Assembleia de Deus Ministério Alto do Ipiranga"
+    },
+    {
+      "campo": "cnpj",
+      "label": "CNPJ do favorecido",
+      "descricao": "CNPJ que deve aparecer no aplicativo do banco. Use o formato 00.000.000/0000-00.",
+      "placeholder": "08.020.296/0001-14",
+      "ondeAparece": "Ao lado da chave Pix para conferência no banco.",
+      "obrigatorio": true,
+      "limite": "18 caracteres",
+      "exemplo": "08.020.296/0001-14"
+    }
+  ]
+}

@@ -7,6 +7,17 @@
 
 ## 1. O que é
 
+### Correções da PR #10 (18/10/2026)
+
+- Filtro por unidade mantém eventos gerais (sem igrejas do cadastro) e os daquela unidade. A resolução de IDs conhecidos é a mesma usada pelas badges; várias unidades continuam com várias badges. IDs desconhecidos são considerados gerais apenas para esse filtro, sem inferir publicação ou local pelo título/endereço.
+- `/agenda/[slug]` usa título + ID por enquanto. Título incorreto ou antigo redireciona permanentemente para `urlDoEvento`; ID inválido/inexistente ou evento não publicado retorna 404. Falhas transitórias continuam recuperáveis.
+- Encerrado ainda publicado permanece com conteúdo, aviso, link à Agenda e `noindex`, sem CTA de acesso. A decisão temporal é calculada fora do cache, com o fim real (ou início quando não há fim), e não altera a validade de publicação.
+- A consulta cacheada reúne duas janelas: início a partir de hoje (preserva eventos sem fim) e início anterior com término a partir de hoje (preserva eventos em andamento). IDs de fronteira são deduplicados; filtros de unidade/categoria permanecem aplicados dentro do mesmo cache. Cache da lista v8.
+- Para detalhes de dias anteriores, a categoria GC é confirmada em uma consulta pública restrita ao dia, compartilhada em cache por 30 minutos. Não depende da presença na lista futura. GC confirmado retorna 404; falha ou paginação incompleta não libera o evento nem vira 404 transitório.
+- SEO preserva imagem original para compartilhamento e WebP no Hero, campos OG, resumo em palavras completas e BreadcrumbList. Local do Schema vem do local físico, não do campus; não há preço/oferta inferidos de `event_url`. Imagem do Hero pode servir de fallback ao SEO da página CMS, entre imagem editorial própria e padrão global.
+- Medição: `acessar_evento`, `filtrar_agenda` e `buscar_evento`; seleção de cards coberta por `selecionar_evento` com origem. `como_chegar` resolve contexto Location → unidade → vazio, mantendo campus em parâmetro separado. Busca envia apenas comprimento e resultados após 1 segundo e mínimo de 3 caracteres, sem texto pessoal. Demais interações cobertas por `clique_cta` e `ver_secao`; sem novo evento de galeria. JSON GTM preparado, publicação externa pendente.
+- Vitrine de detalhes inclui variante `encerrado`; mocks completos usam datas futuras estáveis. Testes de normalize/componentes, metadata, integração de rota e analytics cobrem as regressões. DataLayer validado no navegador em 18/10/2026: filtro, busca sem texto pessoal, seleção Agenda/Outros eventos, CTA e Maps com Location prioritário, inclusive em evento geral. Axe executado na Agenda e detalhes, desktop/mobile: sem falhas críticas ou violações nas seções alteradas; sinalização de contraste da marca decorativa do Footer registrada separadamente, sem alterar o componente. Leitor de tela, dispositivo real e publicação externa do GTM/GA4 permanecem pendentes.
+
 Uma lista completa dos próximos eventos públicos da ADAI. A página ajuda pessoas a encontrar conferências, cultos especiais e encontros ativos e habilitados retornados pela API pública da inChurch. O campo legado `show_on_site` não participa dos filtros.
 
 **Onde é usado:** página `/agenda`, depois do Hero.

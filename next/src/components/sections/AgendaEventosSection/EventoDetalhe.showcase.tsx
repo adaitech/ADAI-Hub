@@ -21,6 +21,7 @@ export const eventoDetalheShowcase = defineShowcase<Exemplo>({
   render: (data) => { const base = normalizeDetalhe(data); const evento = base && normalizeDetalheAdministrativo({ id: data.id, event_attractions: data.event_attractions, event_images: data.event_images }, base, []); return evento ? <EventoDetalhe evento={evento} /> : null; },
   variantes: [
     { nome: 'completo', titulo: 'Evento público sem programação', data: completo, descricao: 'Somente dados públicos; nenhum conteúdo do HACKATHON oculto é exposto na vitrine.' },
+    { nome: 'encerrado', titulo: 'Evento encerrado', data: { ...completo, start_datetime: '2020-01-01T10:00:00', end_datetime: '2020-01-01T11:00:00' }, descricao: 'Conteúdo preservado, aviso de encerramento e CTA oculto.' },
     { nome: 'minimo', titulo: 'Sem opcionais', data: { ...completo, description: null, image: null, image_webp: null, event_url: null } },
     { nome: 'convidados', titulo: 'Convidados — exemplo do contrato', data: { ...completo, event_attractions: convidados }, descricao: 'Demonstração do contrato fornecido, com iniciais na ausência de foto; não representa participação confirmada neste evento.' },
     { nome: 'galeria', titulo: 'Galeria com várias imagens', data: { ...completo, event_images: fotos }, descricao: 'Demonstração do grid e lightbox com arte já pública, sem copiar conteúdo administrativo privado.' },

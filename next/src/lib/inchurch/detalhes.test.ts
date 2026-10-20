@@ -2,6 +2,20 @@ import fixture from './__fixtures__/eventos.json';
 import { idDoSlug, metadataDoEvento, normalizeDetalhe, normalizeDetalheAdministrativo, normalizarConvidados, normalizarGaleria, normalizarProgramacao, normalizarUnidadesAdministrativas, partesDaDescricao, schemaDoEvento, textoDaDescricao, urlDoEvento } from './detalhes';
 import administrativo from './__fixtures__/evento-admin.json';
 import type { InchurchEvento } from './types';
+import { eventoEncerrado } from './detalhes';
+
+it('encerramento usa término real e mantém o instante exato do fim elegível', () => {
+  const evento = normalizeDetalhe({ id: 1, name: 'Teste', active: true, enabled: true, start_datetime: '2026-10-17T10:00:00-03:00', end_datetime: '2026-10-17T12:00:00-03:00' })!;
+  expect(eventoEncerrado(evento, new Date('2026-10-17T12:00:00-03:00'))).toBe(false);
+  expect(eventoEncerrado(evento, new Date('2026-10-17T12:00:01-03:00'))).toBe(true);
+  expect(metadataDoEvento(evento, new Date('2026-10-18T12:00:00-03:00'))).toMatchObject({ robots: { index: false } });
+});
+
+it('compartilhamento preserva original JPG e campos OG, sem cortar palavra no resumo', () => {
+  const evento = normalizeDetalhe({ id: 1, name: 'Teste', active: true, enabled: true, start_datetime: '2099-01-01T10:00:00', image: 'https://example.com/original.jpg', image_webp: 'https://example.com/arte.webp', description: 'palavra '.repeat(30) })!;
+  expect(metadataDoEvento(evento)).toMatchObject({ openGraph: { type: 'website', locale: 'pt_BR', siteName: 'ADAI', images: [{ url: 'https://example.com/original.jpg' }] } });
+  expect(metadataDoEvento(evento).description).toMatch(/palavra…$/);
+});
 
 const raw = fixture.results.find((e) => e.active && e.enabled && e.show_on_site && !e.recurrence_model && !/^GC\b/.test(e.name))! as InchurchEvento;
 

@@ -616,6 +616,54 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   const storedVersion = ((await strapi.store.get(STORE)) as number | null) ?? 1;
   const pages = strapi.documents('api::page.page');
 
+  // Versão independente: restaurar Contribua não reconstrói as demais páginas do editor.
+  const contribuaStore = { type: 'core', name: 'adai', key: 'contribua_version' } as const;
+  const versaoContribua = Number(await strapi.store.get(contribuaStore)) || 0;
+  if (versaoContribua < 2) {
+    const conteudo = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'contribua.json'), 'utf8'));
+    conteudo.sections[0].imagem = await image(strapi, 'hero-adai.jpg', 'Voluntária recebe pessoas na entrada da ADAI com uma placa Amar, Servir e Influenciar');
+    conteudo.seo.metaImage = conteudo.sections[0].imagem;
+    const existente = await pages.findFirst({ filters: { slug: 'contribua' } });
+    const pagina = existente
+      ? await pages.update({ documentId: existente.documentId, data: versaoContribua < 1 ? conteudo : { apresentacao: 'editorial' } as never })
+      : await pages.create({ data: conteudo });
+    await publishPage(strapi, pagina.documentId);
+    await strapi.store.set({ ...contribuaStore, value: 2 });
+    strapi.log.info('[seed] Página Contribua com alinhamento editorial aplicada (v2).');
+  }
+
+  if (versaoContribua < 3) {
+    // Altera só a opção da foto, em rascunho e publicado, sem recriar as seções.
+    const versoes = await strapi.db.query('api::page.page').findMany({ where: { slug: 'contribua' }, populate: ['sections'] });
+    for (const versao of versoes) {
+      for (const secao of versao.sections ?? []) {
+        if (secao.__component === 'sections.imagem-texto') {
+          await strapi.db.query('sections.imagem-texto').update({ where: { id: secao.id }, data: { preto_e_branco: false } });
+        }
+      }
+    }
+    await strapi.store.set({ ...contribuaStore, value: 3 });
+  }
+
+  if (versaoContribua < 5) {
+    const conteudo = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'contribua.json'), 'utf8'));
+    const dadosPix = conteudo.sections.find((secao: { __component: string }) => secao.__component === 'sections.pix');
+    const versoes = await strapi.db.query('api::page.page').findMany({ where: { slug: 'contribua' }, populate: ['sections', 'seo'] });
+    const metaImage = await image(strapi, 'hero-adai.jpg', 'Voluntária recebe pessoas na ADAI');
+    for (const versao of versoes) {
+      for (const secao of versao.sections ?? []) {
+        if (secao.__component === 'sections.pix') {
+          await strapi.db.query('sections.pix').update({ where: { id: secao.id }, data: { favorecido: dadosPix.favorecido, cnpj: dadosPix.cnpj } });
+        }
+      }
+      if (versao.seo) {
+        // Atualiza cada componente SEO sem republicar o rascunho ou mudar o status da página.
+        await strapi.db.query('shared.seo').update({ where: { id: versao.seo.id }, data: { metaImage } });
+      }
+    }
+    await strapi.store.set({ ...contribuaStore, value: 5 });
+  }
+
   const global = await strapi.documents('api::global.global').findFirst();
   if (!global) {
     await strapi.documents('api::global.global').create({ data: { header, footer, seo } as never });

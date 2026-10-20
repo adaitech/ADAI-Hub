@@ -75,6 +75,7 @@ export function normalizeDetalhe(evento: InchurchEvento, unidade: UnidadeInchurc
   const urlEvento = urlHttp(evento.event_url);
   return {
     ...base,
+    imagemSocial: urlHttp(evento.image) || base.imagem?.url || null,
     descricaoCompleta: textoDaDescricao(evento.description),
     fim: paraIsoSaoPaulo(evento.end_datetime),
     unidade: unidade?.nome.trim() || evento.responsible_church?.name?.trim() || null,
@@ -173,7 +174,7 @@ export function normalizeDetalheAdministrativo(admin: InchurchEventoAdministrati
     start_datetime: admin.start_datetime || publico.ocorrencias[0].inicio,
     end_datetime: admin.end_datetime || publico.fim,
     description: admin.description ?? publico.descricaoCompleta,
-    image: admin.image || publico.imagem?.url, image_webp: admin.image_webp,
+    image: admin.image || publico.imagemSocial, image_webp: admin.image_webp || publico.imagem?.url,
     event_url: admin.event_url ?? publico.cta?.url, location: local,
     active: true, enabled: true,
   });
@@ -183,15 +184,21 @@ export function normalizeDetalheAdministrativo(admin: InchurchEventoAdministrati
     convidados: normalizarConvidados(admin.event_attractions), galeria: normalizarGaleria(admin.event_images) };
 }
 
-export function metadataDoEvento(evento: EventoDetalhe): Metadata {
+export function eventoEncerrado(evento: Pick<EventoSite, 'ocorrencias'>, agora = new Date()): boolean {
+  return evento.ocorrencias.every((ocorrencia) => new Date(ocorrencia.fim).getTime() < agora.getTime());
+}
+
+export function metadataDoEvento(evento: EventoDetalhe, agora = new Date()): Metadata {
   const title = `${evento.nome} | ADAI`;
-  const description = evento.descricaoCompleta.replace(/\s+/g, ' ').slice(0, 160) || undefined;
+  const texto = evento.descricaoCompleta.replace(/\s+/g, ' ').trim();
+  const description = (texto.length > 160 ? `${texto.slice(0, 159).replace(/\s+\S*$/, '').trimEnd()}…` : texto) || undefined;
   const base = configuracaoSeo().url;
   const canonical = base ? `${base}${urlDoEvento(evento)}` : urlDoEvento(evento);
   return {
     title: { absolute: title }, description,
+    ...(eventoEncerrado(evento, agora) ? { robots: { index: false, follow: true } } : {}),
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, images: evento.imagem ? [{ url: evento.imagem.url }] : [] },
+    openGraph: { type: 'website', locale: 'pt_BR', siteName: 'ADAI', title, description, url: canonical, images: evento.imagemSocial ? [{ url: evento.imagemSocial }] : [] },
   };
 }
 
@@ -204,10 +211,21 @@ export function schemaDoEvento(evento: EventoDetalhe) {
     startDate: evento.ocorrencias[0].inicio,
     ...(evento.fim ? { endDate: evento.fim } : {}),
     ...(evento.descricaoCompleta ? { description: evento.descricaoCompleta } : {}),
-    ...(evento.imagem ? { image: evento.imagem.url } : {}),
-    location: { '@type': 'Place', address: {
+    ...(evento.imagemSocial ? { image: evento.imagemSocial } : {}),
+    ...(configuracaoSeo().url ? { url: `${configuracaoSeo().url}${urlDoEvento(evento)}`, organizer: { '@type': 'Organization', name: 'ADAI', url: configuracaoSeo().url } } : {}),
+    ...(evento.convidados.length ? { performer: evento.convidados.map((convidado) => ({ '@type': 'Person', name: convidado.nome, ...(convidado.url ? { url: convidado.url } : {}) })) } : {}),
+    location: { '@type': 'Place', ...(local.address_complement ? { name: local.address_complement } : {}), address: {
       '@type': 'PostalAddress', streetAddress: [local.address, local.address_number].filter(Boolean).join(', '),
-      addressLocality: local.city, addressRegion: local.state || undefined, addressCountry: local.country || undefined,
+      addressLocality: local.city, addressRegion: local.state || undefined, addressCountry: /^(br|brasil|brazil)$/i.test(local.country?.trim() ?? '') ? 'BR' : local.country || undefined,
     } },
   };
+}
+
+export function schemaBreadcrumbDoEvento(evento: EventoDetalhe) {
+  const base = configuracaoSeo().url;
+  if (!base) return null;
+  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Agenda', item: `${base}/agenda` },
+    { '@type': 'ListItem', position: 2, name: evento.nome, item: `${base}${urlDoEvento(evento)}` },
+  ] };
 }

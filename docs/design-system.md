@@ -35,7 +35,7 @@ Em 2026-10-18 foram feitas nove leituras no Figma MCP: variáveis e estilos loca
 | `220:19032` | A Igreja Que Vemos | `/sobre-nos/a-igreja-que-vemos` | Só ID e rota | `pagina--institucional` |
 | `220:19107` | No que cremos | `/sobre-nos/no-que-acreditamos` | Só ID e rota | `pagina--institucional` |
 | `220:19183` | Jesus | `/jesus` | Só ID e rota | `pagina--institucional` + CTA |
-| `220:19253` | Agenda | `/agenda` | Derivado (componente da Agenda já implementado) | Card / Evento agenda |
+| `220:19253` | Agenda | `/agenda` | Só ID e rota (a Agenda está em revisão no PR #10) | Card / Evento agenda |
 | `220:19333` | Contribua | `/contribua` | Textos da seção Contribua da Home (`1:279`) | CTA de destaque |
 | `220:19389` | Nossa Casa | `/nossacasa` | Só ID e rota | Editorial + CTA |
 | `220:19607` | Connect | `/connect` | Só ID e rota | Editorial + cards |
@@ -59,7 +59,7 @@ Em 2026-10-18 foram feitas nove leituras no Figma MCP: variáveis e estilos loca
 | `237:1252` | Botão · Primário | 198 × 52 | Observado |
 | `234:998` | Card / Unidade | 261 × 480 (instância da Home: 261 × 360) | Observado pela instância; interior do componente não lido |
 | `237:1199` | Card / Evento | 329,41 × 398 | Observado |
-| `238:1236` | Card / Evento agenda | 443 × 413 | Só dimensões; anatomia Derivada do componente já implementado |
+| `238:1236` | Card / Evento agenda | 443 × 413 | Só dimensões; anatomia Proposta (segue o card da Agenda em revisão no PR #10) |
 | `234:1010` | Card / Página relacionada | 443,2 × 508 | Só dimensões; anatomia Proposta |
 
 ## 3. Tipografia
@@ -258,7 +258,7 @@ Borda de botão: 1px (Observado). Opacidade da marca do footer: 18% (Observado).
 ### 8.8 Card / Evento agenda (`238:1236`)
 
 - **Medidas (Observado):** 443 × 413.
-- **Anatomia (Derivado do componente já implementado na Agenda):** arte 16:9 no topo, selo da unidade no canto superior direito, data, título em H3 e resumo.
+- **Anatomia (Proposto até ler o nó; segue o card da Agenda em revisão no PR #10):** arte 16:9 no topo, selo da unidade no canto superior direito, data, título em H3 e resumo.
 - **Acessibilidade:** `article` com link esticado; arte decorativa porque o título está em texto.
 
 ### 8.9 Card / Página relacionada (`234:1010`)
@@ -302,7 +302,7 @@ Tudo abaixo é **Proposto** e depende de aprovação do design:
 2. `#6b6b6b` como cor de texto secundário no lugar do `#777` (acessibilidade).
 3. Estados de hover, foco, ativo e desabilitado de botões, links, cards e campos.
 4. Fundo `#f2f2f2`, raio 20 e hover `#e8e8e8` do Card / Unidade.
-5. Anatomia do Card / Página relacionada.
+5. Anatomia do Card / Página relacionada e do Card / Evento agenda.
 6. Campos de formulário completos (borda, raio, estados, erro em `#b3471d`).
 7. Menu compacto abaixo de 1024px.
 8. Trilho de eventos com scroll-snap e ícones das setas redesenhados (o vetor original não foi exportado).

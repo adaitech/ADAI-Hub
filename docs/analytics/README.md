@@ -51,7 +51,7 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `selecionar_evento` | Link de um card em Próximos eventos | `evento` (nome), `acao` (Inscreva-se, Participar online) | — |
 | `ver_faq` | Abrir uma pergunta da FAQ | `pergunta` | — |
 | `selecionar_ministerio` | Clique em um ministério de "Encontre seu lugar" | `ministerio` | — |
-| `contribuir` | Link para `/contribua` ou texto com contribuir/dízimo/oferta/doação | `origem`, `texto` | **Sim** |
+| `contribuir` | Navegação para contribuição (exceto âncora na mesma página) ou cópia Pix concluída (`origem: pix`) | `origem`, `texto` | **Sim** |
 | `baixar_app` | Link da App Store ou do Google Play | `origem`, `loja` (app_store, google_play) | — |
 | `clique_cta` | **Todo** clique em link/botão (inclusive os acima) | `origem`, `texto`, `destino` (sem query string; e-mail/telefone só `mailto:`/`tel:`) | — |
 | `ver_secao` | Seção 25% visível (ou ocupando metade da tela, para textos longos), uma vez por página | `secao`, `posicao` | — |
@@ -60,6 +60,23 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `inscrever_curso` | Botão de inscrição de um curso da EBA (topo da página do curso ou bloco "Pronto para começar?"; link com `data-curso`). Inscrição por e-mail (`mailto:`) não conta | `origem` (`curso-cabecalho`, `curso-inscricao`), `curso` (slug) | **Sim** |
 
 `origem` = `data-section` da seção (`hero`, `serie-atual`, `proximos-eventos`…), `header`, `footer` ou `pagina`.
+
+## 3.1 Eventos planejados (ainda não existem no catálogo)
+
+Decisão de 2026-10-17: **inscrição em GC** e **pedido de oração** também são conversões (eventos-chave no GA4), junto com `planejar_visita` e `contribuir`. Cada frente cria o seu evento seguindo a regra da §5 (catálogo → regra → teste → este plano → regex do GTM → dimensões no GA4). **Nunca** enviar o texto digitado nem dado pessoal: só o fato de ter enviado.
+
+| Frente | Evento | Quando dispara | Parâmetros | Conversão? |
+| --- | --- | --- | --- | --- |
+| GC (Comunhão) | `buscar_gc` | Busca/filtro aplicado | `unidade`, `dia`, `publico` (valores do filtro, sem texto livre) | — |
+| GC | `selecionar_gc` | Abrir o card de um GC | `unidade`, `gc` (nome público do GC) | — |
+| GC | `inscricao_gc_iniciada` | Primeiro campo da inscrição preenchido | `unidade` | — |
+| GC | `inscricao_gc_enviada` | Inscrição enviada com sucesso ao inChurch | `unidade` | **Sim** |
+| Cuidado | `pedido_oracao_enviado` | Pedido enviado com sucesso | `origem` | **Sim** |
+| Cuidado | `testemunho_enviado` | Testemunho enviado (vai para moderação) | `origem` | — |
+| Formulários | `erro_formulario` | Validação falhou ao enviar | `formulario`, `campo` (nome do campo, nunca o valor) | — |
+| Agenda | `filtrar_agenda` | Filtro de unidade ou tipo aplicado | `unidade`, `tipo` | — |
+| Blog | `ver_post`, `compartilhar_post` | Abrir e compartilhar um post | `categoria`, `post` | — |
+| Site | `pagina_404` | Página não encontrada exibida | `caminho` (sem query string) | — |
 
 ## 4. Configurar o Google (uma vez por container)
 
@@ -88,7 +105,7 @@ Em analytics.google.com → **Administrador**:
 
 1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`, `curso`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
 2. **Métrica personalizada:** `valor` (Web Vitals).
-3. **Eventos-chave:** marcar `planejar_visita`, `contribuir` e `inscrever_curso`. O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
+3. **Eventos-chave:** marcar `planejar_visita`, `contribuir` e `inscrever_curso` (e, quando existirem, `inscricao_gc_enviada` e `pedido_oracao_enviado` — §3.1). O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
 
 > **Status (2026-10-02, propriedade `G-SCG09PWV8B`):** ✅ 19 dimensões personalizadas (escopo Evento) e a métrica `valor` criadas. ✅ `planejar_visita` e `contribuir` já disparados e vistos no **Tempo real**. ⏳ **Falta marcar a estrela** dos dois em Eventos recentes quando aparecerem (até 24h). Filtro de homologação: não criado.
 4. **Filtro de dados** (opcional): excluir `site_ambiente = homologacao` dos relatórios de produção — ou analisar com essa dimensão.
@@ -124,7 +141,27 @@ Checklist geral (Strapi, segredos, integrações, LGPD): `README.md` → "Antes 
 
 ## 7. Pendências
 
-- **EBA (`inscrever_curso`, 2026-10-18):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 14 eventos e variável `DLV - curso`), criar a dimensão `curso` no GA4 e marcar `inscrever_curso` como evento-chave quando aparecer em Eventos recentes.
+- **EBA (`inscrever_curso`, 2026-10-18):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 17 eventos e variável `DLV - curso`), criar a dimensão `curso` no GA4 e marcar `inscrever_curso` como evento-chave quando aparecer em Eventos recentes.
+
+### Agenda e detalhes — atualização de 18/10/2026
+
+O container JSON contém a configuração abaixo, ainda sem publicação desta atualização no GTM ou configuração no GA4:
+
+| Evento | Quando | Parâmetros |
+| --- | --- | --- |
+| `acessar_evento` | CTA explícito do evento publicado ainda não encerrado | `origem`, `evento`, `evento_id`, `destino` sem query/hash |
+| `filtrar_agenda` | Seleção de unidade ou limpeza dos filtros | `filtro`, `valor_filtro`, `resultados` após aplicar filtro e busca |
+| `buscar_evento` | Após 1 segundo sem digitar, mínimo 3 caracteres | `caracteres` (limitado a 100), `resultados`; nunca o texto digitado |
+| `selecionar_evento` | Cards da Agenda e de Próximos/Outros eventos | `origem`, `evento`, `acao`; `page_path` distingue Home e detalhes |
+| `como_chegar` | Link Maps do detalhe | `local`: Location público → unidade → vazio; `unidade` só para campus real; `evento` identifica o contexto |
+
+Parâmetros vazios são omitidos pelo `registrarEvento`. Nome do evento não é usado como local. Datas encerradas não recebem CTA, mas continuam com visualização de seções e links úteis. Programação, convidados, galeria e breadcrumb permanecem cobertos pelos eventos genéricos; `ver_galeria` fica fora deste escopo.
+
+O callback de `web_vitals` é estável entre renders. Validação em 18/10/2026 com `next start`: FCP e TTFB foram registrados uma vez por documento, inclusive após navegação interna; LCP e FID também foram observados sem duplicação. No modo de desenvolvimento, FCP/TTFB duplicaram. Não foi adicionada deduplicação por nome, que poderia descartar atualizações legítimas de métricas. Os disparos de filtro, busca, seleção, acesso e Maps foram confirmados no DataLayer com instrumentação local temporária removida ao final. Isso não confirma recebimento no GA4: a configuração externa ainda precisa ser importada, validada e publicada pelo responsável.
+
+Preparação externa: importar/revisar o JSON atualizado, conferir gatilho e parâmetros, configurar `evento_id`, `filtro`, `valor_filtro` e `local` como dimensões conforme necessidade e `resultados`/`caracteres` como métricas. Marcar `acessar_evento` como evento-chave; o clique mede acesso externo, não inscrição concluída. `valor_filtro` evita conflitar com `valor` numérico de Web Vitals. Texto livre de busca não é coletado. Publicar somente após validação e autorização do responsável.
+
+Testes: `lib/analytics/cliques.test.ts`, `eventos.test.ts`, `components/analytics/RastreadorAnalytics.test.tsx` e `AgendaEventosSection.test.tsx` cobrem contexto, conversão, contrato GTM, contagem, debounce e privacidade.
 
 - **Eventos-chave** `planejar_visita` e `contribuir`: marcar a estrela no GA4 (§4.2).
 - **Política de Privacidade** (LGPD): página `/politica-de-privacidade` publicada no Strapi (seção `sections.texto-rico`, texto de `docs/conteudo/politica-de-privacidade.md`), com link no aviso de cookies e no rodapé. Falta a revisão jurídica e confirmar os dados da controladora e do encarregado antes de produção.

@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const slugStrapi = slugDaPaginaSobreNos((await params).slug);
   const [page, global] = slugStrapi ? await Promise.all([getPageBySlug(slugStrapi), getGlobal()]) : [null, null];
   if (!page || !slugStrapi) return { title: 'Página não encontrada | ADAI', robots: { index: false } };
-  return buildMetadata(page.seo, global?.seo, caminhoDaPagina(slugStrapi));
+  return buildMetadata(page.seo, global?.seo, caminhoDaPagina(slugStrapi), page.sections);
 }
 
 /** /sobre-nos/<slug> → página "sobre-nos-<slug>" do Strapi (ex.: Nossa história). */
@@ -25,5 +25,5 @@ export default async function SobreNosPage({ params }: PageProps) {
   const page = await getPageBySlug(slugStrapi);
   if (!page) notFound();
 
-  return <SectionRenderer sections={page.sections ?? []} />;
+  return <SectionRenderer sections={page.sections ?? []} apresentacao={page.apresentacao} />;
 }

@@ -21,9 +21,13 @@ import { chipsShowcase } from '@/components/ui/Chips/Chips.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
 import { trilhaShowcase } from '@/components/ui/Trilha/Trilha.showcase';
 import type { ShowcaseCategoria, ShowcaseEntry } from './types';
+import { pixShowcase } from '@/components/sections/PixSection/PixSection.showcase';
+import { copyButtonShowcase } from '@/components/ui/CopyButton/CopyButton.showcase';
 
 /** Todo componente criado ou alterado entra aqui (ver .agents/rules/Vitrine-de-Componentes.md). */
 export const showcaseCatalog: ShowcaseEntry[] = [
+  pixShowcase,
+  copyButtonShowcase,
   headerShowcase,
   agendaEventosShowcase,
   eventoDetalheShowcase,

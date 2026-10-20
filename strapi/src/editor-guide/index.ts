@@ -14,6 +14,7 @@ import sectionsCarrosselCards from './sections.carrossel-cards.json';
 import sectionsCatalogoCursos from './sections.catalogo-cursos.json';
 import sectionsAgendaEventos from './sections.agenda-eventos.json';
 import sectionsHero from './sections.hero.json';
+import sectionsPix from './sections.pix.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
 import sectionsListaTestes from './sections.lista-testes.json';
 import sectionsMinisterios from './sections.ministerios.json';
@@ -54,6 +55,7 @@ export const editorGuides: EditorGuide[] = [
   apiCurso,
   apiTeste,
   sectionsHero,
+  sectionsPix,
   sectionsCarrosselCards,
   sectionsAgendaEventos,
   sectionsSerieAtual,

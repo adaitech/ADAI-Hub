@@ -12,6 +12,11 @@ describe('Trilha', () => {
     expect(within(nav).getByText('Reset')).toHaveAttribute('aria-current', 'page');
   });
 
+  it('data-section="trilha": cliques saem com origem "trilha" (não "pagina")', () => {
+    render(<Trilha itens={itens} />);
+    expect(screen.getByRole('navigation', { name: 'Trilha' })).toHaveAttribute('data-section', 'trilha');
+  });
+
   it('marca o nível anterior (usado como "voltar" no celular)', () => {
     render(<Trilha itens={itens} />);
     expect(screen.getByRole('link', { name: 'Cursos' }).closest('li')).toHaveClass('anterior');
