@@ -66,6 +66,27 @@ describe('ebaFetch', () => {
     expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('usa AbortSignal.timeout(10_000)', async () => {
+    const espiao = jest.spyOn(AbortSignal, 'timeout');
+    fetchMock.mockResolvedValue(new Response('[]', { status: 200 }));
+    await ebaFetch('x');
+    expect(espiao).toHaveBeenCalledWith(10_000);
+    espiao.mockRestore();
+  });
+
+  it('2xx com corpo vazio ou não JSON vira EbaApiIndisponivel', async () => {
+    fetchMock.mockResolvedValue(new Response('', { status: 200 }));
+    await expect(ebaFetch('x')).rejects.toBeInstanceOf(EbaApiIndisponivel);
+  });
+
+  it('timeout durante a leitura do corpo vira EbaApiIndisponivel', async () => {
+    const resposta = { ok: true, status: 200, json: () => Promise.reject(Object.assign(new Error('x'), { name: 'TimeoutError' })) };
+    fetchMock.mockResolvedValue(resposta);
+    const erro = (await ebaFetch('x').catch((e: unknown) => e)) as Error;
+    expect(erro).toBeInstanceOf(EbaApiIndisponivel);
+    expect(erro.message).toContain('timeout');
+  });
+
   it('falha de rede vira EbaApiIndisponivel', async () => {
     fetchMock.mockRejectedValue(new TypeError('fetch failed'));
     await expect(ebaFetch('x')).rejects.toBeInstanceOf(EbaApiIndisponivel);

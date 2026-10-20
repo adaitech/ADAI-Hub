@@ -42,6 +42,7 @@ interface EbaFetchInit {
 /**
  * Único ponto de acesso à API da EBA, via API Management. Só servidor: `EBA_API_KEY` vai no header
  * `Ocp-Apim-Subscription-Key` (nunca na URL, em logs ou erros).
+ * `caminho` não é codificado: quem chama deve usar `encodeURIComponent` nos trechos dinâmicos (ex.: e-mail).
  */
 export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Promise<T> {
   const config = configuracao();
@@ -69,5 +70,10 @@ export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Pro
     const corpo = (await response.json().catch(() => null)) as EbaErroApi | null;
     throw new EbaApiError(response.status, corpo?.Erros?.[0]?.Code ?? null);
   }
-  return (await response.json()) as T;
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    const timeout = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+    throw new EbaApiIndisponivel(timeout ? 'timeout' : 'resposta');
+  }
 }
