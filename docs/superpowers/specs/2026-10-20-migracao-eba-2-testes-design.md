@@ -153,7 +153,7 @@ A tela tem os estados do protótipo:
 - **Fotos dos testes:**
   - **Origem e formato:** copiadas do site atual e convertidas para WebP com no máximo 1200 px (cerca de 20 a 50 KB cada), em `next/public/eba/testes/<slug>/` (`capa`, `1`…`N`, `resultado`), mais `identificacao.webp`. Ficam fora do Strapi porque estão ligadas ao número da pergunta, não ao conteúdo editorial.
   - **Acessibilidade:** são decorativas (`alt=""`).
-  - **Posição:** no desktop (≥ 1024 px), coluna à direita fixa com raio grande; no celular e no tablet, faixa 16:9 acima do questionário.
+  - **Posição e alinhamento:** no desktop (≥ 1024 px), coluna à direita com a **mesma altura da caixa** do questionário (topo e base alinhados); no celular e no tablet, faixa 16:9 acima, com a mesma largura. Caixa e foto usam o mesmo raio (`--radius-lg`) e gap de 12 px entre elas, o mesmo das grades de cards.
   - **Troca:** acompanha o estado e a pergunta. A foto da próxima pergunta é pré-carregada.
   - **Teste do mapa:** cada slug tem capa, resultado e uma foto por pergunta, ou cai na capa.
   - **Script de conversão:** reprodutível em `next/scripts/`, sem novas dependências; usa `sharp`, que já vem com o Next.
