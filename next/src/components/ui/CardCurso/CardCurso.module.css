@@ -1,27 +1,42 @@
-/* Derivado 🟡 do Card / Página relacionada (Figma 234:1010): foto 4:3 raio médio, título H3. */
+/*
+ * Card de curso no padrão dos cards do Hub (Card / Unidade, Carrossel de cards): caixa cinza,
+ * padding 24, raio médio, foto 3:2 dentro com raio pequeno. Protótipo: docs/prototipo/eba (cursos.html).
+ * Quatro linhas (foto, texto, informações, "Conhecer"): com subgrid, alinhadas entre os cards da grade.
+ */
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: var(--space-20);
+  height: 100%;
+  padding: var(--space-24);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+@supports (grid-template-rows: subgrid) {
+  .card {
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+  }
 }
 
 .foto {
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-media);
 }
 
 .semFoto {
   display: flex;
   align-items: flex-end;
-  aspect-ratio: 4 / 3;
-  padding: var(--space-24);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-subtle);
+  aspect-ratio: 3 / 2;
+  padding: var(--space-20);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle-2);
   font-size: var(--font-size-h3);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-h3);
@@ -67,10 +82,10 @@
 
 .card:has(.link:focus-visible) {
   outline: 3px solid var(--color-focus-ring);
-  outline-offset: 4px;
-  border-radius: var(--radius-md);
+  outline-offset: 3px;
 }
 
+/* Sem troca de fundo no hover: o texto suave não tem contraste sobre --color-bg-subtle-2. */
 .card:hover .link {
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -79,10 +94,44 @@
 
 .resumo {
   margin: 0;
+  color: var(--color-text-muted);
   font-size: var(--font-size-corpo-pequeno);
 }
 
-.mais {
+.informacoes {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-8) var(--space-16);
   margin: 0;
+  padding-top: var(--space-16);
+  border-top: var(--border-width) solid var(--color-border-subtle);
+  font-size: var(--font-size-legenda);
+  line-height: var(--line-height-text);
+}
+
+.informacao {
+  display: contents;
+}
+
+.informacao dt {
+  color: var(--color-text-muted);
+}
+
+.informacao dd {
+  margin: 0;
+}
+
+.mais {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch-target-min);
+  border-bottom: var(--border-width) solid currentColor;
   font-weight: var(--font-weight-bold);
+}
+
+.mais::after {
+  content: "→";
 }

@@ -14,7 +14,7 @@ export const cardCursoShowcase = defineShowcase<CardCursoProps>({
   nome: 'Card de curso',
   categoria: 'ui',
   cmsKey: null,
-  descricao: 'Card do catálogo da EBA: foto, vertente, nome, resumo e duas informações. O card inteiro leva à página do curso.',
+  descricao: 'Card do catálogo da EBA no padrão dos cards do Hub: caixa cinza com foto, vertente, nome, resumo e Para quem/Duração. O card inteiro leva à página do curso.',
   quandoUsar: 'Só dentro do Catálogo de cursos. Os dados vêm do curso publicado no Strapi.',
   doc: 'docs/componentes/catalogo-cursos.md',
   render: (data) => (

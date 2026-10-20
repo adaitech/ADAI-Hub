@@ -28,6 +28,27 @@ describe('CardCurso', () => {
     expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent('Start');
   });
 
+  it('Para quem e Duração numa lista de definição (rótulo + valor), sem chips', () => {
+    const { container } = render(<CardCurso curso={talmidim} />);
+    const termos = [...container.querySelectorAll('dl dt')].map((dt) => dt.textContent);
+    const valores = [...container.querySelectorAll('dl dd')].map((dd) => dd.textContent);
+    expect(termos).toEqual(['Para quem', 'Duração']);
+    expect(valores).toEqual(['Adolescentes de 12 a 15 anos', '13 aulas de 1 hora, semanais']);
+    expect(container.querySelector('ul')).toBeNull();
+  });
+
+  it('no máximo 2 informações; sem nenhuma, não há <dl>', () => {
+    const { container, rerender } = render(<CardCurso curso={{ ...talmidim, chips: [...talmidim.chips, { rotulo: 'Extra', valor: 'x' }] }} />);
+    expect(container.querySelectorAll('dl dt')).toHaveLength(2);
+    rerender(<CardCurso curso={{ ...talmidim, chips: [] }} />);
+    expect(container.querySelector('dl')).toBeNull();
+  });
+
+  it('"Conhecer o curso" é só visual: fora da árvore de acessibilidade', () => {
+    render(<CardCurso curso={talmidim} />);
+    expect(screen.getByText('Conhecer o curso')).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('nivelTitulo 2 → título h2', () => {
     render(<CardCurso curso={talmidim} nivelTitulo={2} />);
     expect(screen.getByRole('heading', { level: 2, name: 'Talmidim' })).toBeInTheDocument();

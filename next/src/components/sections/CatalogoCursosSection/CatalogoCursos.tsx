@@ -38,7 +38,7 @@ export function CatalogoCursos({ id, titulo, textoApoio, cursos, verTodos, nivel
       {cursos.length > 0 ? (
         <ul role="list" className={styles.grade}>
           {cursos.map((curso) => (
-            <li key={curso.slug}>
+            <li key={curso.slug} className={styles.item}>
               <CardCurso curso={curso} nivelTitulo={nivelTitulo === 1 ? 2 : 3} />
             </li>
           ))}

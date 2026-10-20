@@ -24,7 +24,14 @@ Ordem dos cursos: campo **Ordem no catálogo** de cada curso (menor primeiro); e
 | o Strapi falha ao listar os cursos e a seção abre a página (`/eba/cursos`) | erro da página (`error.tsx`): o catálogo é o conteúdo principal |
 | curso sem capa ou com capa sem texto alternativo | card sem foto: o nome ocupa o lugar da imagem |
 
-Cada card é um **Card de curso** (`next/src/components/ui/CardCurso/`): foto 4:3, vertente, nome (único link do card), resumo e as duas primeiras informações (Para quem, Duração).
+Cada card é um **Card de curso** (`next/src/components/ui/CardCurso/`), no padrão dos cards do Hub (Card / Unidade, Carrossel de cards):
+
+- caixa cinza com padding de 24 e raio médio;
+- dentro dela, a foto 3:2 com raio pequeno, a vertente, o nome (o único link do card) e o resumo;
+- abaixo de uma linha, as duas primeiras informações (Para quem e Duração) numa lista de rótulo e valor;
+- no fim, "Conhecer o curso →".
+
+Com subgrid, a foto, o texto, as informações e o "Conhecer" ficam alinhados entre os cards da mesma linha. No hover o fundo não muda, porque o texto suave não tem contraste sobre `--color-bg-subtle-2`; só o nome ganha sublinhado.
 
 ## Medição (DataLayer)
 
@@ -44,4 +51,4 @@ Também cobrem este componente, sem precisar editar nada: os testes de caracter�
 
 ## Status
 
-Implementado na branch `feat/eba-editorial` · publicado no Strapi de dev pelo seed v19.
+Implementado na branch `feat/eba-editorial` · publicado no Strapi de dev pelo seed v19 (card no padrão do Hub desde o seed v20).

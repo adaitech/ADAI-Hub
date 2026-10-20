@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CursoResumoView } from '@/lib/eba/types';
-import { Chips } from '../Chips';
 import styles from './CardCurso.module.css';
 
 export interface CardCursoProps {
@@ -10,9 +9,13 @@ export interface CardCursoProps {
   nivelTitulo?: 2 | 3;
 }
 
-/** Card do catálogo: o card inteiro é clicável por um único link (nome do curso). */
+/**
+ * Card do catálogo no padrão dos cards do Hub (caixa cinza, foto dentro). O card inteiro é clicável
+ * por um único link (nome do curso). Para quem e Duração numa lista de definição.
+ */
 export function CardCurso({ curso, nivelTitulo = 3 }: CardCursoProps) {
   const Titulo = nivelTitulo === 2 ? 'h2' : 'h3';
+  const informacoes = curso.chips.slice(0, 2);
   return (
     <article className={styles.card}>
       {curso.capa ? (
@@ -37,11 +40,22 @@ export function CardCurso({ curso, nivelTitulo = 3 }: CardCursoProps) {
           </Link>
         </Titulo>
         <p className={styles.resumo}>{curso.resumo}</p>
-        <Chips itens={curso.chips.slice(0, 2)} />
-        <p className={styles.mais} aria-hidden="true">
-          Conhecer o curso →
-        </p>
       </div>
+      {informacoes.length > 0 ? (
+        <dl className={styles.informacoes}>
+          {informacoes.map((item) => (
+            <div key={item.rotulo} className={styles.informacao}>
+              <dt>{item.rotulo}</dt>
+              <dd>{item.valor}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <span />
+      )}
+      <span className={styles.mais} aria-hidden="true">
+        Conhecer o curso
+      </span>
     </article>
   );
 }
