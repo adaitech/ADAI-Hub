@@ -55,9 +55,9 @@
   - Nunca, Raramente, Às vezes, Frequentemente, Muito, Eu brilho nisso!;
   - o nome acessível de cada opção fica "N — Rótulo".
 - **Unidades (`room`):**
-  - `campestre`, `analia-franco`, `sbc`, `santos`, `adai-on`, `outra-igreja`, `visitante`;
+  - valores, na ordem: `campestre`, `colorado`, `sbc`, `santos`, `adai-on`, `outra-igreja`, `visitante`;
   - rótulos: Campestre, Anália Franco, São Bernardo do Campo, Santos, ADAI On, Outra igreja, Visitante.
-  - **`colorado`**, que existe no site atual, **depende de o usuário confirmar** antes da Tarefa 1.
+  - **Anália Franco grava `colorado`** (decisão do usuário em 2026-10-20: Anália Franco substitui Colorado). O valor antigo é mantido para que os alunos já cadastrados e o painel continuem consistentes.
 - **Ordem da apostila:** dons-servico, dons-ministerio, talentos-naturais, estilo-pessoal, temperamento-pessoal. Define o "Teste N de 5" e o "Próximo teste".
 
 **Medição**
@@ -80,7 +80,6 @@ O que a spec implica e nenhum teste óbvio cobre. Cada item ganha um teste na ta
 ### Tarefa 0: Preparação
 
 - [ ] Parar o `strapi-eba` e o `next-eba`. Criar a branch: `git -C C:/ADAI/ADAI-Hub-eba switch -c feat/eba-testes`.
-- [ ] Confirmar com o usuário a unidade `colorado` (manter na lista ou não).
 - [ ] Adicionar ao `next/.env.example` as 3 variáveis `EBA_*`, comentadas e sem valores.
 
 ### Tarefa 1: Definição dos testes como dados

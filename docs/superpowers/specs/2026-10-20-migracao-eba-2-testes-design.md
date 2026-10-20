@@ -57,6 +57,8 @@ O caminho completo que precisa funcionar:
 
 **Unidades** gravadas no campo `room`: `campestre`, `sbc`, `santos` e as demais da lista atual. Os valores exatos são copiados do `form-complete.tsx`.
 
+**Anália Franco** substitui a antiga opção Colorado e continua gravando `colorado` (decisão de 2026-10-20).
+
 **Unidades novas (pedido de 2026-10-20):** o Primeiro acesso ganha **"Outra igreja"** (`outra-igreja`) e **"Visitante"** (`visitante`), além das 5 ADAIs. O campo `room` é texto livre na API, mas o painel da equipe pode filtrar ou exibir por esses valores. Antes do lançamento, é preciso confirmar no painel atual como aparecem os dois valores novos. Se o painel tiver uma lista fixa, ajustá-la fica para a entrega 4.
 
 **Imagens:** o site atual mostra uma foto decorativa por estado:
