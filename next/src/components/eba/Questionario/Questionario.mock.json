@@ -1,0 +1,573 @@
+{
+  "sessao": {
+    "emailMascarado": "a***@email.com"
+  },
+  "testes": {
+    "dons-servico": {
+      "abertura": {
+        "resumo": "Mostra quais dons espirituais aparecem com mais força no seu jeito de servir no dia a dia da igreja.",
+        "perguntas": "55 afirmações",
+        "resposta": "nota de 0 a 5",
+        "comoResponder": "Para cada afirmação, pergunte-se: “isso tem sido a minha experiência?”. Responda pelo que você vive hoje, não pelo que gostaria de viver.",
+        "aula": "Aula 5"
+      },
+      "perguntas": [
+        {
+          "numero": 1,
+          "texto": "Tenho experimentado um desejo especial de transmitir mensagens vindas diretamente de Deus."
+        },
+        {
+          "numero": 2,
+          "texto": "Eu consigo comunicar uma visão do que é possível para alguém e o encorajo a continuar na luta, apesar de sua derrota."
+        },
+        {
+          "numero": 3,
+          "texto": "Outros irmãos ficam animados e motivados a me seguir por meio da visão dos propósitos de Deus que compartilho com eles."
+        },
+        {
+          "numero": 4,
+          "texto": "Gosto de ajudar as pessoas fazendo pequenos serviços."
+        },
+        {
+          "numero": 5,
+          "texto": "Tenho tanta certeza de que Deus suprirá minhas necessidades, que estou constantemente doando meu dinheiro de forma sacrificial."
+        },
+        {
+          "numero": 6,
+          "texto": "Tenho alegria em trabalhar com as pessoas ignoradas ou desconhecidas da maioria."
+        },
+        {
+          "numero": 7,
+          "texto": "Gosto de estudar a Palavra de Deus, dando atenção especial à pesquisa."
+        },
+        {
+          "numero": 8,
+          "texto": "Tenho facilidade para organizar ideias, pessoas, coisas e o tempo, tendo em vista um serviço mais efetivo e produtivo na obra do Senhor."
+        },
+        {
+          "numero": 9,
+          "texto": "Minha casa está sempre à disposição para quem precisar de uma cama ou um teto."
+        },
+        {
+          "numero": 10,
+          "texto": "Tenho ajudado os líderes da minha igreja para que eles tenham mais tempo para as coisas realmente importantes, relacionadas ao chamado deles."
+        },
+        {
+          "numero": 11,
+          "texto": "Oro por longos períodos"
+        },
+        {
+          "numero": 12,
+          "texto": "Pessoas me dizem que eu transmito mensagens que são tão urgentes e apropriadas que só podem ter vindo diretamente de Deus."
+        },
+        {
+          "numero": 13,
+          "texto": "Deus me dá as palavras que as pessoas indecisas, problemáticas e desencorajadas precisam."
+        },
+        {
+          "numero": 14,
+          "texto": "Eu fico à vontade quando me coloco na frente de um grupo para dar uma direção."
+        },
+        {
+          "numero": 15,
+          "texto": "Fico muito à vontade quando posso ser útil em fazer certas tarefas auxiliares (arrumar cadeiras, transportar objetos, manter a ordem, cozinhar, construir ou reformar o prédio, secretariar uma reunião, controlar o aparelho de som, etc.)"
+        },
+        {
+          "numero": 16,
+          "texto": "Entendo a necessidade de administrar bem o meu dinheiro para poder ser mais generoso no reino de Deus."
+        },
+        {
+          "numero": 17,
+          "texto": "Gosto de visitar hospitais ou lares de pessoas necessitadas e me sinto abençoado com isso."
+        },
+        {
+          "numero": 18,
+          "texto": "Sinto prazer em explicar a verdade de um texto bíblico."
+        },
+        {
+          "numero": 19,
+          "texto": "Tenho facilidade em fazer planos de ação para que, junto com outras pessoas, possamos atingir um objetivo específico."
+        },
+        {
+          "numero": 20,
+          "texto": "Gosto muito das atividades sociais da igreja."
+        },
+        {
+          "numero": 21,
+          "texto": "Pessoas me dizem que consigo ajudá-las a desenvolver suas tarefas."
+        },
+        {
+          "numero": 22,
+          "texto": "Quando recebo um pedido de oração, oro durante alguns dias pelo motivo."
+        },
+        {
+          "numero": 23,
+          "texto": "Às vezes, tenho a forte sensação de que sei exatamente o que Deus deseja dizer a alguém."
+        },
+        {
+          "numero": 24,
+          "texto": "Tenho facilidade para entender os problemas dos outros e dar possíveis soluções."
+        },
+        {
+          "numero": 25,
+          "texto": "Eu gosto de começar novos trabalhos na igreja, mas prefiro que outra pessoa dê sequência depois de um tempo."
+        },
+        {
+          "numero": 26,
+          "texto": "Já me disseram que eu pareço gostar de fazer os trabalhos simples de rotina, e que eu os faço muito bem."
+        },
+        {
+          "numero": 27,
+          "texto": "Estou disposto a gastar menos comigo para poder entregar mais no reino de Deus."
+        },
+        {
+          "numero": 28,
+          "texto": "Me expresso carinhosamente e gosto de auxiliar pessoas necessitadas."
+        },
+        {
+          "numero": 29,
+          "texto": "Tenho grande interesse em ver as verdades da Palavra de Deus serem apresentadas de forma clara, com explicação do significado das palavras."
+        },
+        {
+          "numero": 30,
+          "texto": "Gosto de trabalhar sob a coordenação de um líder, para ajudar a realizar a visão deste líder. "
+        },
+        {
+          "numero": 31,
+          "texto": "Quando recebo visitas em minha casa, elas se sentem muito à vontade."
+        },
+        {
+          "numero": 32,
+          "texto": "Gosto de acompanhar um líder, ajudando no que for preciso."
+        },
+        {
+          "numero": 33,
+          "texto": "Uma das minhas maneiras favoritas de passar o tempo é orando por outras pessoas."
+        },
+        {
+          "numero": 34,
+          "texto": "Tenho a sensação de que sei exatamente o que Deus quer que eu, ou outra pessoa faça."
+        },
+        {
+          "numero": 35,
+          "texto": "Entendo os erros das pessoas, crendo que uma conversa com elas é o melhor remédio para ajudá-la."
+        },
+        {
+          "numero": 36,
+          "texto": "Tenho facilidade de interpretar os ideais ou objetivos de meu grupo e então pensar em estratégias para colocar em prática."
+        },
+        {
+          "numero": 37,
+          "texto": "Prefiro estar em atividade, fazendo alguma coisa, ao invés de apenas ficar sentado ouvindo alguém falar."
+        },
+        {
+          "numero": 38,
+          "texto": "Meus registros mostram que tenho dado bem mais de 10% de minha renda para o trabalho de Deus."
+        },
+        {
+          "numero": 39,
+          "texto": "Sinto-me realizado quando posso fazer algo por uma pessoa doente ou necessitada."
+        },
+        {
+          "numero": 40,
+          "texto": "Tenho facilidade de explicar a Bíblia."
+        },
+        {
+          "numero": 41,
+          "texto": "Tenho a capacidade de fazer planos eficientes e eficazes para realizar os objetivos do grupo."
+        },
+        {
+          "numero": 42,
+          "texto": "Ouço frequentemente as pessoas dizerem que sou uma pessoa muito hospitaleira."
+        },
+        {
+          "numero": 43,
+          "texto": "Estou contente servindo alguém para que seja abençoado em sua vida (ou ministério) e não preciso ser reconhecido"
+        },
+        {
+          "numero": 44,
+          "texto": "Alguém já me disse que uma oração minha trouxe respostas concretas em sua vida."
+        },
+        {
+          "numero": 45,
+          "texto": "Tenho muita facilidade em ouvir a voz de Deus."
+        },
+        {
+          "numero": 46,
+          "texto": "Quando alguma pessoa está em pecado, geralmente a minha maior preocupação é ajudá-la em vez de criticá-la."
+        },
+        {
+          "numero": 47,
+          "texto": "Quando começo um grupo ou sou colocado na frente de um, ele cresce e tem resultados visíveis."
+        },
+        {
+          "numero": 48,
+          "texto": "Fico alegre com os trabalhos que me pedem, mesmo que sejam simples."
+        },
+        {
+          "numero": 49,
+          "texto": "Quando há alguma necessidade financeira ou material na igreja ou na vida de alguém, logo penso em contribuir com o que eu posso."
+        },
+        {
+          "numero": 50,
+          "texto": "Quando vejo alguma pessoa doente, ou com problemas, sinto grande compaixão por ela."
+        },
+        {
+          "numero": 51,
+          "texto": "Fico animado quando descubro fatos referentes à Bíblia para poder contar a outras pessoas."
+        },
+        {
+          "numero": 52,
+          "texto": "Tenho experimentado a alegria de ser uma pessoa responsável pelo sucesso de trabalhos especiais em minha igreja."
+        },
+        {
+          "numero": 53,
+          "texto": "Quero que minha casa esteja sempre disponível para os servos de Deus, para qualquer necessidade."
+        },
+        {
+          "numero": 54,
+          "texto": "Gosto de auxiliar e realizar serviços que ajudem as pessoas."
+        },
+        {
+          "numero": 55,
+          "texto": "Continuo orando até sentir que Deus tenha me respondido."
+        }
+      ]
+    },
+    "dons-ministerio": {
+      "abertura": {
+        "resumo": "Identifica qual dos cinco ministérios de Efésios 4.11 tem mais a ver com o seu chamado.",
+        "perguntas": "25 afirmações",
+        "resposta": "nota de 0 a 5",
+        "comoResponder": "Funciona como o teste de dons de serviço: dê uma nota para cada afirmação, com sinceridade, pensando na sua experiência real.",
+        "aula": "Aula 6"
+      },
+      "perguntas": [
+        {
+          "numero": 1,
+          "texto": "Eu me adapto bem a uma situação ou ambiente novo a fim de começar um novo desafio."
+        },
+        {
+          "numero": 2,
+          "texto": "Sinto alegria em comunicar a vontade de Deus às pessoas e o faço de maneira contagiante, persuasiva e clara, tendo certeza de que falo da parte de Deus."
+        },
+        {
+          "numero": 3,
+          "texto": "Tenho alegria em compartilhar do amor de Cristo as pessoas."
+        },
+        {
+          "numero": 4,
+          "texto": "Sinto grande necessidade e responsabilidade em promover o crescimento espiritual de um grupo de pessoas."
+        },
+        {
+          "numero": 5,
+          "texto": "Tenho prazer em esclarecer detalhes que ajudarão outros a entenderem melhor, ou da forma certa, as verdades bíblicas."
+        },
+        {
+          "numero": 6,
+          "texto": "Eu tenho uma visão bíblica de como a igreja deve funcionar e desenvolver-se de forma saudável."
+        },
+        {
+          "numero": 7,
+          "texto": "Tenho muita alegria e sou solicitado a pregar (nos lares, no templo, ao ar livre etc)."
+        },
+        {
+          "numero": 8,
+          "texto": "Tenho facilidade em iniciar uma conversa com uma pessoa desconhecida e levá-la ao conhecimento de Jesus Cristo"
+        },
+        {
+          "numero": 9,
+          "texto": "Tenho prazer em ser útil na restauração da vida espiritual de vidas que se afastaram do Senhor."
+        },
+        {
+          "numero": 10,
+          "texto": "Gosto de entender bem as questões importantes da Bíblia para explicá-las a outros a fim de que entendam sem dificuldades."
+        },
+        {
+          "numero": 11,
+          "texto": " Quando líderes da igreja estão pensando em novos desafios, compartilham comigo."
+        },
+        {
+          "numero": 12,
+          "texto": "Acredito que a melhor maneira de levar o povo de Deus a uma vida mais dedicada é através da pregação pública da Palavra de Deus."
+        },
+        {
+          "numero": 13,
+          "texto": " Gosto de cooperar com trabalhos evangelísticos da minha igreja, missões urbanas, visitas ao asilo, hospitais, comunidades, etc"
+        },
+        {
+          "numero": 14,
+          "texto": "Normalmente, outras pessoas me procuram para encorajamento ou orientação espiritual."
+        },
+        {
+          "numero": 15,
+          "texto": " Pessoas me dizem que eu as ajudo a estudar a Bíblia de forma mais significativa."
+        },
+        {
+          "numero": 16,
+          "texto": "Se Deus me chamasse, gostaria de pregar o evangelho ou alicerçar a igreja num local distante."
+        },
+        {
+          "numero": 17,
+          "texto": "Tenho muita facilidade de falar em público."
+        },
+        {
+          "numero": 18,
+          "texto": " Sinto grande preocupação com a salvação dos meus parentes, amigos, vizinhos e colegas."
+        },
+        {
+          "numero": 19,
+          "texto": "Tenho prazer em alimentar outras pessoas espiritualmente, orientando-as nos caminhos do Senhor."
+        },
+        {
+          "numero": 20,
+          "texto": " Gosto de dedicar bastante tempo aprendendo novas verdades da Bíblia para poder comunicá-las a outras pessoas."
+        },
+        {
+          "numero": 21,
+          "texto": "Gosto de iniciar trabalhos novos fora da igreja local, como um estudo bíblico ou um grupo familiar."
+        },
+        {
+          "numero": 22,
+          "texto": "Quando há algum problema na igreja, acredito que pela pregação sobre o assunto ele pode ser resolvido."
+        },
+        {
+          "numero": 23,
+          "texto": "A ênfase das minhas conversas tem sido o assunto da salvação em Cristo."
+        },
+        {
+          "numero": 24,
+          "texto": "Quando tenho que dar orientações a um grupo de cristãos, sinto-me bem à vontade, estou em casa."
+        },
+        {
+          "numero": 25,
+          "texto": "Quando um líder ou pastor ensina ou prega com uma interpretação errada, fico muito inquieto."
+        }
+      ]
+    },
+    "talentos-naturais": {
+      "abertura": {
+        "resumo": "Ajuda a reconhecer as habilidades que você já tem e que podem servir a Deus junto com os seus dons.",
+        "perguntas": "lista de 26 habilidades",
+        "resposta": "marcar as que você tem",
+        "comoResponder": "Marque as habilidades que você reconhece em si. Muita gente tem habilidades que não percebe: vale lembrar do que faz no trabalho, em casa e com os amigos.",
+        "aula": "Aula 7"
+      },
+      "perguntas": [
+        {
+          "numero": 1,
+          "texto": "Habilidade de recrutar: alistar e motivar pessoas a envolverem- se"
+        },
+        {
+          "numero": 2,
+          "texto": "Habilidade de entrevistar: descobrir como os outros realmente são"
+        },
+        {
+          "numero": 3,
+          "texto": "Habilidade de pesquisar: ler, colher informações e coletar dados"
+        },
+        {
+          "numero": 4,
+          "texto": "Habilidade artística: conceituar, pintar, desenhar, fotografar ou interpretar"
+        },
+        {
+          "numero": 5,
+          "texto": "Habilidade gráfica: projetos, desenhos, criar painéis e exposições"
+        },
+        {
+          "numero": 6,
+          "texto": "Habilidade de avaliar: analisar dados e elaborar conclusões"
+        },
+        {
+          "numero": 7,
+          "texto": "Habilidade de planejar: elaborar estratégias, projetos, organizar projetos e eventos"
+        },
+        {
+          "numero": 8,
+          "texto": "Habilidade de administrar: supervisionar pessoas a fim de que realizem uma tarefa ou evento e coordenar os detalhes do mesmo"
+        },
+        {
+          "numero": 9,
+          "texto": "Habilidade de aconselhar: escutar, encorajar e guiar com sensibilidade"
+        },
+        {
+          "numero": 10,
+          "texto": "Habilidade de ensinar: explicar, esclarecer, treinar, instruir, ser um tutor"
+        },
+        {
+          "numero": 11,
+          "texto": "Habilidade de escrever: redigir artigos, cartas e livros"
+        },
+        {
+          "numero": 12,
+          "texto": "Habilidade de editar: revisões ou reescrever"
+        },
+        {
+          "numero": 13,
+          "texto": "Habilidade de promover: anunciar ou promover eventos e atividades"
+        },
+        {
+          "numero": 14,
+          "texto": "Habilidade de reparar: consertar, restaurar e prestar manutenção"
+        },
+        {
+          "numero": 15,
+          "texto": "Habilidade de alimentar: fazer refeições para pequenos ou grandes grupos"
+        },
+        {
+          "numero": 16,
+          "texto": "Habilidade de relembrar: lembrar ou relembrar nomes e rostos"
+        },
+        {
+          "numero": 17,
+          "texto": "Habilidade de operação de máquinas: operar equipamentos, ferramentas ou maquinário"
+        },
+        {
+          "numero": 18,
+          "texto": "Habilidade de desembaraço: procurar e encontrar material barato e recursos necessários"
+        },
+        {
+          "numero": 19,
+          "texto": "Habilidade de contabilidade: trabalhar com números, dados ou dinheiro"
+        },
+        {
+          "numero": 20,
+          "texto": "Habilidade de classificar: sistematizar, arquivar ou organizar livros, dados e registrar materiais de tal forma que possam ser acessados facilmente"
+        },
+        {
+          "numero": 21,
+          "texto": "Habilidade de relações públicas: lidar com queixas e clientes insatisfeitos com cuidado, cortesia e sensibilidade"
+        },
+        {
+          "numero": 22,
+          "texto": "Habilidade de hospitalidade: conduzir; demonstrar calor humano e desenvolver amizade fazendo outras pessoas sentirem- se confortáveis"
+        },
+        {
+          "numero": 23,
+          "texto": "Habilidade de composição: compor músicas ou poemas"
+        },
+        {
+          "numero": 24,
+          "texto": "Habilidade de paisagismo: fazer jardins e trabalhar com plantas"
+        },
+        {
+          "numero": 25,
+          "texto": "Habilidade de decoração: ornamentar, enfeitar um cenário ou ambiente para eventos especiais"
+        },
+        {
+          "numero": 26,
+          "texto": "Habilidade musical: tocar algum instrumento, ler partituras e/ou cifras"
+        }
+      ]
+    },
+    "estilo-pessoal": {
+      "abertura": {
+        "resumo": "Revela o que te motiva e como você prefere se organizar para servir.",
+        "perguntas": "pares de frases opostas",
+        "resposta": "escala de 1 a 5",
+        "comoResponder": "Em cada par de frases, marque na escala de 1 a 5 o ponto mais próximo de como você é. Não há resposta certa: os dois lados são bons.",
+        "aula": "Aula 10"
+      },
+      "perguntas": []
+    },
+    "temperamento-pessoal": {
+      "abertura": {
+        "resumo": "Mostra a mistura de temperamentos que influencia como você reage, decide e se relaciona.",
+        "perguntas": "4 listas de características",
+        "resposta": "marcar as que descrevem você",
+        "comoResponder": "Em cada temperamento, marque as características (forças e fraquezas) que descrevem você. Seja honesto também com as fraquezas: todo temperamento tem as suas.",
+        "aula": "Aula 11"
+      },
+      "perguntas": [
+        {
+          "numero": 1,
+          "texto": "Sanguíneo"
+        },
+        {
+          "numero": 2,
+          "texto": "Colérico"
+        },
+        {
+          "numero": 3,
+          "texto": "Melancólico"
+        },
+        {
+          "numero": 4,
+          "texto": "Fleumático"
+        }
+      ]
+    }
+  },
+  "resultados": {
+    "nota": {
+      "tipo": "pontuacao",
+      "itens": [
+        {
+          "nome": "Misericórdia",
+          "total": 25,
+          "mensagem": "Dom de misericórdia"
+        },
+        {
+          "nome": "Ensino",
+          "total": 22,
+          "mensagem": "Dom de ensino"
+        },
+        {
+          "nome": "Fé",
+          "total": 18,
+          "mensagem": null
+        }
+      ],
+      "maximo": 25
+    },
+    "talentos": {
+      "tipo": "pontuacao",
+      "itens": [
+        {
+          "nome": "Música",
+          "total": 1,
+          "mensagem": "Talento musical"
+        },
+        {
+          "nome": "Escrita",
+          "total": 0,
+          "mensagem": null
+        }
+      ],
+      "maximo": 1
+    },
+    "estilo": {
+      "tipo": "estilo",
+      "combinacao": "Tarefa Estruturado",
+      "descricao": "Cumpre a tarefa até o fim. Focaliza nos resultados. Prefere seguir uma agenda. Aprecia orientação clara. Considere o tipo de ministério que lhe permita saber exatamente quais são os alvos e como a tarefa deve ser realizada.",
+      "motivacao": 14,
+      "organizacao": 30
+    },
+    "temperamento": {
+      "tipo": "pontuacao",
+      "itens": [
+        {
+          "nome": "Colérico",
+          "total": 35,
+          "mensagem": null
+        },
+        {
+          "nome": "Sanguíneo",
+          "total": 20,
+          "mensagem": null
+        },
+        {
+          "nome": "Melancólico",
+          "total": 10,
+          "mensagem": null
+        },
+        {
+          "nome": "Fleumático",
+          "total": 5,
+          "mensagem": null
+        }
+      ],
+      "maximo": 70
+    }
+  }
+}

@@ -1,0 +1,470 @@
+'use client';
+
+import Image from 'next/image';
+import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
+import { preload } from 'react-dom';
+import { buttonClassName } from '@/components/ui/ButtonLink';
+import type { cadastrar, enviar, identificar, sair } from '@/app/(site)/eba/testes/[slug]/acoes';
+import { registrarEvento } from '@/lib/analytics/datalayer';
+import type { Pergunta } from '@/lib/eba-api/perguntas';
+import { TESTES, type DefinicaoTeste } from '@/lib/eba-api/testes';
+import { fotoDoTeste, type MomentoFoto } from '@/lib/eba/fotos-testes';
+import {
+  chaveProgresso,
+  criarEstado,
+  lerProgresso,
+  MAXIMO_ESCOLHIDAS,
+  paginaTemperamento,
+  parEstilo,
+  podeEnviar,
+  progressoDe,
+  reducer,
+  respondidas,
+  respostasParaApi,
+  temProgresso,
+  type EstadoQuestionario,
+} from './estado';
+import { Cadastro, Identificacao } from './Identificacao';
+import { PerguntaEstilo } from './PerguntaEstilo';
+import { PerguntaMarcar } from './PerguntaMarcar';
+import { PerguntaNota } from './PerguntaNota';
+import { Resultado } from './Resultado';
+import styles from './Questionario.module.css';
+
+export type { Estado } from './estado';
+export { chaveProgresso, reducer } from './estado';
+
+export interface QuestionarioProps {
+  teste: DefinicaoTeste;
+  abertura: { resumo: string; perguntas: string | null; resposta: string | null; comoResponder: string | null; aula: string | null };
+  perguntas: Pergunta[];
+  sessao: { emailMascarado: string } | null;
+  acoes: { identificar: typeof identificar; cadastrar: typeof cadastrar; enviar: typeof enviar; sair: typeof sair };
+  /**
+   * Só para a vitrine: abre direto num estado. Nesse modo a tela não lê nem grava o
+   * `sessionStorage` e não envia eventos ao DataLayer.
+   */
+  estadoInicial?: Partial<EstadoQuestionario>;
+}
+
+const ROTULO_TELA = { nota: 'Pergunta', estilo: 'Pergunta', talentos: 'Etapa', temperamento: 'Página' } as const;
+const UNIDADE_TELA = { nota: 'perguntas', estilo: 'perguntas', talentos: 'etapas', temperamento: 'páginas' } as const;
+const COM_SESSAO_VISIVEL = new Set(['pergunta', 'enviando', 'erro']);
+
+function Progresso({ atual, total, rotulo }: { atual: number; total: number; rotulo: string }) {
+  const porcentagem = Math.round((atual / total) * 100);
+  return (
+    <div className={styles.progresso}>
+      <p className={styles.progressoTexto}>
+        <span>{`${rotulo} ${atual} de ${total}`}</span>
+        <span>{`${porcentagem}%`}</span>
+      </p>
+      <div className={styles.barra} role="progressbar" aria-label="Progresso do teste" aria-valuemin={0} aria-valuemax={total} aria-valuenow={atual}>
+        <span style={{ width: `${porcentagem}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function momentoDaFoto(s: EstadoQuestionario): MomentoFoto {
+  switch (s.estado) {
+    case 'abertura':
+      return 'capa';
+    case 'email':
+    case 'cadastro':
+    case 'expirou':
+      return 'identificacao';
+    case 'pergunta':
+      return { pergunta: s.passo + 1 };
+    default:
+      return 'resultado';
+  }
+}
+
+/**
+ * Tela de um teste do CDV (ilha cliente): abertura → identificação → perguntas → envio → resultado.
+ * Progresso no `sessionStorage` (só respostas, por slug); dados pessoais só no servidor.
+ */
+export function Questionario({ teste, abertura, perguntas, sessao, acoes, estadoInicial }: QuestionarioProps) {
+  const id = useId();
+  const demonstracao = estadoInicial !== undefined;
+  const [s, dispatch] = useReducer(reducer, undefined, () => ({ ...criarEstado({ tipo: teste.tipo, perguntas, sessao }), ...estadoInicial }));
+  const [semPerguntas, setSemPerguntas] = useState(false);
+  const chave = chaveProgresso(teste.slug);
+
+  // Foco: vai para o enunciado (ou o título do estado) a cada troca de pergunta ou de estado.
+  const foco = useRef<HTMLElement | null>(null);
+  const focar = useCallback((el: HTMLElement | null) => {
+    foco.current = el;
+  }, []);
+  const primeiraRenderizacao = useRef(true);
+  useEffect(() => {
+    if (primeiraRenderizacao.current) {
+      primeiraRenderizacao.current = false;
+      return;
+    }
+    foco.current?.focus();
+  }, [s.estado, s.passo]);
+
+  // Progresso: lê uma vez a chave deste teste; depois grava a cada resposta e apaga no resultado.
+  useEffect(() => {
+    if (demonstracao) return;
+    let salvo: string | null = null;
+    try {
+      salvo = sessionStorage.getItem(chave);
+    } catch {
+      // Storage bloqueado (modo privado, política do navegador): segue sem restaurar.
+    }
+    dispatch({ tipo: 'restaurar', progresso: lerProgresso(salvo, s.total) });
+    // Só na montagem: restaurar depois apagaria respostas novas.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chave, demonstracao]);
+
+  useEffect(() => {
+    if (demonstracao || !s.carregado) return;
+    try {
+      if (s.estado === 'resultado') sessionStorage.removeItem(chave);
+      else if (temProgresso(s)) sessionStorage.setItem(chave, JSON.stringify(progressoDe(s)));
+    } catch {
+      // Sem storage, o teste continua; só não sobrevive a um recarregamento.
+    }
+  }, [s, chave, demonstracao]);
+
+  // Medição: iniciar_teste na primeira pergunta; concluir_teste quando o resultado aparece.
+  const iniciou = useRef(demonstracao);
+  const concluiu = useRef(demonstracao);
+  useEffect(() => {
+    if (s.estado === 'pergunta' && !iniciou.current) {
+      iniciou.current = true;
+      registrarEvento('iniciar_teste', { teste: teste.slug });
+    }
+    if (s.estado === 'resultado' && !concluiu.current) {
+      concluiu.current = true;
+      registrarEvento('concluir_teste', { teste: teste.slug });
+    }
+  }, [s.estado, teste.slug]);
+
+  // Envio: uma chamada por vez (dois cliques rápidos não duplicam).
+  const enviandoAgora = useRef(false);
+  async function enviarRespostas() {
+    if (enviandoAgora.current) return;
+    enviandoAgora.current = true;
+    dispatch({ tipo: 'enviar' });
+    try {
+      const resposta = await acoes.enviar(teste.slug, respostasParaApi(s, perguntas));
+      if (resposta.ok && resposta.dados) dispatch({ tipo: 'enviado', resultado: resposta.dados });
+      else if (!resposta.ok && resposta.erro === 'sessao') dispatch({ tipo: 'falhou', erro: 'sessao' });
+      else if (!resposta.ok && (resposta.erro === 'recusado' || resposta.erro === 'invalido')) dispatch({ tipo: 'falhou', erro: 'recusado' });
+      else dispatch({ tipo: 'falhou', erro: 'indisponivel' });
+    } catch {
+      dispatch({ tipo: 'falhou', erro: 'indisponivel' });
+    } finally {
+      enviandoAgora.current = false;
+    }
+  }
+
+  function aoIdentificar(emailMascarado: string) {
+    const reenviar = s.retorno === 'enviando';
+    dispatch({ tipo: 'identificado', emailMascarado });
+    if (reenviar) void enviarRespostas();
+  }
+
+  function comecar() {
+    if ((teste.tipo === 'nota' || teste.tipo === 'talentos') && perguntas.length === 0) {
+      setSemPerguntas(true);
+      return;
+    }
+    dispatch({ tipo: 'comecar' });
+  }
+
+  async function trocarEmail() {
+    dispatch({ tipo: 'trocarEmail' });
+    try {
+      await acoes.sair();
+    } catch {
+      // O cookie expira sozinho; a próxima identificação o substitui.
+    }
+  }
+
+  async function sairDaSessao() {
+    try {
+      await acoes.sair();
+    } catch {
+      // Idem: sem rede, o cookie de sessão some ao fechar o navegador.
+    }
+    dispatch({ tipo: 'sair' });
+  }
+
+  const foto = fotoDoTeste(teste.slug, momentoDaFoto(s));
+  const proximaFoto = s.estado === 'pergunta' && s.passo + 1 < s.total ? fotoDoTeste(teste.slug, { pergunta: s.passo + 2 }) : null;
+  if (proximaFoto && proximaFoto !== foto) preload(proximaFoto, { as: 'image' });
+
+  const idTitulo = `${id}-titulo`;
+  const rotuloEnviar = teste.tipo === 'talentos' ? 'Concluir' : 'Enviar respostas';
+  const botaoEnviar = (
+    <button type="button" className={buttonClassName()} disabled={s.estado === 'enviando' || !podeEnviar(s, perguntas)} onClick={() => void enviarRespostas()}>
+      {rotuloEnviar}
+    </button>
+  );
+  const voltar = (rotulo: string) =>
+    s.passo > 0 && (
+      <button type="button" className={styles.voltar} onClick={() => dispatch({ tipo: 'voltar' })}>
+        {rotulo}
+      </button>
+    );
+  const proximo = (desabilitado = false) => (
+    <button type="button" className={buttonClassName()} disabled={desabilitado} onClick={() => dispatch({ tipo: 'avancar' })}>
+      Próximo
+    </button>
+  );
+  const ultimaTela = s.passo === s.total - 1;
+
+  function telaDePergunta() {
+    const nome = `${id}-resposta-${s.passo + 1}`;
+    switch (teste.tipo) {
+      case 'nota':
+      case 'estilo': {
+        // Sem perguntas a tela não sai da abertura (ver `comecar`); aqui é só defesa.
+        if (teste.tipo === 'nota' && !perguntas[s.passo]) return null;
+        const chaveResposta = teste.tipo === 'nota' ? perguntas[s.passo].numero : s.passo + 1;
+        const valor = s.respostas[chaveResposta];
+        const responder = (nota: number) => dispatch({ tipo: 'responder', chave: chaveResposta, valor: nota });
+        return (
+          <>
+            {teste.tipo === 'nota' ? (
+              <PerguntaNota key={nome} nome={nome} texto={perguntas[s.passo].texto} valor={valor} onEscolher={responder} legendaRef={focar} />
+            ) : (
+              <PerguntaEstilo key={nome} nome={nome} par={parEstilo(s.passo)} valor={valor} onEscolher={responder} legendaRef={focar} />
+            )}
+            <div className={styles.navegacao}>
+              {voltar('Pergunta anterior')}
+              {ultimaTela ? (
+                botaoEnviar
+              ) : valor !== undefined ? (
+                <button type="button" className={styles.voltar} data-sentido="avancar" onClick={() => dispatch({ tipo: 'avancar' })}>
+                  Próxima pergunta
+                </button>
+              ) : (
+                <span className={styles.dica}>Ao escolher, vai para a próxima</span>
+              )}
+            </div>
+          </>
+        );
+      }
+      case 'talentos':
+        return s.passo === 0 ? (
+          <>
+            <PerguntaMarcar
+              key={nome}
+              nome={nome}
+              legenda="Marque as habilidades que você tem"
+              ajuda={`Marque quantas quiser. ${s.marcadas.length} marcadas.`}
+              opcoes={perguntas.map((p) => ({ id: p.numero, texto: p.texto }))}
+              marcadas={s.marcadas}
+              onAlternar={(idOpcao) => dispatch({ tipo: 'marcar', id: idOpcao })}
+              legendaRef={focar}
+            />
+            <div className={styles.navegacao}>
+              <span />
+              {proximo(s.marcadas.length === 0)}
+            </div>
+          </>
+        ) : (
+          <>
+            <PerguntaMarcar
+              key={nome}
+              nome={nome}
+              legenda={`Escolha até ${MAXIMO_ESCOLHIDAS} habilidades que mais combinam com você`}
+              ajuda={`${s.escolhidas.length} de ${MAXIMO_ESCOLHIDAS} escolhidas.`}
+              opcoes={perguntas.filter((p) => s.marcadas.includes(p.numero)).map((p) => ({ id: p.numero, texto: p.texto }))}
+              marcadas={s.escolhidas}
+              onAlternar={(idOpcao) => dispatch({ tipo: 'escolher', id: idOpcao })}
+              bloqueada={() => s.escolhidas.length >= MAXIMO_ESCOLHIDAS}
+              legendaRef={focar}
+            />
+            <div className={styles.navegacao}>
+              {voltar('Anterior')}
+              {botaoEnviar}
+            </div>
+          </>
+        );
+      case 'temperamento': {
+        const pagina = paginaTemperamento(s.passo);
+        const naPagina = pagina.opcoes.filter((o) => s.marcadas.includes(o.id)).length;
+        return (
+          <>
+            <PerguntaMarcar
+              key={nome}
+              nome={nome}
+              legenda={`${pagina.grupo.nome}: marque as características que descrevem você`}
+              ajuda={`Marque quantas quiser, inclusive as fraquezas. ${naPagina} marcadas nesta página.`}
+              opcoes={pagina.opcoes}
+              marcadas={s.marcadas}
+              onAlternar={(idOpcao) => dispatch({ tipo: 'marcar', id: idOpcao })}
+              legendaRef={focar}
+            />
+            <div className={styles.navegacao}>
+              {voltar('Anterior') || <span />}
+              {ultimaTela ? botaoEnviar : proximo()}
+            </div>
+          </>
+        );
+      }
+    }
+  }
+
+  function conteudo() {
+    switch (s.estado) {
+      case 'abertura': {
+        const feitas = respondidas(s);
+        return (
+          <>
+            <p className={styles.corpo}>{abertura.resumo}</p>
+            {(abertura.perguntas || abertura.resposta) && (
+              <dl className={styles.formato}>
+                {abertura.perguntas && (
+                  <div>
+                    <dt>Perguntas</dt>
+                    <dd>{abertura.perguntas}</dd>
+                  </div>
+                )}
+                {abertura.resposta && (
+                  <div>
+                    <dt>Resposta</dt>
+                    <dd>{abertura.resposta}</dd>
+                  </div>
+                )}
+              </dl>
+            )}
+            {abertura.comoResponder && (
+              <div className={styles.parte}>
+                <h2 className={styles.titulo4}>Como responder</h2>
+                <p className={styles.texto}>{abertura.comoResponder}</p>
+              </div>
+            )}
+            {temProgresso(s) && <p className={styles.texto}>{`Você já respondeu ${feitas} de ${s.total} ${UNIDADE_TELA[teste.tipo]} nesta aba.`}</p>}
+            {semPerguntas && (
+              <p role="alert" className={styles.erro}>
+                Não conseguimos carregar as perguntas agora. Tente em alguns minutos.
+              </p>
+            )}
+            <div className={styles.botoes}>
+              <button type="button" className={buttonClassName()} onClick={comecar}>
+                {temProgresso(s) ? 'Continuar o teste' : 'Começar o teste'}
+              </button>
+            </div>
+          </>
+        );
+      }
+      case 'email':
+        return <Identificacao identificar={acoes.identificar} onIdentificado={aoIdentificar} onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })} tituloRef={focar} />;
+      case 'cadastro':
+        return (
+          <Cadastro
+            email={s.cadastro?.email ?? ''}
+            turmas={s.cadastro?.turmas ?? []}
+            cadastrar={acoes.cadastrar}
+            onIdentificado={aoIdentificar}
+            onOutroEmail={() => dispatch({ tipo: 'voltarEmail' })}
+            tituloRef={focar}
+          />
+        );
+      case 'pergunta':
+        return (
+          <>
+            <Progresso atual={s.passo + 1} total={s.total} rotulo={ROTULO_TELA[teste.tipo]} />
+            {telaDePergunta()}
+          </>
+        );
+      case 'enviando':
+        return (
+          <>
+            <Progresso atual={s.total} total={s.total} rotulo={ROTULO_TELA[teste.tipo]} />
+            <div className={styles.aviso} role="status">
+              <span className={styles.girando} aria-hidden="true" />
+              <p className={styles.corpo}>Calculando seu resultado…</p>
+            </div>
+            <div className={styles.botoes}>{botaoEnviar}</div>
+          </>
+        );
+      case 'resultado':
+        return s.resultado ? <Resultado teste={teste} resultado={s.resultado} emailMascarado={s.emailMascarado} saiu={s.saiu} onSair={() => void sairDaSessao()} tituloRef={focar} /> : null;
+      case 'erro':
+        return (
+          <div className={`${styles.aviso} ${styles.avisoErro}`} role="alert">
+            <h2 ref={focar} tabIndex={-1} className={styles.subtitulo}>
+              {s.erroEnvio === 'recusado' ? 'Algumas respostas não foram aceitas.' : 'Não conseguimos enviar suas respostas'}
+            </h2>
+            <p className={styles.texto}>
+              {s.erroEnvio === 'recusado'
+                ? 'Suas respostas continuam guardadas nesta aba. Confira as respostas e envie de novo.'
+                : 'Suas respostas continuam guardadas nesta aba. Verifique a internet e tente de novo.'}
+            </p>
+            <div className={styles.botoes}>
+              <button type="button" className={buttonClassName()} onClick={() => void enviarRespostas()}>
+                Tentar de novo
+              </button>
+              {s.erroEnvio === 'recusado' && (
+                <button type="button" className={buttonClassName({ estilo: 'contorno' })} onClick={() => dispatch({ tipo: 'revisar' })}>
+                  Revisar respostas
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      case 'expirou':
+        return (
+          <div className={styles.aviso} role="status">
+            <h2 ref={focar} tabIndex={-1} className={styles.subtitulo}>
+              Sua sessão foi encerrada
+            </h2>
+            <p className={styles.texto}>Por segurança, a identificação vale até fechar o navegador ou por 2 horas. Informe seu e-mail para continuar.</p>
+            <div className={styles.botoes}>
+              <button type="button" className={buttonClassName()} onClick={() => dispatch({ tipo: 'informarEmail' })}>
+                Informar e-mail
+              </button>
+            </div>
+          </div>
+        );
+    }
+  }
+
+  const aula = abertura.aula?.trim();
+
+  return (
+    <section className={styles.tela} aria-labelledby={idTitulo} data-section="teste-eba">
+      <div className={styles.grade}>
+        <div className={styles.caixa}>
+          <p className={styles.numero}>
+            <span>{`Teste ${teste.ordem} de ${TESTES.length}`}</span>
+            {aula && <span>{`${aula} do CDV`}</span>}
+          </p>
+          <h1 id={idTitulo} className={styles.nome}>
+            {teste.nome}
+          </h1>
+          {conteudo()}
+          {s.emailMascarado && COM_SESSAO_VISIVEL.has(s.estado) && (
+            <p className={styles.trocar}>
+              Respondendo como <strong>{s.emailMascarado}</strong> ·{' '}
+              <button type="button" className={styles.link} onClick={() => void trocarEmail()}>
+                Não é você? Trocar e-mail
+              </button>
+            </p>
+          )}
+        </div>
+        <div className={styles.midia}>
+          <Image
+            src={foto}
+            alt=""
+            fill
+            unoptimized
+            sizes="(min-width: 1024px) 45vw, 100vw"
+            loading="eager"
+            fetchPriority={s.estado === 'abertura' ? 'high' : undefined}
+            className={styles.foto}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
