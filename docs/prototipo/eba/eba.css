@@ -207,7 +207,7 @@
 .estados-teste { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-8); padding-block: var(--espaco-16); font-size: var(--fs-legenda); }
 .teste-tela { padding-block: var(--espaco-16) var(--secao-y); }
 .teste-tela__caixa {
-  display: grid; gap: var(--espaco-24); max-width: 44rem; margin-inline: auto; padding: var(--espaco-24);
+  display: grid; align-content: start; gap: var(--espaco-24); max-width: 44rem; margin-inline: auto; padding: var(--espaco-24);
   border-radius: var(--raio-grande); background: var(--cor-fundo-sutil);
 }
 .teste-tela__caixa > [data-tela] { display: grid; gap: var(--espaco-20); }
@@ -270,12 +270,13 @@
 @media (prefers-reduced-motion: reduce) { .girando { animation: none; } }
 @media (prefers-contrast: more) { .opcao, .marcar, .aviso-teste, .resultado { outline: 1px solid var(--cor-preto); } }
 
-/* Entrega 2: foto do teste [D] do site atual (capa, uma por pergunta, resultado); decorativa */
-.teste-tela__grade { display: grid; gap: var(--espaco-16); max-width: 44rem; margin-inline: auto; }
+/* Entrega 2: foto do teste [D] do site atual (capa, uma por pergunta, resultado); decorativa.
+   Caixa e foto com o mesmo raio (grande) e, no desktop, a mesma altura: topo e base alinhados [P] */
+.teste-tela__grade { display: grid; gap: var(--espaco-12); max-width: 44rem; margin-inline: auto; }
 .teste-tela__grade .teste-tela__caixa { max-width: none; margin: 0; }
-.teste-tela__midia { order: -1; overflow: hidden; aspect-ratio: 16 / 9; border-radius: var(--raio-grande); background: var(--cor-grafite); }
-.teste-tela__midia img { width: 100%; height: 100%; object-fit: cover; }
+.teste-tela__midia { position: relative; order: -1; overflow: hidden; aspect-ratio: 16 / 9; border-radius: var(--raio-grande); background: var(--cor-grafite); }
+.teste-tela__midia img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 @media (min-width: 1024px) {
-  .teste-tela__grade { max-width: none; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: start; gap: var(--espaco-24); }
-  .teste-tela__midia { order: 0; position: sticky; top: var(--espaco-24); aspect-ratio: auto; height: min(calc(100vh - 3rem), 44rem); }
+  .teste-tela__grade { max-width: none; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: stretch; gap: var(--espaco-12); }
+  .teste-tela__midia { order: 0; aspect-ratio: auto; min-height: 32rem; }
 }
