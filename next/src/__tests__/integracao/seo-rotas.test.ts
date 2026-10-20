@@ -89,6 +89,14 @@ describe('/sitemap.xml', () => {
     ]);
   });
 
+  it('a página /eba/testes entra; as telas dos testes (/eba/testes/<slug>, noindex) ficam de fora', async () => {
+    producao();
+    strapi.paginas['eba-testes'] = { ...strapi.paginas.eba, id: 9, documentId: 'eba-testes', slug: 'eba-testes', titulo: 'Testes' };
+    const urls = (await sitemap()).map((e) => e.url);
+    expect(urls).toContain('https://adai.com.br/eba/testes');
+    expect(urls.filter((u) => u.includes('/eba/testes/'))).toEqual([]);
+  });
+
   it('fora de produção: sitemap vazio e nenhuma consulta ao Strapi', async () => {
     expect(await sitemap()).toEqual([]);
     expect(strapi.fetch).not.toHaveBeenCalled();

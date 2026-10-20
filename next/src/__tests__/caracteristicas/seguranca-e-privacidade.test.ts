@@ -42,6 +42,13 @@ describe('segredos', () => {
     }
   });
 
+  it('variáveis da API da EBA são só de servidor: nenhum arquivo em src/ usa o prefixo público (NEXT_PUBLIC_ + EBA_)', () => {
+    // Inclui testes e test-utils; o padrão é montado para este arquivo não se acusar.
+    const proibido = ['NEXT', 'PUBLIC', 'EBA', ''].join('_');
+    const todos = arquivos(join(next, 'src'), /\.(ts|tsx|js|mjs|json|css)$/);
+    expect(todos.filter((a) => ler(a).includes(proibido)).map(rel)).toEqual([]);
+  });
+
   it('chave de API vai no header, nunca na URL (URL aparece em log e no histórico)', () => {
     expect(codigo.filter((a) => /[?&](key|api_key|apikey|token|secret)=/i.test(ler(a))).map(rel)).toEqual([]);
   });

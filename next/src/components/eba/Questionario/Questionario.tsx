@@ -39,6 +39,8 @@ export interface QuestionarioProps {
   abertura: { resumo: string; perguntas: string | null; resposta: string | null; comoResponder: string | null; aula: string | null };
   perguntas: Pergunta[];
   sessao: { emailMascarado: string } | null;
+  /** A API falhou ao buscar as perguntas no servidor: a abertura aparece, mas "Começar" só avisa. */
+  perguntasIndisponiveis?: boolean;
   acoes: { identificar: typeof identificar; cadastrar: typeof cadastrar; enviar: typeof enviar; sair: typeof sair };
   /**
    * Só para a vitrine: abre direto num estado. Nesse modo a tela não lê nem grava o
@@ -85,7 +87,7 @@ function momentoDaFoto(s: EstadoQuestionario): MomentoFoto {
  * Tela de um teste do CDV (ilha cliente): abertura → identificação → perguntas → envio → resultado.
  * Progresso no `sessionStorage` (só respostas, por slug); dados pessoais só no servidor.
  */
-export function Questionario({ teste, abertura, perguntas, sessao, acoes, estadoInicial }: QuestionarioProps) {
+export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndisponiveis = false, acoes, estadoInicial }: QuestionarioProps) {
   const id = useId();
   const demonstracao = estadoInicial !== undefined;
   const [s, dispatch] = useReducer(reducer, undefined, () => ({ ...criarEstado({ tipo: teste.tipo, perguntas, sessao }), ...estadoInicial }));
@@ -170,7 +172,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, acoes, estado
   }
 
   function comecar() {
-    if ((teste.tipo === 'nota' || teste.tipo === 'talentos') && perguntas.length === 0) {
+    if (perguntasIndisponiveis || ((teste.tipo === 'nota' || teste.tipo === 'talentos') && perguntas.length === 0)) {
       setSemPerguntas(true);
       return;
     }

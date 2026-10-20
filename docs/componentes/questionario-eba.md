@@ -6,14 +6,19 @@ Ilha cliente (`'use client'`) da página `/eba/testes/<slug>`: a tela em que o a
 
 | Parte | Origem |
 | --- | --- |
-| Nome, "Teste N de 5", "Próximo teste" | `TESTES` em `lib/eba-api/testes.ts` (ordem da apostila) |
+| Nome | tipo "Testes da EBA" do Strapi; sem o teste lá, `TESTES` (a página monta a prop `teste`) |
+| "Teste N de 5", "Próximo teste" | `TESTES` em `lib/eba-api/testes.ts` (ordem da apostila) |
 | Resumo, Perguntas/Resposta, "Como responder", aula | tipo "Testes da EBA" do Strapi (prop `abertura`, montada pela página) |
-| Perguntas de nota e talentos | API da EBA (`GET Question/{id}`), buscadas pelo servidor (prop `perguntas`) |
+| Perguntas de nota e talentos | API da EBA (`GET Question/{id}`), buscadas pelo servidor (prop `perguntas`). API fora ao abrir → `perguntasIndisponiveis`: a abertura aparece e "Começar" mostra "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." |
 | Pares do estilo e opções do temperamento | dados locais em `lib/eba-api/conteudo-local.ts` |
 | Identificação, cadastro, envio, sair | Server Actions de `app/(site)/eba/testes/[slug]/acoes.ts`, recebidas pela prop `acoes` (testes e vitrine passam versões de mentira) |
 | Fotos (decorativas, `alt=""`) | `fotoDoTeste` em `lib/eba/fotos-testes.ts` |
 
 Não está no Strapi: o fluxo, as escalas e a agregação das respostas são regras do teste, não conteúdo editorial.
+
+## Página `/eba/testes/<slug>`
+
+`app/(site)/eba/testes/[slug]/page.tsx` (Server Component, dinâmica pelo cookie de sessão): só os 5 slugs de `TESTES` (outro → 404, sem chamar Strapi nem API); trilha ADAI › EBA › Testes › <nome> com BreadcrumbList; metadata `<nome> — Testes da EBA | ADAI`, descrição = resumo, `noindex, nofollow`, fora do sitemap. Sem o teste no Strapi, resumo padrão "Responda com sinceridade, pensando em como você é hoje.". Sem `EBA_API_URL`/`EBA_API_KEY` ou sem `EBA_SESSAO_SEGREDO` válido: "Testes indisponíveis no momento" com link para `/eba/testes`, sem o questionário. Como a pasta `testes/` tem precedência sobre `/eba/[slug]`, `/eba/testes` tem `page.tsx` própria que monta a página "eba-testes" do Strapi (helper `app/(site)/eba/pagina-eba.tsx`).
 
 ## Estados
 

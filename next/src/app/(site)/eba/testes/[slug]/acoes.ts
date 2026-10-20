@@ -9,7 +9,7 @@ import {
   lerSessao,
   mascararEmail,
   OPCOES_COOKIE,
-  TAMANHO_MINIMO_SEGREDO,
+  segredoDaSessao,
   type SessaoAluno,
 } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno, normalizarEmail } from '@/lib/eba-api/alunos';
@@ -36,14 +36,9 @@ const falha = (erro: Falha['erro']): Falha => ({ ok: false, erro });
 
 const limitarTentativas = criarLimitador(10, 60_000);
 
-function segredo(): string | null {
-  const valor = process.env.EBA_SESSAO_SEGREDO ?? '';
-  return valor.length >= TAMANHO_MINIMO_SEGREDO ? valor : null;
-}
-
 /** Segredo válido e API configurada; senão as ações falham fechado. */
 function configuracao(): { segredo: string } | null {
-  const s = segredo();
+  const s = segredoDaSessao();
   return s && ebaApiConfigurada() ? { segredo: s } : null;
 }
 

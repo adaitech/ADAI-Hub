@@ -9,6 +9,7 @@ import SlugPage, { generateMetadata as metadataSlug } from '@/app/(site)/[slug]/
 import SobreNosPage, { generateMetadata as metadataSobreNos } from '@/app/(site)/sobre-nos/[slug]/page';
 import EbaPage, { generateMetadata as metadataEba } from '@/app/(site)/eba/page';
 import EbaCursosPage, { generateMetadata as metadataEbaCursos } from '@/app/(site)/eba/cursos/page';
+import EbaTestesPage, { generateMetadata as metadataEbaTestes } from '@/app/(site)/eba/testes/page';
 import EbaSubPage, { generateMetadata as metadataEbaSub } from '@/app/(site)/eba/[slug]/page';
 import SiteLayout from '@/app/(site)/layout';
 import { proximosEventosShowcase } from '@/components/sections/ProximosEventosSection/ProximosEventosSection.showcase';
@@ -30,7 +31,7 @@ jest.mock('@/lib/inchurch/eventos-cache', () => ({ getEventosInchurch: jest.fn()
 const completo = <T,>(showcase: { variantes: { nome: string; data: unknown }[] }) => showcase.variantes.find((v) => v.nome === 'completo')!.data as T;
 const params = (slug: string) => ({ params: Promise.resolve({ slug }) });
 
-/** Mesma escolha de rota do site: Home, `/sobre-nos/<x>`, `/eba`, `/eba/cursos`, `/eba/<x>` ou `/<slug>`. */
+/** Mesma escolha de rota do site: Home, `/sobre-nos/<x>`, `/eba`, `/eba/cursos`, `/eba/testes`, `/eba/<x>` ou `/<slug>`. */
 function rotaDe(slug: string) {
   if (slug === 'home') return { pagina: () => HomePage(), metadata: () => metadataHome() };
   if (slug.startsWith(PREFIXO_SOBRE_NOS)) {
@@ -39,6 +40,7 @@ function rotaDe(slug: string) {
   }
   if (slug === 'eba') return { pagina: () => EbaPage(), metadata: () => metadataEba() };
   if (slug === 'eba-cursos') return { pagina: () => EbaCursosPage(), metadata: () => metadataEbaCursos() };
+  if (slug === 'eba-testes') return { pagina: () => EbaTestesPage(), metadata: () => metadataEbaTestes() };
   if (slug.startsWith(PREFIXO_EBA)) {
     const segmento = slug.slice(PREFIXO_EBA.length);
     return { pagina: () => EbaSubPage(params(segmento)), metadata: () => metadataEbaSub(params(segmento)) };

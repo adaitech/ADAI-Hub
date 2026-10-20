@@ -1,0 +1,47 @@
+/*
+ * Tela do teste quando a API da EBA não está configurada ("Testes indisponíveis no momento").
+ * Mesma caixa da abertura do Questionário (raio grande, fundo cinza), sem a foto.
+ */
+.tela {
+  --teste-indisponivel-max: 44rem;
+  padding-block: var(--space-16) var(--space-section);
+  padding-inline: var(--space-gutter);
+}
+
+.caixa {
+  display: grid;
+  gap: var(--space-24);
+  max-width: var(--teste-indisponivel-max);
+  margin-inline: auto;
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-subtle);
+}
+
+.nome {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-destaque);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-destaque);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+.corpo {
+  margin: 0;
+  font-size: var(--font-size-corpo);
+  line-height: var(--line-height-text);
+}
+
+.aviso {
+  margin: 0;
+  padding-left: var(--space-12);
+  box-shadow: inset var(--space-4) 0 0 var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (min-width: 1024px) {
+  .caixa {
+    padding: var(--space-40);
+  }
+}

@@ -16,6 +16,12 @@ export const TAMANHO_MINIMO_SEGREDO = 32;
 /** Tolerância para relógios dessincronizados: emissão no futuro além disso é rejeitada. */
 const TOLERANCIA_RELOGIO_MS = 60_000;
 
+/** `EBA_SESSAO_SEGREDO` (só servidor) quando tem o tamanho mínimo; ausente ou curto → null (testes indisponíveis). */
+export function segredoDaSessao(): string | null {
+  const valor = process.env.EBA_SESSAO_SEGREDO ?? '';
+  return valor.length >= TAMANHO_MINIMO_SEGREDO ? valor : null;
+}
+
 /** Cookie de sessão: sem `maxAge`/`expires` de propósito. */
 export const OPCOES_COOKIE = {
   httpOnly: true,

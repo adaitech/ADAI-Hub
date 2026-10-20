@@ -13,10 +13,11 @@ import textoBotoes from '@/components/sections/TextoBotoesSection/TextoBotoesSec
 import textoRico from '@/components/sections/TextoRicoSection/TextoRicoSection.mock.json';
 import contribua from '../../../strapi/seed/contribua.json';
 import cursosEba from '@/lib/eba/__fixtures__/cursos.json';
+import testesEba from '@/lib/eba/__fixtures__/testes.json';
 
 /**
  * Strapi simulado para testes de integração e de característica: responde `/api/pages`,
- * `/api/cursos` e `/api/global` com o **mesmo JSON** dos `.mock.json` (que espelham a API real), sem rede.
+ * `/api/cursos`, `/api/testes` e `/api/global` com o **mesmo JSON** dos `.mock.json` (que espelham a API real), sem rede.
  *
  * Uso: `const strapi = criarStrapiFake(); globalThis.fetch = strapi.fetch;`
  */
@@ -129,6 +130,8 @@ export function criarStrapiFake() {
     },
   };
   const cursos = cursosFake();
+  // Testes da EBA (fixture no formato da API): só 3 dos 5 testes, para exercitar o teste sem cadastro.
+  const testes = testesEba.data.map((teste) => ({ ...teste }));
   const global = { status: 200, corpo: { data: { header: header.completo, footer: footer.completo, seo: seo('ADAI') } } as unknown };
 
   const responder = (status: number, corpo: unknown) =>
@@ -141,6 +144,11 @@ export function criarStrapiFake() {
     if (endereco.includes('/api/cursos')) {
       const slugCurso = /filters\[slug\]\[\$eq\]=([^&]+)/.exec(endereco)?.[1];
       const lista = slugCurso === undefined ? cursos : cursos.filter((c) => c.slug === slugCurso);
+      return responder(200, { data: lista, meta: { pagination: { page: 1, pageSize: 100, pageCount: 1, total: lista.length } } });
+    }
+    if (endereco.includes('/api/testes')) {
+      const slugTeste = /filters\[slug\]\[\$eq\]=([^&]+)/.exec(endereco)?.[1];
+      const lista = slugTeste === undefined ? testes : testes.filter((t) => t.slug === slugTeste);
       return responder(200, { data: lista, meta: { pagination: { page: 1, pageSize: 100, pageCount: 1, total: lista.length } } });
     }
     const slug = /filters\[slug\]\[\$eq\]=([^&]+)/.exec(endereco)?.[1];
@@ -156,6 +164,7 @@ export function criarStrapiFake() {
     fetch: fetch as unknown as typeof globalThis.fetch & jest.Mock,
     paginas,
     cursos,
+    testes,
     global,
     /** Simula o Strapi fora do ar (toda chamada responde com `status`). */
     foraDoAr(status = 503) {

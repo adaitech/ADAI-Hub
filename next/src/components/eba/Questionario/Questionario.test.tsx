@@ -97,6 +97,14 @@ describe('Questionario — abertura', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as perguntas agora. Tente em alguns minutos.');
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
+
+  it.each<SlugTeste>(['temperamento-pessoal', 'dons-servico'])('perguntasIndisponiveis (%s, API fora ao abrir) → mensagem, sem sair da abertura', (slug) => {
+    montar(slug, { perguntasIndisponiveis: true });
+    expect(screen.queryByRole('alert')).toBeNull();
+    comecar();
+    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as perguntas agora. Tente em alguns minutos.');
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
 });
 
 describe('Questionario — perguntas de nota (0 a 5)', () => {

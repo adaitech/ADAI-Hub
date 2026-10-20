@@ -6,6 +6,7 @@ import {
   lerSessao,
   mascararEmail,
   OPCOES_COOKIE,
+  segredoDaSessao,
   TAMANHO_MINIMO_SEGREDO,
   VALIDADE_SESSAO_MS,
   type SessaoAluno,
@@ -161,5 +162,21 @@ describe('OPCOES_COOKIE', () => {
     expect(OPCOES_COOKIE.sameSite).toBe('lax');
     expect(OPCOES_COOKIE.path).toBe('/eba/testes');
     expect(typeof OPCOES_COOKIE.secure).toBe('boolean');
+  });
+});
+
+describe('segredoDaSessao', () => {
+  const original = process.env.EBA_SESSAO_SEGREDO;
+  afterAll(() => {
+    process.env.EBA_SESSAO_SEGREDO = original;
+  });
+
+  it('devolve EBA_SESSAO_SEGREDO com 32+ caracteres; ausente ou curto → null', () => {
+    process.env.EBA_SESSAO_SEGREDO = SEGREDO;
+    expect(segredoDaSessao()).toBe(SEGREDO);
+    process.env.EBA_SESSAO_SEGREDO = 'x'.repeat(TAMANHO_MINIMO_SEGREDO - 1);
+    expect(segredoDaSessao()).toBeNull();
+    delete process.env.EBA_SESSAO_SEGREDO;
+    expect(segredoDaSessao()).toBeNull();
   });
 });
