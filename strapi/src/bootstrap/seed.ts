@@ -611,6 +611,34 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   const storedVersion = ((await strapi.store.get(STORE)) as number | null) ?? 1;
   const pages = strapi.documents('api::page.page');
 
+  // Migração isolada das três páginas aprovadas; não reconstrói Home, Agenda ou Contribua.
+  const institucionaisStore = { type: 'core', name: 'adai', key: 'institucionais_version' } as const;
+  const versaoInstitucionais = Number(await strapi.store.get(institucionaisStore)) || 0;
+  if (versaoInstitucionais < 3) {
+    const dados = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'institucionais.json'), 'utf8'));
+    async function resolverMidias(valor: unknown): Promise<unknown> {
+      if (Array.isArray(valor)) return Promise.all(valor.map(resolverMidias));
+      if (!valor || typeof valor !== 'object') return valor;
+      const objeto = valor as Record<string, unknown>;
+      if (typeof objeto.$arquivo === 'string') return image(strapi, objeto.$arquivo, String(objeto.alt ?? ''));
+      const resultado: Record<string, unknown> = {};
+      for (const [chave, item] of Object.entries(objeto)) resultado[chave] = await resolverMidias(item);
+      return resultado;
+    }
+    for (const pagina of dados) {
+      const conteudo = await resolverMidias(pagina) as Record<string, unknown>;
+      const primeiraImagem = (conteudo.sections as Array<{ imagem?: number }>).find((section) => section.imagem)?.imagem;
+      (conteudo.seo as Record<string, unknown>).metaImage = primeiraImagem;
+      const existente = await pages.findFirst({ filters: { slug: pagina.slug } });
+      const documento = existente
+        ? await pages.update({ documentId: existente.documentId, data: conteudo as never })
+        : await pages.create({ data: conteudo as never });
+      await publishPage(strapi, documento.documentId);
+    }
+    await strapi.store.set({ ...institucionaisStore, value: 3 });
+    strapi.log.info('[seed] Páginas Nossa história, No que cremos e Jesus atualizadas (v3).');
+  }
+
   // Versão independente: restaurar Contribua não reconstrói as demais páginas do editor.
   const contribuaStore = { type: 'core', name: 'adai', key: 'contribua_version' } as const;
   const versaoContribua = Number(await strapi.store.get(contribuaStore)) || 0;
@@ -757,6 +785,8 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   }
 
   for (const p of PAGINAS_INSTITUCIONAIS) {
+    // Estas páginas têm versão editorial própria, inclusive em banco novo.
+    if (['sobre-nos-nossa-historia', 'sobre-nos-no-que-acreditamos', 'jesus'].includes(p.slug)) continue;
     const existente = await pages.findFirst({ filters: { slug: p.slug } });
     if (!existente) {
       const created = await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...(await paginaInstitucional(strapi, p)) } as never });

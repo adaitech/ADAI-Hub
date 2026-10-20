@@ -6,6 +6,11 @@ import type { HeroData } from './types';
 const completo = mocks.completo as HeroData;
 
 describe('HeroSection', () => {
+  it('capa resolve uploads relativos no host do Strapi', () => {
+    render(<HeroSection data={{ ...completo, imagem: { id: 1, url: '/uploads/foto.jpg', alternativeText: 'Comunidade ADAI' } }} index={0} somenteImagem />);
+    const src = screen.getByRole('img', { name: 'Comunidade ADAI' }).getAttribute('src') ?? '';
+    expect(decodeURIComponent(src)).toContain('http://localhost:1337/uploads/foto.jpg');
+  });
   it('modo imagem dispensa título, overlay e botões e mantém fallback sem imagem', () => {
     const { container, rerender } = render(<HeroSection data={completo} index={0} somenteImagem />);
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { resolveStrapiMedia } from '@/lib/strapi/media';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import type { SectionProps } from '@/types/sections';
 import { normalizeHero } from './normalize';
@@ -11,10 +12,11 @@ import styles from './HeroSection.module.css';
  */
 export function HeroSection({ data, index, somenteImagem = false }: SectionProps<HeroData> & { somenteImagem?: boolean }) {
   if (somenteImagem) {
+    const imagem = resolveStrapiMedia(data.imagem);
     return (
       <div className={`${styles.hero} ${styles.somenteImagem}`} data-section="hero">
         <div className={styles.cartao} data-foto="colorida">
-          {data.imagem && <Image src={data.imagem.url} alt={data.imagem.alternativeText ?? ''} fill sizes="(min-width: 1440px) 1440px, 100vw" loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : undefined} className={styles.imagem} />}
+          {imagem && <Image src={imagem.url} alt={imagem.alt} fill sizes="(min-width: 1440px) 1440px, 100vw" loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : undefined} className={styles.imagem} />}
         </div>
       </div>
     );

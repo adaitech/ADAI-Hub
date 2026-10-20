@@ -13,7 +13,7 @@
   "attributes": {
     "apresentacao": {
       "type": "enumeration",
-      "enum": ["padrao", "editorial"]
+      "enum": ["padrao", "editorial", "institucional"]
     },
     "titulo": {
       "type": "string",

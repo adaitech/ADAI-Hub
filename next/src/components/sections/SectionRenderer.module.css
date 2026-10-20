@@ -15,6 +15,33 @@
   padding: 0;
 }
 
+/* Composição institucional: capa sem sobreposição e coluna confortável de leitura. */
+.institucional > :global([data-section='texto-rico']:not([data-apresentacao='destaque'])) {
+  max-width: var(--texto-rico-max);
+  margin-inline: auto;
+}
+
+.institucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) + :global([data-section='texto-rico'][data-apresentacao='destaque']) {
+  margin-top: calc(var(--space-12) - var(--space-40));
+}
+
+.institucional :global([data-section='texto-rico'][data-apresentacao='destaque']) h2 {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+.institucional :global([data-section='texto-rico']) h3 {
+  font-size: var(--font-size-h3);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+@media (min-width: 769px) {
+  .institucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) + :global([data-section='texto-rico'][data-apresentacao='destaque']) {
+    margin-top: calc(var(--space-12) - var(--space-56));
+  }
+}
+
 /* A citação continua o assunto dos cards anteriores, com um intervalo menor. */
 .editorial > :global([data-section='carrossel-cards']) + :global([data-section='texto-rico']:not(section)) {
   margin-top: calc(var(--space-32) - var(--space-40));
