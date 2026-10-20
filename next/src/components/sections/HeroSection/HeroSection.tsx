@@ -9,7 +9,16 @@ import styles from './HeroSection.module.css';
  * Figma: "Hero" (node 1:32) e "Hero / Campestre" (28:414). Abertura da página com foto
  * (P&B por padrão; colorida nas unidades), frase principal, subtítulo opcional e CTAs.
  */
-export function HeroSection({ data, index }: SectionProps<HeroData>) {
+export function HeroSection({ data, index, somenteImagem = false }: SectionProps<HeroData> & { somenteImagem?: boolean }) {
+  if (somenteImagem) {
+    return (
+      <div className={`${styles.hero} ${styles.somenteImagem}`} data-section="hero">
+        <div className={styles.cartao} data-foto="colorida">
+          {data.imagem && <Image src={data.imagem.url} alt={data.imagem.alternativeText ?? ''} fill sizes="(min-width: 1440px) 1440px, 100vw" loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : undefined} className={styles.imagem} />}
+        </div>
+      </div>
+    );
+  }
   const view = normalizeHero(data);
   if (!view) return null;
 

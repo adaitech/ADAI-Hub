@@ -6,6 +6,15 @@ import type { HeroData } from './types';
 const completo = mocks.completo as HeroData;
 
 describe('HeroSection', () => {
+  it('modo imagem dispensa título, overlay e botões e mantém fallback sem imagem', () => {
+    const { container, rerender } = render(<HeroSection data={completo} index={0} somenteImagem />);
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(container.querySelector('img')).toHaveAttribute('fetchpriority', 'high');
+    rerender(<HeroSection data={{ ...completo, imagem: null }} index={0} somenteImagem />);
+    expect(container.querySelector('[data-foto="colorida"]')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
+  });
   it('renderiza a frase principal como h1 quando é a primeira seção', () => {
     render(<HeroSection data={completo} index={0} />);
     const titulo = screen.getByRole('heading', { level: 1 });

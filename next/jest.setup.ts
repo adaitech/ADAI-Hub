@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
+// O marcador é validado pelo compilador do Next; testes de servidor executam fora dele.
+jest.mock('server-only', () => ({}), { virtual: true });
+
 // Cache do Next (unstable_cache/revalidateTag) é comportamento do framework: nos testes
 // unitários vira chamada direta. (O módulo real depende de Request/TextEncoder, ausentes no jsdom.)
 jest.mock('next/cache', () => ({

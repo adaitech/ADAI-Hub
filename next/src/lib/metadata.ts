@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import { resolveStrapiMedia } from './strapi/media';
-import type { StrapiSeo } from './strapi/types';
+import type { StrapiMedia, StrapiSection, StrapiSeo } from './strapi/types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 /** SEO da página no Strapi, com o SEO padrão de `global` como reserva. */
-export function buildMetadata(seo?: StrapiSeo | null, fallback?: StrapiSeo | null, path = '/'): Metadata {
+export function buildMetadata(seo?: StrapiSeo | null, fallback?: StrapiSeo | null, path = '/', sections?: StrapiSection[] | null): Metadata {
   const title = seo?.metaTitle ?? fallback?.metaTitle ?? 'ADAI';
   const description = seo?.metaDescription ?? fallback?.metaDescription ?? undefined;
-  const image = resolveStrapiMedia(seo?.metaImage ?? fallback?.metaImage);
+  const hero = sections?.find((section) => section.__component === 'sections.hero') as (StrapiSection & { imagem?: StrapiMedia | null }) | undefined;
+  const image = resolveStrapiMedia(seo?.metaImage) ?? resolveStrapiMedia(hero?.imagem) ?? resolveStrapiMedia(fallback?.metaImage);
   // Só o "Meta robots" da própria página (nunca o padrão do site): o mesmo critério do sitemap.
   const metaRobots = seo?.metaRobots?.trim();
 

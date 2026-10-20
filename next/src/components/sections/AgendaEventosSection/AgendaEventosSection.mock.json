@@ -1,0 +1,26 @@
+{
+  "completo": {
+    "__component": "sections.agenda-eventos",
+    "id": 71,
+    "titulo": "Todos os eventos",
+    "mensagem_vazia": "Ainda não há eventos programados."
+  },
+  "minimo": {
+    "__component": "sections.agenda-eventos",
+    "id": 70,
+    "titulo": "Todos os eventos",
+    "mensagem_vazia": "Ainda não há eventos programados."
+  },
+  "sem_arte": {
+    "__component": "sections.agenda-eventos",
+    "id": 72,
+    "titulo": "Agenda da ADAI",
+    "mensagem_vazia": "Ainda não há eventos programados."
+  },
+  "vazio": {
+    "__component": "sections.agenda-eventos",
+    "id": 73,
+    "titulo": "Todos os eventos",
+    "mensagem_vazia": "Ainda não há eventos programados."
+  }
+}

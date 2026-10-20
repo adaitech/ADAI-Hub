@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_sections_agenda_eventos",
+  "info": {
+    "displayName": "Agenda de eventos (inChurch)",
+    "icon": "calendar",
+    "description": "Lista completa dos próximos eventos da inChurch. Aqui você edita apenas os textos da seção; eventos, artes e unidades vêm dos sistemas de origem."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80,
+      "default": "Todos os eventos"
+    },
+    "mensagem_vazia": {
+      "type": "string",
+      "required": true,
+      "maxLength": 160,
+      "default": "Ainda não há eventos programados."
+    }
+  }
+}

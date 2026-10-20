@@ -7,7 +7,7 @@ import type { HeroData } from './types';
 const completo = mocks.completo as HeroData;
 const BOTOES = completo.botoes ?? [];
 
-export const heroShowcase = defineShowcase<HeroData>({
+export const heroShowcase = defineShowcase<HeroData & { somenteImagem?: boolean }>({
   slug: 'hero',
   nome: 'Hero',
   categoria: 'secao',
@@ -17,8 +17,9 @@ export const heroShowcase = defineShowcase<HeroData>({
   quandoUsar: 'Primeira seção da Home e de páginas de ministério ou campanha. Apenas um por página.',
   doc: 'docs/componentes/hero.md',
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-32',
-  render: (data) => <HeroSection data={data} index={0} />,
+  render: (data) => <HeroSection data={data} index={0} somenteImagem={data.somenteImagem} />,
   variantes: [
+    { nome: 'imagem_evento', titulo: 'Imagem do evento', descricao: 'Uso por código: arte 16:9, sem texto sobreposto; sem imagem, mantém fundo de fallback.', data: { ...mocks.imagem_evento as HeroData, somenteImagem: true } },
     { nome: 'completo', titulo: 'Completo', descricao: 'Como está na Home (Figma).', data: mocks.completo as HeroData },
     {
       nome: 'unidade',

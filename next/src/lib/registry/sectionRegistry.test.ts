@@ -7,6 +7,7 @@ describe('sectionRegistry', () => {
 
   it('getSection: seção conhecida → componente + populate; desconhecida → null', () => {
     expect(getSection('sections.hero')).toEqual({ component: expect.any(Function), populate: expect.anything() });
+    expect(getSection('sections.agenda-eventos')).toEqual({ component: expect.any(Function), populate: true });
     expect(getSection('sections.nao-existe')).toBeNull();
     expect(getSection('__proto__')).toBeNull();
     expect(getSection('constructor')).toBeNull();

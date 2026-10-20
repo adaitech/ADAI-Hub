@@ -135,3 +135,5 @@ Também cobrem este componente, sem precisar editar nada:
 - `src/__tests__/integracao/paginas.test.tsx` — página montada do Strapi (quando a seção está na Home).
 
 **Regra:** alterou o componente → atualize ou crie o teste no mesmo PR, antes de abrir (`.agents/rules/Testes.md` e `.agents/rules/Pull-Request.md`).
+
+A prop opcional `colunasDesktop={3}` atende Outros eventos, preservando o padrão de cinco colunas dos demais usos. Exemplo na vitrine de Próximos eventos (outros_eventos).

@@ -6,7 +6,7 @@ import type { Core } from '@strapi/strapi';
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 17;
+const SEED_VERSION = 18;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
@@ -476,6 +476,28 @@ async function homeSections(strapi: Core.Strapi) {
   ];
 }
 
+/** Página Agenda: Hero comum da dynamic zone + listagem editorialmente configurável. */
+async function agendaSections(strapi: Core.Strapi) {
+  const hero = await image(
+    strapi,
+    'hero-adai.jpg',
+    'Voluntária sorri na entrada da igreja segurando uma placa com as palavras Amar, Servir e Influenciar',
+  );
+  return [
+    {
+      __component: 'sections.hero',
+      titulo: 'Agenda',
+      texto_apoio: 'Confira os próximos eventos, conferências e cultos especiais da ADAI.',
+      imagem: hero,
+    },
+    {
+      __component: 'sections.agenda-eventos',
+      titulo: 'Todos os eventos',
+      mensagem_vazia: 'Ainda não há eventos programados.',
+    },
+  ];
+}
+
 /** Página /exemplos: variações dos componentes montadas no Strapi (conteúdo ilustrativo). */
 async function exemplosSections(strapi: Core.Strapi) {
   const fotos = await Promise.all([
@@ -596,6 +618,36 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   } else if (storedVersion < SEED_VERSION) {
     await strapi.documents('api::global.global').update({ documentId: global.documentId, data: { footer } as never });
     strapi.log.warn(`[seed] Rodapé reconstruído (seed v${storedVersion} → v${SEED_VERSION}).`);
+  }
+
+  const agenda = await pages.findFirst({ filters: { slug: 'agenda' } });
+  if (!agenda) {
+    const created = await pages.create({
+      data: {
+        titulo: 'Agenda',
+        slug: 'agenda',
+        seo: {
+          metaTitle: 'Agenda | ADAI',
+          metaDescription: 'Confira os próximos eventos, conferências e cultos especiais da ADAI.',
+        },
+        sections: await agendaSections(strapi),
+      } as never,
+    });
+    await publishPage(strapi, created.documentId);
+    strapi.log.info('[seed] Página "agenda" criada e publicada.');
+  } else if (storedVersion < SEED_VERSION) {
+    await pages.update({
+      documentId: agenda.documentId,
+      data: {
+        seo: {
+          metaTitle: 'Agenda | ADAI',
+          metaDescription: 'Confira os próximos eventos, conferências e cultos especiais da ADAI.',
+        },
+        sections: await agendaSections(strapi),
+      } as never,
+    });
+    await publishPage(strapi, agenda.documentId);
+    strapi.log.warn(`[seed] Página "agenda" reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
   }
 
   const home = await pages.findFirst({ filters: { slug: 'home' } });

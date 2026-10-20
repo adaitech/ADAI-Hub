@@ -179,6 +179,29 @@ export interface LayoutHeader extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsAgendaEventos extends Struct.ComponentSchema {
+  collectionName: 'components_sections_agenda_eventos';
+  info: {
+    description: 'Lista completa dos pr\u00F3ximos eventos da inChurch. Aqui voc\u00EA edita apenas os textos da se\u00E7\u00E3o; eventos, artes e unidades v\u00EAm dos sistemas de origem.';
+    displayName: 'Agenda de eventos (inChurch)';
+    icon: 'calendar';
+  };
+  attributes: {
+    mensagem_vazia: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }> &
+      Schema.Attribute.DefaultTo<'Ainda n\u00E3o h\u00E1 eventos programados.'>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }> &
+      Schema.Attribute.DefaultTo<'Todos os eventos'>;
+  };
+}
+
 export interface SectionsCarrosselCards extends Struct.ComponentSchema {
   collectionName: 'components_sections_carrosseis_cards';
   info: {
@@ -545,6 +568,7 @@ declare module '@strapi/strapi' {
       'items.pergunta-frequente': ItemsPerguntaFrequente;
       'layout.footer': LayoutFooter;
       'layout.header': LayoutHeader;
+      'sections.agenda-eventos': SectionsAgendaEventos;
       'sections.carrossel-cards': SectionsCarrosselCards;
       'sections.hero': SectionsHero;
       'sections.imagem-texto': SectionsImagemTexto;

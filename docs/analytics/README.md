@@ -140,6 +140,26 @@ Checklist geral (Strapi, segredos, integrações, LGPD): `README.md` → "Antes 
 
 ## 7. Pendências
 
+### Agenda e detalhes — atualização de 18/10/2026
+
+O container JSON contém a configuração abaixo, ainda sem publicação desta atualização no GTM ou configuração no GA4:
+
+| Evento | Quando | Parâmetros |
+| --- | --- | --- |
+| `acessar_evento` | CTA explícito do evento publicado ainda não encerrado | `origem`, `evento`, `evento_id`, `destino` sem query/hash |
+| `filtrar_agenda` | Seleção de unidade ou limpeza dos filtros | `filtro`, `valor_filtro`, `resultados` após aplicar filtro e busca |
+| `buscar_evento` | Após 1 segundo sem digitar, mínimo 3 caracteres | `caracteres` (limitado a 100), `resultados`; nunca o texto digitado |
+| `selecionar_evento` | Cards da Agenda e de Próximos/Outros eventos | `origem`, `evento`, `acao`; `page_path` distingue Home e detalhes |
+| `como_chegar` | Link Maps do detalhe | `local`: Location público → unidade → vazio; `unidade` só para campus real; `evento` identifica o contexto |
+
+Parâmetros vazios são omitidos pelo `registrarEvento`. Nome do evento não é usado como local. Datas encerradas não recebem CTA, mas continuam com visualização de seções e links úteis. Programação, convidados, galeria e breadcrumb permanecem cobertos pelos eventos genéricos; `ver_galeria` fica fora deste escopo.
+
+O callback de `web_vitals` é estável entre renders. Validação em 18/10/2026 com `next start`: FCP e TTFB foram registrados uma vez por documento, inclusive após navegação interna; LCP e FID também foram observados sem duplicação. No modo de desenvolvimento, FCP/TTFB duplicaram. Não foi adicionada deduplicação por nome, que poderia descartar atualizações legítimas de métricas. Os disparos de filtro, busca, seleção, acesso e Maps foram confirmados no DataLayer com instrumentação local temporária removida ao final. Isso não confirma recebimento no GA4: a configuração externa ainda precisa ser importada, validada e publicada pelo responsável.
+
+Preparação externa: importar/revisar o JSON atualizado, conferir gatilho e parâmetros, configurar `evento_id`, `filtro`, `valor_filtro` e `local` como dimensões conforme necessidade e `resultados`/`caracteres` como métricas. Marcar `acessar_evento` como evento-chave; o clique mede acesso externo, não inscrição concluída. `valor_filtro` evita conflitar com `valor` numérico de Web Vitals. Texto livre de busca não é coletado. Publicar somente após validação e autorização do responsável.
+
+Testes: `lib/analytics/cliques.test.ts`, `eventos.test.ts`, `components/analytics/RastreadorAnalytics.test.tsx` e `AgendaEventosSection.test.tsx` cobrem contexto, conversão, contrato GTM, contagem, debounce e privacidade.
+
 - **Eventos-chave** `planejar_visita` e `contribuir`: marcar a estrela no GA4 (§4.2).
 - **Política de Privacidade** (LGPD): página `/politica-de-privacidade` publicada no Strapi (seção `sections.texto-rico`, texto de `docs/conteudo/politica-de-privacidade.md`), com link no aviso de cookies e no rodapé. Falta a revisão jurídica e confirmar os dados da controladora e do encarregado antes de produção.
 - Bônus de vídeo: com `enablejsapi=1` no embed do YouTube, o gatilho "Vídeo do YouTube" do GTM mede início/progresso/fim das mensagens assistidas no site.

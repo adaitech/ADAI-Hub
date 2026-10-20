@@ -9,6 +9,7 @@ import itemsPerguntaFrequente from './items.pergunta-frequente.json';
 import layoutFooter from './layout.footer.json';
 import layoutHeader from './layout.header.json';
 import sectionsCarrosselCards from './sections.carrossel-cards.json';
+import sectionsAgendaEventos from './sections.agenda-eventos.json';
 import sectionsHero from './sections.hero.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
 import sectionsMinisterios from './sections.ministerios.json';
@@ -48,6 +49,7 @@ export const editorGuides: EditorGuide[] = [
   apiUnidade,
   sectionsHero,
   sectionsCarrosselCards,
+  sectionsAgendaEventos,
   sectionsSerieAtual,
   sectionsProximosEventos,
   sectionsImagemTexto,

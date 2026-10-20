@@ -12,7 +12,7 @@ export interface EventosAnalytics {
   /** Conversão: clique para planejar a visita (link para `/planeje-sua-visita`). */
   planejar_visita: Origem & { texto: string };
   /** Clique em "Como chegar" (Google Maps) de uma unidade. */
-  como_chegar: Origem & { unidade: string };
+  como_chegar: Origem & { unidade: string; local?: string; evento?: string };
   /** Abriu uma mensagem da Série atual (player no site ou YouTube). */
   assistir_mensagem: Origem & {
     serie: string;
@@ -23,7 +23,11 @@ export interface EventosAnalytics {
   /** "Todas as mensagens" (playlist no YouTube). */
   ver_todas_mensagens: Origem & { serie: string };
   /** Clique no link de um card de Próximos eventos. */
-  selecionar_evento: { evento: string; acao: string };
+  selecionar_evento: { evento: string; acao: string; origem?: string };
+  acessar_evento: Origem & { evento: string; evento_id: number; destino: string };
+  filtrar_agenda: { filtro: 'unidade'; valor_filtro: string; resultados: number };
+  /** Texto digitado não é enviado, para evitar coleta de dados pessoais. */
+  buscar_evento: { caracteres: number; resultados: number };
   /** Abriu uma pergunta da FAQ. */
   ver_faq: { pergunta: string };
   /** Clique em um ministério de "Encontre seu lugar". */
@@ -59,4 +63,7 @@ export const NOMES_EVENTOS: NomeEvento[] = [
   'ver_secao',
   'web_vitals',
   'consentimento_cookies',
+  'acessar_evento',
+  'filtrar_agenda',
+  'buscar_evento',
 ];

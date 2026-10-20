@@ -3,7 +3,7 @@ import type { EventoSite } from '@/lib/inchurch/eventos';
 import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
 import mocks from './ProximosEventosSection.mock.json';
 import { getIgrejasInchurch } from '@/lib/strapi/queries/unidades';
-import { datasDoEvento, igrejaDe, paraCarrossel, quantidadeDe } from './normalize';
+import { datasDoEvento, igrejaDe, paraCarrossel, quantidadeDe, selecionarEventos } from './normalize';
 import { ProximosEventosSection } from './ProximosEventosSection';
 import { proximosEventosShowcase } from './ProximosEventosSection.showcase';
 import type { ProximosEventosData, ProximosEventosExemplo } from './types';
@@ -61,6 +61,7 @@ describe('paraCarrossel', () => {
     expect(data).toMatchObject({ titulo: 'Próximos eventos', estilo_imagem: 'arte', posicao_imagem: 'apos_titulo' });
     expect(data.cards?.[0]).toMatchObject({
       titulo: 'The Chosen',
+      url: '/agenda/the-chosen-1',
       cor: 'azul',
       destaques: '14 de Outubro\n20h',
       imagem: { url: 'https://storage.googleapis.com/media_files_prod/x.webp', alternativeText: '' },
@@ -83,6 +84,32 @@ describe('paraCarrossel', () => {
 });
 
 describe('ProximosEventosSection', () => {
+  it('ordem cronológica inclui evento em andamento e mantém o comportamento padrão de destaques', () => {
+    const dados = { atualizadoEm: '', eventos: [
+      ev([['2026-10-20T09:00:00', '2026-10-20T10:00:00']], { id: 1, destaque: true }),
+      ev([['2026-10-16T09:00:00', '2026-10-18T10:00:00']], { id: 2 }),
+      ev([['2026-10-16T09:00:00', '2026-10-16T10:00:00']], { id: 3 }),
+    ] };
+    const agora = new Date('2026-10-17T12:00:00-03:00');
+    expect(selecionarEventos(minimo, dados, { agora, ordemCronologica: true }).map((e) => e.id)).toEqual([2, 1]);
+    expect(selecionarEventos(minimo, dados, { agora }).map((e) => e.id)).toEqual([1, 2]);
+  });
+  it('Outros eventos: exclui atual e encerrados, ordena por início e limita a três sem priorizar destaque ou unidade', async () => {
+    getIgrejas.mockClear(); getEventos.mockClear();
+    const dados = { atualizadoEm: '', eventos: [
+      ev([['2027-01-10T09:00:00', '2027-01-10T10:00:00']], { id: 1 }),
+      ev([['2027-01-11T09:00:00', '2027-01-11T10:00:00']], { id: 2, nome: 'Outro' }),
+      ev([['2027-01-12T09:00:00', '2027-01-12T10:00:00']], { id: 3, nome: 'Da unidade', igrejaId: 10 }),
+      ev([['2027-01-13T09:00:00', '2027-01-13T10:00:00']], { id: 4, nome: 'Mais um' }),
+      ev([['2027-01-14T09:00:00', '2027-01-14T10:00:00']], { id: 5, nome: 'Excedente', destaque: true }),
+      ev([['2020-01-01T09:00:00', '2020-01-01T10:00:00']], { id: 6, nome: 'Encerrado' }),
+    ] };
+    render(<>{await ProximosEventosSection({ data: { ...minimo, titulo: 'Outros eventos', quantidade: 12 }, index: 1, eventosExternos: dados, excluirId: 1, priorizarIgrejaId: 10, detalhes: true })}</>);
+    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Outro', 'Da unidade', 'Mais um']);
+    expect(screen.getByRole('link', { name: 'Da unidade' })).toHaveAttribute('href', '/agenda/da-unidade-3');
+    expect(screen.getByRole('list', { name: /Outros eventos: 3 cards/ })).toHaveClass('tresColunas');
+    expect(getIgrejas).not.toHaveBeenCalled(); expect(getEventos).not.toHaveBeenCalled();
+  });
   it('renderiza o mesmo Carrossel de cards com as artes coloridas da inChurch', () => {
     render(<>{proximosEventosShowcase.render(exemplo('completo'))}</>);
     const lista = screen.getByRole('list', { name: /Agenda da ADAI: 4 cards/ });
@@ -97,6 +124,19 @@ describe('ProximosEventosSection', () => {
     const ui = await ProximosEventosSection({ data: { ...minimo, quantidade: 2 }, index: 1 });
     render(<>{ui}</>);
     expect(screen.getByRole('list', { name: 'Próximos eventos: 2 cards' })).toBeInTheDocument();
+  });
+
+  it('Home: título e card abrem detalhes pelo ID, mesmo sem link externo de inscrição', async () => {
+    getEventos.mockResolvedValue({ atualizadoEm: '', eventos: [
+      ev([['2027-01-10T09:00:00', '2027-01-10T10:00:00']], { id: 1635364, nome: 'Connect Pulse' }),
+      ev([['2027-01-11T09:00:00', '2027-01-11T10:00:00']], { id: 2, nome: 'Conferência ADAI', link: { texto: 'Participar online', url: 'https://zoom.us/j/1' } }),
+    ] });
+    render(<>{await ProximosEventosSection({ data: minimo, index: 1 })}</>);
+    const connect = screen.getByRole('link', { name: 'Connect Pulse' });
+    expect(connect).toHaveAttribute('href', '/agenda/connect-pulse-1635364');
+    expect(connect).not.toHaveAttribute('target');
+    expect(screen.getByRole('link', { name: 'Conferência ADAI' })).toHaveAttribute('href', '/agenda/conferencia-adai-2');
+    expect(screen.getByRole('link', { name: /Participar online/ })).toHaveAttribute('href', 'https://zoom.us/j/1');
   });
 
   it('inChurch fora (sem cache) ou sem eventos futuros → seção some', async () => {

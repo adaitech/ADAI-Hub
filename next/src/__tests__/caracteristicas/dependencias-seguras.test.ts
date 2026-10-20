@@ -42,8 +42,8 @@ describe('versões mínimas seguras', () => {
     expect(menorQue(deps('next').next, '16.3.8')).toBe(false);
   });
 
-  it('sharp ≥ 0.35.4 (libvips/libheif)', () => {
-    expect(menorQue(deps('next').sharp, '0.35.4')).toBe(false);
+  it('sharp ≥ 0.35.5 (libvips/libheif)', () => {
+    expect(menorQue(deps('next').sharp, '0.35.5')).toBe(false);
   });
 });
 
@@ -65,11 +65,20 @@ describe('menorQue', () => {
 describe('ninguém contorna o piso', () => {
   type ComResolutions = { resolutions?: Record<string, string> };
   const resolutions = (app: 'next' | 'strapi') =>
-    Object.keys((JSON.parse(readFileSync(join(raiz, app, 'package.json'), 'utf8')) as ComResolutions).resolutions ?? {});
+    Object.entries((JSON.parse(readFileSync(join(raiz, app, 'package.json'), 'utf8')) as ComResolutions).resolutions ?? {});
 
   it('resolutions não podem forçar os pacotes vigiados (o package.json deixaria de valer)', () => {
-    const vigiados = ['next', 'sharp', '@strapi/strapi', '@strapi/plugin-users-permissions', '@strapi/plugin-seo'];
-    expect([...resolutions('next'), ...resolutions('strapi')].filter((p) => vigiados.some((v) => p === v || p.endsWith(`/${v}`)))).toEqual([]);
+    const vigiados = ['next', '@strapi/strapi', '@strapi/plugin-users-permissions', '@strapi/plugin-seo'];
+    expect([...resolutions('next'), ...resolutions('strapi')].filter(([p]) => vigiados.some((v) => p === v || p.endsWith(`/${v}`)))).toEqual([]);
+  });
+
+  it('patches transitivos de segurança não podem ser rebaixados por resolutions', () => {
+    const pisos: Record<string, string> = { sharp: '0.35.5', handlebars: '4.7.10', 'source-map-js': '1.2.2' };
+    for (const [pacote, versao] of [...resolutions('next'), ...resolutions('strapi')]) {
+      for (const [nome, piso] of Object.entries(pisos)) {
+        if (pacote === nome || pacote.endsWith(`/${nome}`)) expect(menorQue(versao, piso)).toBe(false);
+      }
+    }
   });
 
   it('a versão de fato instalada (yarn.lock) também respeita o piso', () => {
@@ -80,7 +89,11 @@ describe('ninguém contorna o piso', () => {
     };
     const pisos: [app: 'next' | 'strapi', pacote: string, piso: string][] = [
       ['next', 'next', '16.3.8'],
-      ['next', 'sharp', '0.35.4'],
+      ['next', 'sharp', '0.35.5'],
+      ['next', 'source-map-js', '1.2.2'],
+      ['strapi', 'sharp', '0.35.5'],
+      ['strapi', 'handlebars', '4.7.10'],
+      ['strapi', 'source-map-js', '1.2.2'],
       ['strapi', '@strapi/strapi', '5.37.0'],
       ['strapi', '@strapi/plugin-users-permissions', '5.37.0'],
     ];
