@@ -17,8 +17,8 @@
         "__component": "sections.hero",
         "titulo": "Nossa história",
         "imagem": {
-          "$arquivo": "sobre-nos-nossa-historia.jpg",
-          "alt": "Pastores Rodrigo e Tati Soeiro durante um encontro da ADAI"
+          "$arquivo": "paulo-silas.png",
+          "alt": "Pastor Paulo Silas, fundador da ADAI, em uma fotografia do acervo enviada pela igreja"
         },
         "preto_e_branco": false
       },
@@ -119,61 +119,71 @@
       {
         "__component": "sections.texto-rico",
         "titulo": "No que cremos",
-        "conteudo": "Conhecer a nossa fé  \ntambém pode ser um começo.\n\nEstas são as convicções que orientam nossa vida como igreja. Se algum termo for novo para você, tudo bem: reunimos uma breve explicação de cada tema e os trechos da Bíblia que ajudam a conhecê-lo melhor."
+        "conteudo": "Conhecer a nossa fé  \ntambém pode ser um começo.\n\nEstas são as convicções que orientam nossa vida como igreja. Se algum termo for novo para você, tudo bem: reunimos uma breve explicação de cada tema e os trechos da Bíblia que ajudam a conhecê-lo melhor.\n\n## Explore os temas\n\nVocê pode ler na ordem ou começar pelo assunto que mais desperta sua curiosidade.\n\n- [1. Deus](#deus)\n- [2. Jesus Cristo](#jesus-cristo)\n- [3. Espírito Santo](#espirito-santo)\n- [4. A Bíblia](#a-biblia)\n- [5. A humanidade e o pecado](#humanidade-e-pecado)\n- [6. A salvação](#salvacao)\n- [7. A eternidade](#eternidade)\n- [8. O batismo](#batismo)\n- [9. A ceia do Senhor](#ceia-do-senhor)",
+        "ancora": "temas-da-fe"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "1. Deus",
-        "conteudo": "Um Deus que nos conhece e nos ama.\n\nCremos em um único Deus, Criador e Senhor de todas as coisas. Ele existe eternamente em três pessoas: Pai, Filho e Espírito Santo. Os três são igualmente divinos, eternos e constituem um só Deus.\n\nNa Bíblia: Gênesis 1:1; Mateus 28:19; 2 Coríntios 13:13.",
-        "apresentacao": "destaque"
+        "conteudo": "Um Deus que nos conhece e nos ama.\n\nCremos em um único Deus, Criador e Senhor de todas as coisas. Ele existe eternamente em três pessoas: Pai, Filho e Espírito Santo. Os três são igualmente divinos, eternos e constituem um só Deus.\n\nNa Bíblia: Gênesis 1:1; Mateus 28:19; 2 Coríntios 13:13.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "deus"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "2. Jesus Cristo",
-        "conteudo": "Deus veio ao nosso encontro.\n\nCremos que Jesus Cristo é o Filho de Deus, nosso Senhor e Salvador. Ele é plenamente Deus e plenamente homem. Viveu sem pecado, entregou Sua vida na cruz como sacrifício pelos nossos pecados e ressuscitou ao terceiro dia, vencendo o pecado e a morte. Ascendeu aos céus e um dia voltará em glória.\n\nNa Bíblia: João 1:1–14; Hebreus 4:15; 1 Coríntios 15:3–4; Atos 1:9–11.",
-        "apresentacao": "destaque"
+        "conteudo": "Deus veio ao nosso encontro.\n\nCremos que Jesus Cristo é o Filho de Deus, nosso Senhor e Salvador. Ele é plenamente Deus e plenamente homem. Viveu sem pecado, entregou Sua vida na cruz como sacrifício pelos nossos pecados e ressuscitou ao terceiro dia, vencendo o pecado e a morte. Ascendeu aos céus e um dia voltará em glória.\n\nNa Bíblia: João 1:1–14; Hebreus 4:15; 1 Coríntios 15:3–4; Atos 1:9–11.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "jesus-cristo"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "3. Espírito Santo",
-        "conteudo": "A presença de Deus na nossa caminhada.\n\nCremos no Espírito Santo, que habita e atua na vida de todo aquele que pertence a Cristo. Ele é Deus, juntamente com o Pai e o Filho. Convence o mundo do pecado, conduz as pessoas à verdade, transforma nosso caráter e nos capacita a viver segundo a vontade de Deus. Buscamos diariamente Sua direção e Seu poder.\n\nNa Bíblia: João 14:16–17; João 16:8–13; Romanos 8:9; Gálatas 5:22–25.",
-        "apresentacao": "destaque"
+        "conteudo": "A presença de Deus na nossa caminhada.\n\nCremos no Espírito Santo, que habita e atua na vida de todo aquele que pertence a Cristo. Ele é Deus, juntamente com o Pai e o Filho. Convence o mundo do pecado, conduz as pessoas à verdade, transforma nosso caráter e nos capacita a viver segundo a vontade de Deus. Buscamos diariamente Sua direção e Seu poder.\n\nNa Bíblia: João 14:16–17; João 16:8–13; Romanos 8:9; Gálatas 5:22–25.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "espirito-santo"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "4. A Bíblia",
-        "conteudo": "Uma referência para conhecer Deus e viver.\n\nCremos que a Bíblia é a Palavra de Deus, inspirada pelo Espírito Santo. Ela é verdadeira, digna de confiança e nossa autoridade suprema em questões de fé e prática. Por meio das Escrituras, conhecemos a Deus, compreendemos Sua vontade e encontramos direção para nossa vida.\n\nNa Bíblia: 2 Timóteo 3:16–17; 2 Pedro 1:20–21; Salmos 119:105.",
-        "apresentacao": "destaque"
+        "conteudo": "Uma referência para conhecer Deus e viver.\n\nCremos que a Bíblia é a Palavra de Deus, inspirada pelo Espírito Santo. Ela é verdadeira, digna de confiança e nossa autoridade suprema em questões de fé e prática. Por meio das Escrituras, conhecemos a Deus, compreendemos Sua vontade e encontramos direção para nossa vida.\n\nNa Bíblia: 2 Timóteo 3:16–17; 2 Pedro 1:20–21; Salmos 119:105.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "a-biblia"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "5. A humanidade e o pecado",
-        "conteudo": "Temos valor, mas precisamos de reconciliação.\n\nCremos que todas as pessoas foram criadas à imagem de Deus e possuem valor e dignidade. Entretanto, todos pecaram e necessitam da graça de Deus. O pecado nos separa de Deus, e somente por meio de Jesus Cristo podemos experimentar reconciliação e restauração.\n\nNa Bíblia: Gênesis 1:26–27; Romanos 3:23; Romanos 6:23; 2 Coríntios 5:18–19.",
-        "apresentacao": "destaque"
+        "conteudo": "Temos valor, mas precisamos de reconciliação.\n\nCremos que todas as pessoas foram criadas à imagem de Deus e possuem valor e dignidade. Entretanto, todos pecaram e necessitam da graça de Deus. O pecado nos separa de Deus, e somente por meio de Jesus Cristo podemos experimentar reconciliação e restauração.\n\nNa Bíblia: Gênesis 1:26–27; Romanos 3:23; Romanos 6:23; 2 Coríntios 5:18–19.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "humanidade-e-pecado"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "6. A salvação",
-        "conteudo": "Uma nova vida que começa com a graça.\n\nCremos que a salvação é um presente da graça de Deus, recebido pela fé em Jesus Cristo. Não podemos conquistar a salvação por boas obras ou méritos pessoais. Somos salvos ao nos arrependermos dos nossos pecados e depositarmos nossa fé em Jesus Cristo como Senhor e Salvador. A salvação nos concede uma nova vida e nos chama a viver em obediência à Palavra de Deus.\n\nNa Bíblia: Efésios 2:8–9; João 3:16; Romanos 10:9–10; 2 Coríntios 5:17.",
-        "apresentacao": "destaque"
+        "conteudo": "Uma nova vida que começa com a graça.\n\nCremos que a salvação é um presente da graça de Deus, recebido pela fé em Jesus Cristo. Não podemos conquistar a salvação por boas obras ou méritos pessoais. Somos salvos ao nos arrependermos dos nossos pecados e depositarmos nossa fé em Jesus Cristo como Senhor e Salvador. A salvação nos concede uma nova vida e nos chama a viver em obediência à Palavra de Deus.\n\nNa Bíblia: Efésios 2:8–9; João 3:16; Romanos 10:9–10; 2 Coríntios 5:17.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "salvacao"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "7. A eternidade",
-        "conteudo": "Nossa esperança vai além desta vida.\n\nCremos que fomos criados para a eternidade. Aqueles que recebem a salvação em Jesus Cristo desfrutarão da vida eterna com Deus. Aqueles que permanecem separados de Cristo enfrentarão a separação eterna de Deus. Cremos na realidade do céu e do inferno e na promessa da ressurreição e da vida eterna.\n\nNa Bíblia: João 3:16–18; Mateus 25:46; João 5:28–29; Apocalipse 21:1–4.",
-        "apresentacao": "destaque"
+        "conteudo": "Nossa esperança vai além desta vida.\n\nCremos que fomos criados para a eternidade. Aqueles que recebem a salvação em Jesus Cristo desfrutarão da vida eterna com Deus. Aqueles que permanecem separados de Cristo enfrentarão a separação eterna de Deus. Cremos na realidade do céu e do inferno e na promessa da ressurreição e da vida eterna.\n\nNa Bíblia: João 3:16–18; Mateus 25:46; João 5:28–29; Apocalipse 21:1–4.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "eternidade"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "8. O batismo",
-        "conteudo": "Uma forma pública de expressar a fé.\n\nCremos que o batismo nas águas é uma declaração pública de fé e obediência a Jesus Cristo. Ele simboliza nossa identificação com a morte, o sepultamento e a ressurreição de Jesus. É uma expressão visível da nova vida que recebemos pela fé em Cristo e um passo importante de obediência ao Seu mandamento.\n\nNa Bíblia: Mateus 28:19–20; Romanos 6:3–4; Atos 2:38–41.",
-        "apresentacao": "destaque"
+        "conteudo": "Uma forma pública de expressar a fé.\n\nCremos que o batismo nas águas é uma declaração pública de fé e obediência a Jesus Cristo. Ele simboliza nossa identificação com a morte, o sepultamento e a ressurreição de Jesus. É uma expressão visível da nova vida que recebemos pela fé em Cristo e um passo importante de obediência ao Seu mandamento.\n\nNa Bíblia: Mateus 28:19–20; Romanos 6:3–4; Atos 2:38–41.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "batismo"
       },
       {
         "__component": "sections.texto-rico",
         "titulo": "9. A ceia do Senhor",
-        "conteudo": "Lembramos, juntos, do amor de Jesus.\n\nCremos que a Ceia do Senhor é uma ordenança instituída por Jesus Cristo, por meio da qual celebramos Sua morte, proclamamos Sua ressurreição e anunciamos Sua volta. Ao participarmos do pão e do cálice, recordamos com gratidão o sacrifício de Jesus na cruz, reafirmamos nossa comunhão com Cristo e com Sua Igreja e renovamos nossa esperança em Sua promessa de voltar.\n\nNa Bíblia: Lucas 22:19–20; 1 Coríntios 10:16–17; 1 Coríntios 11:23–29.",
-        "apresentacao": "destaque"
+        "conteudo": "Lembramos, juntos, do amor de Jesus.\n\nCremos que a Ceia do Senhor é uma ordenança instituída por Jesus Cristo, por meio da qual celebramos Sua morte, proclamamos Sua ressurreição e anunciamos Sua volta. Ao participarmos do pão e do cálice, recordamos com gratidão o sacrifício de Jesus na cruz, reafirmamos nossa comunhão com Cristo e com Sua Igreja e renovamos nossa esperança em Sua promessa de voltar.\n\nNa Bíblia: Lucas 22:19–20; 1 Coríntios 10:16–17; 1 Coríntios 11:23–29.\n\n[Voltar aos temas](#temas-da-fe)",
+        "apresentacao": "destaque",
+        "ancora": "ceia-do-senhor"
       },
       {
         "__component": "sections.texto-rico",
@@ -351,6 +361,235 @@
             "botao": {
               "texto": "Saiba mais",
               "url": "/sobre-nos/a-igreja-que-vemos",
+              "estilo": "solido"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "titulo": "A igreja que vemos",
+    "slug": "sobre-nos-a-igreja-que-vemos",
+    "apresentacao": "institucional-grade",
+    "seo": {
+      "metaTitle": "A igreja que vemos | ADAI",
+      "metaDescription": "Conheça a visão, a missão e os valores da ADAI: uma comunidade que deseja amar a Deus, servir as pessoas e influenciar o mundo."
+    },
+    "sections": [
+      {
+        "__component": "sections.hero",
+        "titulo": "A igreja que vemos",
+        "imagem": {
+          "$arquivo": "sobre-nos-a-igreja-que-vemos.jpg",
+          "alt": "Comunidade reunida em um encontro da ADAI"
+        },
+        "preto_e_branco": false
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "A igreja que vemos",
+        "conteudo": "Uma igreja se constrói com pessoas. Estes são os sonhos, os compromissos e os valores que orientam o tipo de comunidade que queremos viver juntos.\n\nSe você está nos conhecendo agora, este é um convite para descobrir o que nos move."
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "01. Vivemos o evangelho",
+        "conteudo": "Uma igreja que não apenas fala do evangelho, mas vive, prega e canta o verdadeiro evangelho de Jesus Cristo — com a vida, com o coração e com tudo o que é.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "02. Honramos a história e olhamos adiante",
+        "conteudo": "Uma igreja pentecostal contemporânea que honra o que Deus já fez, mas se recusa a morar no passado. Celebramos os triunfos de ontem, sem perder a fome pelo que Deus ainda fará amanhã. Com uma visão que inspira, mantemos os olhos fixos no futuro.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "03. Cada pessoa tem lugar",
+        "conteudo": "Uma igreja grande o suficiente para sonhar em escala global, e íntima o bastante para que cada pessoa seja vista, conhecida e encontre o seu lugar.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "04. Servir faz parte de quem somos",
+        "conteudo": "Uma igreja onde cada membro entende que servir não é uma função, é identidade. Porque servir é a própria natureza de Deus.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "05. Lideramos com integridade",
+        "conteudo": "Uma igreja liderada por homens e mulheres unificados por um compromisso profundo com autenticidade, credibilidade e integridade de coração. Líderes que ousam ser quem são, seguros na verdade de que aquilo do qual fazem parte é infinitamente maior do que o papel que desempenham.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "06. Construímos pontes",
+        "conteudo": "Uma igreja que ama e defende a causa da igreja local em todo lugar. Que constrói pontes, forma redes e conecta centenas de milhares de pastores e líderes, encorajando cada comunidade a ser tudo o que Deus a chamou para ser.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "07. Levamos esperança",
+        "conteudo": "Uma igreja presente em alguns estados do Brasil, em países da América Latina e em todos os continentes da Terra — como farol que ilumina, aponta caminhos e revela a glória de Deus ao mundo, levando esperança onde ela parece ter se apagado.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "08. Cuidamos além das nossas portas",
+        "conteudo": "Uma igreja profundamente comprometida com a obra missionária e social no mundo. Uma fé que não se limita às palavras, mas se expressa em ações concretas de cuidado, justiça, compaixão e serviço, alcançando comunidades vulneráveis, sustentando missionários e levando dignidade, esperança e amor onde há dor e esquecimento.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "09. Preparamos pessoas para servir",
+        "conteudo": "Uma igreja que capacita pessoas do mundo inteiro por meio do ADAI College, preparando líderes para impactar a sociedade nas sete áreas de influência: família, religião, educação, governo, mídia, artes e economia.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "10. Vivemos o essencial",
+        "conteudo": "Disposta a viver o essencial: amar a Deus acima de tudo, servir todas as pessoas ao seu alcance e influenciar o mundo com o poder transformador de Jesus Cristo.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-botoes",
+        "titulo": "Amar a Deus, servir as pessoas e influenciar o mundo.",
+        "texto_apoio": "Nossa missão"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "Valores de alinhamento",
+        "conteudo": "Nossos valores ajudam a transformar a fé em atitudes. Eles orientam a maneira como servimos, nos relacionamos e caminhamos como igreja."
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "01. Honramos a Cristo e à Sua Igreja com integridade.",
+        "conteudo": "Somos uma igreja cristocêntrica. Jesus é o centro de tudo o que somos e fazemos.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "02. Sempre oferecemos o nosso melhor.",
+        "conteudo": "A excelência honra a Deus e inspira as pessoas. Valorizamos o preparo, a precisão técnica e a atenção aos detalhes, oferecendo sempre o nosso melhor com aquilo que Deus nos confiou.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "03. Fazemos tudo, exceto pecar, para alcançar pessoas que não conhecem a Cristo.",
+        "conteudo": "Somos uma igreja apaixonadamente criativa, disposta a inovar para alcançar quem ainda não conhece Jesus, sem comprometer a verdade do Evangelho.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "04. Crescemos sem perder a proximidade.",
+        "conteudo": "Queremos alcançar multidões sem deixar de cuidar de cada pessoa. Por isso, estamos organizados em cinco pilares: Pastoral, Grupos de Conexão, Escola Bíblica, College e Rede Ministerial, promovendo aconselhamento, relacionamentos, ensino, treinamento e serviço.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "05. Abrimos mão de coisas que amamos por coisas que amamos ainda mais.",
+        "conteudo": "É uma honra fazer sacrifícios por Cristo e por Sua Igreja. Nossa entrega revela aquilo que verdadeiramente valorizamos.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "06. Somos contribuidores espirituais, não consumidores espirituais.",
+        "conteudo": "A igreja não existe apenas para atender às nossas necessidades. Nós somos a Igreja e existimos para servir às pessoas e anunciar o Evangelho ao mundo.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "07. Somos cheios de fé, pensamos grande e assumimos riscos ousados.",
+        "conteudo": "Não permitimos que o medo ou a acomodação limitem nossa visão. Confiamos em Deus, agimos com coragem e avançamos com fé e sabedoria.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "08. Lideramos pelo exemplo com generosidade extraordinária.",
+        "conteudo": "Acreditamos que há mais alegria em dar do que em receber. Somos generosos com nosso tempo, nossos dons, nossos talentos e nossos recursos.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "09. Somos apaixonados pela Igreja de Cristo como um todo.",
+        "conteudo": "O Reino de Deus é maior do que a nossa igreja local. Celebramos o que Deus está fazendo por meio de outras igrejas e acreditamos que juntos podemos alcançar muito mais.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.texto-rico",
+        "titulo": "10. Rimos muito, intensamente e frequentemente.",
+        "conteudo": "Servimos a Deus com alegria e amamos caminhar juntos. Celebramos a vida, valorizamos nossos relacionamentos e cultivamos ambientes cheios de graça, leveza e amor.",
+        "apresentacao": "destaque"
+      },
+      {
+        "__component": "sections.imagem-texto",
+        "posicao_imagem": "direita",
+        "rotulo": "Um próximo passo, no seu tempo",
+        "titulo": "Você pode começar com uma conversa.",
+        "texto": "Não precisa ter todas as respostas para se aproximar. Se quiser saber mais sobre Jesus ou conhecer a ADAI, nossa equipe pode caminhar com você.",
+        "botao": {
+          "texto": "Quero conversar",
+          "url": "mailto:contato@adai.com.br",
+          "estilo": "solido"
+        },
+        "botoes_secundarios": [
+          {
+            "texto": "Conhecer a ADAI Campestre",
+            "url": "/campestre",
+            "estilo": "contorno"
+          }
+        ]
+      },
+      {
+        "__component": "sections.carrossel-cards",
+        "titulo": "Tem mais para descobrir.",
+        "exibicao": "grade",
+        "posicao_imagem": "apos_titulo",
+        "estilo_imagem": "foto",
+        "preto_e_branco": false,
+        "cards": [
+          {
+            "titulo": "Nossa história",
+            "url": "/sobre-nos/nossa-historia",
+            "cor": "cinza",
+            "texto": "Conheça as pessoas e a trajetória que nos trouxeram até aqui.",
+            "imagem": {
+              "$arquivo": "sobre-nos-nossa-historia.jpg",
+              "alt": "Pastores Rodrigo e Tati Soeiro"
+            },
+            "botao": {
+              "texto": "Saiba mais",
+              "url": "/sobre-nos/nossa-historia",
+              "estilo": "solido"
+            }
+          },
+          {
+            "titulo": "No que cremos",
+            "url": "/sobre-nos/no-que-acreditamos",
+            "texto": "As convicções que orientam nossa fé.",
+            "cor": "cinza",
+            "imagem": {
+              "$arquivo": "sobre-nos-no-que-acreditamos.jpg",
+              "alt": "No que cremos"
+            },
+            "botao": {
+              "texto": "Saiba mais",
+              "url": "/sobre-nos/no-que-acreditamos",
+              "estilo": "solido"
+            }
+          },
+          {
+            "titulo": "Jesus",
+            "url": "/jesus",
+            "texto": "Conheça quem está no centro da nossa fé.",
+            "cor": "cinza",
+            "imagem": {
+              "$arquivo": "lideranca-rodrigo-tati-soeiro.jpg",
+              "alt": "Jesus"
+            },
+            "botao": {
+              "texto": "Saiba mais",
+              "url": "/jesus",
               "estilo": "solido"
             }
           }

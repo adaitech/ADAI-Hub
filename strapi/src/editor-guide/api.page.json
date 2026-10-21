@@ -11,11 +11,11 @@
     {
       "campo": "apresentacao",
       "label": "Apresentação da página",
-      "descricao": "Editorial alinha as seções. Institucional usa capa sem título sobreposto e coluna de leitura; o primeiro Texto deve ter o título da página. Padrão mantém o layout próprio de cada seção.",
+      "descricao": "Editorial alinha as seções. Institucional usa capa sem título sobreposto e coluna de leitura; o primeiro Texto deve ter o título da página. Institucional-grade organiza textos em destaque em duas colunas. Padrão mantém o layout próprio de cada seção.",
       "placeholder": "",
       "ondeAparece": "Margens e espaçamento do conteúdo entre cabeçalho e rodapé.",
       "obrigatorio": false,
-      "limite": "Padrão, editorial ou institucional",
+      "limite": "Padrão, editorial, institucional ou institucional-grade",
       "exemplo": "editorial"
     },
     {

@@ -4,6 +4,13 @@ import { SectionRenderer } from './SectionRenderer';
 import type { TextoRicoData } from './TextoRicoSection/types';
 
 describe('SectionRenderer', () => {
+  it('variação institucional em grade mantém o título e a seção de visão no renderer compartilhado', () => {
+    const texto: TextoRicoData = { __component: 'sections.texto-rico', id: 503, titulo: 'A igreja que vemos', conteudo: 'Uma comunidade para caminhar juntos.' };
+    const { container } = render(<SectionRenderer apresentacao="institucional-grade" sections={[mocks.completo, texto]} />);
+    expect(container.querySelector('[data-page-layout="institucional-grade"]')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'A igreja que vemos' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
   it('página institucional com capa mantém um único h1 no texto, sem título sobre a foto', () => {
     const texto: TextoRicoData = { __component: 'sections.texto-rico', id: 501, titulo: 'Jesus', conteudo: 'Uma pessoa para conhecer.\n\n## Quem é Jesus?\n\nJesus é o Filho de Deus.' };
     const { container } = render(<SectionRenderer apresentacao="institucional" sections={[mocks.completo, texto]} />);

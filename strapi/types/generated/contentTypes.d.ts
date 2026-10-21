@@ -487,7 +487,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   };
   attributes: {
     apresentacao: Schema.Attribute.Enumeration<
-      ['padrao', 'editorial', 'institucional']
+      ['padrao', 'editorial', 'institucional', 'institucional-grade']
     >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

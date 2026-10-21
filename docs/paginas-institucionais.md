@@ -1,4 +1,10 @@
-# Nossa história, No que cremos e Jesus
+# Páginas institucionais da ADAI
+
+## A igreja que vemos e foto do fundador
+
+Quarta página: `/sobre-nos/a-igreja-que-vemos`, com conteúdo de visão já publicado e missão/valores transcritos das imagens do Figma enviadas pelo Marcelo. Títulos curtos dos dez pontos de visão são adaptações para facilitar a leitura; os textos integrais foram preservados. A composição `institucional-grade` reutiliza Texto rico em destaque em duas colunas (uma no celular), faixa de missão com Texto e botões e componentes existentes de convite e páginas relacionadas. A migração isolada `visao_version` publica apenas essa página.
+
+A fotografia de Paulo Silas enviada pelo Marcelo foi copiada sem edição para `strapi/seed/paulo-silas.png` e para a vitrine. A migração `foto_paulo_silas_version` troca somente a mídia no Hero da história, em rascunho/publicado, sem republicar textos. Renderização mantém 324×213px sem recorte nem ampliação; substituir quando a igreja enviar uma foto maior. As demais capas seguem provisórias em relação ao Figma.
 
 Conteúdo aprovado em prévia pelo Marcelo, com linguagem para pessoas que estão conhecendo a igreja e a fé cristã. Estrutura baseada nas telas enviadas do Figma; explicações e convites são adaptações editoriais. A história e os temas de fé foram conferidos nas páginas publicadas em adai.com.br. Fotos atuais do acervo ainda são provisórias em relação ao Figma; falta o retrato original de Paulo Silas.
 
@@ -22,6 +28,8 @@ Tipografia usa `--font-display`, `--font-size-h1` e demais tokens do site, carre
 Texto fala na voz da ADAI. Glossário, perguntas e primeiros passos são propostas didáticas aprovadas na prévia. Não foram importadas crenças da Passion City. Nenhuma imagem de comunicado de falecimento foi usada como foto editorial.
 
 ## SEO, medição e validação
+
+No que cremos inclui índice com nove links internos e retorno aos temas em cada bloco. Usa Markdown e o campo Âncora já existentes em Texto rico, com alvos de toque de 44px e margem de rolagem para o cabeçalho. A migração independente `cremos_indice_version` acrescenta os links em rascunho e publicado sem republicar nem substituir os textos do editor. Medição coberta por `clique_cta`; navegação na mesma página não gera conversão.
 
 Conteúdo renderizado no servidor, um h1 por página, metadados e imagem de compartilhamento no Strapi, alt em imagens. Medição coberta por `clique_cta` e `ver_secao` existentes; nenhum novo evento ou script externo.
 

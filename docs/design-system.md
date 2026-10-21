@@ -8,6 +8,8 @@
 
 **Proposto — páginas institucionais:** composição `institucional` com capa Hero sem sobreposição, coluna de Texto rico, destaques consecutivos para crenças e grade de páginas relacionadas. Usa os tokens existentes e a tipografia de produção, sem novos valores. Detalhes em [paginas-institucionais.md](paginas-institucionais.md).
 
+**Proposto — visão e valores:** `institucional-grade` usa os mesmos Textos ricos em duas colunas, missão em fundo inverso e índice Markdown com links internos. Fotografias de acervo podem preservar as dimensões reais da mídia, sem ampliação; nenhum token novo. Desktop segue a estrutura das imagens enviadas do Figma; adaptação móvel mantém uma coluna.
+
 O site da ADAI é editorial, contemporâneo e acolhedor: tipografia forte em Bold, títulos compactos com tracking negativo, muito espaço em branco, superfícies claras em preto, branco e cinzas, fotos (algumas em P&B) e cantos arredondados. A identidade se resume em **Amar a Deus. Servir as pessoas. Influenciar o mundo.**
 
 Este documento é a referência humana. `tokens.css` é a fonte executável; os dois HTMLs autocontidos repetem os mesmos tokens. O teste `next/src/__tests__/caracteristicas/design-system.test.ts` falha se nomes ou valores divergirem, se uma prancha ou componente sair do inventário, se uma seção ficar vazia ou se surgir dependência de rede.

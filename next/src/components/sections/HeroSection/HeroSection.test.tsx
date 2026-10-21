@@ -6,6 +6,11 @@ import type { HeroData } from './types';
 const completo = mocks.completo as HeroData;
 
 describe('HeroSection', () => {
+  it('fotografia pequena preserva resolução e proporção quando solicitado', () => {
+    const { container } = render(<HeroSection data={{ ...completo, imagem: { id: 1, url: '/mocks/foto.png', width: 324, height: 213 } }} index={1} somenteImagem preservarProporcao />);
+    expect(container.firstChild).toHaveStyle({ maxWidth: '324px' });
+    expect(container.querySelector('[data-foto="colorida"]')).toHaveStyle({ aspectRatio: '324 / 213' });
+  });
   it('capa resolve uploads relativos no host do Strapi', () => {
     render(<HeroSection data={{ ...completo, imagem: { id: 1, url: '/uploads/foto.jpg', alternativeText: 'Comunidade ADAI' } }} index={0} somenteImagem />);
     const src = screen.getByRole('img', { name: 'Comunidade ADAI' }).getAttribute('src') ?? '';

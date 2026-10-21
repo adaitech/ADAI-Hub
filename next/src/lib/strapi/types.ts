@@ -47,7 +47,7 @@ export interface StrapiSection {
 }
 
 export interface StrapiPage {
-  apresentacao?: 'padrao' | 'editorial' | 'institucional' | null;
+  apresentacao?: 'padrao' | 'editorial' | 'institucional' | 'institucional-grade' | null;
   id: number;
   documentId: string;
   titulo: string;

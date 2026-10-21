@@ -22,9 +22,19 @@ async function image(strapi: Core.Strapi, fileName: string, alternativeText: str
   const filepath = path.join(SEED_DIR, fileName);
   const [file] = (await strapi.plugin('upload').service('upload').upload({
     data: { fileInfo: { name: fileName, alternativeText, caption: alternativeText } },
-    files: { filepath, originalFilename: fileName, mimetype: 'image/jpeg', size: fs.statSync(filepath).size },
+    files: { filepath, originalFilename: fileName, mimetype: fileName.endsWith('.png') ? 'image/png' : 'image/jpeg', size: fs.statSync(filepath).size },
   })) as Upload[];
   return file.id;
+}
+
+async function resolverMidias(strapi: Core.Strapi, valor: unknown): Promise<unknown> {
+  if (Array.isArray(valor)) return Promise.all(valor.map(item => resolverMidias(strapi, item)));
+  if (!valor || typeof valor !== 'object') return valor;
+  const objeto = valor as Record<string, unknown>;
+  if (typeof objeto.$arquivo === 'string') return image(strapi, objeto.$arquivo, String(objeto.alt ?? ''));
+  const resultado: Record<string, unknown> = {};
+  for (const [chave, item] of Object.entries(objeto)) resultado[chave] = await resolverMidias(strapi, item);
+  return resultado;
 }
 
 // Fotos do Figma: 1:108 (fill original) e 6:14 (export 2x do que aparece no layout; é colorida).
@@ -616,17 +626,8 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   const versaoInstitucionais = Number(await strapi.store.get(institucionaisStore)) || 0;
   if (versaoInstitucionais < 3) {
     const dados = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'institucionais.json'), 'utf8'));
-    async function resolverMidias(valor: unknown): Promise<unknown> {
-      if (Array.isArray(valor)) return Promise.all(valor.map(resolverMidias));
-      if (!valor || typeof valor !== 'object') return valor;
-      const objeto = valor as Record<string, unknown>;
-      if (typeof objeto.$arquivo === 'string') return image(strapi, objeto.$arquivo, String(objeto.alt ?? ''));
-      const resultado: Record<string, unknown> = {};
-      for (const [chave, item] of Object.entries(objeto)) resultado[chave] = await resolverMidias(item);
-      return resultado;
-    }
     for (const pagina of dados) {
-      const conteudo = await resolverMidias(pagina) as Record<string, unknown>;
+      const conteudo = await resolverMidias(strapi, pagina) as Record<string, unknown>;
       const primeiraImagem = (conteudo.sections as Array<{ imagem?: number }>).find((section) => section.imagem)?.imagem;
       (conteudo.seo as Record<string, unknown>).metaImage = primeiraImagem;
       const existente = await pages.findFirst({ filters: { slug: pagina.slug } });
@@ -637,6 +638,66 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     }
     await strapi.store.set({ ...institucionaisStore, value: 3 });
     strapi.log.info('[seed] Páginas Nossa história, No que cremos e Jesus atualizadas (v3).');
+  }
+
+  const visaoStore = { type: 'core', name: 'adai', key: 'visao_version' } as const;
+  if (!Number(await strapi.store.get(visaoStore))) {
+    const dados = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'institucionais.json'), 'utf8'));
+    const fonte = dados.find((pagina: { slug: string }) => pagina.slug === 'sobre-nos-a-igreja-que-vemos');
+    const conteudo = await resolverMidias(strapi, fonte) as Record<string, unknown>;
+    (conteudo.seo as Record<string, unknown>).metaImage = (conteudo.sections as Array<{ imagem?: number }>)[0].imagem;
+    const existente = await pages.findFirst({ filters: { slug: fonte.slug } });
+    const documento = existente
+      ? await pages.update({ documentId: existente.documentId, data: conteudo as never })
+      : await pages.create({ data: conteudo as never });
+    await publishPage(strapi, documento.documentId);
+    await strapi.store.set({ ...visaoStore, value: 1 });
+  }
+
+  const fotoPauloStore = { type: 'core', name: 'adai', key: 'foto_paulo_silas_version' } as const;
+  if (!Number(await strapi.store.get(fotoPauloStore))) {
+    const foto = await image(strapi, 'paulo-silas.png', 'Pastor Paulo Silas, fundador da ADAI');
+    const versoes = await strapi.db.query('api::page.page').findMany({ where: { slug: 'sobre-nos-nossa-historia' }, populate: ['sections'] });
+    for (const versao of versoes) {
+      for (const secao of versao.sections ?? []) {
+        if (secao.__component === 'sections.hero') {
+          await strapi.db.query('sections.hero').update({ where: { id: secao.id }, data: { imagem: foto } });
+        }
+      }
+    }
+    await strapi.store.set({ ...fotoPauloStore, value: 1 });
+  }
+
+  // Índice de crenças: altera só âncoras e acrescenta links, preservando os textos do editor.
+  const indiceStore = { type: 'core', name: 'adai', key: 'cremos_indice_version' } as const;
+  if (!Number(await strapi.store.get(indiceStore))) {
+    const dados = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'institucionais.json'), 'utf8'));
+    const fonte = dados.find((pagina: { slug: string }) => pagina.slug === 'sobre-nos-no-que-acreditamos');
+    const intro = fonte.sections.find((secao: { ancora?: string }) => secao.ancora === 'temas-da-fe');
+    const indice = `## Explore os temas${intro.conteudo.split('## Explore os temas')[1]}`;
+    const versoes = await strapi.db.query('api::page.page').findMany({ where: { slug: fonte.slug }, populate: ['sections'] });
+    for (const versao of versoes) {
+      let introducao = true;
+      for (const secao of versao.sections ?? []) {
+        if (secao.__component !== 'sections.texto-rico') continue;
+        const numero = /^\d+\./.exec(secao.titulo ?? '')?.[0];
+        const tema = numero && fonte.sections.find((item: { titulo?: string }) => item.titulo?.startsWith(`${numero} `));
+        if (tema) {
+          const retorno = '[Voltar aos temas](#temas-da-fe)';
+          await strapi.db.query('sections.texto-rico').update({ where: { id: secao.id }, data: {
+            ancora: tema.ancora,
+            conteudo: secao.conteudo.includes(retorno) ? secao.conteudo : `${secao.conteudo}\n\n${retorno}`,
+          } });
+        } else if (introducao) {
+          await strapi.db.query('sections.texto-rico').update({ where: { id: secao.id }, data: {
+            ancora: 'temas-da-fe',
+            conteudo: secao.conteudo.includes('## Explore os temas') ? secao.conteudo : `${secao.conteudo}\n\n${indice}`,
+          } });
+        }
+        introducao = false;
+      }
+    }
+    await strapi.store.set({ ...indiceStore, value: 1 });
   }
 
   // Versão independente: restaurar Contribua não reconstrói as demais páginas do editor.
@@ -786,7 +847,7 @@ export async function seedInitialContent(strapi: Core.Strapi) {
 
   for (const p of PAGINAS_INSTITUCIONAIS) {
     // Estas páginas têm versão editorial própria, inclusive em banco novo.
-    if (['sobre-nos-nossa-historia', 'sobre-nos-no-que-acreditamos', 'jesus'].includes(p.slug)) continue;
+    if (['sobre-nos-nossa-historia', 'sobre-nos-no-que-acreditamos', 'jesus', 'sobre-nos-a-igreja-que-vemos'].includes(p.slug)) continue;
     const existente = await pages.findFirst({ filters: { slug: p.slug } });
     if (!existente) {
       const created = await pages.create({ data: { titulo: p.titulo, slug: p.slug, ...(await paginaInstitucional(strapi, p)) } as never });

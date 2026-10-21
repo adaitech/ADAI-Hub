@@ -132,3 +132,5 @@ Também cobrem este componente, sem precisar editar nada:
 Uso por código nos detalhes de eventos: a prop opcional `somenteImagem` mantém o Hero existente em 16:9, colorido, sem título, degradê ou botões, com fundo de fallback. Não é um campo novo do CMS. Vitrine: variante imagem_evento; testes em HeroSection.test.tsx.
 
 Na apresentação institucional da página, o SectionRenderer reutiliza essa mesma variante para capas e fotografias de encerramento. O título fica no primeiro Texto rico. Medição continua coberta por `ver_secao`; sem novos controles ou eventos. Testes de composição em SectionRenderer.test.tsx.
+
+Fotografias após o texto usam `preservarProporcao`: dimensões vindas da mídia limitam a ampliação e preservam o enquadramento, sem valores de design inventados. A foto enviada de Paulo Silas tem 324×213px e fica nesse limite até ser substituída por um original maior. A vitrine inclui a variante foto_historica e controle de preservação de tamanho. Eventos e as capas sem essa opção mantêm 16:9.
