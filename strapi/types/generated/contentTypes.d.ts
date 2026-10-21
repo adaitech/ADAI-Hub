@@ -723,6 +723,64 @@ export interface ApiUnidadeUnidade extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiVerificacaoEbaVerificacaoEba
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'verificacoes_eba';
+  info: {
+    description: 'Interno: c\u00F3digos enviados por e-mail aos alunos dos testes da EBA (s\u00F3 hashes, valem 10 min).';
+    displayName: 'Verifica\u00E7\u00F5es de e-mail (EBA)';
+    pluralName: 'verificacoes-eba';
+    singularName: 'verificacao-eba';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    codigo_hash: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    criado_em: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    email_hash: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    expira_em: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::verificacao-eba.verificacao-eba'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    tentativas: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    usado: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1239,6 +1297,7 @@ declare module '@strapi/strapi' {
       'api::page.page': ApiPagePage;
       'api::teste.teste': ApiTesteTeste;
       'api::unidade.unidade': ApiUnidadeUnidade;
+      'api::verificacao-eba.verificacao-eba': ApiVerificacaoEbaVerificacaoEba;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

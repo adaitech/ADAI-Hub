@@ -1,0 +1,72 @@
+{
+  "uid": "api::verificacao-eba.verificacao-eba",
+  "nome": "Verificações de e-mail (EBA)",
+  "resumo": "Tipo interno, preenchido só pelo site: guarda por alguns minutos o código enviado por e-mail aos alunos dos testes. Não edite.",
+  "ondeAparece": "Em nenhuma página. O site usa este tipo para conferir o código que o aluno digita antes de começar um teste da EBA.",
+  "boasPraticas": [
+    "Não crie, edite nem apague registros: o site cuida disso sozinho.",
+    "Os registros não têm o e-mail nem o código, só um resumo cifrado. Os antigos são apagados todo dia."
+  ],
+  "campos": [
+    {
+      "campo": "email_hash",
+      "label": "E-mail (cifrado)",
+      "descricao": "Resumo cifrado do e-mail do aluno. Não dá para descobrir o e-mail a partir dele.",
+      "placeholder": "Preenchido pelo site",
+      "ondeAparece": "Em nenhum lugar do site.",
+      "obrigatorio": true,
+      "limite": "Até 100 caracteres",
+      "exemplo": "Preenchido pelo site"
+    },
+    {
+      "campo": "codigo_hash",
+      "label": "Código (cifrado)",
+      "descricao": "Resumo cifrado do código enviado. O código em si nunca fica guardado.",
+      "placeholder": "Preenchido pelo site",
+      "ondeAparece": "Em nenhum lugar do site.",
+      "obrigatorio": true,
+      "limite": "Até 100 caracteres",
+      "exemplo": "Preenchido pelo site"
+    },
+    {
+      "campo": "expira_em",
+      "label": "Vale até",
+      "descricao": "Data e hora em que o código deixa de valer (10 minutos depois do envio).",
+      "placeholder": "Preenchido pelo site",
+      "ondeAparece": "Em nenhum lugar do site.",
+      "obrigatorio": true,
+      "limite": "Data e hora",
+      "exemplo": "21/10/2026 19:40"
+    },
+    {
+      "campo": "tentativas",
+      "label": "Tentativas",
+      "descricao": "Quantas vezes o aluno digitou um código para este envio (no máximo 5).",
+      "placeholder": "0",
+      "ondeAparece": "Em nenhum lugar do site.",
+      "obrigatorio": false,
+      "limite": "De 0 a 5",
+      "exemplo": "2"
+    },
+    {
+      "campo": "usado",
+      "label": "Já usado",
+      "descricao": "Ligado quando o código foi aceito ou trocado por um novo.",
+      "placeholder": "Desligado",
+      "ondeAparece": "Em nenhum lugar do site.",
+      "obrigatorio": false,
+      "limite": "Ligado ou desligado",
+      "exemplo": "Desligado"
+    },
+    {
+      "campo": "criado_em",
+      "label": "Enviado em",
+      "descricao": "Data e hora em que o código foi enviado.",
+      "placeholder": "Preenchido pelo site",
+      "ondeAparece": "Em nenhum lugar do site.",
+      "obrigatorio": true,
+      "limite": "Data e hora",
+      "exemplo": "21/10/2026 19:30"
+    }
+  ]
+}
