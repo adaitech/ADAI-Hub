@@ -60,6 +60,7 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `inscrever_curso` | Botão de inscrição de um curso da EBA (topo da página do curso ou bloco "Pronto para começar?"; link com `data-curso`). Inscrição por e-mail (`mailto:`) não conta | `origem` (`curso-cabecalho`, `curso-inscricao`), `curso` (slug) | **Sim** |
 | `iniciar_teste` | A primeira pergunta de um teste do CDV aparece (`/eba/testes/<slug>`), uma vez por tela | `teste` (slug) | — |
 | `concluir_teste` | O resultado de um teste do CDV aparece | `teste` (slug) | **Sim** |
+| `confirmar_codigo` | O aluno confere o código de 6 dígitos enviado por e-mail antes de um teste do CDV | `teste` (slug), `resultado` (`ok`, `errado`, `esgotado`, `vencido`) | — |
 
 `origem` = `data-section` da seção (`hero`, `serie-atual`, `proximos-eventos`…), `header`, `footer` ou `pagina`.
 
@@ -144,6 +145,7 @@ Checklist geral (Strapi, segredos, integrações, LGPD): `README.md` → "Antes 
 ## 7. Pendências
 
 - **EBA (`inscrever_curso`, 2026-10-18):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 17 eventos e variável `DLV - curso`), criar a dimensão `curso` no GA4 e marcar `inscrever_curso` como evento-chave quando aparecer em Eventos recentes.
+- **EBA (`confirmar_codigo`, 2026-10-21):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 20 eventos e variável `DLV - resultado`) e criar a dimensão `resultado` no GA4. Nenhum dado pessoal: só o slug do teste e o resultado da conferência.
 - **EBA (`iniciar_teste` e `concluir_teste`, 2026-10-20):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 19 eventos e variável `DLV - teste`), criar a dimensão `teste` no GA4 e marcar `concluir_teste` como evento-chave quando aparecer em Eventos recentes. Nenhum dado pessoal é enviado: só o slug do teste. O `data-section="teste-eba"` da tela dá a origem a `clique_cta` e `ver_secao`.
 
 ### Agenda e detalhes — atualização de 18/10/2026

@@ -35,4 +35,16 @@ describe('catálogo de eventos × GTM × plano de medição', () => {
     expect(plano).toMatch(/\| `iniciar_teste` \|/);
     expect(plano).toMatch(/\| `concluir_teste` \|.*\*\*Sim\*\*/);
   });
+
+  it('confirmar_codigo (código por e-mail dos testes) está no contrato, no gatilho, na tabela e leva o resultado ao GA4', () => {
+    expect(NOMES_EVENTOS).toContain('confirmar_codigo');
+    const json = JSON.parse(readFileSync(join(repoRoot, 'docs/analytics/gtm-container-adai.json'), 'utf8'));
+    const variavel = json.containerVersion.variable.find((v: { name: string }) => v.name === 'DLV - resultado');
+    expect(variavel).toBeDefined();
+    expect(variavel.parameter.find((p: { key: string }) => p.key === 'name').value).toBe('resultado');
+    const tag = json.containerVersion.tag.find((t: { type: string }) => t.type === 'gaawe');
+    expect(JSON.stringify(tag)).toContain('{{DLV - resultado}}');
+    const plano = readFileSync(join(repoRoot, 'docs/analytics/README.md'), 'utf8');
+    expect(plano).toMatch(/\| `confirmar_codigo` \|.*`resultado`/);
+  });
 });

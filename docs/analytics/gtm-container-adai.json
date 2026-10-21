@@ -522,6 +522,21 @@
                     "value": "{{DLV - teste}}"
                   }
                 ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameter",
+                    "value": "resultado"
+                  },
+                  {
+                    "type": "TEMPLATE",
+                    "key": "parameterValue",
+                    "value": "{{DLV - resultado}}"
+                  }
+                ]
               }
             ]
           }
@@ -557,7 +572,7 @@
               {
                 "type": "TEMPLATE",
                 "key": "arg1",
-                "value": "^(planejar_visita|como_chegar|assistir_mensagem|ver_todas_mensagens|selecionar_evento|ver_faq|selecionar_ministerio|contribuir|baixar_app|clique_cta|ver_secao|web_vitals|consentimento_cookies|acessar_evento|filtrar_agenda|buscar_evento|inscrever_curso|iniciar_teste|concluir_teste)$"
+                "value": "^(planejar_visita|como_chegar|assistir_mensagem|ver_todas_mensagens|selecionar_evento|ver_faq|selecionar_ministerio|contribuir|baixar_app|clique_cta|ver_secao|web_vitals|consentimento_cookies|acessar_evento|filtrar_agenda|buscar_evento|inscrever_curso|iniciar_teste|concluir_teste|confirmar_codigo)$"
               }
             ]
           }
@@ -1286,6 +1301,31 @@
             "type": "TEMPLATE",
             "key": "name",
             "value": "teste"
+          }
+        ],
+        "formatValue": {}
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "variableId": "208",
+        "name": "DLV - resultado",
+        "type": "v",
+        "parameter": [
+          {
+            "type": "INTEGER",
+            "key": "dataLayerVersion",
+            "value": "2"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "setDefaultValue",
+            "value": "false"
+          },
+          {
+            "type": "TEMPLATE",
+            "key": "name",
+            "value": "resultado"
           }
         ],
         "formatValue": {}
