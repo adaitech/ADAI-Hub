@@ -53,7 +53,8 @@ Só quem tem acesso à caixa de e-mail consegue abrir a sessão dos testes. Ante
 | --- | --- |
 | `lib/email/mailersend.ts` | `enviarEmail({ para, assunto, html, texto })`: `fetch` com `Authorization: Bearer MAILERSEND_API_TOKEN`, timeout curto (10 s), sem log de destinatário. Falha → `EmailIndisponivel`. |
 | `lib/eba/codigo-email.ts` | Monta assunto ("Seu código para os testes da EBA: 123456"), HTML e texto: o código, a validade (10 min) e "Se não foi você, ignore este e-mail". Sem nome, turma ou outro dado. |
-| `lib/eba/verificacao.ts` | `gerarCodigo()` (`crypto.randomInt(0, 1_000_000)`, 6 dígitos com zeros à esquerda), `hashDoEmail`, `hashDoCodigo` (HMAC com o segredo; o do código inclui o `emailHash`), cliente das rotas do Strapi com `STRAPI_TOKEN_VERIFICACAO`. |
+| `lib/eba/verificacao.ts` | `gerarCodigo()` (`crypto.randomInt(0, 1_000_000)`, 6 dígitos com zeros à esquerda), `hashDoEmail`, `hashDoCodigo` (HMAC com o segredo; o do código inclui o `emailHash`). |
+| `lib/strapi/verificacao.ts` | Cliente das rotas `emitir`/`conferir` com `STRAPI_TOKEN_VERIFICACAO` (fetch para o Strapi só em `lib/strapi/`, regra de arquitetura). |
 | `lib/eba/aparelho.ts` | Cookie `eba_aparelho`: `{ emailHash, emitidoEm }` assinado (mesmo formato do `eba_sessao`), validade de 30 dias conferida no servidor; cookie `eba_email_verificado` (`{ emailHash, emitidoEm }`, 15 min). Os dois com os mesmos atributos do `eba_sessao` (`httpOnly`, `secure` em produção, `sameSite=lax`, `path=/eba/testes`); o do aparelho com `maxAge` de 30 dias, o do e-mail verificado de 15 min. |
 | Ações (`acoes.ts`) | `pedirCodigo(email)` substitui o começo do `identificar`: aparelho lembrado → segue como o `identificar` atual; senão emite e envia, e responde `{ codigoEnviado: true, emailMascarado }` (igual para e-mail existente ou não). `confirmarCodigo(email, codigo)` → `ok` abre a sessão ou devolve `{ novo: true, turmas }`; `errado` com tentativas restantes; `esgotado`/`vencido`. `reenviarCodigo(email)` = `pedirCodigo` com o mesmo limite. `cadastrar` exige `eba_email_verificado` com o mesmo `emailHash`. `trocarEmail`/`sair` apagam também `eba_aparelho`. |
 
@@ -116,7 +117,7 @@ Sem qualquer uma delas, os testes ficam "indisponíveis" (falha fechado), como j
 ## 11. Rollout e rollback
 
 - Entra no **PR #15**, que fica bloqueado até isto estar pronto e validado em homologação.
-- Seed do Strapi sobe de versão (tipo novo, sem conteúdo); snapshot exportado com o ok do Jonatan.
+- O seed do Strapi não muda (o tipo novo não tem conteúdo); o schema muda, então o snapshot é exportado de novo com o ok do Jonatan.
 - Rollback: reverter o PR. Não há dado a migrar (as verificações são temporárias).
 
 ## 12. Riscos
