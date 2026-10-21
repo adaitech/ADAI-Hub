@@ -1,4 +1,4 @@
-import { criarLimitador } from './limite';
+import { criarLimitador, ipDoCliente } from './limite';
 
 const MINUTO = 60_000;
 
@@ -42,5 +42,31 @@ describe('criarLimitador', () => {
     expect(permitir('c', 2)).toBe(true); // 'a' (a mais antiga) é descartada
     expect(permitir('b', 3)).toBe(false);
     expect(permitir('a', 4)).toBe(true); // esquecida, começa do zero
+  });
+});
+
+describe('ipDoCliente (x-forwarded-for atrás de proxies confiáveis)', () => {
+  it('1 proxy confiável (ingress): usa o último item, que o proxy acrescentou', () => {
+    expect(ipDoCliente('203.0.113.7', 1)).toBe('203.0.113.7');
+    expect(ipDoCliente('1.2.3.4, 203.0.113.7', 1)).toBe('203.0.113.7');
+  });
+
+  it('IP forjado pelo cliente no começo do cabeçalho não muda a chave do limite', () => {
+    expect(ipDoCliente('9.9.9.1, 203.0.113.7', 1)).toBe(ipDoCliente('9.9.9.2, 203.0.113.7', 1));
+  });
+
+  it('2 proxies confiáveis (ex.: Front Door + ingress): pula o último e usa o penúltimo', () => {
+    expect(ipDoCliente('1.2.3.4, 203.0.113.7, 10.0.0.1', 2)).toBe('203.0.113.7');
+  });
+
+  it('cabeçalho ausente, vazio ou mais curto que a cadeia: chave "local" ou o primeiro item', () => {
+    expect(ipDoCliente(null, 1)).toBe('local');
+    expect(ipDoCliente('  ', 1)).toBe('local');
+    expect(ipDoCliente('203.0.113.7', 3)).toBe('203.0.113.7');
+  });
+
+  it('quantidade de proxies inválida vale 1', () => {
+    expect(ipDoCliente('1.2.3.4, 203.0.113.7', 0)).toBe('203.0.113.7');
+    expect(ipDoCliente('1.2.3.4, 203.0.113.7', Number.NaN)).toBe('203.0.113.7');
   });
 });

@@ -22,8 +22,8 @@ const resultadoNota = mock.resultados.nota as Resultado;
 
 function criarAcoes(extra: Partial<Record<keyof Acoes, jest.Mock>> = {}) {
   const acoes = {
-    identificar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'a***@email.com' } })),
-    cadastrar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'n***@email.com' } })),
+    identificar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-a' } })),
+    cadastrar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } })),
     enviar: jest.fn(async () => ({ ok: true, dados: resultadoNota })),
     sair: jest.fn(async () => undefined),
     aquecer: jest.fn(async () => undefined),
@@ -39,7 +39,7 @@ function montar(slug: SlugTeste = 'dons-servico', extra: Partial<QuestionarioPro
     teste: definicaoDoTeste(slug)!,
     abertura: (mock.testes as Testes)[slug].abertura,
     perguntas: slug === 'dons-servico' ? perguntasCurtas : (mock.testes as Testes)[slug].perguntas,
-    sessao: { emailMascarado: 'a***@email.com' },
+    sessao: { emailMascarado: 'a***@email.com', dono: 'dono-a' },
     ...extra,
     acoes,
   };
@@ -54,6 +54,11 @@ const escolherNota = (rotulo: string) => fireEvent.click(screen.getByRole('radio
 /** Escolha pelo teclado: as setas marcam o radio e geram change + clique com detail 0. */
 const escolherPeloTeclado = (rotulo: string) => fireEvent.click(screen.getByRole('radio', { name: rotulo }), { detail: 0 });
 const foto = (container: HTMLElement) => container.querySelector('img')!;
+/** Caminho original da foto, com ou sem o otimizador de imagem do Next (`/_next/image?url=…`). */
+const fotoOriginal = (container: HTMLElement) => {
+  const src = foto(container).getAttribute('src') ?? '';
+  return src.startsWith('/_next/image') ? new URL(src, 'http://x').searchParams.get('url') : src;
+};
 /** Deixa as promessas das ações (fakes) resolverem dentro do act. */
 const esperarAcoes = () => act(async () => {});
 
@@ -72,8 +77,15 @@ describe('Questionario — abertura', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Como responder' })).toBeInTheDocument();
     expect(container.querySelector('[data-section="teste-eba"]')).toHaveAttribute('aria-labelledby');
     expect(foto(container)).toHaveAttribute('alt', '');
-    expect(foto(container).getAttribute('src')).toBe('/eba/testes/dons-servico/capa.webp');
+    expect(fotoOriginal(container)).toBe('/eba/testes/dons-servico/capa.webp');
     expect(auditarAcessibilidade(container)).toEqual([]);
+  });
+
+  it('a foto de capa (LCP) passa pelo otimizador: srcset por largura, o celular não baixa a de 1200 px', () => {
+    const { container } = montar('dons-servico', { sessao: null });
+    expect(foto(container)).toHaveAttribute('fetchpriority', 'high');
+    expect(foto(container).getAttribute('srcset')).toMatch(/w=640&q=75 640w/);
+    expect(foto(container).getAttribute('sizes')).toBe('(min-width: 1024px) 45vw, 100vw');
   });
 
   it('sem aula nem textos opcionais, mostra só o resumo', () => {
@@ -103,7 +115,7 @@ describe('Questionario — abertura', () => {
   });
 
   it('"Trocar e-mail" na abertura apaga o progresso salvo e pede o e-mail', async () => {
-    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@email.com' }));
+    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-a' }));
     const { acoes } = montar();
     expect(screen.getByText('Você já respondeu 1 de 3 perguntas nesta aba.')).toBeInTheDocument();
     fireEvent.click(botao('Não é você? Trocar e-mail'));
@@ -239,7 +251,7 @@ describe('Questionario — perguntas indisponíveis na abertura (API fria)', () 
 
   it('depois de carregar, progresso salvo de outra pessoa é descartado e o teste começa na pergunta 1', async () => {
     const chave = chaveProgresso('dons-servico');
-    sessionStorage.setItem(chave, JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 4 }, marcadas: [], escolhidas: [], respondidoComo: 'b***@email.com' }));
+    sessionStorage.setItem(chave, JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 4 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-b' }));
     const carregarPerguntas = jest.fn().mockResolvedValue({ ok: true, dados: perguntasCurtas });
     montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
     comecar();
@@ -247,7 +259,7 @@ describe('Questionario — perguntas indisponíveis na abertura (API fria)', () 
     expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
     expect(screen.getAllByRole('radio').some((r) => (r as HTMLInputElement).checked)).toBe(false);
     const salvo = sessionStorage.getItem(chave);
-    expect(salvo === null || JSON.parse(salvo).respondidoComo === 'a***@email.com').toBe(true);
+    expect(salvo === null || JSON.parse(salvo).respondidoComo === 'dono-a').toBe(true);
     expect(salvo === null ? {} : JSON.parse(salvo).respostas).toEqual({});
   });
 
@@ -262,7 +274,7 @@ describe('Questionario — perguntas indisponíveis na abertura (API fria)', () 
 
   it('progresso salvo não se perde: é restaurado depois que as perguntas chegam', async () => {
     const chave = chaveProgresso('dons-servico');
-    const salvo = JSON.stringify({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@email.com' });
+    const salvo = JSON.stringify({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-a' });
     sessionStorage.setItem(chave, salvo);
     const carregarPerguntas = jest.fn().mockResolvedValue({ ok: true, dados: perguntasCurtas });
     montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
@@ -424,10 +436,13 @@ describe('Questionario — perguntas de nota (0 a 5)', () => {
   it('a foto troca com a pergunta e a da próxima é pré-carregada', () => {
     const { container } = montar();
     comecar();
-    expect(foto(container).getAttribute('src')).toBe('/eba/testes/dons-servico/1.webp');
-    expect(document.head.querySelector('link[rel="preload"][href="/eba/testes/dons-servico/2.webp"]')).not.toBeNull();
+    expect(fotoOriginal(container)).toBe('/eba/testes/dons-servico/1.webp');
+    // Preload com o mesmo srcset/sizes da foto (o navegador reaproveita o download).
+    const preloads = [...document.head.querySelectorAll('link[rel="preload"][as="image"]')];
+    const proxima = preloads.find((l) => (l.getAttribute('imagesrcset') ?? '').includes(encodeURIComponent('/eba/testes/dons-servico/2.webp')));
+    expect(proxima?.getAttribute('imagesizes')).toBe('(min-width: 1024px) 45vw, 100vw');
     escolherNota('2 — Às vezes');
-    expect(foto(container).getAttribute('src')).toBe('/eba/testes/dons-servico/2.webp');
+    expect(fotoOriginal(container)).toBe('/eba/testes/dons-servico/2.webp');
   });
 
   it('"Respondendo como" mostra o e-mail mascarado; "Trocar e-mail" sai da sessão e pede o e-mail', async () => {
@@ -441,7 +456,7 @@ describe('Questionario — perguntas de nota (0 a 5)', () => {
   });
 
   it('"Trocar e-mail" apaga as respostas (estado e sessionStorage): a outra pessoa recomeça da primeira pergunta', async () => {
-    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com' } }));
+    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
     const { acoes } = montar('dons-servico', { acoes: criarAcoes({ identificar }) });
     comecar();
     escolherNota('3 — Frequentemente');
@@ -463,7 +478,7 @@ describe('Questionario — perguntas de nota (0 a 5)', () => {
       respostas: { 1: 1 },
       marcadas: [],
       escolhidas: [],
-      respondidoComo: 'b***@outro.com',
+      respondidoComo: 'dono-b',
     });
   });
 
@@ -483,7 +498,7 @@ describe('Questionario — progresso no sessionStorage (Foco 2)', () => {
     comecar();
     escolherNota('3 — Frequentemente');
     const salvo = sessionStorage.getItem(chaveProgresso('dons-servico'))!;
-    expect(JSON.parse(salvo)).toEqual({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@email.com' });
+    expect(JSON.parse(salvo)).toEqual({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-a' });
     unmount();
     sessionStorage.clear();
     montar('dons-servico', { sessao: null });
@@ -496,7 +511,7 @@ describe('Questionario — progresso no sessionStorage (Foco 2)', () => {
   });
 
   it('progresso de outra pessoa (outro e-mail mascarado) é descartado ao abrir', () => {
-    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [], respondidoComo: 'x***@outro.com' }));
+    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-x' }));
     montar();
     expect(botao('Começar o teste')).toBeInTheDocument();
     expect(screen.queryByText(/Você já respondeu/)).toBeNull();
@@ -504,7 +519,7 @@ describe('Questionario — progresso no sessionStorage (Foco 2)', () => {
   });
 
   it('sem sessão, o progresso salvo espera a identificação: outra pessoa recomeça do zero', async () => {
-    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [], respondidoComo: 'x***@outro.com' }));
+    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-x' }));
     montar('dons-servico', { sessao: null });
     expect(screen.getByText('Você já respondeu 2 de 3 perguntas nesta aba.')).toBeInTheDocument();
     comecar();
@@ -517,8 +532,8 @@ describe('Questionario — progresso no sessionStorage (Foco 2)', () => {
   });
 
   it('recarregar restaura só a chave do próprio slug, sem duplicar as respondidas', () => {
-    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@email.com' }));
-    sessionStorage.setItem(chaveProgresso('dons-ministerio'), JSON.stringify({ passo: 1, respostas: { 1: 0, 2: 0, 3: 0 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@email.com' }));
+    sessionStorage.setItem(chaveProgresso('dons-servico'), JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 5 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-a' }));
+    sessionStorage.setItem(chaveProgresso('dons-ministerio'), JSON.stringify({ passo: 1, respostas: { 1: 0, 2: 0, 3: 0 }, marcadas: [], escolhidas: [], respondidoComo: 'dono-a' }));
     montar();
     expect(screen.getByText('Você já respondeu 2 de 3 perguntas nesta aba.')).toBeInTheDocument();
     comecar();
@@ -588,7 +603,7 @@ describe('Questionario — envio (Foco 4)', () => {
       { numero: 1, nota: 1 },
       { numero: 2, nota: 2 },
       { numero: 3, nota: 3 },
-    ], 'a***@email.com');
+    ], 'dono-a');
     expect(botao('Enviar respostas')).toBeDisabled();
     expect(screen.getByRole('status')).toHaveTextContent('Calculando seu resultado…');
     expect(screen.getByRole('status')).toHaveFocus();
@@ -606,7 +621,7 @@ describe('Questionario — envio (Foco 4)', () => {
     expect(sessionStorage.getItem(chaveProgresso('dons-servico'))).toBeNull();
     expect(registrarEvento).toHaveBeenLastCalledWith('concluir_teste', { teste: 'dons-servico' });
     expect(registrarEvento).toHaveBeenCalledTimes(2);
-    expect(foto(container).getAttribute('src')).toBe('/eba/testes/dons-servico/resultado.webp');
+    expect(fotoOriginal(container)).toBe('/eba/testes/dons-servico/resultado.webp');
   });
 
   it('sessão encerrada → "expirou" com as respostas mantidas; depois do e-mail, reenvia', async () => {
@@ -630,13 +645,13 @@ describe('Questionario — envio (Foco 4)', () => {
   it('envio com dono A e sessão B (trocada em outra aba): sessao → sessão encerrada → identifica B → recomeça na pergunta 1, sem reenvio', async () => {
     // O servidor compara o dono das respostas com o cookie (agora de B) e devolve `sessao`.
     const enviar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'sessao' }).mockResolvedValue({ ok: true, dados: resultadoNota });
-    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com' } }));
+    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
     montar('dons-servico', { acoes: criarAcoes({ enviar, identificar }) });
     responderTudo();
     fireEvent.click(botao('Enviar respostas'));
     await esperarAcoes();
     expect(enviar).toHaveBeenCalledTimes(1);
-    expect(enviar).toHaveBeenLastCalledWith('dons-servico', expect.any(Array), 'a***@email.com');
+    expect(enviar).toHaveBeenLastCalledWith('dons-servico', expect.any(Array), 'dono-a');
     expect(screen.getByRole('heading', { level: 2, name: 'Sua sessão foi encerrada' })).toBeInTheDocument();
     fireEvent.click(botao('Informar e-mail'));
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'bruno@outro.com' } });
@@ -653,12 +668,12 @@ describe('Questionario — envio (Foco 4)', () => {
     fireEvent.click(botao('Enviar respostas'));
     await esperarAcoes();
     expect(enviar).toHaveBeenCalledTimes(2);
-    expect(enviar).toHaveBeenLastCalledWith('dons-servico', expect.any(Array), 'b***@outro.com');
+    expect(enviar).toHaveBeenLastCalledWith('dons-servico', expect.any(Array), 'dono-b');
   });
 
   it('sessão encerrada e outra pessoa se identifica: não reenvia as respostas de quem saiu e recomeça', async () => {
     const enviar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'sessao' });
-    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com' } }));
+    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
     montar('dons-servico', { acoes: criarAcoes({ enviar, identificar }) });
     responderTudo();
     fireEvent.click(botao('Enviar respostas'));
@@ -787,7 +802,7 @@ describe('Questionario — estilo pessoal (1 a 5)', () => {
     expect(acoes.enviar).toHaveBeenCalledWith('estilo-pessoal', [
       { numero: 1, nota: 14 },
       { numero: 2, nota: 28 },
-    ], 'a***@email.com');
+    ], 'dono-a');
   });
 });
 
@@ -798,7 +813,7 @@ describe('Questionario — temperamento (páginas de 10)', () => {
     expect(screen.getByText('Página 1 de 20')).toBeInTheDocument();
     expect(screen.getByText('Sanguíneo: marque as características que descrevem você')).toHaveFocus();
     expect(screen.getAllByRole('checkbox')).toHaveLength(10);
-    expect(foto(container).getAttribute('src')).toBe('/eba/testes/temperamento-pessoal/1.webp');
+    expect(fotoOriginal(container)).toBe('/eba/testes/temperamento-pessoal/1.webp');
     fireEvent.click(screen.getAllByRole('checkbox')[0]);
     fireEvent.click(screen.getAllByRole('checkbox')[1]);
     expect(screen.getByText('Marque quantas quiser, inclusive as fraquezas. 2 marcadas nesta página.')).toBeInTheDocument();
@@ -813,7 +828,7 @@ describe('Questionario — temperamento (páginas de 10)', () => {
       { numero: 2, nota: 0 },
       { numero: 3, nota: 0 },
       { numero: 4, nota: 1 },
-    ], 'a***@email.com');
+    ], 'dono-a');
   });
 });
 
@@ -836,7 +851,7 @@ describe('Questionario — identificação', () => {
     const campo = screen.getByLabelText('E-mail');
     expect(campo).toHaveAttribute('autocomplete', 'email');
     expect(campo).toHaveAttribute('inputmode', 'email');
-    expect(foto(container).getAttribute('src')).toBe('/eba/testes/identificacao.webp');
+    expect(fotoOriginal(container)).toBe('/eba/testes/identificacao.webp');
     expect(auditarAcessibilidade(container)).toEqual([]);
   });
 
@@ -903,7 +918,7 @@ describe('Questionario — identificação', () => {
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
     fireEvent.click(botao('Continuar'));
     expect(botao('Continuar')).toBeDisabled();
-    await act(async () => concluir({ ok: true, dados: { emailMascarado: 'a***@email.com' } }));
+    await act(async () => concluir({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-a' } }));
   });
 
   describe('primeiro acesso', () => {
@@ -995,7 +1010,7 @@ describe('Questionario — identificação', () => {
         .fn()
         .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas } })
         .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas: [...turmas, { id: 't3', nome: 'Nova turma' }] } });
-      const cadastrar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'indisponivel' }).mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com' } });
+      const cadastrar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'indisponivel' }).mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } });
       irParaEmail({ acoes: criarAcoes({ identificar, cadastrar }) });
       await informar('nova@email.com');
       preencher();
@@ -1016,7 +1031,7 @@ describe('Questionario — identificação', () => {
       const identificar = jest
         .fn()
         .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas } })
-        .mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com' } });
+        .mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } });
       irParaEmail({ acoes: criarAcoes({ identificar, cadastrar: jest.fn().mockResolvedValue({ ok: false, erro: 'indisponivel' }) }) });
       await informar('nova@email.com');
       preencher();

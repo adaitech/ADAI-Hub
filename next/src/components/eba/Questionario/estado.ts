@@ -20,16 +20,16 @@ export type Estado = 'abertura' | 'email' | 'cadastro' | 'pergunta' | 'enviando'
 export type ErroEnvio = 'indisponivel' | 'recusado';
 
 /**
- * O que fica no `sessionStorage`: as respostas e o e-mail **mascarado** da sessão em que foram dadas
- * (`a***@email.com`), nunca o e-mail inteiro nem outro dado pessoal. O e-mail mascarado impede que as
- * respostas de uma pessoa sejam enviadas como de outra que use o mesmo aparelho.
+ * O que fica no `sessionStorage`: as respostas e o **dono opaco** da sessão em que foram dadas (HMAC do
+ * aluno, sem dado pessoal), nunca o e-mail. O dono impede que as respostas de uma pessoa sejam enviadas
+ * como de outra que use o mesmo aparelho, mesmo quando as duas têm a mesma máscara de e-mail.
  */
 export interface Progresso {
   passo: number;
   respostas: Record<number, number>;
   marcadas: number[];
   escolhidas: number[];
-  /** E-mail mascarado da sessão em que as respostas foram dadas; null = ainda sem dono. */
+  /** Dono opaco da sessão em que as respostas foram dadas; null = ainda sem dono. */
   respondidoComo: string | null;
 }
 
@@ -38,7 +38,10 @@ export interface EstadoQuestionario extends Progresso {
   tipo: TipoTeste;
   /** Quantidade de telas de pergunta do teste. */
   total: number;
+  /** Só para mostrar ("Respondendo como a***@…"); quem identifica a sessão é o `dono`. */
   emailMascarado: string | null;
+  /** Dono opaco da sessão atual (vem do servidor); null = sem sessão. */
+  dono: string | null;
   /** E-mail não encontrado: dados do Primeiro acesso. O e-mail fica só na memória da tela. */
   cadastro: { email: string; turmas: Turma[] } | null;
   /** Para onde ir depois de se identificar: de volta às perguntas ou direto para o envio. */
@@ -56,7 +59,7 @@ export type Acao =
   /** Perguntas que chegaram depois da renderização (a busca do servidor falhou: API fria). */
   | { tipo: 'perguntas'; perguntas: Pergunta[] }
   | { tipo: 'comecar' }
-  | { tipo: 'identificado'; emailMascarado: string }
+  | { tipo: 'identificado'; sessao: SessaoTela }
   | { tipo: 'novoAluno'; email: string; turmas: Turma[] }
   | { tipo: 'voltarEmail' }
   | { tipo: 'trocarEmail' }
@@ -71,6 +74,9 @@ export type Acao =
   | { tipo: 'falhou'; erro: 'sessao' | ErroEnvio }
   | { tipo: 'revisar' }
   | { tipo: 'sair' };
+
+/** Sessão como a tela a recebe do servidor. */
+export type SessaoTela = { emailMascarado: string; dono: string };
 
 export const chaveProgresso = (slug: SlugTeste) => `eba-teste:${slug}`;
 
@@ -108,7 +114,7 @@ export function telasDoTeste(tipo: TipoTeste, perguntas: Pergunta[]): number {
   }
 }
 
-export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perguntas: Pergunta[]; sessao: { emailMascarado: string } | null }): EstadoQuestionario {
+export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perguntas: Pergunta[]; sessao: SessaoTela | null }): EstadoQuestionario {
   return {
     estado: 'abertura',
     tipo,
@@ -119,6 +125,7 @@ export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perg
     escolhidas: [],
     respondidoComo: null,
     emailMascarado: sessao?.emailMascarado ?? null,
+    dono: sessao?.dono ?? null,
     cadastro: null,
     retorno: 'pergunta',
     resultado: null,
@@ -131,21 +138,21 @@ export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perg
 const SEM_PROGRESSO = { passo: 0, respostas: {}, marcadas: [], escolhidas: [] } satisfies Omit<Progresso, 'respondidoComo'>;
 
 /**
- * O progresso atual pode seguir com a sessão de `emailMascarado`: foi respondido nela, ainda não tem
- * dono (nenhuma resposta dada com sessão) ou está vazio.
+ * O progresso atual pode seguir com a sessão de `dono`: foi respondido nela, ainda não tem dono
+ * (nenhuma resposta dada com sessão) ou está vazio.
  */
-export function progressoPertenceA(s: EstadoQuestionario, emailMascarado: string): boolean {
-  return s.respondidoComo === null || s.respondidoComo === emailMascarado || !temProgresso(s);
+export function progressoPertenceA(s: EstadoQuestionario, dono: string): boolean {
+  return s.respondidoComo === null || s.respondidoComo === dono || !temProgresso(s);
 }
 
 /** Cada resposta fica marcada com a sessão em que foi dada. */
-const comDono = (s: EstadoQuestionario) => s.respondidoComo ?? s.emailMascarado;
+const comDono = (s: EstadoQuestionario) => s.respondidoComo ?? s.dono;
 
-/** A sessão de `emailMascarado` assume o progresso; respostas de outra pessoa são descartadas. */
-function assumir(s: EstadoQuestionario, emailMascarado: string): EstadoQuestionario {
-  return progressoPertenceA(s, emailMascarado)
-    ? { ...s, respondidoComo: emailMascarado }
-    : { ...s, ...SEM_PROGRESSO, respondidoComo: emailMascarado, retorno: 'pergunta' };
+/** A sessão de `dono` assume o progresso; respostas de outra pessoa são descartadas. */
+function assumir(s: EstadoQuestionario, dono: string): EstadoQuestionario {
+  return progressoPertenceA(s, dono)
+    ? { ...s, respondidoComo: dono }
+    : { ...s, ...SEM_PROGRESSO, respondidoComo: dono, retorno: 'pergunta' };
 }
 
 const ordenados = (lista: number[]) => [...new Set(lista)].sort((a, b) => a - b);
@@ -154,19 +161,21 @@ const alternar = (lista: number[], id: number) => (lista.includes(id) ? lista.fi
 export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
   switch (a.tipo) {
     case 'restaurar': {
-      // Progresso sem o e-mail das respostas (formato antigo ou adulterado) não tem dono: descarta.
+      // Progresso sem o dono das respostas (formato antigo ou adulterado) não tem dono: descarta.
       const progresso = a.progresso?.respondidoComo ? a.progresso : null;
       const restaurado = { ...s, ...(progresso ?? {}), carregado: true };
-      return s.emailMascarado ? assumir(restaurado, s.emailMascarado) : restaurado;
+      return s.dono ? assumir(restaurado, s.dono) : restaurado;
     }
     case 'perguntas':
       return { ...s, total: telasDoTeste(s.tipo, a.perguntas) };
     case 'comecar':
-      return s.emailMascarado ? assumir({ ...s, estado: 'pergunta' }, s.emailMascarado) : { ...s, estado: 'email' };
+      return s.dono ? assumir({ ...s, estado: 'pergunta' }, s.dono) : { ...s, estado: 'email' };
     case 'identificado': {
-      // Outra pessoa (e-mail mascarado diferente): recomeça da primeira pergunta, sem reenviar.
-      const estado = progressoPertenceA(s, a.emailMascarado) ? s.retorno : 'pergunta';
-      return assumir({ ...s, estado, emailMascarado: a.emailMascarado, cadastro: null, saiu: false }, a.emailMascarado);
+      // Outra pessoa (outro dono, mesmo que a máscara do e-mail seja igual): recomeça da primeira
+      // pergunta, sem reenviar.
+      const { emailMascarado, dono } = a.sessao;
+      const estado = progressoPertenceA(s, dono) ? s.retorno : 'pergunta';
+      return assumir({ ...s, estado, emailMascarado, dono, cadastro: null, saiu: false }, dono);
     }
     case 'novoAluno':
       return { ...s, estado: 'cadastro', cadastro: { email: a.email, turmas: a.turmas } };
@@ -175,7 +184,7 @@ export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
     // "Não é você?": a sessão é encerrada e o progresso, apagado; depois de identificar, o teste
     // recomeça da primeira pergunta. (Sessão vencida usa `falhou` → `expirou` e mantém as respostas.)
     case 'trocarEmail':
-      return { ...s, ...SEM_PROGRESSO, respondidoComo: null, estado: 'email', emailMascarado: null, retorno: 'pergunta', erroEnvio: null };
+      return { ...s, ...SEM_PROGRESSO, respondidoComo: null, estado: 'email', emailMascarado: null, dono: null, retorno: 'pergunta', erroEnvio: null };
     case 'informarEmail':
       return { ...s, estado: 'email' };
     // Só registra: quem avança é a tela (escolha com ponteiro ou 'Próxima pergunta'), para o
@@ -202,12 +211,12 @@ export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
       return { ...s, estado: 'resultado', resultado: a.resultado, erroEnvio: null };
     case 'falhou':
       return a.erro === 'sessao'
-        ? { ...s, estado: 'expirou', emailMascarado: null, retorno: 'enviando' }
+        ? { ...s, estado: 'expirou', emailMascarado: null, dono: null, retorno: 'enviando' }
         : { ...s, estado: 'erro', erroEnvio: a.erro };
     case 'revisar':
       return { ...s, estado: 'pergunta', passo: 0, erroEnvio: null };
     case 'sair':
-      return { ...s, emailMascarado: null, saiu: true };
+      return { ...s, emailMascarado: null, dono: null, saiu: true };
   }
 }
 

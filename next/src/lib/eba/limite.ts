@@ -30,3 +30,16 @@ export function criarLimitador(
     return true;
   };
 }
+
+/**
+ * IP do cliente para a chave do limitador, a partir do `x-forwarded-for`. Lê da direita para a
+ * esquerda: cada proxy confiável (ingress, Front Door…) acrescenta um item no fim, e o que vem antes
+ * deles pode ter sido escrito pelo próprio cliente. Com `proxiesConfiaveis` = 1 (padrão), usa o último
+ * item. Isso vale tanto se o proxy substitui o cabeçalho quanto se ele acrescenta.
+ */
+export function ipDoCliente(xff: string | null | undefined, proxiesConfiaveis: number): string {
+  const itens = (xff ?? '').split(',').map((item) => item.trim()).filter(Boolean);
+  if (itens.length === 0) return 'local';
+  const saltos = Number.isInteger(proxiesConfiaveis) && proxiesConfiaveis >= 1 ? proxiesConfiaveis : 1;
+  return itens[Math.max(itens.length - saltos, 0)];
+}

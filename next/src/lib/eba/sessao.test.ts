@@ -3,6 +3,7 @@ import { createHmac } from 'node:crypto';
 import {
   assinarSessao,
   COOKIE_SESSAO,
+  donoDaSessao,
   lerSessao,
   mascararEmail,
   OPCOES_COOKIE,
@@ -178,5 +179,21 @@ describe('segredoDaSessao', () => {
     expect(segredoDaSessao()).toBeNull();
     delete process.env.EBA_SESSAO_SEGREDO;
     expect(segredoDaSessao()).toBeNull();
+  });
+});
+
+describe('donoDaSessao', () => {
+  const SEGREDO = 'segredo-de-teste-com-mais-de-32-caracteres';
+
+  it('é estável para o mesmo aluno e diferente entre alunos com a mesma máscara de e-mail', () => {
+    expect(donoDaSessao('aluno-1', SEGREDO)).toBe(donoDaSessao('aluno-1', SEGREDO));
+    expect(donoDaSessao('aluno-1', SEGREDO)).not.toBe(donoDaSessao('aluno-2', SEGREDO));
+  });
+
+  it('não revela o idStudent e depende do segredo', () => {
+    const dono = donoDaSessao('aluno-1', SEGREDO);
+    expect(dono).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(dono).not.toContain('aluno');
+    expect(donoDaSessao('aluno-1', `${SEGREDO}-outro`)).not.toBe(dono);
   });
 });

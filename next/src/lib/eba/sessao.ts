@@ -41,6 +41,14 @@ function assinar(payload: string, segredo: string): string {
   return createHmac('sha256', segredo).update(payload).digest('base64url');
 }
 
+/**
+ * Identificador opaco do dono das respostas: HMAC do `idStudent` (22 caracteres, sem dado pessoal).
+ * Não usa o e-mail mascarado, que se repete entre pessoas (`ana@` e `alice@` viram `a***@`).
+ */
+export function donoDaSessao(idStudent: string, segredo: string): string {
+  return assinar(`dono:${idStudent}`, segredo).slice(0, 22);
+}
+
 /** `base64url(json).base64url(hmac-sha256)`. */
 export function assinarSessao(s: SessaoAluno, segredo: string): string {
   if (segredo.length < TAMANHO_MINIMO_SEGREDO) throw new Error('segredo da sessão ausente ou curto');

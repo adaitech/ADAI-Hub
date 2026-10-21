@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair, sessaoAtual } from './acoes';
-import { assinarSessao, COOKIE_SESSAO, OPCOES_COOKIE } from '@/lib/eba/sessao';
+import { assinarSessao, COOKIE_SESSAO, donoDaSessao, OPCOES_COOKIE } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno } from '@/lib/eba-api/alunos';
 import { EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida, ebaApiConfigurada } from '@/lib/eba-api/client';
 import { perguntasDoTeste } from '@/lib/eba-api/perguntas';
@@ -27,11 +27,24 @@ jest.mock('@/lib/eba-api/client', () => ({
 jest.mock('@/lib/eba-api/perguntas', () => ({ perguntasDoTeste: jest.fn() }));
 jest.mock('@/lib/eba-api/respostas', () => ({ enviarRespostas: jest.fn() }));
 jest.mock('@/lib/eba-api/turmas', () => ({ turmasAtivas: jest.fn(), aquecerApi: jest.fn() }));
+// Envio único real, recriado a cada teste (o guardado é do módulo e não deve vazar entre testes).
+jest.mock('@/lib/eba/envio-unico', () => {
+  const real = jest.requireActual('@/lib/eba/envio-unico');
+  const recriar: Array<() => void> = [];
+  return {
+    criarEnvioUnico: (...args: unknown[]) => {
+      let atual = real.criarEnvioUnico(...args);
+      recriar.push(() => (atual = real.criarEnvioUnico(...args)));
+      return (...chamada: unknown[]) => atual(...chamada);
+    },
+    recriarTodos: () => recriar.forEach((r) => r()),
+  };
+});
 
 const SEGREDO = 'segredo-de-teste-com-mais-de-32-caracteres';
 const EMAIL = 'ana.silva@exemplo.com';
-/** E-mail mascarado da sessão de `sessaoValida()`: dono das respostas enviadas. */
-const COMO = 'a***@exemplo.com';
+/** Dono opaco da sessão de `sessaoValida()` (aluno-1): dono das respostas enviadas. */
+const COMO = donoDaSessao('aluno-1', SEGREDO);
 const TURMAS = [{ id: 'turma-1', nome: 'Turma 1' }];
 const resultado: Resultado = { tipo: 'pontuacao', itens: [], maximo: 25 };
 
@@ -67,10 +80,12 @@ let error: jest.SpyInstance;
 
 beforeEach(() => {
   jest.resetAllMocks();
+  jest.requireMock<{ recriarTodos: () => void }>('@/lib/eba/envio-unico').recriarTodos();
   process.env.EBA_SESSAO_SEGREDO = SEGREDO;
   configuradaMock.mockReturnValue(true);
-  // IP distinto por teste: o limitador é do módulo e não deve vazar entre testes
-  headerGet.mockImplementation(() => `10.0.0.${++ipSeq}, 1.1.1.1`);
+  // IP distinto por teste (último item: o que o ingress acrescenta): o limitador é do módulo e não deve vazar entre testes
+  delete process.env.EBA_PROXIES_CONFIAVEIS;
+  headerGet.mockImplementation(() => `1.1.1.1, 10.0.0.${++ipSeq}`);
   comSessao(undefined);
   turmasMock.mockResolvedValue(TURMAS);
   warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -82,10 +97,10 @@ afterEach(() => {
 });
 
 describe('identificar', () => {
-  it('e-mail existente: grava o cookie assinado e devolve só o e-mail mascarado', async () => {
+  it('e-mail existente: grava o cookie assinado e devolve só o e-mail mascarado e o dono opaco', async () => {
     alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
     const r = await identificar(`  ${EMAIL.toUpperCase()} `);
-    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
     expect(JSON.stringify(r)).not.toMatch(/aluno-1|turma-1/);
     expect(cookieSet).toHaveBeenCalledTimes(1);
     const [nome, valor, opcoes] = cookieSet.mock.calls[0];
@@ -123,13 +138,30 @@ describe('identificar', () => {
   });
 
   it('a 11ª chamada no minuto, do mesmo IP, devolve limite antes de validar ou chamar a API', async () => {
-    headerGet.mockReturnValue('9.9.9.9, 8.8.8.8');
+    headerGet.mockReturnValue('8.8.8.8, 9.9.9.9');
     alunoPorEmailMock.mockResolvedValue(null);
     for (let i = 0; i < 10; i++) expect((await identificar(EMAIL)).ok).toBe(true);
     alunoPorEmailMock.mockClear();
     expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'limite' });
     expect(await identificar('lixo')).toEqual({ ok: false, erro: 'limite' });
     expect(alunoPorEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('trocar o IP forjado no começo do x-forwarded-for não fura o limite (vale o item do ingress)', async () => {
+    let forjado = 0;
+    headerGet.mockImplementation(() => `6.6.${++forjado}.1, 4.4.4.4`);
+    alunoPorEmailMock.mockResolvedValue(null);
+    for (let i = 0; i < 10; i++) expect((await identificar(EMAIL)).ok).toBe(true);
+    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'limite' });
+  });
+
+  it('EBA_PROXIES_CONFIAVEIS=2: a chave é o penúltimo item (cliente antes do Front Door + ingress)', async () => {
+    process.env.EBA_PROXIES_CONFIAVEIS = '2';
+    let proxy = 0;
+    headerGet.mockImplementation(() => `3.3.3.3, 10.9.9.${++proxy}`);
+    alunoPorEmailMock.mockResolvedValue(null);
+    for (let i = 0; i < 10; i++) expect((await identificar(EMAIL)).ok).toBe(true);
+    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'limite' });
   });
 
   it('sem x-forwarded-for usa a chave local', async () => {
@@ -178,7 +210,7 @@ describe('cadastrar', () => {
   it('e-mail que já existe: abre a sessão do aluno encontrado e não faz o POST', async () => {
     alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
     const r = await cadastrar(dados);
-    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
     expect(cadastrarAlunoMock).not.toHaveBeenCalled();
     expect(cookieSet).toHaveBeenCalledWith(COOKIE_SESSAO, expect.any(String), OPCOES_COOKIE);
   });
@@ -204,7 +236,7 @@ describe('cadastrar', () => {
   it('cadastra, grava o cookie e devolve só o e-mail mascarado', async () => {
     cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
     const r = await cadastrar(dados);
-    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: donoDaSessao('aluno-9', SEGREDO) } });
     expect(cadastrarAlunoMock).toHaveBeenCalledWith(
       {
         nome: 'Ana Silva',
@@ -279,6 +311,32 @@ describe('enviar', () => {
     );
   });
 
+  it('duas abas enviando as mesmas respostas ao mesmo tempo: uma gravação só na API', async () => {
+    let liberar!: (r: Resultado) => void;
+    enviarMock.mockImplementation(() => new Promise<Resultado>((ok) => (liberar = ok)));
+    const a = enviar('dons-servico', notas(3, 4), COMO);
+    const b = enviar('dons-servico', notas(3, 4), COMO);
+    await new Promise((ok) => setTimeout(ok, 0));
+    liberar(resultado);
+    expect(await a).toEqual({ ok: true, dados: resultado });
+    expect(await b).toEqual({ ok: true, dados: resultado });
+    expect(enviarMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('reenvio das mesmas respostas depois do sucesso devolve o mesmo resultado sem gravar de novo', async () => {
+    await enviar('dons-servico', notas(3, 4), COMO);
+    expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: true, dados: resultado });
+    expect(enviarMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('respostas diferentes ou falha anterior: grava de novo', async () => {
+    enviarMock.mockRejectedValueOnce(new EbaApiIndisponivel('rede')).mockResolvedValue(resultado);
+    expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: true, dados: resultado });
+    expect(await enviar('dons-servico', notas(3, 2), COMO)).toEqual({ ok: true, dados: resultado });
+    expect(enviarMock).toHaveBeenCalledTimes(3);
+  });
+
   it('usa 60 s no envio e 45 s nas perguntas da validação', async () => {
     await enviar('dons-servico', notas(3, 4), COMO);
     expect(enviarMock).toHaveBeenCalledWith(expect.anything(), ENVIO);
@@ -335,8 +393,21 @@ describe('enviar', () => {
     expect(cookieDelete).not.toHaveBeenCalled();
   });
 
-  it('o dono das respostas é comparado com a sessão sem normalizar (máscara exata)', async () => {
-    expect(await enviar('dons-servico', notas(3, 1), 'A***@exemplo.com')).toEqual({ ok: false, erro: 'sessao' });
+  it('e-mails com a mesma máscara (ana@ e alice@) não se confundem: respostas da ana não vão para a alice', async () => {
+    // A ana respondeu na aba 1; a alice (mesma máscara a***@exemplo.com) entrou na aba 2.
+    const sessaoDaAlice = assinarSessao(
+      { idStudent: 'aluno-2', idClass: 'turma-1', emailMascarado: 'a***@exemplo.com', emitidoEm: Date.now() },
+      SEGREDO,
+    );
+    comSessao(sessaoDaAlice);
+    const r = await enviar('dons-servico', notas(3, 1), COMO);
+    expect(r).toEqual({ ok: false, erro: 'sessao' });
+    expect(enviarMock).not.toHaveBeenCalled();
+  });
+
+  it('o dono das respostas é comparado com a sessão sem normalizar; a máscara de e-mail não vale como dono', async () => {
+    expect(await enviar('dons-servico', notas(3, 1), 'a***@exemplo.com')).toEqual({ ok: false, erro: 'sessao' });
+    expect(await enviar('dons-servico', notas(3, 1), COMO.toUpperCase())).toEqual({ ok: false, erro: 'sessao' });
     expect(await enviar('dons-servico', notas(3, 1), ` ${COMO}`)).toEqual({ ok: false, erro: 'sessao' });
     expect(enviarMock).not.toHaveBeenCalled();
   });
@@ -552,7 +623,7 @@ describe('aquecer', () => {
   });
 
   it('limite próprio de 5 por minuto por IP: a 6ª não chama a API e não gasta o limite do identificar', async () => {
-    headerGet.mockReturnValue('5.5.5.5, 8.8.8.8');
+    headerGet.mockReturnValue('8.8.8.8, 5.5.5.5');
     aquecerApiMock.mockResolvedValue(undefined);
     for (let i = 0; i < 6; i++) await aquecer();
     expect(aquecerApiMock).toHaveBeenCalledTimes(5);
@@ -625,7 +696,7 @@ describe('sair e sessaoAtual', () => {
 
   it('sessaoAtual devolve só o e-mail mascarado', async () => {
     comSessao(sessaoValida());
-    expect(await sessaoAtual()).toEqual({ emailMascarado: 'a***@exemplo.com' });
+    expect(await sessaoAtual()).toEqual({ emailMascarado: 'a***@exemplo.com', dono: COMO });
   });
 
   it.each([

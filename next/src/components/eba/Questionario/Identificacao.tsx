@@ -5,6 +5,7 @@ import type { cadastrar as cadastrarAcao, identificar as identificarAcao, Respos
 import { UNIDADES } from '@/lib/eba-api/testes';
 import type { Turma } from '@/lib/eba-api/turmas';
 import { AvisoDeEspera } from './AvisoDeEspera';
+import type { SessaoTela } from './estado';
 import styles from './Questionario.module.css';
 
 type CodigoErro = Extract<RespostaAcao, { ok: false }>['erro'];
@@ -43,7 +44,7 @@ function TentarDeNovo({ visivel, pendente, onClick }: { visivel: boolean; penden
 
 export interface IdentificacaoProps {
   identificar: typeof identificarAcao;
-  onIdentificado: (emailMascarado: string) => void;
+  onIdentificado: (sessao: SessaoTela) => void;
   /** E-mail não encontrado: abre o Primeiro acesso com as turmas abertas. */
   onNovo: (email: string, turmas: Turma[]) => void;
   tituloRef: RefCallback<HTMLElement>;
@@ -73,7 +74,7 @@ export function Identificacao({ identificar, onIdentificado, onNovo, tituloRef }
       const resposta = await identificar(valor);
       if (resposta.ok && resposta.dados) {
         if ('novo' in resposta.dados) onNovo(valor, resposta.dados.turmas);
-        else onIdentificado(resposta.dados.emailMascarado);
+        else onIdentificado(resposta.dados);
         return;
       }
       setErro(resposta.ok ? 'indisponivel' : resposta.erro);
@@ -131,7 +132,7 @@ export interface CadastroProps {
   cadastrar: typeof cadastrarAcao;
   /** "Tentar de novo" refaz a identificação (turmas atualizadas ou e-mail já cadastrado). */
   identificar: typeof identificarAcao;
-  onIdentificado: (emailMascarado: string) => void;
+  onIdentificado: (sessao: SessaoTela) => void;
   onNovo: (email: string, turmas: Turma[]) => void;
   onOutroEmail: () => void;
   tituloRef: RefCallback<HTMLElement>;
@@ -187,7 +188,7 @@ export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado
       const resposta = await identificar(email);
       if (resposta.ok && resposta.dados) {
         if ('novo' in resposta.dados) onNovo(email, resposta.dados.turmas);
-        else onIdentificado(resposta.dados.emailMascarado);
+        else onIdentificado(resposta.dados);
         return;
       }
       setErro(resposta.ok ? 'indisponivel' : resposta.erro);
@@ -210,7 +211,7 @@ export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado
     try {
       const resposta = await cadastrar({ email, nome: nome.trim(), unidade, idTurma });
       if (resposta.ok && resposta.dados) {
-        onIdentificado(resposta.dados.emailMascarado);
+        onIdentificado(resposta.dados);
         return;
       }
       setErro(resposta.ok ? 'indisponivel' : resposta.erro);

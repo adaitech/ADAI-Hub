@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import Image, { getImageProps } from 'next/image';
 import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
 import { preload } from 'react-dom';
 import { buttonClassName } from '@/components/ui/ButtonLink';
@@ -25,6 +25,7 @@ import {
   telasDoTeste,
   temProgresso,
   type EstadoQuestionario,
+  type SessaoTela,
 } from './estado';
 import { TextoEspera, useEsperaLonga } from './AvisoDeEspera';
 import { Cadastro, Identificacao } from './Identificacao';
@@ -41,7 +42,7 @@ export interface QuestionarioProps {
   teste: DefinicaoTeste;
   abertura: { resumo: string; perguntas: string | null; resposta: string | null; comoResponder: string | null; aula: string | null };
   perguntas: Pergunta[];
-  sessao: { emailMascarado: string } | null;
+  sessao: SessaoTela | null;
   /**
    * A API falhou ao buscar as perguntas no servidor (API fria passa dos 10 s da página): a abertura
    * aparece e "Começar" tenta de novo pela ação `carregarPerguntas` (45 s).
@@ -67,6 +68,8 @@ const ROTULO_TELA = { nota: 'Pergunta', estilo: 'Pergunta', talentos: 'Etapa', t
 const UNIDADE_TELA = { nota: 'perguntas', estilo: 'perguntas', talentos: 'etapas', temperamento: 'páginas' } as const;
 /** Onde aparece "Respondendo como … · Trocar e-mail" (na abertura, antes de responder num aparelho emprestado). */
 const COM_SESSAO_VISIVEL = new Set(['abertura', 'pergunta', 'erro']);
+/** Largura da foto na tela: coluna de 45% no desktop, largura toda no celular (a foto da capa é o LCP). */
+const TAMANHOS_FOTO = '(min-width: 1024px) 45vw, 100vw';
 
 function Progresso({ atual, total, rotulo }: { atual: number; total: number; rotulo: string }) {
   const porcentagem = Math.round((atual / total) * 100);
@@ -197,7 +200,7 @@ export function Questionario({
 
   // Envio: uma chamada por vez (dois cliques rápidos não duplicam).
   const enviandoAgora = useRef(false);
-  async function enviarRespostas(dono: string | null = s.respondidoComo ?? s.emailMascarado) {
+  async function enviarRespostas(dono: string | null = s.respondidoComo ?? s.dono) {
     if (enviandoAgora.current) return;
     enviandoAgora.current = true;
     dispatch({ tipo: 'enviar' });
@@ -216,11 +219,11 @@ export function Questionario({
     }
   }
 
-  function aoIdentificar(emailMascarado: string) {
+  function aoIdentificar(sessao: SessaoTela) {
     // Só reenvia as respostas da própria pessoa; de outra, o reducer descarta e recomeça.
-    const reenviar = s.retorno === 'enviando' && progressoPertenceA(s, emailMascarado);
-    dispatch({ tipo: 'identificado', emailMascarado });
-    if (reenviar) void enviarRespostas(s.respondidoComo ?? emailMascarado);
+    const reenviar = s.retorno === 'enviando' && progressoPertenceA(s, sessao.dono);
+    dispatch({ tipo: 'identificado', sessao });
+    if (reenviar) void enviarRespostas(s.respondidoComo ?? sessao.dono);
   }
 
   const precisaDePerguntas = teste.tipo === 'nota' || teste.tipo === 'talentos';
@@ -292,7 +295,11 @@ export function Questionario({
 
   const foto = fotoDoTeste(teste.slug, momentoDaFoto(s));
   const proximaFoto = s.estado === 'pergunta' && s.passo + 1 < s.total ? fotoDoTeste(teste.slug, { pergunta: s.passo + 2 }) : null;
-  if (proximaFoto && proximaFoto !== foto) preload(proximaFoto, { as: 'image' });
+  if (proximaFoto && proximaFoto !== foto) {
+    // Mesmo srcset/sizes da <Image>: o navegador baixa a largura certa e reaproveita na troca.
+    const { props } = getImageProps({ src: proximaFoto, alt: '', fill: true, sizes: TAMANHOS_FOTO });
+    preload(props.src, { as: 'image', imageSrcSet: props.srcSet, imageSizes: props.sizes });
+  }
 
   const idTitulo = `${id}-titulo`;
   const rotuloEnviar = teste.tipo === 'talentos' ? 'Concluir' : 'Enviar respostas';
@@ -568,8 +575,7 @@ export function Questionario({
             src={foto}
             alt=""
             fill
-            unoptimized
-            sizes="(min-width: 1024px) 45vw, 100vw"
+            sizes={TAMANHOS_FOTO}
             loading="eager"
             fetchPriority={s.estado === 'abertura' ? 'high' : undefined}
             className={styles.foto}

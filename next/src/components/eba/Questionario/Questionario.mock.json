@@ -1,6 +1,7 @@
 {
   "sessao": {
-    "emailMascarado": "a***@email.com"
+    "emailMascarado": "a***@email.com",
+    "dono": "dono-vitrine"
   },
   "testes": {
     "dons-servico": {

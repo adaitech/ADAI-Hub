@@ -1,11 +1,14 @@
 'use server';
 
+import { createHash } from 'node:crypto';
 import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
-import { criarLimitador } from '@/lib/eba/limite';
+import { criarEnvioUnico } from '@/lib/eba/envio-unico';
+import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
 import {
   assinarSessao,
   COOKIE_SESSAO,
+  donoDaSessao,
   lerSessao,
   mascararEmail,
   OPCOES_COOKIE,
@@ -47,6 +50,8 @@ type Falha = { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao
 const falha = (erro: Falha['erro']): Falha => ({ ok: false, erro });
 
 const limitarTentativas = criarLimitador(10, 60_000);
+/** Mesmo aluno, teste e respostas em 10 min: uma gravação só na API (duas abas, reenvio após sucesso). */
+const enviarUmaVez = criarEnvioUnico<Resultado>(600_000);
 /** Aquecimento: limite próprio (não gasta as tentativas do identificar), mesma chave (IP). */
 const limitarAquecimento = criarLimitador(5, 60_000);
 const ACAO = { timeoutMs: TIMEOUT_ACAO_MS };
@@ -68,17 +73,24 @@ function registrarFalha(acao: string, erro: unknown): void {
   }
 }
 
-async function dentroDoLimite(limitar = limitarTentativas): Promise<boolean> {
-  const cabecalhos = await headers();
-  const ip = cabecalhos.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
-  return limitar(ip, Date.now());
+/** Proxies confiáveis na frente do Next (padrão 1: o ingress). Ver `ipDoCliente`. */
+function proxiesConfiaveis(): number {
+  return Number(process.env.EBA_PROXIES_CONFIAVEIS ?? 1);
 }
 
-async function abrirSessao(aluno: { idStudent: string; idClass: string }, email: string, chave: string) {
+async function dentroDoLimite(limitar = limitarTentativas): Promise<boolean> {
+  const cabecalhos = await headers();
+  return limitar(ipDoCliente(cabecalhos.get('x-forwarded-for'), proxiesConfiaveis()), Date.now());
+}
+
+/** O que a tela recebe da sessão: o e-mail mascarado (para mostrar) e o dono opaco (para comparar). */
+export type SessaoVisivel = { emailMascarado: string; dono: string };
+
+async function abrirSessao(aluno: { idStudent: string; idClass: string }, email: string, chave: string): Promise<SessaoVisivel> {
   const emailMascarado = mascararEmail(email);
   const sessao: SessaoAluno = { ...aluno, emailMascarado, emitidoEm: Date.now() };
   (await cookies()).set(COOKIE_SESSAO, assinarSessao(sessao, chave), OPCOES_COOKIE);
-  return emailMascarado;
+  return { emailMascarado, dono: donoDaSessao(aluno.idStudent, chave) };
 }
 
 const esquemaEmail = z.string().trim().max(254).pipe(z.email());
@@ -104,7 +116,7 @@ async function sessaoDoCookie(segredo: string): Promise<SessaoAluno | null> {
 
 export async function identificar(
   email: string,
-): Promise<RespostaAcao<{ emailMascarado: string } | { novo: true; turmas: Turma[] }>> {
+): Promise<RespostaAcao<SessaoVisivel | { novo: true; turmas: Turma[] }>> {
   if (!(await dentroDoLimite())) return falha('limite');
   const config = configuracao();
   if (!config) return falha('indisponivel');
@@ -116,8 +128,7 @@ export async function identificar(
   try {
     const aluno = await alunoPorEmail(emailNormalizado, ACAO);
     if (aluno) {
-      const emailMascarado = await abrirSessao(aluno, emailNormalizado, config.segredo);
-      return { ok: true, dados: { emailMascarado } };
+      return { ok: true, dados: await abrirSessao(aluno, emailNormalizado, config.segredo) };
     }
     return { ok: true, dados: { novo: true, turmas: await turmasAtivas(ACAO) } };
   } catch (erro) {
@@ -139,7 +150,7 @@ export async function cadastrar(dados: {
   nome: string;
   unidade: string;
   idTurma: string;
-}): Promise<RespostaAcao<{ emailMascarado: string }>> {
+}): Promise<RespostaAcao<SessaoVisivel>> {
   if (!(await dentroDoLimite())) return falha('limite');
   const config = configuracao();
   if (!config) return falha('indisponivel');
@@ -154,13 +165,12 @@ export async function cadastrar(dados: {
     // sessão como no `identificar`, sem criar um aluno duplicado.
     const existente = await alunoPorEmail(email, ACAO);
     if (existente) {
-      return { ok: true, dados: { emailMascarado: await abrirSessao(existente, email, config.segredo) } };
+      return { ok: true, dados: await abrirSessao(existente, email, config.segredo) };
     }
     const turmas = await turmasAtivas(ACAO);
     if (!turmas.some((t) => t.id === idTurma)) return falha('invalido');
     const aluno = await cadastrarAluno({ nome, email, unidade, idTurma }, ACAO);
-    const emailMascarado = await abrirSessao(aluno, email, config.segredo);
-    return { ok: true, dados: { emailMascarado } };
+    return { ok: true, dados: await abrirSessao(aluno, email, config.segredo) };
   } catch (erro) {
     registrarFalha('cadastrar', erro);
     return falha(erro instanceof EbaApiError && erro.status === 400 ? 'recusado' : 'indisponivel');
@@ -213,13 +223,14 @@ async function respostasValidas(slug: SlugTeste, respostas: RespostaTeste[]): Pr
   }
 }
 
-/** E-mail mascarado do dono das respostas, como o cliente guardou no progresso. */
+/** Dono opaco das respostas (`donoDaSessao`), como o cliente guardou no progresso. */
 const esquemaRespondidoComo = z.string().max(260).refine((v) => v.trim() !== '');
 
 /**
- * Envia as respostas com os ids da sessão. `respondidoComo` é o e-mail mascarado da sessão em que as
- * respostas foram dadas: se a sessão do cookie for de outra pessoa (trocada em outra aba), devolve
- * `sessao` sem chamar a API, para as respostas de uma pessoa não serem gravadas como de outra.
+ * Envia as respostas com os ids da sessão. `respondidoComo` é o dono opaco da sessão em que as
+ * respostas foram dadas: se a sessão do cookie for de outra pessoa (trocada em outra aba, mesmo com a
+ * mesma máscara de e-mail), devolve `sessao` sem chamar a API, para as respostas de uma pessoa não
+ * serem gravadas como de outra.
  */
 export async function enviar(
   slug: string,
@@ -234,7 +245,7 @@ export async function enviar(
 
   const dono = esquemaRespondidoComo.safeParse(respondidoComo);
   if (!dono.success) return falha('invalido');
-  if (dono.data !== sessao.emailMascarado) return falha('sessao');
+  if (dono.data !== donoDaSessao(sessao.idStudent, config.segredo)) return falha('sessao');
 
   const teste = definicaoDoTeste(typeof slug === 'string' ? slug : '');
   const lista = z.array(esquemaResposta).safeParse(respostas);
@@ -242,15 +253,10 @@ export async function enviar(
 
   try {
     if (!(await respostasValidas(teste.slug, lista.data))) return falha('invalido');
-    const resultado = await enviarRespostas(
-      {
-        slug: teste.slug,
-        idStudent: sessao.idStudent,
-        idClass: sessao.idClass,
-        respostas: lista.data,
-      },
-      ENVIO,
-    );
+    const envio = { slug: teste.slug, idStudent: sessao.idStudent, idClass: sessao.idClass, respostas: lista.data };
+    // Chave sem dado pessoal em claro: hash do aluno, turma, teste e respostas.
+    const chave = createHash('sha256').update(JSON.stringify(envio)).digest('base64url');
+    const resultado = await enviarUmaVez(chave, Date.now(), () => enviarRespostas(envio, ENVIO));
     return { ok: true, dados: resultado };
   } catch (erro) {
     registrarFalha('enviar', erro);
@@ -301,9 +307,9 @@ export async function sair(): Promise<void> {
   (await cookies()).delete({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
 }
 
-export async function sessaoAtual(): Promise<{ emailMascarado: string } | null> {
+export async function sessaoAtual(): Promise<SessaoVisivel | null> {
   const config = configuracao();
   if (!config) return null;
   const sessao = await sessaoDoCookie(config.segredo);
-  return sessao ? { emailMascarado: sessao.emailMascarado } : null;
+  return sessao ? { emailMascarado: sessao.emailMascarado, dono: donoDaSessao(sessao.idStudent, config.segredo) } : null;
 }
