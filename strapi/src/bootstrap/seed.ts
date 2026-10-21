@@ -7,7 +7,7 @@ import { ensureCursos, ensurePaginasEba, ensureTestes, type Imagem, type StrapiS
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 21;
+const SEED_VERSION = 22;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
