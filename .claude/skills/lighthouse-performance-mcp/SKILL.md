@@ -18,6 +18,7 @@ Adaptada da skill `lighthouse-performance-mcp` do vitru-portal (sem os scripts s
    cd next && yarn build && yarn start   # http://localhost:3000
    ```
    `next dev` distorce LCP/TBT (HMR, JS não minificado): **não** usar para decidir.
+   **`next start` fala HTTP/1.1** e produção fala HTTP/2: no throttling simulado o Lantern enfileira as ~20 requisições em 6 conexões com RTT de 150 ms e o LCP mobile sai **~1 s maior** que em produção (21/10/2026: 3,2–3,4 s em HTTP/1.1 × 2,25 s no mesmo build em HTTP/2). Para comparar com a meta de LCP, medir atrás do proxy HTTP/2 `h2-proxy.mjs` (ver [`reference.md`](reference.md)); para A/B entre builds, qualquer um serve desde que os dois lados usem o mesmo protocolo.
 2. Strapi rodando com conteúdo (`cd strapi && yarn develop`), se a página depender do CMS.
 3. MCP de Lighthouse é opcional (score rápido); **oportunidades detalhadas vêm do JSON da CLI** (ver [`reference.md`](reference.md)).
 
