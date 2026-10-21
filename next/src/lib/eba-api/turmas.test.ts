@@ -59,6 +59,12 @@ describe('aquecerApi', () => {
     expect(ebaFetchMock.mock.calls[0][1]).not.toHaveProperty('cache');
   });
 
+  it('sem opção, usa o timeout curto do aquecimento (8 s): não precisa esperar a resposta', async () => {
+    ebaFetchMock.mockResolvedValue(classes);
+    await aquecerApi();
+    expect(ebaFetchMock).toHaveBeenCalledWith('ClassEBA?page-size=1', { timeoutMs: 8_000 });
+  });
+
   it('propaga o erro (quem chama decide ignorar)', async () => {
     const erro = new Error('x');
     ebaFetchMock.mockRejectedValue(erro);

@@ -170,6 +170,8 @@ describe('Questionario — perguntas indisponíveis na abertura (API fria)', () 
     const carregarPerguntas = jest.fn(() => carga.promessa);
     montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
     expect(screen.queryByRole('alert')).toBeNull();
+    // A região de status já existe (vazia) na abertura: o leitor de tela anuncia quando o texto entra.
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
     comecar();
     expect(carregarPerguntas).toHaveBeenCalledWith('dons-servico');
     expect(screen.getByRole('status')).toHaveTextContent('Preparando o teste…');
@@ -194,11 +196,26 @@ describe('Questionario — perguntas indisponíveis na abertura (API fria)', () 
     montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
     comecar();
     const botaoComecar = botao(/começar o teste/i);
-    expect(botaoComecar).toBeDisabled();
+    expect(botaoComecar).toHaveAttribute('aria-disabled', 'true');
     fireEvent.click(botaoComecar);
     fireEvent.click(botaoComecar);
     expect(carregarPerguntas).toHaveBeenCalledTimes(1);
     await act(async () => carga.concluir({ ok: false, erro: 'indisponivel' }));
+  });
+
+  it('durante a preparação o botão fica aria-disabled (não disabled) e o foco continua nele na falha', async () => {
+    const carga = adiada();
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas: jest.fn(() => carga.promessa) }) });
+    const botaoComecar = botao(/começar o teste/i);
+    botaoComecar.focus();
+    fireEvent.click(botaoComecar);
+    expect(botaoComecar).toBeEnabled();
+    expect(botaoComecar).toHaveAttribute('aria-disabled', 'true');
+    expect(botaoComecar).toHaveFocus();
+    await act(async () => carga.concluir({ ok: false, erro: 'indisponivel' }));
+    expect(botao('Tentar de novo')).toBe(botaoComecar);
+    expect(botaoComecar).toHaveFocus();
+    expect(botaoComecar).not.toHaveAttribute('aria-disabled');
   });
 
   it.each([
@@ -212,12 +229,26 @@ describe('Questionario — perguntas indisponíveis na abertura (API fria)', () 
     await esperarAcoes();
     expect(screen.getByRole('alert')).toHaveTextContent(SEM_PERGUNTAS);
     expect(screen.queryByRole('progressbar')).toBeNull();
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
     carregarPerguntas.mockReset().mockResolvedValue({ ok: true, dados: perguntasCurtas });
     fireEvent.click(botao('Tentar de novo'));
     await esperarAcoes();
     expect(carregarPerguntas).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '3');
+  });
+
+  it('depois de carregar, progresso salvo de outra pessoa é descartado e o teste começa na pergunta 1', async () => {
+    const chave = chaveProgresso('dons-servico');
+    sessionStorage.setItem(chave, JSON.stringify({ passo: 2, respostas: { 1: 3, 2: 4 }, marcadas: [], escolhidas: [], respondidoComo: 'b***@email.com' }));
+    const carregarPerguntas = jest.fn().mockResolvedValue({ ok: true, dados: perguntasCurtas });
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
+    comecar();
+    await esperarAcoes();
+    expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+    expect(screen.getAllByRole('radio').some((r) => (r as HTMLInputElement).checked)).toBe(false);
+    const salvo = sessionStorage.getItem(chave);
+    expect(salvo === null || JSON.parse(salvo).respondidoComo === 'a***@email.com').toBe(true);
+    expect(salvo === null ? {} : JSON.parse(salvo).respostas).toEqual({});
   });
 
   it('temperamento: sucesso com lista vazia segue (o teste usa as opções locais)', async () => {

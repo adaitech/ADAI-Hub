@@ -444,14 +444,20 @@ export function Questionario({
                 Não conseguimos carregar as perguntas agora. Tente em alguns minutos.
               </p>
             )}
-            {preparando && (
+            {/* Região já montada (vazia) para o leitor de tela anunciar quando o texto entra. */}
+            {indisponiveis && (
               <div className={styles.preparando} role="status">
-                <p className={styles.texto}>Preparando o teste…</p>
-                <TextoEspera visivel={esperaLonga} />
+                {preparando && (
+                  <>
+                    <p className={styles.texto}>Preparando o teste…</p>
+                    <TextoEspera visivel={esperaLonga} />
+                  </>
+                )}
               </div>
             )}
             <div className={styles.botoes}>
-              <button type="button" className={buttonClassName()} disabled={preparando} onClick={comecar}>
+              {/* aria-disabled (não disabled): o foco fica no botão; a trava é o ref de `prepararTeste`. */}
+              <button type="button" className={buttonClassName()} aria-disabled={preparando || undefined} onClick={comecar}>
                 {indisponiveis && semPerguntas ? 'Tentar de novo' : temProgresso(s) ? 'Continuar o teste' : 'Começar o teste'}
               </button>
             </div>

@@ -7,7 +7,7 @@ import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { segredoDaSessao } from '@/lib/eba/sessao';
 import { ebaApiConfigurada, TIMEOUT_PAGINA_MS } from '@/lib/eba-api/client';
 import { perguntasDoTeste, type Pergunta } from '@/lib/eba-api/perguntas';
-import { definicaoDoTeste, type DefinicaoTeste } from '@/lib/eba-api/testes';
+import { definicaoDoTeste, usaPerguntasDaApi, type DefinicaoTeste } from '@/lib/eba-api/testes';
 import { buildMetadata } from '@/lib/metadata';
 import { jsonLdSeguro, origemDoSite } from '@/lib/seo/json-ld';
 import { getGlobal } from '@/lib/strapi/queries/global';
@@ -15,6 +15,13 @@ import { getTesteBySlug } from '@/lib/strapi/queries/testes';
 import { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair, sessaoAtual } from './acoes';
 import estilosEba from '../../eba.module.css';
 import styles from './page.module.css';
+
+/**
+ * Tempo máximo do segmento, em segundos; as Server Actions da página herdam. Com a API fria, as
+ * ações esperam até 45 s (envio: 60 s): sem folga, a hospedagem poderia encerrar a função antes e,
+ * no envio, a nova tentativa gravaria em dobro.
+ */
+export const maxDuration = 120;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -54,9 +61,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 /**
  * API ou APIM fora ao abrir (ou fria: o banco pausa e a 1ª chamada passa dos 10 s): a abertura
  * aparece e "Começar" busca de novo pela ação `carregarPerguntas` (nunca 404). A página não espera
- * mais que `TIMEOUT_PAGINA_MS`. Estilo pessoal não usa a API (lista vazia).
+ * mais que `TIMEOUT_PAGINA_MS`. Estilo e temperamento não usam perguntas da API: nem buscam.
  */
 async function buscarPerguntas(teste: DefinicaoTeste): Promise<{ perguntas: Pergunta[]; indisponiveis: boolean }> {
+  if (!usaPerguntasDaApi(teste)) return { perguntas: [], indisponiveis: false };
   try {
     return { perguntas: await perguntasDoTeste(teste.slug, { timeoutMs: TIMEOUT_PAGINA_MS }), indisponiveis: false };
   } catch (erro) {

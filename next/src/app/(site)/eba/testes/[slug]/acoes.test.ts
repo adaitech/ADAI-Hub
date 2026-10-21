@@ -45,6 +45,8 @@ const aquecerApiMock = jest.mocked(aquecerApi);
 /** Timeouts esperados (API fria): ações 45 s, envio 60 s. */
 const ACAO = { timeoutMs: 45_000 };
 const ENVIO = { timeoutMs: 60_000 };
+/** Aquecimento: timeout curto, para não segurar a fila de Server Actions. */
+const AQUECER = { timeoutMs: 8_000 };
 
 let ipSeq = 0;
 function sessaoValida(emitidoEm = Date.now()) {
@@ -496,14 +498,14 @@ describe('enviar', () => {
 });
 
 describe('aquecer', () => {
-  it('acorda a API com 45 s e não devolve dados', async () => {
+  it('acorda a API com timeout curto (8 s) e não devolve dados', async () => {
     aquecerApiMock.mockResolvedValue(undefined);
     await expect(aquecer()).resolves.toBeUndefined();
     expect(aquecerApiMock).toHaveBeenCalledTimes(1);
-    expect(aquecerApiMock).toHaveBeenCalledWith(ACAO);
+    expect(aquecerApiMock).toHaveBeenCalledWith(AQUECER);
   });
 
-  it('pelo client real: um GET ClassEBA?page-size=1 sem cache, com AbortSignal.timeout(45_000)', async () => {
+  it('pelo client real: um GET ClassEBA?page-size=1 sem cache, com AbortSignal.timeout(8_000)', async () => {
     const { aquecerApi: real } = jest.requireActual<typeof import('@/lib/eba-api/turmas')>('@/lib/eba-api/turmas');
     aquecerApiMock.mockImplementation(real);
     const fetchOriginal = global.fetch;
@@ -520,7 +522,7 @@ describe('aquecer', () => {
       expect(init.method).toBe('GET');
       expect(init.cache).toBe('no-store');
       expect(init.next).toBeUndefined();
-      expect(espiao).toHaveBeenCalledWith(45_000);
+      expect(espiao).toHaveBeenCalledWith(8_000);
     } finally {
       global.fetch = fetchOriginal;
       process.env = envOriginal;
@@ -579,8 +581,8 @@ describe('carregarPerguntas', () => {
     expect(perguntasMock).toHaveBeenCalledWith('dons-servico', ACAO);
   });
 
-  it('estilo-pessoal → [] sem chamar a API', async () => {
-    expect(await carregarPerguntas('estilo-pessoal')).toEqual({ ok: true, dados: [] });
+  it.each(['estilo-pessoal', 'temperamento-pessoal'])('%s (sem perguntas da API) → [] sem chamar a API', async (slug) => {
+    expect(await carregarPerguntas(slug)).toEqual({ ok: true, dados: [] });
     expect(perguntasMock).not.toHaveBeenCalled();
   });
 

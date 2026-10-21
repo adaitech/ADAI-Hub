@@ -6,6 +6,7 @@ import {
   EbaApiIndisponivel,
   EbaApiRespostaInvalida,
   TIMEOUT_ACAO_MS,
+  TIMEOUT_AQUECER_MS,
   TIMEOUT_ENVIO_MS,
   TIMEOUT_PAGINA_MS,
 } from './client';
@@ -104,7 +105,8 @@ describe('ebaFetch', () => {
     espiao.mockRestore();
   });
 
-  it('constantes de timeout: página 10 s, ação 45 s, envio 60 s', () => {
+  it('constantes de timeout: página 10 s, ação 45 s, envio 60 s, aquecimento 8 s', () => {
+    expect(TIMEOUT_AQUECER_MS).toBe(8_000);
     expect(TIMEOUT_PAGINA_MS).toBe(10_000);
     expect(TIMEOUT_ACAO_MS).toBe(45_000);
     expect(TIMEOUT_ENVIO_MS).toBe(60_000);

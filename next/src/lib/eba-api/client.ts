@@ -7,8 +7,13 @@ import type { EbaErroApi } from './tipos';
  */
 /** Perguntas buscadas ao renderizar a página (padrão de `ebaFetch`). */
 export const TIMEOUT_PAGINA_MS = 10_000;
-/** Chamadas dentro de Server Actions (identificar, cadastrar, carregar perguntas, aquecer). */
+/** Chamadas dentro de Server Actions (identificar, cadastrar, carregar perguntas). */
 export const TIMEOUT_ACAO_MS = 45_000;
+/**
+ * Aquecimento: o banco começa a acordar com a tentativa de conexão, então não é preciso esperar a
+ * resposta. Curto para não segurar a fila de Server Actions (o Next despacha uma por vez).
+ */
+export const TIMEOUT_AQUECER_MS = 8_000;
 /** `POST SurveyResponse`. */
 export const TIMEOUT_ENVIO_MS = 60_000;
 

@@ -19,11 +19,12 @@ import {
   EbaApiRespostaInvalida,
   ebaApiConfigurada,
   TIMEOUT_ACAO_MS,
+  TIMEOUT_AQUECER_MS,
   TIMEOUT_ENVIO_MS,
 } from '@/lib/eba-api/client';
 import { perguntasDoTeste, type Pergunta } from '@/lib/eba-api/perguntas';
 import { enviarRespostas, type Resultado } from '@/lib/eba-api/respostas';
-import { definicaoDoTeste, UNIDADES, type SlugTeste } from '@/lib/eba-api/testes';
+import { definicaoDoTeste, UNIDADES, usaPerguntasDaApi, type SlugTeste } from '@/lib/eba-api/testes';
 import { aquecerApi, turmasAtivas, type Turma } from '@/lib/eba-api/turmas';
 
 /**
@@ -33,7 +34,8 @@ import { aquecerApi, turmasAtivas, type Turma } from '@/lib/eba-api/turmas';
  * - logs só com classe do erro/status/código: nunca e-mail, nome ou ids.
  *
  * API fria: o banco da API pausa quando fica ocioso e a primeira chamada leva de 10 a 45 s. Por
- * isso as chamadas daqui usam `TIMEOUT_ACAO_MS` (45 s) e o envio, `TIMEOUT_ENVIO_MS` (60 s).
+ * isso as chamadas daqui usam `TIMEOUT_ACAO_MS` (45 s), o envio `TIMEOUT_ENVIO_MS` (60 s) e o
+ * aquecimento `TIMEOUT_AQUECER_MS` (8 s). A página declara `maxDuration` de 120 s (as ações herdam).
  */
 
 export type RespostaAcao<T = undefined> =
@@ -261,14 +263,15 @@ export async function enviar(
 
 /**
  * Acorda o banco da API (ele pausa quando fica ocioso) enquanto a pessoa lê a abertura: um GET leve
- * e sem cache. Nunca lança e nunca devolve dados. Não chama a API acima de 5 por minuto por IP nem
+ * e sem cache, com timeout curto (8 s: o banco acorda com a tentativa de conexão, e a fila de Server
+ * Actions não fica presa). Nunca lança e nunca devolve dados. Não chama a API acima de 5 por minuto por IP nem
  * sem configuração ou segredo (falha fechado).
  */
 export async function aquecer(): Promise<void> {
   try {
     if (!(await dentroDoLimite(limitarAquecimento))) return;
     if (!configuracao()) return;
-    await aquecerApi(ACAO);
+    await aquecerApi({ timeoutMs: TIMEOUT_AQUECER_MS });
   } catch (erro) {
     // Só a classe do erro: o aquecimento é uma tentativa, e a próxima ação mostra a falha real.
     console.warn(`[eba-testes] aquecer: ${erro instanceof Error ? erro.name : 'erro desconhecido'}`);
@@ -277,14 +280,14 @@ export async function aquecer(): Promise<void> {
 
 /**
  * Perguntas do teste quando a busca na renderização falhou (API fria passa dos 10 s da página):
- * "Começar" tenta de novo com 45 s. Estilo pessoal não usa perguntas da API (`[]`).
+ * "Começar" tenta de novo com 45 s. Estilo e temperamento não usam perguntas da API (`[]`).
  */
 export async function carregarPerguntas(slug: string): Promise<RespostaAcao<Pergunta[]>> {
   const teste = definicaoDoTeste(typeof slug === 'string' ? slug : '');
   if (!teste) return falha('invalido');
   if (!(await dentroDoLimite())) return falha('limite');
   if (!configuracao()) return falha('indisponivel');
-  if (teste.tipo === 'estilo') return { ok: true, dados: [] };
+  if (!usaPerguntasDaApi(teste)) return { ok: true, dados: [] };
 
   try {
     return { ok: true, dados: await perguntasDoTeste(teste.slug, ACAO) };

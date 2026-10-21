@@ -1,5 +1,5 @@
 import 'server-only';
-import { ebaFetch, type OpcoesChamada } from './client';
+import { ebaFetch, TIMEOUT_AQUECER_MS, type OpcoesChamada } from './client';
 import type { EbaClassListApi } from './tipos';
 
 export interface Turma {
@@ -24,8 +24,8 @@ export async function turmasAtivas(opcoes: OpcoesChamada = {}): Promise<Turma[]>
 
 /**
  * Acorda o banco da API (ele pausa quando fica ocioso): um GET leve e sem cache, cujo resultado é
- * descartado. Lança como qualquer chamada; quem chama ignora o erro.
+ * descartado. Timeout padrão `TIMEOUT_AQUECER_MS` (8 s). Lança como qualquer chamada; quem chama ignora o erro.
  */
 export async function aquecerApi(opcoes: OpcoesChamada = {}): Promise<void> {
-  await ebaFetch<unknown>('ClassEBA?page-size=1', { ...opcoes });
+  await ebaFetch<unknown>('ClassEBA?page-size=1', { timeoutMs: opcoes.timeoutMs ?? TIMEOUT_AQUECER_MS });
 }

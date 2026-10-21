@@ -90,3 +90,8 @@ export const UNIDADES: readonly { valor: string; rotulo: string }[] = [
   { valor: 'outra-igreja', rotulo: 'Outra igreja' },
   { valor: 'visitante', rotulo: 'Visitante' },
 ];
+
+/** Nota e talentos mostram as perguntas da API; estilo e temperamento usam conteúdo local. */
+export function usaPerguntasDaApi(teste: DefinicaoTeste): boolean {
+  return teste.tipo === 'nota' || teste.tipo === 'talentos';
+}

@@ -7,7 +7,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { cookies, draftMode, headers } from 'next/headers';
 import TestesPage, { generateMetadata as metadataTestes } from '@/app/(site)/eba/testes/page';
-import TestePage, { generateMetadata as metadataTeste } from '@/app/(site)/eba/testes/[slug]/page';
+import TestePage, { generateMetadata as metadataTeste, maxDuration } from '@/app/(site)/eba/testes/[slug]/page';
 import hero from '@/components/sections/HeroSection/HeroSection.mock.json';
 import listaTestes from '@/components/sections/ListaTestesSection/ListaTestesSection.mock.json';
 import { assinarSessao, COOKIE_SESSAO } from '@/lib/eba/sessao';
@@ -167,6 +167,22 @@ describe('/eba/testes/[slug] — tela do teste', () => {
     expect(screen.getByText(/a\*\*\*@exemplo\.com/)).toBeInTheDocument();
   });
 
+  it('maxDuration de 120 s no segmento (as Server Actions da página herdam: 45/60 s cabem)', () => {
+    expect(maxDuration).toBe(120);
+  });
+
+  it('temperamento não usa as perguntas da API: a página não busca e, com a API fora, "Começar" segue', async () => {
+    api.mockImplementation(() => responder(503, {}));
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    cookieSessao = assinarSessao({ idStudent: 'aluno-1', idClass: 'turma-1', emailMascarado: 'a***@exemplo.com', emitidoEm: Date.now() }, SEGREDO);
+    render(await TestePage(params('temperamento-pessoal')));
+    expect(chamadasDePerguntas()).toHaveLength(0);
+    comecar();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '20');
+    warn.mockRestore();
+  });
+
   it('a busca de perguntas na renderização continua com timeout de 10 s (a página não pode travar)', async () => {
     const espiao = jest.spyOn(AbortSignal, 'timeout');
     await TestePage(params('dons-servico'));
@@ -176,7 +192,7 @@ describe('/eba/testes/[slug] — tela do teste', () => {
     espiao.mockRestore();
   });
 
-  it('ao abrir, a tela aquece a API: um GET ClassEBA?page-size=1 sem cache, com 45 s', async () => {
+  it('ao abrir, a tela aquece a API: um GET ClassEBA?page-size=1 sem cache, com timeout curto (8 s)', async () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     // IP próprio: o limite do aquecimento (5 por minuto) é por IP e do módulo.
     const cabecalhos = jest.mocked(headers).getMockImplementation()!;
@@ -188,7 +204,7 @@ describe('/eba/testes/[slug] — tela do teste', () => {
     const aquecimento = api.mock.calls.filter(([url]) => String(url).includes('ClassEBA?page-size=1'));
     expect(aquecimento).toHaveLength(1);
     expect((aquecimento[0][1] as RequestInit).cache).toBe('no-store');
-    expect(espiao).toHaveBeenCalledWith(45_000);
+    expect(espiao).toHaveBeenCalledWith(8_000);
     espiao.mockRestore();
     warn.mockRestore();
   });
@@ -232,9 +248,8 @@ describe('/eba/testes/[slug] — indisponibilidade (nunca 404)', () => {
   ])('%s: a abertura aparece e "Começar" mostra que as perguntas não carregaram', async (_caso, derrubar) => {
     derrubar();
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    render(await TestePage(params('temperamento-pessoal')));
-    expect(screen.getByRole('heading', { level: 1, name: 'Temperamento pessoal' })).toBeInTheDocument();
-    expect(screen.getByText(/mistura de temperamentos/)).toBeInTheDocument();
+    render(await TestePage(params('dons-servico')));
+    expect(screen.getByRole('heading', { level: 1, name: 'Dons de serviço prático' })).toBeInTheDocument();
     comecar();
     // "Começar" tenta de novo pela ação (45 s); a API continua fora.
     expect(await screen.findByRole('alert')).toHaveTextContent('Não conseguimos carregar as perguntas agora. Tente em alguns minutos.');

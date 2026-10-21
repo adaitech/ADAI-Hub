@@ -1,4 +1,4 @@
-import { definicaoDoTeste, ESCALA_NOTA, proximoTeste, TESTES, UNIDADES } from './testes';
+import { definicaoDoTeste, ESCALA_NOTA, proximoTeste, TESTES, UNIDADES, usaPerguntasDaApi } from './testes';
 
 describe('TESTES', () => {
   it('tem os 5 testes na ordem da apostila com os idQuestion da restrição global', () => {
@@ -61,5 +61,11 @@ describe('UNIDADES', () => {
       { valor: 'outra-igreja', rotulo: 'Outra igreja' },
       { valor: 'visitante', rotulo: 'Visitante' },
     ]);
+  });
+});
+
+describe('usaPerguntasDaApi', () => {
+  it('só nota e talentos usam as perguntas da API (estilo e temperamento são locais)', () => {
+    expect(TESTES.filter(usaPerguntasDaApi).map((t) => t.slug)).toEqual(['dons-servico', 'dons-ministerio', 'talentos-naturais']);
   });
 });

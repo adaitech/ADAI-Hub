@@ -120,12 +120,13 @@ components/eba/Questionario/   ilha cliente: estados, progresso, sessionStorage
   | Constante | Valor | Uso |
   | --- | --- | --- |
   | `TIMEOUT_PAGINA_MS` | 10 s | Perguntas buscadas ao renderizar a página (padrão de `ebaFetch` e das funções de `lib/eba-api`): a página não pode travar. |
-  | `TIMEOUT_ACAO_MS` | 45 s | Chamadas dentro de Server Actions: `alunoPorEmail`, `cadastrarAluno`, `turmasAtivas`, `carregarPerguntas`, as perguntas da validação do `enviar` e o aquecimento. |
+  | `TIMEOUT_ACAO_MS` | 45 s | Chamadas dentro de Server Actions: `alunoPorEmail`, `cadastrarAluno`, `turmasAtivas`, `carregarPerguntas` e as perguntas da validação do `enviar`. |
   | `TIMEOUT_ENVIO_MS` | 60 s | `POST SurveyResponse` (padrão de `enviarRespostas`). |
+  | `TIMEOUT_AQUECER_MS` | 8 s | Aquecimento (padrão de `aquecerApi`): o banco começa a acordar com a tentativa de conexão, então não é preciso esperar a resposta. |
 
-  As regras de erro não mudam (POST com 2xx ilegível continua `EbaApiRespostaInvalida`).
-- **Aquecimento:** a ação `aquecer()` faz um GET leve e sem cache (`ClassEBA?page-size=1`, 45 s) só para acordar o banco. A tela a chama uma vez, sem esperar, quando monta na abertura (nunca na vitrine). Ela nunca lança nem devolve dados; erros só vão para o log com a classe. Limite próprio de 5 por minuto por IP (mesma chave do `identificar`, sem gastar as tentativas dele); sem variáveis ou sem segredo, não chama a API. Como o Next despacha as Server Actions uma por vez por cliente, um `identificar` feito logo depois espera o aquecimento terminar (que é o tempo de o banco acordar).
-- **Perguntas depois da abertura:** se a busca da página falhar, a ação `carregarPerguntas(slug)` busca de novo com 45 s (slug inválido → `invalido`; falha → `indisponivel`; estilo pessoal → `[]`; mesmo limite por IP do `identificar`).
+  As regras de erro não mudam (POST com 2xx ilegível continua `EbaApiRespostaInvalida`). A página `/eba/testes/[slug]` declara `export const maxDuration = 120` (segmento de rota; as Server Actions da página herdam), para a hospedagem não encerrar uma ação antes dos 45/60 s; no envio, isso poderia levar a gravação dupla.
+- **Aquecimento:** a ação `aquecer()` faz um GET leve e sem cache (`ClassEBA?page-size=1`, 8 s) só para acordar o banco. A tela a chama uma vez, sem esperar, quando monta na abertura (nunca na vitrine). Ela nunca lança nem devolve dados; erros só vão para o log com a classe. Limite próprio de 5 por minuto por IP (mesma chave do `identificar`, sem gastar as tentativas dele); sem variáveis ou sem segredo, não chama a API. Como o Next despacha as Server Actions uma por vez por cliente, um `identificar` feito logo depois espera o aquecimento terminar; por isso o timeout do aquecimento é curto (no máximo 8 s de fila).
+- **Perguntas depois da abertura:** se a busca da página falhar, a ação `carregarPerguntas(slug)` busca de novo com 45 s (slug inválido → `invalido`; falha → `indisponivel`; estilo e temperamento → `[]`, sem chamar a API; mesmo limite por IP do `identificar`). Estilo e temperamento usam conteúdo local: a página nem busca perguntas para eles, então nunca ficam "indisponíveis".
 
 ### 5.3 Sessão
 
