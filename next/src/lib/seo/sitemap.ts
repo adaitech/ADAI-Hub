@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { caminhoDaPagina } from '@/lib/paginas/caminho';
+import { caminhoDaPagina, caminhoDoCurso } from '@/lib/paginas/caminho';
 
 /** Projeção mínima de uma página publicada no Strapi para o sitemap. */
 export interface PaginaSitemap {
@@ -14,8 +14,8 @@ export const SLUGS_FORA_DO_SITEMAP = ['exemplos'];
 const HOME = 'home';
 const SLUG_VALIDO = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-function urlDaPagina(slug: string, site: string): string {
-  return slug === HOME ? site : `${site}${caminhoDaPagina(slug)}`;
+function urlDaPagina(slug: string, site: string, caminho = caminhoDaPagina(slug)): string {
+  return slug === HOME ? site : `${site}${caminho}`;
 }
 
 /** Canonical do Strapi resolvido no domínio do site, sem barra final (null se vazio/inválido). */
@@ -34,11 +34,11 @@ function canonicalResolvido(canonical: string | null | undefined, site: string):
  * Entra no sitemap: slug válido, fora da lista de dev, sem `noindex` no "Meta robots" e sem
  * canonical apontando para outra URL (a página diz que a versão oficial está em outro lugar).
  */
-export function paginaNoSitemap(pagina: PaginaSitemap, site: string): boolean {
+export function paginaNoSitemap(pagina: PaginaSitemap, site: string, caminho?: string): boolean {
   if (!SLUG_VALIDO.test(pagina.slug) || SLUGS_FORA_DO_SITEMAP.includes(pagina.slug)) return false;
   if (/noindex/i.test(pagina.seo?.metaRobots ?? '')) return false;
   const canonical = canonicalResolvido(pagina.seo?.canonicalURL, site);
-  return canonical === null || canonical === urlDaPagina(pagina.slug, site);
+  return canonical === null || canonical === urlDaPagina(pagina.slug, site, caminho ?? caminhoDaPagina(pagina.slug));
 }
 
 /** `updatedAt` do Strapi em `AAAA-MM-DD` (UTC), ou undefined se ausente/inválido. */
@@ -59,3 +59,16 @@ export function montarSitemap(paginas: readonly PaginaSitemap[], site: string): 
   }
   return [...porUrl.values()].sort((a, b) => (a.url === site ? -1 : b.url === site ? 1 : a.url.localeCompare(b.url)));
 }
+
+/** Cursos da EBA publicados: `/eba/cursos/<slug>`, prioridade 0,7, mesmas regras de noindex/canonical. */
+export function montarSitemapCursos(cursos: readonly PaginaSitemap[], site: string): MetadataRoute.Sitemap {
+  return cursos
+    .flatMap((curso) => {
+      const caminho = caminhoDoCurso(curso.slug);
+      if (!paginaNoSitemap(curso, site, caminho)) return [];
+      const lastModified = dataDe(curso.updatedAt);
+      return [{ url: `${site}${caminho}`, ...(lastModified ? { lastModified } : {}), priority: 0.7 }];
+    })
+    .sort((a, b) => a.url.localeCompare(b.url));
+}
+

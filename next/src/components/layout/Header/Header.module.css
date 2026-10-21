@@ -27,7 +27,7 @@
 
 .lista {
   display: flex;
-  gap: var(--space-32);
+  gap: var(--space-menu);
 }
 
 .link {
@@ -50,6 +50,7 @@
 
   .acoesDesktop {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: var(--space-12);
   }

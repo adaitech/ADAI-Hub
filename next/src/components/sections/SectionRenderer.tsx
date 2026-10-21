@@ -6,11 +6,13 @@ import type { HeroData } from './HeroSection/types';
 
 interface SectionRendererProps {
   sections: StrapiSection[];
+  /** Use 1 quando a página já fornece seu próprio h1, como nos cursos da EBA. */
+  indiceInicial?: number;
   apresentacao?: 'padrao' | 'editorial' | 'institucional' | 'institucional-grade' | null;
 }
 
 /** Renderiza a dynamic zone `sections` da página, na ordem do Strapi. */
-export function SectionRenderer({ sections, apresentacao }: SectionRendererProps) {
+export function SectionRenderer({ sections, apresentacao, indiceInicial = 0 }: SectionRendererProps) {
   const institucional = apresentacao === 'institucional' || apresentacao === 'institucional-grade';
   const primeiroConteudo = institucional ? sections.findIndex((section) => section.__component !== 'sections.hero') : 0;
   const conteudo = sections.map((section, index) => {
@@ -25,7 +27,7 @@ export function SectionRenderer({ sections, apresentacao }: SectionRendererProps
       return null;
     }
     const Component = entry.component;
-    return <Component key={`${section.__component}-${section.id}`} data={section} index={institucional && index === primeiroConteudo ? 0 : index} />;
+    return <Component key={`${section.__component}-${section.id}`} data={section} index={indiceInicial + (institucional && index === primeiroConteudo ? 0 : index)} />;
   });
   if (apresentacao === 'editorial' && sections.length > 0) {
     return <div className={styles.editorial} data-page-layout="editorial">{conteudo}</div>;

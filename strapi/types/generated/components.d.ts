@@ -241,6 +241,40 @@ export interface SectionsCarrosselCards extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsCatalogoCursos extends Struct.ComponentSchema {
+  collectionName: 'components_sections_catalogos_cursos';
+  info: {
+    description: 'Lista autom\u00E1tica dos cursos da EBA publicados (tipo Cursos da EBA), em cards.';
+    displayName: 'Cat\u00E1logo de cursos';
+    icon: 'book';
+  };
+  attributes: {
+    link_ver_todos: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    quantidade: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 12;
+          min: 1;
+        },
+        number
+      >;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 240;
+      }>;
+    titulo: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    vertente: Schema.Attribute.Enumeration<
+      ['todas', 'integracao', 'consolidacao']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'todas'>;
+  };
+}
+
 export interface SectionsHero extends Struct.ComponentSchema {
   collectionName: 'components_sections_heroes';
   info: {
@@ -312,6 +346,28 @@ export interface SectionsImagemTexto extends Struct.ComponentSchema {
         maxLength: 400;
       }>;
     titulo: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+  };
+}
+
+export interface SectionsListaTestes extends Struct.ComponentSchema {
+  collectionName: 'components_sections_listas_testes';
+  info: {
+    description: 'Lista autom\u00E1tica dos testes da EBA publicados (tipo Testes da EBA), cada um com explica\u00E7\u00E3o e bot\u00E3o para fazer o teste.';
+    displayName: 'Lista de testes';
+    icon: 'check';
+  };
+  attributes: {
+    mostrar_atalhos: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
+    texto_apoio: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 240;
+      }>;
+    titulo: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 80;
@@ -620,8 +676,10 @@ declare module '@strapi/strapi' {
       'layout.header': LayoutHeader;
       'sections.agenda-eventos': SectionsAgendaEventos;
       'sections.carrossel-cards': SectionsCarrosselCards;
+      'sections.catalogo-cursos': SectionsCatalogoCursos;
       'sections.hero': SectionsHero;
       'sections.imagem-texto': SectionsImagemTexto;
+      'sections.lista-testes': SectionsListaTestes;
       'sections.ministerios': SectionsMinisterios;
       'sections.perguntas-frequentes': SectionsPerguntasFrequentes;
       'sections.pix': SectionsPix;

@@ -1,0 +1,59 @@
+{
+  "data": [
+    {
+      "id": 4,
+      "documentId": "curso-talmidim",
+      "nome": "Talmidim",
+      "slug": "talmidim",
+      "resumo": "Acompanhamento do adolescente no início de uma nova caminhada com Jesus.",
+      "vertente": "integracao",
+      "publico_alvo": "Adolescentes de 12 a 15 anos",
+      "duracao": "13 aulas de 1 hora, semanais",
+      "formato": "presencial_ou_online",
+      "entrada": null,
+      "video_apresentacao": null,
+      "ordem": 40,
+      "updatedAt": "2026-10-18T12:00:00.000Z",
+      "capa": { "id": 41, "url": "/uploads/talmidim_capa.webp", "alternativeText": "Adolescentes sentados conversam e sorriem durante um encontro na ADAI.", "width": 1600, "height": 1066 },
+      "inscricao": { "id": 7, "texto": "Quero me inscrever", "url": "https://forms.gle/BtMpykm2Gs6zM1Mm6", "estilo": "solido", "nova_aba": true },
+      "seo": null
+    },
+    {
+      "id": 1,
+      "documentId": "curso-reset",
+      "nome": "Reset",
+      "slug": "reset",
+      "resumo": "Um passo de fé e obediência, transformação interior e início de uma nova caminhada com Jesus.",
+      "vertente": "integracao",
+      "publico_alvo": "A partir de 16 anos",
+      "duracao": "7 aulas de 1 hora, semanais",
+      "formato": "presencial_ou_online",
+      "entrada": "A qualquer momento",
+      "video_apresentacao": null,
+      "ordem": 10,
+      "updatedAt": "2026-10-18T12:00:00.000Z",
+      "capa": { "id": 11, "url": "/uploads/reset_capa.webp", "alternativeText": "Pastor fala ao microfone ao lado do tanque de batismo da ADAI.", "width": 1600, "height": 1067 },
+      "inscricao": { "id": 5, "texto": "Quero me inscrever", "url": "https://docs.google.com/forms/d/e/1FAIpQLScBEgcusa3AwOVT_o6-wiM3xKYIqx0ASbM5LHqoNewYe-oayA/viewform", "estilo": "solido", "nova_aba": true },
+      "seo": null
+    },
+    {
+      "id": 2,
+      "documentId": "curso-start",
+      "nome": "Start",
+      "slug": "start",
+      "resumo": "Porta de entrada para a vida cristã na igreja local.",
+      "vertente": "integracao",
+      "publico_alvo": null,
+      "duracao": null,
+      "formato": null,
+      "entrada": null,
+      "video_apresentacao": null,
+      "ordem": 20,
+      "updatedAt": "2026-10-18T12:00:00.000Z",
+      "capa": null,
+      "inscricao": null,
+      "seo": null
+    }
+  ],
+  "meta": { "pagination": { "page": 1, "pageSize": 100, "pageCount": 1, "total": 3 } }
+}

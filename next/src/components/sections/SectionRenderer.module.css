@@ -87,6 +87,7 @@
 .institucional > :global([data-section='hero']) { margin-inline: auto; }
 .gradeInstitucional > :global([data-section]) { grid-column: 1 / -1; margin-block: var(--space-12); }
 .gradeInstitucional > :global([data-section='texto-rico']:not([data-apresentacao='destaque'])) { max-width: none; }
+.gradeInstitucional > :global([data-section='texto-rico']:not([data-apresentacao='destaque'])) > article { max-width: none; }
 .gradeInstitucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) { grid-column: auto; margin: 0; }
 .gradeInstitucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) + :global([data-section='texto-rico'][data-apresentacao='destaque']) { margin-top: 0; }
 .gradeInstitucional > :global([data-section='texto-botoes']) { padding: var(--space-40); border-radius: var(--radius-lg); background: var(--color-bg-inverse); color: var(--color-text-inverse); }

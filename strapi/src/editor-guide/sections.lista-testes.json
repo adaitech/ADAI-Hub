@@ -1,0 +1,43 @@
+{
+  "uid": "sections.lista-testes",
+  "nome": "Lista de testes",
+  "resumo": "Mostra os testes da EBA publicados no Strapi, cada um com explicação e botão \"Fazer o teste\". Você escolhe só o título: os testes entram e saem sozinhos quando são publicados ou despublicados.",
+  "ondeAparece": "Na página de testes da EBA (/eba/testes); use uma vez por página.",
+  "boasPraticas": [
+    "Para mudar a ordem, edite o campo \"Ordem na lista\" de cada teste.",
+    "Deixe os atalhos ligados: eles levam direto a cada teste.",
+    "Se a seção for a primeira da página, o título dela vira o título principal da página."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título",
+      "descricao": "Nome da seção.",
+      "placeholder": "Ex.: Os 5 testes",
+      "ondeAparece": "Letras grandes acima dos testes.",
+      "obrigatorio": true,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Os 5 testes"
+    },
+    {
+      "campo": "texto_apoio",
+      "label": "Texto de apoio",
+      "descricao": "Uma frase de introdução.",
+      "placeholder": "Ex.: Na ordem em que aparecem no curso.",
+      "ondeAparece": "Abaixo do título.",
+      "obrigatorio": false,
+      "limite": "Até 240 caracteres",
+      "exemplo": "Na ordem em que aparecem no curso. Você pode ir direto a um deles:"
+    },
+    {
+      "campo": "mostrar_atalhos",
+      "label": "Mostrar atalhos",
+      "descricao": "Links com o nome de cada teste, que levam direto ao bloco dele.",
+      "placeholder": "Ligado",
+      "ondeAparece": "Abaixo do texto de apoio.",
+      "obrigatorio": false,
+      "limite": "Ligado ou desligado",
+      "exemplo": "Ligado"
+    }
+  ]
+}

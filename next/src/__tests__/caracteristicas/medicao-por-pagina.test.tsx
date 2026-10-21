@@ -11,6 +11,9 @@ import { draftMode } from 'next/headers';
 import HomePage from '@/app/(site)/page';
 import SlugPage from '@/app/(site)/[slug]/page';
 import SobreNosPage from '@/app/(site)/sobre-nos/[slug]/page';
+import EbaPage from '@/app/(site)/eba/page';
+import EbaCursosPage from '@/app/(site)/eba/cursos/page';
+import EbaSubPage from '@/app/(site)/eba/[slug]/page';
 import SiteLayout from '@/app/(site)/layout';
 import { RastreadorAnalytics } from '@/components/analytics/RastreadorAnalytics';
 import { proximosEventosShowcase } from '@/components/sections/ProximosEventosSection/ProximosEventosSection.showcase';
@@ -18,7 +21,7 @@ import type { ProximosEventosExemplo } from '@/components/sections/ProximosEvent
 import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/SerieAtualSection.showcase';
 import type { SerieAtualExemplo } from '@/components/sections/SerieAtualSection/types';
 import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
-import { PREFIXO_SOBRE_NOS } from '@/lib/paginas/caminho';
+import { PREFIXO_EBA, PREFIXO_SOBRE_NOS } from '@/lib/paginas/caminho';
 import { getAoVivoAtual, getSerieAtual } from '@/lib/youtube/serie-atual';
 import { fixarRelogio, renderizarServidor } from '@/test-utils/servidor';
 import { criarStrapiFake } from '@/test-utils/strapi-fake';
@@ -35,6 +38,9 @@ const params = (slug: string) => ({ params: Promise.resolve({ slug }) });
 function paginaDe(slug: string) {
   if (slug === 'home') return HomePage();
   if (slug.startsWith(PREFIXO_SOBRE_NOS)) return SobreNosPage(params(slug.slice(PREFIXO_SOBRE_NOS.length)));
+  if (slug === 'eba') return EbaPage();
+  if (slug === 'eba-cursos') return EbaCursosPage();
+  if (slug.startsWith(PREFIXO_EBA)) return EbaSubPage(params(slug.slice(PREFIXO_EBA.length)));
   return SlugPage(params(slug));
 }
 

@@ -14,6 +14,8 @@ export interface ButtonLinkProps {
   tamanho?: 'sm' | 'md';
   novaAba?: boolean;
   className?: string;
+  /** Slug do curso da EBA: vira `data-curso` e o clique gera `inscrever_curso` (medição). */
+  curso?: string;
 }
 
 type EstiloBotao = Pick<ButtonLinkProps, 'estilo' | 'superficie' | 'tamanho' | 'className'>;
@@ -35,12 +37,14 @@ export function ButtonLink({
   tamanho = 'md',
   novaAba = false,
   className,
+  curso,
 }: ButtonLinkProps) {
   return (
     <SmartLink
       href={href}
       novaAba={novaAba}
       className={buttonClassName({ estilo, superficie, tamanho, className })}
+      {...(curso ? { 'data-curso': curso } : {})}
     >
       {children}
     </SmartLink>

@@ -43,7 +43,9 @@
         "sections.perguntas-frequentes",
         "sections.texto-rico",
         "sections.pix",
-        "sections.agenda-eventos"
+        "sections.agenda-eventos",
+        "sections.catalogo-cursos",
+        "sections.lista-testes"
       ]
     }
   }

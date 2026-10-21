@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dons de serviço prático — Testes da EBA | ADAI</title>
+<meta name="description" content="Mostra quais dons espirituais aparecem com mais força no seu jeito de servir no dia a dia da igreja.">
+<meta name="robots" content="noindex, nofollow">
+<!-- Protótipo da migração da EBA (entrega 1). Base visual: docs/prototipo/index.html (design system).
+     Conteúdo real do site atual eba.adai.com.br. Nada aqui é código de produção. -->
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="eba.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="logo-uso" viewBox="0 0 99.21 32.6">
+    <g transform="translate(19.46 3.29)" fill="currentColor"><path d="M13.01 0C5.82 0 0 5.83 0 13.01C0 20.19 5.83 26.02 13.01 26.02C20.19 26.02 26.02 20.19 26.02 13.01C26.02 5.83 20.19 0 13.01 0ZM14.27 18.35L14.25 15.75H16.31L13.02 10.12L9.76 15.75H11.7V18.35H5.12L9.06 11.53L13 4.71L16.94 11.53L20.88 18.35H14.26H14.27Z"/></g>
+    <g transform="translate(48.71 7.15)" fill="currentColor"><path d="M5.93 17.09L5.49 13.75H3L2.49 17.09H0L2.85 0H5.85L8.7 17.09H5.93ZM4.34 4.49L3.34 11.47H5.19L4.34 4.49Z"/><path d="M13.91 17.09H9.75V0H13.91C16.37 0 17.81 1.54 17.81 4.08V13.11C17.81 15.68 16.37 17.09 13.91 17.09ZM15.09 4.06C15.09 2.98 14.68 2.44 13.73 2.44H12.47V14.68H13.73C14.68 14.68 15.09 14.12 15.09 13.06V4.05V4.06Z"/><path d="M24.5 17.09L24.06 13.75H21.57L21.06 17.09H18.57L21.42 0H24.42L27.27 17.09H24.5ZM22.91 4.49L21.91 11.47H23.76L22.91 4.49Z"/><path d="M28.33 17.09V0H31.05V17.09H28.33Z"/></g>
+  </symbol>
+</svg>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="prototipo-barra" role="region" aria-label="Controles do protótipo">
+  <strong>Protótipo · EBA no ADAI Hub · entrega 1</strong>
+  <nav aria-label="Telas do protótipo">
+    <ul role="list">
+      <li><a href="index.html">/eba</a></li>
+      <li><a href="cursos.html">/eba/cursos</a></li>
+      <li><a href="talmidim.html">Talmidim</a></li>
+      <li><a href="reset.html">Reset</a></li>
+      <li><a href="start.html">Start</a></li>
+      <li><a href="cdv.html">CDV</a></li>
+      <li><a href="testes.html">/eba/testes</a></li>
+      <li><a href="teste-dons-servico.html">Teste (entrega 2)</a></li>
+      <li><a href="estados.html">Estados</a></li>
+    </ul>
+  </nav>
+  <div class="alternancias">
+    <div class="grupo-nav" role="group" aria-label="Navegação interna da EBA" hidden>
+      <span>Navegação:</span>
+      <button type="button" class="alternar" data-nav="a" aria-pressed="true">A · conteúdo + trilha</button>
+      <button type="button" class="alternar" data-nav="b" aria-pressed="false">B · barra da área</button>
+    </div>
+    <button type="button" class="alternar" id="alternar-anotacoes" aria-pressed="false" hidden>Mostrar marcações O/D/P</button>
+  </div>
+</div>
+
+<nav class="topbar" aria-label="Institucional">
+  <ul role="list">
+    <li><a href="/sobre-nos/nossa-historia">Sobre nós</a></li>
+    <li><a href="/unidades">Localidades</a></li>
+    <li><a href="/contribua">Contribua</a></li>
+    <li><a href="/contato">Contato</a></li>
+  </ul>
+</nav>
+
+<header class="header" data-anotada>
+  <div class="header__barra">
+    <a class="logo" href="/" aria-label="ADAI, página inicial">
+      <svg viewBox="0 0 99.21 32.6" aria-hidden="true" focusable="false"><use href="#logo-uso"/></svg>
+    </a>
+    <button type="button" class="menu-botao" aria-expanded="false" aria-controls="menu-principal" hidden>
+      <span class="menu-botao__icone" aria-hidden="true"></span>Menu
+    </button>
+    <div class="header__painel" id="menu-principal">
+      <nav class="nav-principal" aria-label="Principal">
+        <ul role="list">
+          <li><a href="/unidades">Unidades</a></li>
+          <li><a href="/mensagens">Mensagens</a></li>
+          <li><a href="/agenda">Agenda</a></li>
+          <li><a href="/ministerios">Ministérios</a></li>
+          <li><a href="/contribua">Contribua</a></li>
+          <li><a href="index.html" aria-current="true">EBA</a></li>
+        </ul>
+      </nav>
+      <div class="header__acoes">
+        <a class="botao botao--contorno-escuro botao--baixo" href="/ao-vivo">Ao vivo</a>
+        <a class="botao botao--primario botao--baixo" href="/planeje-sua-visita">Planeje sua visita</a>
+      </div>
+    </div>
+  </div>
+</header>
+<p class="anotacao container"><span class="selo selo--o">Observado</span><span>Header 233:48 · 80px · menu gap 32</span><span class="selo selo--p">Proposto</span><span>“EBA” é o 6º link (limite do cabeçalho), cadastrado no Strapi sem código</span><span class="selo selo--p">Proposto</span><span>aria-current marca a área da EBA</span></p>
+<nav class="area-nav" aria-label="Escola Bíblica ADAI" data-anotada>
+    <div class="area-nav__barra">
+      <a class="area-nav__marca" href="index.html"><img src="assets/logo-eba.webp" alt="EBA, início da Escola Bíblica ADAI" width="400" height="118"></a>
+      <ul role="list">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="cursos.html">Cursos</a></li>
+        <li><a href="testes.html" aria-current="page">Testes</a></li>
+        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Área da equipe<span class="sr-only"> (no site atual da EBA)</span></a></li>
+      </ul>
+    </div>
+  </nav>
+  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes vira página do Hub (/eba/testes); Área da equipe leva ao login do site atual até a entrega 4</span></p>
+<main id="conteudo" tabindex="-1">
+<nav class="trilha container" aria-label="Trilha" data-anotada>
+      <ol role="list"><li><a href="/">ADAI</a></li><li><a href="index.html">EBA</a></li><li><a href="testes.html">Testes</a></li><li><span aria-current="page">Dons de serviço prático</span></li></ol>
+    </nav>
+    <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Trilha (opção A): completa a partir de 769px; no celular vira “‹ voltar” ao nível anterior</span><span class="selo selo--p">Proposto</span><span>Gera o BreadcrumbList no HTML do servidor</span></p>
+<div class="container estados-teste" role="group" aria-label="Estados da tela (protótipo)" data-anotada>
+  <span>Estado da tela:</span><button type="button" class="alternar" data-estado="abertura" aria-pressed="true">Abertura</button><button type="button" class="alternar" data-estado="email" aria-pressed="false">Identificação</button><button type="button" class="alternar" data-estado="cadastro" aria-pressed="false">Primeiro acesso</button><button type="button" class="alternar" data-estado="pergunta" aria-pressed="false">Pergunta (0 a 5)</button><button type="button" class="alternar" data-estado="marcar" aria-pressed="false">Marcar itens</button><button type="button" class="alternar" data-estado="estilo" aria-pressed="false">Escala 1 a 5</button><button type="button" class="alternar" data-estado="enviando" aria-pressed="false">Enviando</button><button type="button" class="alternar" data-estado="resultado" aria-pressed="false">Resultado</button><button type="button" class="alternar" data-estado="erro" aria-pressed="false">Erro no envio</button><button type="button" class="alternar" data-estado="expirou" aria-pressed="false">Sessão encerrada</button>
+</div>
+
+<section class="container teste-tela" aria-labelledby="teste-tela-titulo" data-anotada>
+  <div class="teste-tela__grade">
+  <div class="teste-tela__caixa">
+
+    <div data-imagem="assets/testes/dons-capa.webp" data-tela="abertura">
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome" id="teste-tela-titulo">Dons de serviço prático</h1>
+      <p class="t-corpo">Mostra quais dons espirituais aparecem com mais força no seu jeito de servir no dia a dia da igreja.</p>
+      <dl class="card-curso__meta teste__formato"><div><dt>Perguntas</dt><dd>55 afirmações</dd></div><div><dt>Resposta</dt><dd>nota de 0 a 5</dd></div><div><dt>Tempo</dt><dd>cerca de 15 minutos</dd></div></dl>
+      <div class="teste__parte"><h2 class="t-h4">Como responder</h2><p class="t-corpo-pequeno">Para cada afirmação, pergunte-se: “isso tem sido a minha experiência?”. Responda pelo que você vive hoje, não pelo que gostaria de viver.</p></div>
+      <div class="botoes"><button type="button" class="botao botao--primario" data-ir="email">Começar o teste</button></div>
+    </div>
+
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="email" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <h2 class="t-h3">Antes de começar</h2>
+      <p class="t-corpo-pequeno">Informe seu e-mail para a equipe da EBA receber seu resultado. Se você já fez outro teste, use o mesmo e-mail.</p>
+      <form class="formulario" onsubmit="return false">
+        <div class="grupo"><label class="rotulo" for="email">E-mail</label><input class="campo" id="email" type="email" autocomplete="email" inputmode="email" required placeholder="seu@email.com"></div>
+        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="pergunta">Continuar</button></div>
+        <p class="aviso-externo">Usamos seu e-mail só para ligar suas respostas à sua turma. <a href="/politica-de-privacidade">Política de Privacidade</a>.</p>
+      </form>
+    </div>
+
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="cadastro" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <h2 class="t-h3">Primeiro acesso</h2>
+      <p class="t-corpo-pequeno">Não encontramos o e-mail <strong>ana@email.com</strong>. Complete seu cadastro uma vez; nos próximos testes basta o e-mail.</p>
+      <form class="formulario" onsubmit="return false">
+        <div class="grupo"><label class="rotulo" for="nome">Nome completo</label><input class="campo" id="nome" autocomplete="name" required></div>
+        <fieldset class="grupo"><legend class="rotulo">Unidade</legend><p class="ajuda">De qual ADAI você é? Se é de outra igreja ou está visitando, escolha a opção correspondente.</p><ul class="lista-marcar lista-marcar--duas" role="list"><li><label class="marcar marcar--radio"><input type="radio" name="unidade" checked><span>Campestre</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Anália Franco</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>São Bernardo do Campo</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Santos</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>ADAI On</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Outra igreja</span></label></li><li><label class="marcar marcar--radio"><input type="radio" name="unidade"><span>Visitante</span></label></li></ul></fieldset>
+        <div class="grupo"><label class="rotulo" for="turma">Turma</label><select class="campo" id="turma"><option>Selecione sua turma</option><option>CDV · Campestre · quinta 20h</option><option>CDV · On-line · sábado 9h</option></select></div>
+        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="pergunta">Cadastrar e começar</button><button type="button" class="botao botao--contorno-escuro" data-ir="email">Usar outro e-mail</button></div>
+      </form>
+    </div>
+
+    <div data-imagem="assets/testes/dons-12.webp" data-tela="pergunta" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <div class="progresso">
+          <p class="progresso__texto"><span>Pergunta 12 de 55</span><span>22%</span></p>
+          <div class="progresso__barra" role="progressbar" aria-label="Progresso do teste" aria-valuemin="0" aria-valuemax="55" aria-valuenow="12"><span style="width:21.818181818181817%"></span></div>
+        </div>
+      <fieldset class="pergunta">
+        <legend class="pergunta__texto">Gosto de ajudar as pessoas fazendo pequenos serviços.</legend>
+        <p class="t-micro t-suave">Isso tem sido a sua experiência?</p>
+        <ul class="opcoes" role="list"><li><label class="opcao"><input type="radio" name="resposta-12" value="0"><span class="opcao__n" aria-hidden="true">0</span><span>Nunca</span></label></li><li><label class="opcao"><input type="radio" name="resposta-12" value="1"><span class="opcao__n" aria-hidden="true">1</span><span>Raramente</span></label></li><li><label class="opcao"><input type="radio" name="resposta-12" value="2"><span class="opcao__n" aria-hidden="true">2</span><span>Às vezes</span></label></li><li><label class="opcao"><input type="radio" name="resposta-12" value="3"><span class="opcao__n" aria-hidden="true">3</span><span>Frequentemente</span></label></li><li><label class="opcao"><input type="radio" name="resposta-12" value="4"><span class="opcao__n" aria-hidden="true">4</span><span>Muito</span></label></li><li><label class="opcao"><input type="radio" name="resposta-12" value="5"><span class="opcao__n" aria-hidden="true">5</span><span>Eu brilho nisso!</span></label></li></ul>
+      </fieldset>
+      <div class="pergunta__navegacao"><button type="button" class="link-seta link-seta--voltar">Pergunta anterior</button><span class="t-micro t-suave">Ao escolher, vai para a próxima</span></div>
+    </div>
+
+    <div data-imagem="assets/testes/temperamento-1.webp" data-tela="marcar" hidden>
+      <p class="teste__numero t-micro"><span>Teste 5 de 5</span><span>Aula 11 do CDV</span></p>
+      <h1 class="t-h2 teste-tela__nome">Temperamento pessoal</h1>
+      <div class="progresso">
+          <p class="progresso__texto"><span>Pergunta 1 de 4</span><span>25%</span></p>
+          <div class="progresso__barra" role="progressbar" aria-label="Progresso do teste" aria-valuemin="0" aria-valuemax="4" aria-valuenow="1"><span style="width:25.0%"></span></div>
+        </div>
+      <fieldset class="pergunta">
+        <legend class="pergunta__texto">Sanguíneo: marque as características que descrevem você</legend>
+        <p class="t-micro t-suave">Marque quantas quiser, inclusive as fraquezas. 2 marcadas.</p>
+        <ul class="lista-marcar lista-marcar--duas" role="list"><li><label class="marcar"><input type="checkbox" name="sanguineo" checked><span>Comunicativo</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo"><span>Entusiasmado</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo" checked><span>Otimista</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo"><span>Espontâneo</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo"><span>Desorganizado</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo"><span>Indisciplinado</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo"><span>Fala demais</span></label></li><li><label class="marcar"><input type="checkbox" name="sanguineo"><span>Esquece compromissos</span></label></li></ul>
+      </fieldset>
+      <div class="pergunta__navegacao"><button type="button" class="link-seta link-seta--voltar">Anterior</button><button type="button" class="botao botao--primario">Próximo</button></div>
+    </div>
+
+    <div data-imagem="assets/testes/estilo-3.webp" data-tela="estilo" hidden>
+      <p class="teste__numero t-micro"><span>Teste 4 de 5</span><span>Aula 10 do CDV</span></p>
+      <h1 class="t-h2 teste-tela__nome">Estilo pessoal</h1>
+      <div class="progresso">
+          <p class="progresso__texto"><span>Pergunta 3 de 14</span><span>21%</span></p>
+          <div class="progresso__barra" role="progressbar" aria-label="Progresso do teste" aria-valuemin="0" aria-valuemax="14" aria-valuenow="3"><span style="width:21.428571428571427%"></span></div>
+        </div>
+      <fieldset class="pergunta">
+        <legend class="pergunta__texto">Fico empolgado com…</legend>
+        <div class="par"><span>uma meta alcançada</span><span>as pessoas envolvidas na causa</span></div>
+        <ul class="opcoes opcoes--estilo" role="list"><li><label class="opcao opcao--estilo"><input type="radio" name="estilo-3" value="1"><span class="opcao__n">1</span></label></li><li><label class="opcao opcao--estilo"><input type="radio" name="estilo-3" value="2"><span class="opcao__n">2</span></label></li><li><label class="opcao opcao--estilo"><input type="radio" name="estilo-3" value="3"><span class="opcao__n">3</span></label></li><li><label class="opcao opcao--estilo"><input type="radio" name="estilo-3" value="4"><span class="opcao__n">4</span></label></li><li><label class="opcao opcao--estilo"><input type="radio" name="estilo-3" value="5"><span class="opcao__n">5</span></label></li></ul>
+        <p class="t-micro t-suave">1 = totalmente a frase da esquerda · 5 = totalmente a da direita</p>
+      </fieldset>
+      <div class="pergunta__navegacao"><button type="button" class="link-seta link-seta--voltar">Pergunta anterior</button></div>
+    </div>
+
+    <div data-imagem="assets/testes/dons-resultado.webp" data-tela="enviando" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <div class="progresso">
+          <p class="progresso__texto"><span>Pergunta 55 de 55</span><span>100%</span></p>
+          <div class="progresso__barra" role="progressbar" aria-label="Progresso do teste" aria-valuemin="0" aria-valuemax="55" aria-valuenow="55"><span style="width:100.0%"></span></div>
+        </div>
+      <div class="aviso-teste" role="status"><span class="girando" aria-hidden="true"></span><p class="t-corpo">Calculando seu resultado…</p></div>
+    </div>
+
+    <div data-imagem="assets/testes/dons-resultado.webp" data-tela="resultado" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <h2 class="t-h3">Seu resultado</h2>
+      <p class="t-corpo-pequeno">Cada dom vai de 0 a 25. Os três primeiros são os seus pontos de partida para a consultoria do CDV.</p>
+      <ol class="resultado" role="list"><li class="destaque"><span class="resultado__nome">Ensino</span><span class="resultado__barra" aria-hidden="true"><span style="width:88%"></span></span><span class="resultado__valor">22<span class="sr-only"> de 25</span></span></li><li class="destaque"><span class="resultado__nome">Exortação</span><span class="resultado__barra" aria-hidden="true"><span style="width:80%"></span></span><span class="resultado__valor">20<span class="sr-only"> de 25</span></span></li><li class="destaque"><span class="resultado__nome">Serviço</span><span class="resultado__barra" aria-hidden="true"><span style="width:72%"></span></span><span class="resultado__valor">18<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Intercessão</span><span class="resultado__barra" aria-hidden="true"><span style="width:60%"></span></span><span class="resultado__valor">15<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Hospitalidade</span><span class="resultado__barra" aria-hidden="true"><span style="width:56%"></span></span><span class="resultado__valor">14<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Administração</span><span class="resultado__barra" aria-hidden="true"><span style="width:48%"></span></span><span class="resultado__valor">12<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Misericórdia</span><span class="resultado__barra" aria-hidden="true"><span style="width:44%"></span></span><span class="resultado__valor">11<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Presidir</span><span class="resultado__barra" aria-hidden="true"><span style="width:36%"></span></span><span class="resultado__valor">9<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Socorro</span><span class="resultado__barra" aria-hidden="true"><span style="width:32%"></span></span><span class="resultado__valor">8<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Contribuição</span><span class="resultado__barra" aria-hidden="true"><span style="width:24%"></span></span><span class="resultado__valor">6<span class="sr-only"> de 25</span></span></li><li class=""><span class="resultado__nome">Profecia</span><span class="resultado__barra" aria-hidden="true"><span style="width:16%"></span></span><span class="resultado__valor">4<span class="sr-only"> de 25</span></span></li></ol>
+      <div class="teste__parte"><h3 class="t-h4">Ensino</h3><p class="t-corpo-pequeno">Mensagem da API para o dom com a maior soma (texto que a equipe da EBA já usa hoje).</p></div>
+      <p class="t-corpo-pequeno">Seu resultado foi enviado para a equipe da EBA.</p>
+      <div class="botoes"><a class="botao botao--primario" href="testes.html#dons-ministerio">Próximo teste: Dons ministeriais</a><a class="botao botao--contorno-escuro" href="testes.html">Ver todos os testes</a></div>
+      <p class="sair">Usou um aparelho emprestado? <button type="button" class="link" data-ir="expirou">Sair</button></p>
+    </div>
+
+    <div data-imagem="assets/testes/dons-resultado.webp" data-tela="erro" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <div class="aviso-teste aviso-teste--erro" role="alert">
+        <h2 class="t-h3">Não conseguimos enviar suas respostas</h2>
+        <p class="t-corpo-pequeno">Suas 55 respostas continuam guardadas nesta aba. Verifique a internet e tente de novo.</p>
+        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="enviando">Tentar de novo</button></div>
+      </div>
+    </div>
+
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="expirou" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <div class="aviso-teste" role="status">
+        <h2 class="t-h3">Sua sessão foi encerrada</h2>
+        <p class="t-corpo-pequeno">Por segurança, a identificação vale até fechar o navegador ou por 2 horas. Informe seu e-mail para continuar.</p>
+        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="email">Informar e-mail</button></div>
+      </div>
+    </div>
+
+    <p class="trocar" data-mostra-trocar hidden>Respondendo como <strong>a***@email.com</strong> · <button type="button" class="link" data-ir="email">Não é você? Trocar e-mail</button></p>
+  </div>
+  <div class="teste-tela__midia"><img data-imagem-teste src="assets/testes/dons-capa.webp" alt="" width="1200" height="797" fetchpriority="high"></div>
+  </div>
+</section>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Rota /eba/testes/<slug> (noindex): uma tela, estados no cliente; abertura vem do tipo “Testes da EBA” do Strapi</span><span class="selo selo--p">Proposto</span><span>Perguntas, turmas e cálculo vêm da API atual, chamada só pelo servidor do Hub via APIM</span><span class="selo selo--p">Proposto</span><span>Identificação por e-mail em sessão de até 2 h (cookie httpOnly assinado); progresso no sessionStorage</span><span class="selo selo--p">Proposto</span><span>Resposta 0–5 como radio: escolher avança; voltar mantém a resposta anterior marcada</span><span class="selo selo--d">Derivado</span><span>Resultado ordenado como no site atual; os 3 primeiros em destaque</span><span class="selo selo--d">Derivado</span><span>Fotos do site atual (capa, uma por pergunta, resultado), decorativas: alt vazio; ao lado no desktop, faixa acima no celular</span></p>
+</main>
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grade">
+      <div class="footer__marca">
+        <a class="logo" href="/" aria-label="ADAI, página inicial">
+          <svg viewBox="19 3 62 27" style="width:62px;height:27px" aria-hidden="true" focusable="false"><use href="#logo-uso" x="0" y="0" width="99.21" height="32.6"/></svg>
+        </a>
+        <p>Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo.</p>
+      </div>
+      <nav class="footer__colunas" aria-label="Rodapé">
+        <div class="footer__coluna">
+          <h2>Igreja</h2>
+          <ul role="list">
+            <li><a href="/sobre-nos/nossa-historia">Nossa história</a></li>
+            <li><a href="/sobre-nos/a-igreja-que-vemos">A igreja que vemos</a></li>
+            <li><a href="/sobre-nos/no-que-acreditamos">No que acreditamos</a></li>
+            <li><a href="/jesus">Jesus</a></li>
+          </ul>
+        </div>
+        <div class="footer__coluna">
+          <h2>Participe</h2>
+          <ul role="list">
+            <li><a href="/unidades">Unidades</a></li>
+            <li><a href="/agenda">Agenda</a></li>
+            <li><a href="/ministerios">Ministérios</a></li>
+            <li><a href="index.html">Escola Bíblica (EBA)</a></li>
+          </ul>
+        </div>
+        <div class="footer__coluna">
+          <h2>Contato</h2>
+          <ul role="list">
+            <li><a href="mailto:contato@adai.com.br">E-mail<span class="sr-only"> contato@adai.com.br</span></a></li>
+            <li><a href="/contato">Fale com a gente</a></li>
+            <li><a href="/contribua">Contribua</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="footer__legal">
+      <p>© 2026 ADAI. Todos os direitos reservados. <a href="/politica-de-privacidade">Política de Privacidade</a></p>
+      <p>Amar · Servir · Influenciar.</p>
+    </div>
+  </div>
+  <p class="footer__mega" aria-hidden="true">ADAI</p>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="prototipo.js"></script>
+<script src="teste.js"></script>
+</body>
+</html>

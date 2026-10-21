@@ -284,4 +284,9 @@ describe('validação do design system nos PRs', () => {
     const exigido = ['docs/design-system.md', 'Observado', 'Proposto', 'tokens', 'contraste', 'H1'];
     expect(exigido.filter((termo) => !texto.includes(termo))).toEqual([]);
   });
+
+  it('o checklist de PR não repete seção (sobra de merge)', () => {
+    const titulos = ler('.agents/rules/Pull-Request.md').split('\n').filter((linha) => /^#{2,3} /.test(linha));
+    expect(titulos.filter((titulo, i) => titulos.indexOf(titulo) !== i)).toEqual([]);
+  });
 });

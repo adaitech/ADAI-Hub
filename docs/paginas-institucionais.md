@@ -6,13 +6,13 @@ Quarta página: `/sobre-nos/a-igreja-que-vemos`, com conteúdo de visão já pub
 
 A fotografia de Paulo Silas enviada pelo Marcelo foi copiada sem edição para `strapi/seed/paulo-silas.png` e para a vitrine. A migração `foto_paulo_silas_version` troca somente a mídia no Hero da história, em rascunho/publicado, sem republicar textos. Renderização mantém 324×213px sem recorte nem ampliação; substituir quando a igreja enviar uma foto maior. As demais capas seguem provisórias em relação ao Figma.
 
-Conteúdo aprovado em prévia pelo Marcelo, com linguagem para pessoas que estão conhecendo a igreja e a fé cristã. Estrutura baseada nas telas enviadas do Figma; explicações e convites são adaptações editoriais. A história e os temas de fé foram conferidos nas páginas publicadas em adai.com.br. Fotos atuais do acervo ainda são provisórias em relação ao Figma; falta o retrato original de Paulo Silas.
+Conteúdo aprovado em prévia pelo Marcelo, com linguagem para pessoas que estão conhecendo a igreja e a fé cristã. Estrutura baseada nas telas enviadas do Figma; explicações e convites são adaptações editoriais. A história e os temas de fé foram conferidos nas páginas publicadas em adai.com.br. A foto enviada de Paulo Silas já está incluída; as demais capas do acervo ainda são provisórias em relação ao Figma.
 
 Rotas: `/sobre-nos/nossa-historia`, `/sobre-nos/no-que-acreditamos` e `/jesus`. Mantidos os endereços já usados no rodapé e os redirecionamentos existentes.
 
 ## Edição e composição
 
-`strapi/seed/institucionais.json` cadastra o conteúdo inicial. A migração independente `institucionais_version` aplica somente essas três páginas uma vez, sem reconstruir Home, Agenda ou Contribua. A entrega atualiza e publica essas páginas conforme solicitado; edições posteriores ficam no painel e não são sobrescritas em cada reinício. Importar o snapshot substitui conteúdo do ambiente, como nos demais fluxos do projeto.
+`strapi/seed/institucionais.json` cadastra o conteúdo inicial. A migração independente `institucionais_version` aplica o conjunto inicial de páginas uma vez; a adição de visão usa `visao_version`. A entrega atualiza e publica as páginas conforme solicitado; edições posteriores ficam no painel e não são sobrescritas em cada reinício. Importar o snapshot substitui conteúdo do ambiente, como nos demais fluxos do projeto. A integração da main preserva a EBA: o snapshot combinado foi comparado com os 24 registros de cursos, testes e páginas EBA da versão da main, sem perda ou alteração de conteúdo.
 
 A apresentação **institucional** reaproveita Hero (somente imagem), Texto rico, Imagem e texto e Carrossel de cards em grade. Hero não contém títulos sobre a foto nessa apresentação. O primeiro conteúdo textual recebe h1, mesmo após uma capa; demais seções mantêm a hierarquia. Todos os componentes mantêm suas vitrines existentes. A apresentação padrão e a editorial do Contribua não mudam.
 

@@ -1,0 +1,40 @@
+/* Proposta 🟡 (protótipo da EBA): caixa cinza raio pequeno, rótulo micro em caixa alta. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  font-size: var(--font-size-legenda);
+  line-height: var(--line-height-legenda);
+}
+
+.rotulo {
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.claro {
+  color: var(--color-text-primary);
+}
+
+.inverso .chip {
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.inverso .rotulo {
+  color: var(--color-text-inverse);
+}

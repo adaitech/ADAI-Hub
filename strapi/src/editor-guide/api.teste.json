@@ -1,0 +1,144 @@
+{
+  "uid": "api::teste.teste",
+  "nome": "Teste da EBA",
+  "resumo": "Cada teste do CDV (dons de serviço, dons ministeriais, talentos, estilo pessoal e temperamento). Publicado, ele aparece sozinho na página /eba/testes, com a explicação e o botão para fazer o teste.",
+  "ondeAparece": "Seção \"Lista de testes\" (página /eba/testes).",
+  "boasPraticas": [
+    "Escreva para quem nunca fez o teste: o que ele mostra, como responder e como ler o resultado.",
+    "Não mude o endereço de um teste publicado: ele é a âncora usada nos links (/eba/testes#endereço).",
+    "O link do teste deve ser o mesmo dos QR codes impressos nas salas.",
+    "Para tirar um teste do site, despublique. Não apague: o histórico fica guardado."
+  ],
+  "campos": [
+    {
+      "campo": "nome",
+      "label": "Nome do teste",
+      "descricao": "Nome como a EBA chama o teste.",
+      "placeholder": "Ex.: Dons de serviço prático",
+      "ondeAparece": "Título do bloco do teste e atalho no topo da lista.",
+      "obrigatorio": true,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Temperamento pessoal"
+    },
+    {
+      "campo": "slug",
+      "label": "Endereço",
+      "descricao": "Gerado a partir do nome. Vira a âncora do teste na página: /eba/testes#<endereço>.",
+      "placeholder": "Ex.: dons-servico",
+      "ondeAparece": "Link direto para o teste na página /eba/testes.",
+      "obrigatorio": true,
+      "limite": "Só letras minúsculas, números e hífen",
+      "exemplo": "temperamento-pessoal"
+    },
+    {
+      "campo": "aula",
+      "label": "Aula do CDV",
+      "descricao": "Aula da apostila em que o teste é explicado.",
+      "placeholder": "Ex.: Aula 5",
+      "ondeAparece": "Acima do nome do teste (\"Aula 5 do CDV\").",
+      "obrigatorio": false,
+      "limite": "Até 30 caracteres",
+      "exemplo": "Aula 11"
+    },
+    {
+      "campo": "resumo",
+      "label": "Resumo",
+      "descricao": "Uma frase sobre o que o teste mostra.",
+      "placeholder": "Ex.: Mostra quais dons espirituais aparecem com mais força no seu jeito de servir.",
+      "ondeAparece": "Abaixo do nome do teste.",
+      "obrigatorio": true,
+      "limite": "Até 200 caracteres",
+      "exemplo": "Revela o que te motiva e como você prefere se organizar para servir."
+    },
+    {
+      "campo": "o_que_e",
+      "label": "O que é",
+      "descricao": "Explique o conceito do teste com as suas palavras (dom, talento, temperamento…).",
+      "placeholder": "Ex.: O temperamento é o jeito natural de cada pessoa…",
+      "ondeAparece": "Caixa \"O que é\".",
+      "obrigatorio": false,
+      "limite": "Até 600 caracteres",
+      "exemplo": "Talento não é dom. Talento é uma habilidade que a pessoa aprende e aperfeiçoa com a prática."
+    },
+    {
+      "campo": "itens_titulo",
+      "label": "Título da lista",
+      "descricao": "Título da lista de itens que o teste avalia.",
+      "placeholder": "Ex.: Os 11 dons do teste",
+      "ondeAparece": "Título da caixa com as etiquetas.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Os 4 temperamentos"
+    },
+    {
+      "campo": "itens",
+      "label": "Itens avaliados",
+      "descricao": "Um item por linha (dons, temperamentos, eixos…). Linhas vazias são ignoradas.",
+      "placeholder": "Um item por linha",
+      "ondeAparece": "Etiquetas dentro da caixa da lista.",
+      "obrigatorio": false,
+      "limite": "Até 600 caracteres",
+      "exemplo": "Sanguíneo / Colérico / Melancólico / Fleumático (um por linha)"
+    },
+    {
+      "campo": "perguntas",
+      "label": "Perguntas",
+      "descricao": "Quantas e quais perguntas o teste tem.",
+      "placeholder": "Ex.: 55 afirmações",
+      "ondeAparece": "Linha \"Perguntas\" na abertura do teste.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "25 afirmações"
+    },
+    {
+      "campo": "resposta",
+      "label": "Resposta",
+      "descricao": "Como a pessoa responde.",
+      "placeholder": "Ex.: nota de 0 a 5",
+      "ondeAparece": "Linha \"Resposta\" na abertura do teste.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "marcar as que descrevem você"
+    },
+    {
+      "campo": "como_responder",
+      "label": "Como responder",
+      "descricao": "Orientação para responder com sinceridade.",
+      "placeholder": "Ex.: Responda pelo que você vive hoje…",
+      "ondeAparece": "Caixa \"Como responder\".",
+      "obrigatorio": false,
+      "limite": "Até 400 caracteres",
+      "exemplo": "Marque as habilidades que você reconhece em si."
+    },
+    {
+      "campo": "como_ler_resultado",
+      "label": "Como ler o resultado",
+      "descricao": "Como a pessoa entende a pontuação.",
+      "placeholder": "Ex.: Cada dom soma de 0 a 25…",
+      "ondeAparece": "Caixa \"Como ler o resultado\".",
+      "obrigatorio": false,
+      "limite": "Até 400 caracteres",
+      "exemplo": "O resultado mostra a porcentagem de cada temperamento em você."
+    },
+    {
+      "campo": "link_teste",
+      "label": "Link do teste",
+      "descricao": "Endereço onde a pessoa faz o teste (hoje, o site atual da EBA). Use um endereço que comece com https://. Sem link, o botão não aparece.",
+      "placeholder": "Ex.: https://eba.adai.com.br/teste/dons-servico",
+      "ondeAparece": "Botão \"Fazer o teste\".",
+      "obrigatorio": false,
+      "limite": "Até 300 caracteres",
+      "exemplo": "https://eba.adai.com.br/teste/temperamento-pessoal"
+    },
+    {
+      "campo": "ordem",
+      "label": "Ordem na lista",
+      "descricao": "Menor aparece primeiro. Empate: ordem alfabética.",
+      "placeholder": "Ex.: 10",
+      "ondeAparece": "Posição do teste na página.",
+      "obrigatorio": false,
+      "limite": "Número inteiro a partir de 0",
+      "exemplo": "10"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
+import apiCurso from './api.curso.json';
 import apiGlobal from './api.global.json';
 import apiPage from './api.page.json';
+import apiTeste from './api.teste.json';
 import apiUnidade from './api.unidade.json';
 import itemsCard from './items.card.json';
 import itemsColunaLinks from './items.coluna-links.json';
@@ -9,10 +11,12 @@ import itemsPerguntaFrequente from './items.pergunta-frequente.json';
 import layoutFooter from './layout.footer.json';
 import layoutHeader from './layout.header.json';
 import sectionsCarrosselCards from './sections.carrossel-cards.json';
+import sectionsCatalogoCursos from './sections.catalogo-cursos.json';
 import sectionsAgendaEventos from './sections.agenda-eventos.json';
 import sectionsHero from './sections.hero.json';
 import sectionsPix from './sections.pix.json';
 import sectionsImagemTexto from './sections.imagem-texto.json';
+import sectionsListaTestes from './sections.lista-testes.json';
 import sectionsMinisterios from './sections.ministerios.json';
 import sectionsPerguntasFrequentes from './sections.perguntas-frequentes.json';
 import sectionsTextoBotoes from './sections.texto-botoes.json';
@@ -48,6 +52,8 @@ export const editorGuides: EditorGuide[] = [
   apiPage,
   apiGlobal,
   apiUnidade,
+  apiCurso,
+  apiTeste,
   sectionsHero,
   sectionsPix,
   sectionsCarrosselCards,
@@ -59,6 +65,8 @@ export const editorGuides: EditorGuide[] = [
   sectionsTextoBotoes,
   sectionsPerguntasFrequentes,
   sectionsTextoRico,
+  sectionsCatalogoCursos,
+  sectionsListaTestes,
   layoutHeader,
   layoutFooter,
   itemsCard,
@@ -75,6 +83,8 @@ export const editorGuides: EditorGuide[] = [
 export const mainFields: Record<string, string> = {
   'api::page.page': 'titulo',
   'api::unidade.unidade': 'nome',
+  'api::curso.curso': 'nome',
+  'api::teste.teste': 'nome',
   'shared.botao': 'texto',
   'shared.link': 'texto',
   'items.coluna-links': 'titulo',

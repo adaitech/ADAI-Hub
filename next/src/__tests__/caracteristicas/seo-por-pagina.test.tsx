@@ -7,6 +7,9 @@ import { draftMode } from 'next/headers';
 import HomePage, { generateMetadata as metadataHome } from '@/app/(site)/page';
 import SlugPage, { generateMetadata as metadataSlug } from '@/app/(site)/[slug]/page';
 import SobreNosPage, { generateMetadata as metadataSobreNos } from '@/app/(site)/sobre-nos/[slug]/page';
+import EbaPage, { generateMetadata as metadataEba } from '@/app/(site)/eba/page';
+import EbaCursosPage, { generateMetadata as metadataEbaCursos } from '@/app/(site)/eba/cursos/page';
+import EbaSubPage, { generateMetadata as metadataEbaSub } from '@/app/(site)/eba/[slug]/page';
 import SiteLayout from '@/app/(site)/layout';
 import { proximosEventosShowcase } from '@/components/sections/ProximosEventosSection/ProximosEventosSection.showcase';
 import type { ProximosEventosExemplo } from '@/components/sections/ProximosEventosSection/types';
@@ -14,7 +17,7 @@ import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/Seri
 import type { SerieAtualExemplo } from '@/components/sections/SerieAtualSection/types';
 import { getEventosInchurch } from '@/lib/inchurch/eventos-cache';
 import { buildMetadata } from '@/lib/metadata';
-import { caminhoDaPagina, PREFIXO_SOBRE_NOS } from '@/lib/paginas/caminho';
+import { caminhoDaPagina, PREFIXO_EBA, PREFIXO_SOBRE_NOS } from '@/lib/paginas/caminho';
 import { getAoVivoAtual, getSerieAtual } from '@/lib/youtube/serie-atual';
 import { auditarTitulos } from '@/test-utils/auditoria';
 import { fixarRelogio, renderizarServidor } from '@/test-utils/servidor';
@@ -27,12 +30,18 @@ jest.mock('@/lib/inchurch/eventos-cache', () => ({ getEventosInchurch: jest.fn()
 const completo = <T,>(showcase: { variantes: { nome: string; data: unknown }[] }) => showcase.variantes.find((v) => v.nome === 'completo')!.data as T;
 const params = (slug: string) => ({ params: Promise.resolve({ slug }) });
 
-/** Mesma escolha de rota do site: Home, `/sobre-nos/<x>` ou `/<slug>`. */
+/** Mesma escolha de rota do site: Home, `/sobre-nos/<x>`, `/eba`, `/eba/cursos`, `/eba/<x>` ou `/<slug>`. */
 function rotaDe(slug: string) {
   if (slug === 'home') return { pagina: () => HomePage(), metadata: () => metadataHome() };
   if (slug.startsWith(PREFIXO_SOBRE_NOS)) {
     const segmento = slug.slice(PREFIXO_SOBRE_NOS.length);
     return { pagina: () => SobreNosPage(params(segmento)), metadata: () => metadataSobreNos(params(segmento)) };
+  }
+  if (slug === 'eba') return { pagina: () => EbaPage(), metadata: () => metadataEba() };
+  if (slug === 'eba-cursos') return { pagina: () => EbaCursosPage(), metadata: () => metadataEbaCursos() };
+  if (slug.startsWith(PREFIXO_EBA)) {
+    const segmento = slug.slice(PREFIXO_EBA.length);
+    return { pagina: () => EbaSubPage(params(segmento)), metadata: () => metadataEbaSub(params(segmento)) };
   }
   return { pagina: () => SlugPage(params(slug)), metadata: () => metadataSlug(params(slug)) };
 }

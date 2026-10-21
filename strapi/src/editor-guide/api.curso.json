@@ -1,0 +1,155 @@
+{
+  "uid": "api::curso.curso",
+  "nome": "Curso da EBA",
+  "resumo": "Cada curso da Escola Bíblica ADAI (Reset, Start, CDV, Talmidim…). Publicado, ele aparece sozinho no catálogo, na home da EBA e no Google, com uma página própria em /eba/cursos/<endereço>.",
+  "ondeAparece": "Card no Catálogo de cursos (home da EBA e /eba/cursos) e página do curso em /eba/cursos/<endereço>.",
+  "boasPraticas": [
+    "Não mude o endereço de um curso publicado: links e QR codes quebram. Se precisar, peça um redirecionamento ao time de dev.",
+    "Use uma foto real das aulas na capa e descreva a foto no texto alternativo.",
+    "O resumo é a frase que convence: diga para quem é e o que a pessoa ganha.",
+    "Monte o conteúdo da página com as seções: \"Sobre o curso\" (Imagem e texto), objetivos e regras (Texto) e Perguntas frequentes.",
+    "Para tirar um curso do site, despublique. Não apague: o histórico fica guardado."
+  ],
+  "campos": [
+    {
+      "campo": "nome",
+      "label": "Nome do curso",
+      "descricao": "Nome curto, como a EBA chama o curso.",
+      "placeholder": "Ex.: Reset",
+      "ondeAparece": "Título do card e título principal da página do curso.",
+      "obrigatorio": true,
+      "limite": "Até 40 caracteres",
+      "exemplo": "Talmidim"
+    },
+    {
+      "campo": "slug",
+      "label": "Endereço",
+      "descricao": "Parte final do endereço da página. Gerado a partir do nome. Não mude o endereço de um curso publicado: links e QR codes quebram. Se precisar, peça um redirecionamento ao time de dev.",
+      "placeholder": "Ex.: reset",
+      "ondeAparece": "Endereço da página: /eba/cursos/<endereço>.",
+      "obrigatorio": true,
+      "limite": "Só letras minúsculas, números e hífen",
+      "exemplo": "talmidim"
+    },
+    {
+      "campo": "resumo",
+      "label": "Resumo",
+      "descricao": "Uma ou duas frases sobre o curso. Também é a descrição que aparece no Google quando o SEO não é preenchido.",
+      "placeholder": "Ex.: Um passo de fé e obediência, transformação interior e início de uma nova caminhada com Jesus.",
+      "ondeAparece": "Card do catálogo e abaixo do título da página do curso.",
+      "obrigatorio": true,
+      "limite": "Até 160 caracteres",
+      "exemplo": "Acompanhamento do adolescente no início de uma nova caminhada com Jesus."
+    },
+    {
+      "campo": "capa",
+      "label": "Foto de capa",
+      "descricao": "Foto horizontal das aulas ou do público do curso. Preencha o texto alternativo (descrição da foto): sem ele a foto não aparece.",
+      "placeholder": "Escolha uma foto horizontal",
+      "ondeAparece": "Card do catálogo, topo da página do curso e compartilhamento em redes sociais.",
+      "obrigatorio": true,
+      "limite": "Imagem horizontal, de preferência 1600 × 1066 px",
+      "exemplo": "Adolescentes sentados conversam e sorriem durante um encontro na ADAI."
+    },
+    {
+      "campo": "vertente",
+      "label": "Vertente",
+      "descricao": "Integração: para novos membros e para quem quer reforçar as bases da fé. Consolidação: para quem está numa fase mais avançada.",
+      "placeholder": "Integração",
+      "ondeAparece": "Rótulo acima do título do curso e filtro do Catálogo de cursos.",
+      "obrigatorio": true,
+      "limite": "Integração ou Consolidação",
+      "exemplo": "Integração"
+    },
+    {
+      "campo": "publico_alvo",
+      "label": "Para quem",
+      "descricao": "Quem pode fazer o curso, em poucas palavras.",
+      "placeholder": "Ex.: A partir de 16 anos",
+      "ondeAparece": "Informação \"Para quem\" no card e no topo da página.",
+      "obrigatorio": false,
+      "limite": "Até 80 caracteres",
+      "exemplo": "Adolescentes de 12 a 15 anos"
+    },
+    {
+      "campo": "duracao",
+      "label": "Duração",
+      "descricao": "Quantas aulas e com que frequência.",
+      "placeholder": "Ex.: 7 aulas de 1 hora, semanais",
+      "ondeAparece": "Informação \"Duração\" no card e no topo da página.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "13 aulas de 1 hora, semanais"
+    },
+    {
+      "campo": "formato",
+      "label": "Formato",
+      "descricao": "Como as aulas acontecem.",
+      "placeholder": "Presencial ou on-line",
+      "ondeAparece": "Informação \"Formato\" no topo da página.",
+      "obrigatorio": false,
+      "limite": "Presencial, On-line ou Presencial ou on-line",
+      "exemplo": "Presencial ou on-line"
+    },
+    {
+      "campo": "entrada",
+      "label": "Quando entrar",
+      "descricao": "Se a pessoa pode começar a qualquer momento ou só no início de uma turma.",
+      "placeholder": "Ex.: A qualquer momento",
+      "ondeAparece": "Informação \"Quando entrar\" no topo da página.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Só no início de cada turma"
+    },
+    {
+      "campo": "inscricao",
+      "label": "Botão de inscrição",
+      "descricao": "Texto e link da inscrição (formulário ou e-mail). Marque \"Abrir em nova aba\" para formulários de outros sites.",
+      "placeholder": "Ex.: Quero me inscrever",
+      "ondeAparece": "Botão no topo da página do curso e no bloco final \"Pronto para começar?\".",
+      "obrigatorio": false,
+      "limite": "Texto até 30 caracteres",
+      "exemplo": "Quero me inscrever"
+    },
+    {
+      "campo": "video_apresentacao",
+      "label": "Vídeo de apresentação (YouTube)",
+      "descricao": "Link de um vídeo do YouTube que apresenta o curso. Links de outros sites são ignorados.",
+      "placeholder": "Ex.: https://www.youtube.com/watch?v=…",
+      "ondeAparece": "Botão \"Assistir à apresentação\" no topo da página; o vídeo abre no próprio site.",
+      "obrigatorio": false,
+      "limite": "Link do YouTube",
+      "exemplo": "https://youtu.be/…"
+    },
+    {
+      "campo": "ordem",
+      "label": "Ordem no catálogo",
+      "descricao": "Número menor aparece primeiro. Cursos com o mesmo número ficam em ordem alfabética.",
+      "placeholder": "Ex.: 10",
+      "ondeAparece": "Posição do card no Catálogo de cursos.",
+      "obrigatorio": false,
+      "limite": "Número inteiro a partir de 0",
+      "exemplo": "10"
+    },
+    {
+      "campo": "secoes",
+      "label": "Conteúdo da página",
+      "descricao": "Seções que aparecem abaixo do topo do curso, na ordem em que você montar.",
+      "placeholder": "Adicione uma seção",
+      "ondeAparece": "Corpo da página do curso.",
+      "obrigatorio": false,
+      "limite": "Imagem e texto, Texto, Perguntas frequentes e Texto e botões",
+      "exemplo": "Imagem e texto \"Sobre o curso\" + Texto com objetivos + Perguntas frequentes"
+    },
+    {
+      "campo": "seo",
+      "label": "SEO",
+      "descricao": "Título e descrição para o Google e as redes sociais. Se ficar vazio, o site usa o nome, o resumo e a capa do curso.",
+      "placeholder": "Opcional",
+      "ondeAparece": "Resultado de busca e compartilhamento em redes sociais.",
+      "obrigatorio": false,
+      "limite": "Título até 60 e descrição até 160 caracteres",
+      "exemplo": "Reset — curso de batismo da EBA | ADAI"
+    }
+  ]
+}

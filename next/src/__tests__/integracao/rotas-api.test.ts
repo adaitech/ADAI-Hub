@@ -77,6 +77,17 @@ describe('GET /api/preview (botão "Pré-visualizar" do Strapi)', () => {
     expect(rascunho.enable).not.toHaveBeenCalled();
   });
 
+  it('curso da EBA (tipo=curso) → abre /eba/cursos/<slug> em rascunho', async () => {
+    const destino = await destinoDoRedirect(chamar('secret=segredo-preview-teste&tipo=curso&slug=reset&status=draft'));
+    expect(destino).toBe('/eba/cursos/reset');
+    expect(rascunho.enable).toHaveBeenCalled();
+  });
+
+  it('curso com slug fora do padrão → 400', async () => {
+    const resposta = (await chamar('secret=segredo-preview-teste&tipo=curso&slug=Reset')) as Response;
+    expect(resposta.status).toBe(400);
+  });
+
   it('segredo errado → 401 sem mexer no draft mode', async () => {
     const resposta = (await chamar('secret=errado&slug=kids&status=draft')) as Response;
     expect(resposta.status).toBe(401);

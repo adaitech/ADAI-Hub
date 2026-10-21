@@ -62,7 +62,7 @@ Textos completos no guia do editor. Resumo:
 | Tier | Comportamento |
 | --- | --- |
 | Mobile/Tablet <1024 | 🟡 Logo + botão "Menu" (44px); painel com links grandes e botões em largura total/lado a lado |
-| Desktop ≥1024 | ✅ Figma: 80px de altura; logo · menu (gap 32) · botões pequenos (40px, gap 12) |
+| Desktop ≥1024 | ✅ Figma: 80px de altura; logo · menu (gap 32 no Figma; `--space-menu` fluido 16–32 para caber 6 links em 1024 🟡) · botões pequenos (40px, gap 12, sem encolher) |
 
 - `<header>` (banner) e `<nav aria-label="Principal">`.
 - Menu mobile: `aria-expanded`/`aria-controls`; `Esc` fecha e devolve o foco ao botão; fecha ao clicar num link ou ao virar desktop.
