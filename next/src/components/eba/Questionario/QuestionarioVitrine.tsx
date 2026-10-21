@@ -7,7 +7,7 @@ import type { EstadoQuestionario } from './estado';
 import mock from './Questionario.mock.json';
 import { Questionario, type QuestionarioProps } from './Questionario';
 
-export type TelaVitrine = 'abertura' | 'pergunta' | 'resultado' | 'sem-resultado' | 'erro';
+export type TelaVitrine = 'abertura' | 'codigo' | 'pergunta' | 'resultado' | 'sem-resultado' | 'erro';
 
 export interface QuestionarioVitrineProps {
   teste: SlugTeste;
@@ -33,7 +33,9 @@ const sessao = mock.sessao;
 export function QuestionarioVitrine({ teste, tela }: QuestionarioVitrineProps) {
   const resultado = resultadoDe(teste);
   const acoes = {
-    identificar: async () => ({ ok: true, dados: sessao }),
+    pedirCodigo: async () => ({ ok: true, dados: { codigoEnviado: true, emailMascarado: sessao.emailMascarado } }),
+    confirmarCodigo: async () => ({ ok: true, dados: sessao }),
+    retomarCadastro: async () => ({ ok: true, dados: sessao }),
     cadastrar: async () => ({ ok: true, dados: sessao }),
     enviar: async () => ({ ok: true, dados: resultado }),
     sair: async () => undefined,
@@ -42,6 +44,7 @@ export function QuestionarioVitrine({ teste, tela }: QuestionarioVitrineProps) {
   } as unknown as QuestionarioProps['acoes'];
   const iniciais: Record<TelaVitrine, Partial<EstadoQuestionario>> = {
     abertura: {},
+    codigo: { estado: 'codigo', verificacao: { email: 'aluno@exemplo.com', emailMascarado: sessao.emailMascarado } },
     pergunta: { estado: 'pergunta' },
     resultado: { estado: 'resultado', resultado },
     'sem-resultado': { estado: 'resultado', resultado: { tipo: 'sem-resultado' } },

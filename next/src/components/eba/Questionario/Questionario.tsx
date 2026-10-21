@@ -4,7 +4,7 @@ import Image, { getImageProps } from 'next/image';
 import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
 import { preload } from 'react-dom';
 import { buttonClassName } from '@/components/ui/ButtonLink';
-import type { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair } from '@/app/(site)/eba/testes/[slug]/acoes';
+import type { aquecer, cadastrar, carregarPerguntas, confirmarCodigo, enviar, pedirCodigo, retomarCadastro, sair } from '@/app/(site)/eba/testes/[slug]/acoes';
 import { registrarEvento } from '@/lib/analytics/datalayer';
 import type { Pergunta } from '@/lib/eba-api/perguntas';
 import { TESTES, type DefinicaoTeste } from '@/lib/eba-api/testes';
@@ -28,7 +28,7 @@ import {
   type SessaoTela,
 } from './estado';
 import { TextoEspera, useEsperaLonga } from './AvisoDeEspera';
-import { Cadastro, Identificacao } from './Identificacao';
+import { Cadastro, ConfirmarCodigo, Identificacao } from './Identificacao';
 import { PerguntaEstilo } from './PerguntaEstilo';
 import { PerguntaMarcar } from './PerguntaMarcar';
 import { PerguntaNota } from './PerguntaNota';
@@ -49,7 +49,9 @@ export interface QuestionarioProps {
    */
   perguntasIndisponiveis?: boolean;
   acoes: {
-    identificar: typeof identificar;
+    pedirCodigo: typeof pedirCodigo;
+    confirmarCodigo: typeof confirmarCodigo;
+    retomarCadastro: typeof retomarCadastro;
     cadastrar: typeof cadastrar;
     enviar: typeof enviar;
     sair: typeof sair;
@@ -91,6 +93,7 @@ function momentoDaFoto(s: EstadoQuestionario): MomentoFoto {
     case 'abertura':
       return 'capa';
     case 'email':
+    case 'codigo':
     case 'cadastro':
     case 'expirou':
       return 'identificacao';
@@ -472,14 +475,38 @@ export function Questionario({
         );
       }
       case 'email':
-        return <Identificacao identificar={acoes.identificar} onIdentificado={aoIdentificar} onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })} tituloRef={focar} />;
+        return (
+          <Identificacao
+            pedirCodigo={acoes.pedirCodigo}
+            onIdentificado={aoIdentificar}
+            onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })}
+            onCodigoEnviado={(email, emailMascarado) => dispatch({ tipo: 'codigoEnviado', email, emailMascarado })}
+            tituloRef={focar}
+          />
+        );
+      case 'codigo':
+        return (
+          <ConfirmarCodigo
+            email={s.verificacao?.email ?? ''}
+            emailMascarado={s.verificacao?.emailMascarado ?? ''}
+            confirmar={acoes.confirmarCodigo}
+            reenviar={acoes.pedirCodigo}
+            onIdentificado={aoIdentificar}
+            onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })}
+            onOutroEmail={() => dispatch({ tipo: 'outroEmail' })}
+            onResultado={(resultado) => {
+              if (!demonstracao) registrarEvento('confirmar_codigo', { teste: teste.slug, resultado });
+            }}
+            tituloRef={focar}
+          />
+        );
       case 'cadastro':
         return (
           <Cadastro
             email={s.cadastro?.email ?? ''}
             turmas={s.cadastro?.turmas ?? []}
             cadastrar={acoes.cadastrar}
-            identificar={acoes.identificar}
+            retomarCadastro={acoes.retomarCadastro}
             onIdentificado={aoIdentificar}
             onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })}
             onOutroEmail={() => dispatch({ tipo: 'voltarEmail' })}

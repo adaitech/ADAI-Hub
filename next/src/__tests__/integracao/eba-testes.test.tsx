@@ -53,6 +53,8 @@ beforeEach(() => {
   process.env.EBA_API_URL = API;
   process.env.EBA_API_KEY = 'chave-de-teste';
   process.env.EBA_SESSAO_SEGREDO = SEGREDO;
+  process.env.MAILERSEND_API_TOKEN = 'token-mailersend-de-teste';
+  process.env.STRAPI_TOKEN_VERIFICACAO = 'token-verificacao-de-teste';
   strapi = criarStrapiFake();
   strapi.paginas['eba-testes'] = {
     id: 9,
@@ -263,6 +265,8 @@ describe('/eba/testes/[slug] — indisponibilidade (nunca 404)', () => {
     ['sem EBA_API_URL', () => delete process.env.EBA_API_URL],
     ['sem EBA_API_KEY', () => delete process.env.EBA_API_KEY],
     ['sem EBA_SESSAO_SEGREDO', () => delete process.env.EBA_SESSAO_SEGREDO],
+    ['sem MAILERSEND_API_TOKEN', () => delete process.env.MAILERSEND_API_TOKEN],
+    ['sem STRAPI_TOKEN_VERIFICACAO', () => delete process.env.STRAPI_TOKEN_VERIFICACAO],
     ['EBA_SESSAO_SEGREDO curto', () => (process.env.EBA_SESSAO_SEGREDO = 'curto')],
   ])('%s: "Testes indisponíveis no momento", link para /eba/testes, sem questionário nem API', async (_caso, tirar) => {
     tirar();

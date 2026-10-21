@@ -99,7 +99,7 @@
     </nav>
     <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Trilha (opção A): completa a partir de 769px; no celular vira “‹ voltar” ao nível anterior</span><span class="selo selo--p">Proposto</span><span>Gera o BreadcrumbList no HTML do servidor</span></p>
 <div class="container estados-teste" role="group" aria-label="Estados da tela (protótipo)" data-anotada>
-  <span>Estado da tela:</span><button type="button" class="alternar" data-estado="abertura" aria-pressed="true">Abertura</button><button type="button" class="alternar" data-estado="email" aria-pressed="false">Identificação</button><button type="button" class="alternar" data-estado="cadastro" aria-pressed="false">Primeiro acesso</button><button type="button" class="alternar" data-estado="pergunta" aria-pressed="false">Pergunta (0 a 5)</button><button type="button" class="alternar" data-estado="marcar" aria-pressed="false">Marcar itens</button><button type="button" class="alternar" data-estado="estilo" aria-pressed="false">Escala 1 a 5</button><button type="button" class="alternar" data-estado="enviando" aria-pressed="false">Enviando</button><button type="button" class="alternar" data-estado="resultado" aria-pressed="false">Resultado</button><button type="button" class="alternar" data-estado="erro" aria-pressed="false">Erro no envio</button><button type="button" class="alternar" data-estado="expirou" aria-pressed="false">Sessão encerrada</button>
+  <span>Estado da tela:</span><button type="button" class="alternar" data-estado="abertura" aria-pressed="true">Abertura</button><button type="button" class="alternar" data-estado="email" aria-pressed="false">Identificação</button><button type="button" class="alternar" data-estado="codigo" aria-pressed="false">Código</button><button type="button" class="alternar" data-estado="cadastro" aria-pressed="false">Primeiro acesso</button><button type="button" class="alternar" data-estado="pergunta" aria-pressed="false">Pergunta (0 a 5)</button><button type="button" class="alternar" data-estado="marcar" aria-pressed="false">Marcar itens</button><button type="button" class="alternar" data-estado="estilo" aria-pressed="false">Escala 1 a 5</button><button type="button" class="alternar" data-estado="enviando" aria-pressed="false">Enviando</button><button type="button" class="alternar" data-estado="resultado" aria-pressed="false">Resultado</button><button type="button" class="alternar" data-estado="erro" aria-pressed="false">Erro no envio</button><button type="button" class="alternar" data-estado="expirou" aria-pressed="false">Sessão encerrada</button>
 </div>
 
 <section class="container teste-tela" aria-labelledby="teste-tela-titulo" data-anotada>
@@ -122,8 +122,20 @@
       <p class="t-corpo-pequeno">Informe seu e-mail para a equipe da EBA receber seu resultado. Se você já fez outro teste, use o mesmo e-mail.</p>
       <form class="formulario" onsubmit="return false">
         <div class="grupo"><label class="rotulo" for="email">E-mail</label><input class="campo" id="email" type="email" autocomplete="email" inputmode="email" required placeholder="seu@email.com"></div>
-        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="pergunta">Continuar</button></div>
+        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="codigo">Continuar</button></div>
         <p class="aviso-externo">Usamos seu e-mail só para ligar suas respostas à sua turma. <a href="/politica-de-privacidade">Política de Privacidade</a>.</p>
+      </form>
+    </div>
+
+    <div data-imagem="assets/testes/identificacao.webp" data-tela="codigo" hidden>
+      <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h1 class="t-h2 teste-tela__nome">Dons de serviço prático</h1>
+      <h2 class="t-h3">Digite o código</h2>
+      <p class="t-corpo-pequeno">Enviamos um código de 6 dígitos para a***@email.com.</p>
+      <form class="formulario" onsubmit="return false">
+        <div class="grupo"><label class="rotulo" for="codigo">Código de 6 dígitos</label><input class="campo" id="codigo" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" required></div>
+        <div class="botoes"><button type="button" class="botao botao--primario" data-ir="pergunta">Confirmar</button><button type="button" class="botao botao--contorno-escuro" data-ir="email">Usar outro e-mail</button></div>
+        <p class="aviso-externo">Não chegou? Confira o spam ou reenvie em 60 s.</p>
       </form>
     </div>
 
@@ -233,7 +245,7 @@
   <div class="teste-tela__midia"><img data-imagem-teste src="assets/testes/dons-capa.webp" alt="" width="1200" height="797" fetchpriority="high"></div>
   </div>
 </section>
-<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Rota /eba/testes/<slug> (noindex): uma tela, estados no cliente; abertura vem do tipo “Testes da EBA” do Strapi</span><span class="selo selo--p">Proposto</span><span>Perguntas, turmas e cálculo vêm da API atual, chamada só pelo servidor do Hub via APIM</span><span class="selo selo--p">Proposto</span><span>Identificação por e-mail em sessão de até 2 h (cookie httpOnly assinado); progresso no sessionStorage</span><span class="selo selo--p">Proposto</span><span>Resposta 0–5 como radio: escolher avança; voltar mantém a resposta anterior marcada</span><span class="selo selo--d">Derivado</span><span>Resultado ordenado como no site atual; os 3 primeiros em destaque</span><span class="selo selo--d">Derivado</span><span>Fotos do site atual (capa, uma por pergunta, resultado), decorativas: alt vazio; ao lado no desktop, faixa acima no celular</span></p>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Rota /eba/testes/<slug> (noindex): uma tela, estados no cliente; abertura vem do tipo “Testes da EBA” do Strapi</span><span class="selo selo--p">Proposto</span><span>Perguntas, turmas e cálculo vêm da API atual, chamada só pelo servidor do Hub via APIM</span><span class="selo selo--p">Proposto</span><span>Identificação por e-mail em sessão de até 2 h (cookie httpOnly assinado); progresso no sessionStorage</span><span class="selo selo--p">Proposto</span><span>Código de 6 dígitos por e-mail antes da sessão (10 min, 5 tentativas); o aparelho fica lembrado por 30 dias</span><span class="selo selo--p">Proposto</span><span>Resposta 0–5 como radio: escolher avança; voltar mantém a resposta anterior marcada</span><span class="selo selo--d">Derivado</span><span>Resultado ordenado como no site atual; os 3 primeiros em destaque</span><span class="selo selo--d">Derivado</span><span>Fotos do site atual (capa, uma por pergunta, resultado), decorativas: alt vazio; ao lado no desktop, faixa acima no celular</span></p>
 </main>
 <footer class="footer">
   <div class="container">

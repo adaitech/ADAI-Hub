@@ -14,7 +14,7 @@ import type { Resultado } from '@/lib/eba-api/respostas';
 import type { SlugTeste, TipoTeste } from '@/lib/eba-api/testes';
 import type { Turma } from '@/lib/eba-api/turmas';
 
-export type Estado = 'abertura' | 'email' | 'cadastro' | 'pergunta' | 'enviando' | 'resultado' | 'erro' | 'expirou';
+export type Estado = 'abertura' | 'email' | 'codigo' | 'cadastro' | 'pergunta' | 'enviando' | 'resultado' | 'erro' | 'expirou';
 
 /** Erros de envio que mantêm a pessoa na tela de erro (sessão encerrada vira `expirou`). */
 export type ErroEnvio = 'indisponivel' | 'recusado';
@@ -42,6 +42,8 @@ export interface EstadoQuestionario extends Progresso {
   emailMascarado: string | null;
   /** Dono opaco da sessão atual (vem do servidor); null = sem sessão. */
   dono: string | null;
+  /** Código enviado: o e-mail digitado (só na memória da tela, nunca no storage) e o mascarado. */
+  verificacao: { email: string; emailMascarado: string } | null;
   /** E-mail não encontrado: dados do Primeiro acesso. O e-mail fica só na memória da tela. */
   cadastro: { email: string; turmas: Turma[] } | null;
   /** Para onde ir depois de se identificar: de volta às perguntas ou direto para o envio. */
@@ -60,6 +62,8 @@ export type Acao =
   | { tipo: 'perguntas'; perguntas: Pergunta[] }
   | { tipo: 'comecar' }
   | { tipo: 'identificado'; sessao: SessaoTela }
+  | { tipo: 'codigoEnviado'; email: string; emailMascarado: string }
+  | { tipo: 'outroEmail' }
   | { tipo: 'novoAluno'; email: string; turmas: Turma[] }
   | { tipo: 'voltarEmail' }
   | { tipo: 'trocarEmail' }
@@ -126,6 +130,7 @@ export function criarEstado({ tipo, perguntas, sessao }: { tipo: TipoTeste; perg
     respondidoComo: null,
     emailMascarado: sessao?.emailMascarado ?? null,
     dono: sessao?.dono ?? null,
+    verificacao: null,
     cadastro: null,
     retorno: 'pergunta',
     resultado: null,
@@ -175,10 +180,14 @@ export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
       // pergunta, sem reenviar.
       const { emailMascarado, dono } = a.sessao;
       const estado = progressoPertenceA(s, dono) ? s.retorno : 'pergunta';
-      return assumir({ ...s, estado, emailMascarado, dono, cadastro: null, saiu: false }, dono);
+      return assumir({ ...s, estado, emailMascarado, dono, verificacao: null, cadastro: null, saiu: false }, dono);
     }
+    case 'codigoEnviado':
+      return { ...s, estado: 'codigo', verificacao: { email: a.email, emailMascarado: a.emailMascarado } };
+    case 'outroEmail':
+      return { ...s, estado: 'email', verificacao: null };
     case 'novoAluno':
-      return { ...s, estado: 'cadastro', cadastro: { email: a.email, turmas: a.turmas } };
+      return { ...s, estado: 'cadastro', verificacao: null, cadastro: { email: a.email, turmas: a.turmas } };
     case 'voltarEmail':
       return { ...s, estado: 'email', cadastro: null };
     // "Não é você?": a sessão é encerrada e o progresso, apagado; depois de identificar, o teste

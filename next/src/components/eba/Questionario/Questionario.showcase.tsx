@@ -14,6 +14,7 @@ export const questionarioShowcase = defineShowcase<QuestionarioVitrineProps>({
   render: (data) => <QuestionarioVitrine {...data} />,
   variantes: [
     { nome: 'abertura', titulo: 'Abertura', data: { teste: 'dons-servico', tela: 'abertura' } },
+    { nome: 'codigo', titulo: 'Código enviado por e-mail', data: { teste: 'dons-servico', tela: 'codigo' } },
     { nome: 'pergunta-nota', titulo: 'Pergunta (0 a 5)', data: { teste: 'dons-servico', tela: 'pergunta' } },
     { nome: 'estilo', titulo: 'Escala 1 a 5 (estilo)', data: { teste: 'estilo-pessoal', tela: 'pergunta' } },
     { nome: 'temperamento', titulo: 'Marcar itens (temperamento)', data: { teste: 'temperamento-pessoal', tela: 'pergunta' } },

@@ -22,8 +22,10 @@ Não está no Strapi: o fluxo, as escalas e a agregação das respostas são reg
 
 ## Estados
 
-`abertura → email | cadastro → pergunta → enviando → resultado`, mais `erro` (envio falhou; "Tentar de novo") e `expirou` (sessão encerrada; pede o e-mail e reenvia sozinho depois, se for a mesma pessoa). Com sessão válida, "Começar o teste" pula a identificação. O reducer puro fica em `estado.ts`.
+`abertura → email → codigo → cadastro | pergunta → enviando → resultado`, mais `erro` (envio falhou; "Tentar de novo") e `expirou` (sessão encerrada; pede o e-mail e reenvia sozinho depois, se for a mesma pessoa). Com sessão válida, "Começar o teste" pula a identificação. O reducer puro fica em `estado.ts`.
 
+- **Código por e-mail (spec `2026-10-21-migracao-eba-2-codigo-por-email-design.md`):** depois do e-mail, o servidor manda um código de 6 dígitos pelo MailerSend (vale 10 min, 5 tentativas; 3 envios por e-mail a cada 15 min) e a tela abre o passo "Digite o código" ("Enviamos um código de 6 dígitos para a***@…"). A resposta é a mesma para e-mail de aluno ou não. O campo usa `inputmode="numeric"` e `autocomplete="one-time-code"` e fica só com os dígitos (aceita "123 456" colado); "Confirmar" faz uma conferência por vez; erro em `role="alert"` ("Código incorreto. Você tem mais N tentativas." / "Este código não vale mais. Enviamos um novo?" com "Enviar novo código"); "Reenviar código" depois de 60 s; "Usar outro e-mail". O Strapi guarda só hashes (tipo privado `verificacao-eba`).
+- **Aparelho lembrado:** código certo ou cadastro concluído gravam `eba_aparelho` (hash do e-mail, 30 dias); com ele, o mesmo e-mail segue sem código. Código certo de e-mail sem cadastro grava `eba_email_verificado` (15 min), exigido pelo `cadastrar` e pelo "Tentar de novo" do Primeiro acesso (sem ele, a tela volta ao e-mail). "Não é você?" e "Sair" esquecem o aparelho.
 - **Respondendo como:** "Respondendo como a***@… · Não é você? Trocar e-mail" aparece na abertura (com sessão válida), nas perguntas e no erro de envio. "Trocar e-mail" encerra a sessão (`sair`), **apaga o progresso** (estado e `sessionStorage`) e volta para a identificação; depois, o teste recomeça da primeira pergunta.
 - **Identificação indisponível:** API fora ou turmas que não carregam (no e-mail ou no Primeiro acesso) mostram "Tentar de novo", que refaz a identificação; no Primeiro acesso o formulário preenchido é mantido e a lista de turmas é atualizada. Nome e turma inválidos têm mensagem própria ligada por `aria-describedby`, como a unidade; nome com caractere de controle é recusado.
 - **Sessão de outra aba:** o envio leva o `respondidoComo` (dono das respostas). Se o cookie for de outra pessoa (o e-mail foi trocado ou a sessão venceu e outra pessoa entrou em outra aba), o servidor devolve `sessao` sem chamar a API; a tela mostra "Sua sessão foi encerrada" e, se quem se identifica é outra pessoa, o teste recomeça da primeira pergunta, sem reenviar. Limite: dois e-mails com a mesma máscara (`a***@x.com`) não se distinguem.
@@ -51,12 +53,14 @@ Caixa cinza + foto na mesma grade, raio `--radius-lg`, gap `--space-12`. Abaixo 
 
 ## Medição (DataLayer)
 
-Dois eventos novos, sem dado pessoal: **`iniciar_teste`** (`teste` = slug), uma vez, quando a primeira pergunta aparece, e **`concluir_teste`** (`teste` = slug) quando o resultado aparece (evento-chave). Os botões e links continuam cobertos por `clique_cta`; a tela tem `data-section="teste-eba"`. No modo vitrine (`estadoInicial`) nenhum evento é enviado. Ver `docs/analytics/README.md`.
+Três eventos novos, sem dado pessoal: **`confirmar_codigo`** (`teste`, `resultado` = `ok`, `errado`, `esgotado` ou `vencido`) a cada conferência do código; **`iniciar_teste`** (`teste` = slug), uma vez, quando a primeira pergunta aparece, e **`concluir_teste`** (`teste` = slug) quando o resultado aparece (evento-chave). Os botões e links continuam cobertos por `clique_cta`; a tela tem `data-section="teste-eba"`. No modo vitrine (`estadoInicial`) nenhum evento é enviado. Ver `docs/analytics/README.md`.
 
 ## Testes
 
-- `estado.test.ts`: transições do reducer, leitura do progresso salvo, agregação das respostas por tipo.
+- `estado.test.ts`: transições do reducer (inclusive o passo `codigo`, com o e-mail só na memória), leitura do progresso salvo, agregação das respostas por tipo.
 - `Questionario.test.tsx`: aquecimento (uma vez na abertura, nunca na vitrine), "Preparando o teste…" com sucesso, falha e "Tentar de novo" (uma chamada por vez, progresso restaurado), aviso de espera depois de 5 s (timers falsos) em cada ação; cada estado, avançar/voltar mantendo a resposta, restauração só da chave do slug sem duplicar (Foco 2), envio único com botão desabilitado (Foco 4), sessão encerrada e erro, talentos com a 4ª escolha desabilitada (Foco 5), nomes acessíveis, foco, fotos e eventos.
+- `Questionario.test.tsx` (código por e-mail): título e foco, campo do celular, código colado com espaço, errado/vencido/esgotado, reenviar só depois de 60 s, "Usar outro e-mail", dois toques em "Confirmar" (uma chamada), evento `confirmar_codigo`, e-mail fora do storage e do DataLayer.
+- `acoes.test.ts`: `pedirCodigo` (mesma resposta para e-mail de aluno ou não, limite, aparelho lembrado), `confirmarCodigo`, `retomarCadastro`, `cadastrar` sem e-mail verificado. Regras do Strapi em `__tests__/integracao/verificacao-eba-strapi.test.ts`.
 - `Resultado.test.tsx`: barras, destaque, porcentagem com máximo 0, talentos, estilo, sem resultado, próximo teste e sair.
 - Vitrine: `lib/showcase/catalog.test.tsx` e `__tests__/caracteristicas/acessibilidade-e-seo.test.tsx` (todas as variantes e o controle "Tipo de teste").
 

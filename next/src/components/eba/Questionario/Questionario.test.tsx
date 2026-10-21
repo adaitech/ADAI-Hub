@@ -22,12 +22,14 @@ const resultadoNota = mock.resultados.nota as Resultado;
 
 function criarAcoes(extra: Partial<Record<keyof Acoes, jest.Mock>> = {}) {
   const acoes = {
-    identificar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-a' } })),
+    pedirCodigo: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-a' } })),
     cadastrar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } })),
     enviar: jest.fn(async () => ({ ok: true, dados: resultadoNota })),
     sair: jest.fn(async () => undefined),
     aquecer: jest.fn(async () => undefined),
     carregarPerguntas: jest.fn(async () => ({ ok: false, erro: 'indisponivel' })),
+    confirmarCodigo: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-a' } })),
+    retomarCadastro: jest.fn(async () => ({ ok: true, dados: { novo: true, turmas: [] } })),
     ...extra,
   };
   return acoes as typeof acoes & Acoes;
@@ -322,7 +324,7 @@ describe('Questionario — aviso de espera (API fria)', () => {
 
   it('identificar: aparece depois de 5 s numa região de status e some ao terminar', async () => {
     const verificacao = adiada();
-    montar('dons-servico', { sessao: null, acoes: criarAcoes({ identificar: jest.fn(() => verificacao.promessa) }) });
+    montar('dons-servico', { sessao: null, acoes: criarAcoes({ pedirCodigo: jest.fn(() => verificacao.promessa) }) });
     comecar();
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
     fireEvent.click(botao('Continuar'));
@@ -336,8 +338,8 @@ describe('Questionario — aviso de espera (API fria)', () => {
 
   it('cadastrar e "Tentar de novo" do cadastro: aparece depois de 5 s e some ao terminar', async () => {
     const cadastro = adiada();
-    const identificar = jest.fn().mockResolvedValue({ ok: true, dados: { novo: true, turmas: [{ id: 't1', nome: 'Turma 1' }] } });
-    montar('dons-servico', { sessao: null, acoes: criarAcoes({ identificar, cadastrar: jest.fn(() => cadastro.promessa) }) });
+    const pedirCodigo = jest.fn().mockResolvedValue({ ok: true, dados: { novo: true, turmas: [{ id: 't1', nome: 'Turma 1' }] } });
+    montar('dons-servico', { sessao: null, acoes: criarAcoes({ pedirCodigo, cadastrar: jest.fn(() => cadastro.promessa) }) });
     comecar();
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'nova@email.com' } });
     fireEvent.click(botao('Continuar'));
@@ -352,7 +354,7 @@ describe('Questionario — aviso de espera (API fria)', () => {
     expect(screen.queryByText(ESPERA)).toBeNull();
 
     const nova = adiada();
-    identificar.mockImplementation(() => nova.promessa);
+    pedirCodigo.mockImplementation(() => nova.promessa);
     fireEvent.click(botao('Tentar de novo'));
     passar(5_000);
     expect(screen.getByRole('status')).toHaveTextContent(ESPERA);
@@ -362,7 +364,7 @@ describe('Questionario — aviso de espera (API fria)', () => {
 
   it('ação rápida (menos de 5 s): o aviso não aparece', async () => {
     const verificacao = adiada();
-    montar('dons-servico', { sessao: null, acoes: criarAcoes({ identificar: jest.fn(() => verificacao.promessa) }) });
+    montar('dons-servico', { sessao: null, acoes: criarAcoes({ pedirCodigo: jest.fn(() => verificacao.promessa) }) });
     comecar();
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
     fireEvent.click(botao('Continuar'));
@@ -456,8 +458,8 @@ describe('Questionario — perguntas de nota (0 a 5)', () => {
   });
 
   it('"Trocar e-mail" apaga as respostas (estado e sessionStorage): a outra pessoa recomeça da primeira pergunta', async () => {
-    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
-    const { acoes } = montar('dons-servico', { acoes: criarAcoes({ identificar }) });
+    const pedirCodigo = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
+    const { acoes } = montar('dons-servico', { acoes: criarAcoes({ pedirCodigo }) });
     comecar();
     escolherNota('3 — Frequentemente');
     escolherNota('4 — Muito');
@@ -636,7 +638,7 @@ describe('Questionario — envio (Foco 4)', () => {
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
     fireEvent.click(botao('Continuar'));
     await esperarAcoes();
-    expect(acoes.identificar).toHaveBeenCalledWith('ana@email.com');
+    expect(acoes.pedirCodigo).toHaveBeenCalledWith('ana@email.com');
     expect(enviar).toHaveBeenCalledTimes(2);
     expect(enviar.mock.calls[1]).toEqual(enviar.mock.calls[0]);
     expect(screen.getByRole('heading', { level: 2, name: 'Seu resultado' })).toBeInTheDocument();
@@ -645,8 +647,8 @@ describe('Questionario — envio (Foco 4)', () => {
   it('envio com dono A e sessão B (trocada em outra aba): sessao → sessão encerrada → identifica B → recomeça na pergunta 1, sem reenvio', async () => {
     // O servidor compara o dono das respostas com o cookie (agora de B) e devolve `sessao`.
     const enviar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'sessao' }).mockResolvedValue({ ok: true, dados: resultadoNota });
-    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
-    montar('dons-servico', { acoes: criarAcoes({ enviar, identificar }) });
+    const pedirCodigo = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
+    montar('dons-servico', { acoes: criarAcoes({ enviar, pedirCodigo }) });
     responderTudo();
     fireEvent.click(botao('Enviar respostas'));
     await esperarAcoes();
@@ -673,8 +675,8 @@ describe('Questionario — envio (Foco 4)', () => {
 
   it('sessão encerrada e outra pessoa se identifica: não reenvia as respostas de quem saiu e recomeça', async () => {
     const enviar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'sessao' });
-    const identificar = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
-    montar('dons-servico', { acoes: criarAcoes({ enviar, identificar }) });
+    const pedirCodigo = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'b***@outro.com', dono: 'dono-b' } }));
+    montar('dons-servico', { acoes: criarAcoes({ enviar, pedirCodigo }) });
     responderTudo();
     fireEvent.click(botao('Enviar respostas'));
     await esperarAcoes();
@@ -858,7 +860,7 @@ describe('Questionario — identificação', () => {
   it('e-mail encontrado → primeira pergunta, com "Respondendo como"', async () => {
     const { acoes } = irParaEmail();
     await informar('  ana@email.com ');
-    expect(acoes.identificar).toHaveBeenCalledWith('ana@email.com');
+    expect(acoes.pedirCodigo).toHaveBeenCalledWith('ana@email.com');
     expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
     expect(screen.getByText('a***@email.com')).toBeInTheDocument();
   });
@@ -866,7 +868,7 @@ describe('Questionario — identificação', () => {
   it('e-mail vazio ou sem @ → "Confira os campos destacados." sem chamar a ação', async () => {
     const { acoes } = irParaEmail();
     await informar('ana');
-    expect(acoes.identificar).not.toHaveBeenCalled();
+    expect(acoes.pedirCodigo).not.toHaveBeenCalled();
     expect(screen.getByRole('alert')).toHaveTextContent('Confira os campos destacados.');
     expect(screen.getByLabelText('E-mail')).toHaveAttribute('aria-invalid', 'true');
   });
@@ -877,34 +879,34 @@ describe('Questionario — identificação', () => {
     ['indisponivel', 'Não conseguimos verificar agora. Tente em alguns minutos.'],
     ['sessao', 'Não conseguimos verificar agora. Tente em alguns minutos.'],
   ])('erro %s → %s', async (erro, mensagem) => {
-    irParaEmail({ acoes: criarAcoes({ identificar: jest.fn().mockResolvedValue({ ok: false, erro }) }) });
+    irParaEmail({ acoes: criarAcoes({ pedirCodigo: jest.fn().mockResolvedValue({ ok: false, erro }) }) });
     await informar('ana@email.com');
     expect(screen.getByRole('alert')).toHaveTextContent(mensagem);
   });
 
   it('indisponível (ex.: turmas que não carregam para um e-mail novo) → "Tentar de novo" refaz a identificação', async () => {
-    const identificar = jest
+    const pedirCodigo = jest
       .fn()
       .mockResolvedValueOnce({ ok: false, erro: 'indisponivel' })
       .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas: [{ id: 't1', nome: 'Turma 1' }] } });
-    irParaEmail({ acoes: criarAcoes({ identificar }) });
+    irParaEmail({ acoes: criarAcoes({ pedirCodigo }) });
     await informar('nova@email.com');
     fireEvent.click(botao('Tentar de novo'));
     await esperarAcoes();
-    expect(identificar).toHaveBeenCalledTimes(2);
-    expect(identificar).toHaveBeenLastCalledWith('nova@email.com');
+    expect(pedirCodigo).toHaveBeenCalledTimes(2);
+    expect(pedirCodigo).toHaveBeenLastCalledWith('nova@email.com');
     expect(screen.getByRole('heading', { level: 2, name: 'Primeiro acesso' })).toBeInTheDocument();
   });
 
   it.each(['limite', 'invalido'])('erro %s não mostra "Tentar de novo"', async (erro) => {
-    irParaEmail({ acoes: criarAcoes({ identificar: jest.fn().mockResolvedValue({ ok: false, erro }) }) });
+    irParaEmail({ acoes: criarAcoes({ pedirCodigo: jest.fn().mockResolvedValue({ ok: false, erro }) }) });
     await informar('ana@email.com');
     expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
   });
 
   it('a ação lança (rede) → indisponível; resposta sem dados também', async () => {
-    const identificar = jest.fn().mockRejectedValueOnce(new Error('rede')).mockResolvedValueOnce({ ok: true });
-    irParaEmail({ acoes: criarAcoes({ identificar }) });
+    const pedirCodigo = jest.fn().mockRejectedValueOnce(new Error('rede')).mockResolvedValueOnce({ ok: true });
+    irParaEmail({ acoes: criarAcoes({ pedirCodigo }) });
     await informar('ana@email.com');
     expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos verificar agora.');
     await informar('ana@email.com');
@@ -913,8 +915,8 @@ describe('Questionario — identificação', () => {
 
   it('enquanto verifica, o botão fica desabilitado', async () => {
     let concluir: (r: unknown) => void = () => {};
-    const identificar = jest.fn(() => new Promise((resolve) => (concluir = resolve)));
-    irParaEmail({ acoes: criarAcoes({ identificar }) });
+    const pedirCodigo = jest.fn(() => new Promise((resolve) => (concluir = resolve)));
+    irParaEmail({ acoes: criarAcoes({ pedirCodigo }) });
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
     fireEvent.click(botao('Continuar'));
     expect(botao('Continuar')).toBeDisabled();
@@ -929,7 +931,7 @@ describe('Questionario — identificação', () => {
     const novo = (lista = turmas) => jest.fn().mockResolvedValue({ ok: true, dados: { novo: true, turmas: lista } });
 
     it('e-mail novo → cadastro com nome, unidade e turma; cadastra e começa', async () => {
-      const { acoes, container } = irParaEmail({ acoes: criarAcoes({ identificar: novo() }) });
+      const { acoes, container } = irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo() }) });
       await informar('nova@email.com');
       expect(screen.getByRole('heading', { level: 2, name: 'Primeiro acesso' })).toHaveFocus();
       expect(screen.getByText('nova@email.com')).toBeInTheDocument();
@@ -946,7 +948,7 @@ describe('Questionario — identificação', () => {
     });
 
     it('campos faltando → destacados, sem chamar a ação', async () => {
-      const { acoes } = irParaEmail({ acoes: criarAcoes({ identificar: novo() }) });
+      const { acoes } = irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo() }) });
       await informar('nova@email.com');
       fireEvent.click(botao('Cadastrar e começar'));
       await esperarAcoes();
@@ -965,7 +967,7 @@ describe('Questionario — identificação', () => {
       ['limite', 'Muitas tentativas. Aguarde um minuto.'],
       ['indisponivel', 'Não conseguimos verificar agora. Tente em alguns minutos.'],
     ])('erro %s no cadastro → %s', async (erro, mensagem) => {
-      irParaEmail({ acoes: criarAcoes({ identificar: novo(), cadastrar: jest.fn().mockResolvedValue({ ok: false, erro }) }) });
+      irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo(), cadastrar: jest.fn().mockResolvedValue({ ok: false, erro }) }) });
       await informar('nova@email.com');
       fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: 'Ana Souza' } });
       fireEvent.click(screen.getByRole('radio', { name: 'Campestre' }));
@@ -983,7 +985,7 @@ describe('Questionario — identificação', () => {
     };
 
     it('nome e turma inválidos apontam (aria-describedby) para a mensagem de erro de cada campo', async () => {
-      irParaEmail({ acoes: criarAcoes({ identificar: novo() }) });
+      irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo() }) });
       await informar('nova@email.com');
       fireEvent.click(botao('Cadastrar e começar'));
       await esperarAcoes();
@@ -994,7 +996,7 @@ describe('Questionario — identificação', () => {
     });
 
     it('nome com caractere de controle é destacado sem chamar a ação', async () => {
-      const { acoes } = irParaEmail({ acoes: criarAcoes({ identificar: novo() }) });
+      const { acoes } = irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo() }) });
       await informar('nova@email.com');
       fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: 'Ana' + String.fromCharCode(0) + 'Souza' } });
       fireEvent.click(screen.getByRole('radio', { name: 'Campestre' }));
@@ -1006,19 +1008,17 @@ describe('Questionario — identificação', () => {
     });
 
     it('cadastro indisponível (turmas não carregam) → "Tentar de novo" refaz a identificação e mantém o formulário', async () => {
-      const identificar = jest
-        .fn()
-        .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas } })
-        .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas: [...turmas, { id: 't3', nome: 'Nova turma' }] } });
+      const pedirCodigo = jest.fn().mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas } });
+      const retomarCadastro = jest.fn().mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas: [...turmas, { id: 't3', nome: 'Nova turma' }] } });
       const cadastrar = jest.fn().mockResolvedValueOnce({ ok: false, erro: 'indisponivel' }).mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } });
-      irParaEmail({ acoes: criarAcoes({ identificar, cadastrar }) });
+      irParaEmail({ acoes: criarAcoes({ pedirCodigo, retomarCadastro, cadastrar }) });
       await informar('nova@email.com');
       preencher();
       await esperarAcoes();
       fireEvent.click(botao('Tentar de novo'));
       await esperarAcoes();
-      expect(identificar).toHaveBeenCalledTimes(2);
-      expect(identificar).toHaveBeenLastCalledWith('nova@email.com');
+      expect(pedirCodigo).toHaveBeenCalledTimes(1);
+      expect(retomarCadastro).toHaveBeenCalledWith('nova@email.com');
       expect(screen.getByRole('option', { name: 'Nova turma' })).toBeInTheDocument();
       expect(screen.getByLabelText('Nome completo')).toHaveValue('Ana Souza');
       expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
@@ -1028,11 +1028,9 @@ describe('Questionario — identificação', () => {
     });
 
     it('"Tentar de novo" no cadastro com o e-mail já encontrado → segue para as perguntas', async () => {
-      const identificar = jest
-        .fn()
-        .mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas } })
-        .mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } });
-      irParaEmail({ acoes: criarAcoes({ identificar, cadastrar: jest.fn().mockResolvedValue({ ok: false, erro: 'indisponivel' }) }) });
+      const pedirCodigo = jest.fn().mockResolvedValueOnce({ ok: true, dados: { novo: true, turmas } });
+      const retomarCadastro = jest.fn().mockResolvedValueOnce({ ok: true, dados: { emailMascarado: 'n***@email.com', dono: 'dono-n' } });
+      irParaEmail({ acoes: criarAcoes({ pedirCodigo, retomarCadastro, cadastrar: jest.fn().mockResolvedValue({ ok: false, erro: 'indisponivel' }) }) });
       await informar('nova@email.com');
       preencher();
       await esperarAcoes();
@@ -1042,7 +1040,7 @@ describe('Questionario — identificação', () => {
     });
 
     it('cadastro recusado pela API → mensagem própria, sem "Tentar de novo"', async () => {
-      irParaEmail({ acoes: criarAcoes({ identificar: novo(), cadastrar: jest.fn().mockResolvedValue({ ok: false, erro: 'recusado' }) }) });
+      irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo(), cadastrar: jest.fn().mockResolvedValue({ ok: false, erro: 'recusado' }) }) });
       await informar('nova@email.com');
       preencher();
       await esperarAcoes();
@@ -1051,7 +1049,7 @@ describe('Questionario — identificação', () => {
     });
 
     it('sem turma aberta → aviso, sem formulário; "Usar outro e-mail" volta', async () => {
-      irParaEmail({ acoes: criarAcoes({ identificar: novo([]) }) });
+      irParaEmail({ acoes: criarAcoes({ pedirCodigo: novo([]) }) });
       await informar('nova@email.com');
       expect(screen.getByText('Nenhuma turma aberta no momento. Fale com a equipe da EBA.')).toBeInTheDocument();
       expect(screen.queryByLabelText('Nome completo')).toBeNull();
@@ -1074,5 +1072,167 @@ describe('Questionario — estado inicial (vitrine)', () => {
   it('erro de envio como estado inicial mostra "Tentar de novo"', () => {
     montar('dons-servico', { estadoInicial: { estado: 'erro', erroEnvio: 'indisponivel' } });
     expect(within(screen.getByRole('alert')).getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
+  });
+});
+
+describe('Questionario — código por e-mail', () => {
+  const ENVIADO = { ok: true, dados: { codigoEnviado: true, emailMascarado: 'a***@email.com' } };
+  const irParaCodigo = async (acoes: Partial<Record<keyof Acoes, jest.Mock>> = {}) => {
+    const r = montar('dons-servico', { sessao: null, acoes: criarAcoes({ pedirCodigo: jest.fn(async () => ENVIADO), ...acoes }) });
+    comecar();
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
+    fireEvent.click(botao('Continuar'));
+    await esperarAcoes();
+    return r;
+  };
+  const digitar = (codigo: string) => fireEvent.change(screen.getByLabelText('Código de 6 dígitos'), { target: { value: codigo } });
+  const confirmar = async () => {
+    fireEvent.click(botao('Confirmar'));
+    await esperarAcoes();
+  };
+
+  afterEach(() => jest.useRealTimers());
+
+  it('código enviado: tela "Digite o código" com o e-mail mascarado, foco no título e campo do celular', async () => {
+    const { container } = await irParaCodigo();
+    expect(screen.getByRole('heading', { name: 'Digite o código' })).toHaveFocus();
+    expect(screen.getByText('Enviamos um código de 6 dígitos para a***@email.com.')).toBeInTheDocument();
+    const campo = screen.getByLabelText('Código de 6 dígitos');
+    expect(campo).toHaveAttribute('inputmode', 'numeric');
+    expect(campo).toHaveAttribute('autocomplete', 'one-time-code');
+    expect(auditarAcessibilidade(container)).toEqual([]);
+  });
+
+  it('código certo → primeira pergunta e evento confirmar_codigo ok', async () => {
+    const { acoes } = await irParaCodigo();
+    digitar('042137');
+    await confirmar();
+    expect(acoes.confirmarCodigo).toHaveBeenCalledWith('ana@email.com', '042137');
+    expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+    expect(registrarEvento).toHaveBeenCalledWith('confirmar_codigo', { teste: 'dons-servico', resultado: 'ok' });
+  });
+
+  it('código certo de e-mail novo → Primeiro acesso', async () => {
+    await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: true, dados: { novo: true, turmas: [{ id: 't1', nome: 'Turma 1' }] } })) });
+    digitar('042137');
+    await confirmar();
+    expect(screen.getByRole('heading', { name: 'Primeiro acesso' })).toBeInTheDocument();
+  });
+
+  it('código colado com espaço: só os dígitos vão para a ação', async () => {
+    const { acoes } = await irParaCodigo();
+    digitar('123 456');
+    expect(screen.getByLabelText('Código de 6 dígitos')).toHaveValue('123456');
+    await confirmar();
+    expect(acoes.confirmarCodigo).toHaveBeenCalledWith('ana@email.com', '123456');
+  });
+
+  it('código errado → "Código incorreto. Você tem mais 3 tentativas." e campo limpo', async () => {
+    await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: false, erro: 'codigo', resultado: 'errado', restantes: 3 })) });
+    digitar('111111');
+    await confirmar();
+    expect(screen.getByRole('alert')).toHaveTextContent('Código incorreto. Você tem mais 3 tentativas.');
+    expect(screen.getByLabelText('Código de 6 dígitos')).toHaveValue('');
+    expect(registrarEvento).toHaveBeenCalledWith('confirmar_codigo', { teste: 'dons-servico', resultado: 'errado' });
+  });
+
+  it('última tentativa: "mais 1 tentativa." no singular', async () => {
+    await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: false, erro: 'codigo', resultado: 'errado', restantes: 1 })) });
+    digitar('111111');
+    await confirmar();
+    expect(screen.getByRole('alert')).toHaveTextContent('Código incorreto. Você tem mais 1 tentativa.');
+  });
+
+  it.each(['vencido', 'esgotado'])('código %s → "Este código não vale mais. Enviamos um novo?" e "Enviar novo código" reenvia', async (resultado) => {
+    const { acoes } = await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: false, erro: 'codigo', resultado, restantes: 0 })) });
+    digitar('111111');
+    await confirmar();
+    expect(screen.getByRole('alert')).toHaveTextContent('Este código não vale mais. Enviamos um novo?');
+    fireEvent.click(botao('Enviar novo código'));
+    await esperarAcoes();
+    expect(acoes.pedirCodigo).toHaveBeenCalledTimes(2);
+    expect(acoes.pedirCodigo).toHaveBeenLastCalledWith('ana@email.com');
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('"Reenviar código" só depois de 60 s', async () => {
+    jest.useFakeTimers();
+    const { acoes } = await irParaCodigo();
+    expect(screen.getByText('Não chegou? Confira o spam ou reenvie em 60 s.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reenviar código' })).toBeNull();
+    // O relógio conta de 1 em 1 s (cada passo agenda o próximo depois de renderizar).
+    for (let i = 0; i < 60; i++) {
+      await act(async () => {
+        jest.advanceTimersByTime(1_000);
+      });
+    }
+    fireEvent.click(botao('Reenviar código'));
+    await esperarAcoes();
+    expect(acoes.pedirCodigo).toHaveBeenCalledTimes(2);
+    expect(screen.getByText('Não chegou? Confira o spam ou reenvie em 60 s.')).toBeInTheDocument();
+  });
+
+  it('"Usar outro e-mail" volta ao campo de e-mail', async () => {
+    await irParaCodigo();
+    fireEvent.click(botao('Usar outro e-mail'));
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
+  });
+
+  it('dois toques rápidos em "Confirmar": uma chamada só e nenhum erro depois do sucesso', async () => {
+    let concluir!: (r: unknown) => void;
+    const confirmarCodigo = jest.fn(() => new Promise((resolve) => (concluir = resolve)));
+    await irParaCodigo({ confirmarCodigo });
+    digitar('042137');
+    fireEvent.click(botao('Confirmar'));
+    fireEvent.click(botao('Confirmar'));
+    await act(async () => concluir({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-a' } }));
+    expect(confirmarCodigo).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+  });
+
+  it('menos de 6 dígitos → "Digite os 6 dígitos do código." sem chamar a ação', async () => {
+    const { acoes } = await irParaCodigo();
+    digitar('123');
+    await confirmar();
+    expect(acoes.confirmarCodigo).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Digite os 6 dígitos do código.');
+  });
+
+  it('serviço fora → mensagem de indisponível', async () => {
+    await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: false, erro: 'indisponivel' })) });
+    digitar('042137');
+    await confirmar();
+    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos verificar agora. Tente em alguns minutos.');
+  });
+
+  it('o e-mail digitado nunca vai para o sessionStorage nem para o DataLayer', async () => {
+    await irParaCodigo();
+    digitar('042137');
+    await confirmar();
+    const guardado = Object.keys(sessionStorage).map((k) => sessionStorage.getItem(k)).join('');
+    expect(guardado).not.toContain('ana@email.com');
+    expect(JSON.stringify(jest.mocked(registrarEvento).mock.calls)).not.toContain('ana@email.com');
+  });
+
+  it('e-mail com o código enviado: sem o e-mail, a tela mostra o aviso de envio', async () => {
+    await irParaCodigo({ pedirCodigo: jest.fn(async () => ({ ok: false, erro: 'indisponivel' })) });
+    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos verificar agora. Tente em alguns minutos.');
+    expect(screen.queryByLabelText('Código de 6 dígitos')).toBeNull();
+  });
+
+  it('cadastro com o e-mail sem verificação (marca vencida) → volta ao e-mail', async () => {
+    await irParaCodigo({
+      confirmarCodigo: jest.fn(async () => ({ ok: true, dados: { novo: true, turmas: [{ id: 't1', nome: 'Turma 1' }] } })),
+      cadastrar: jest.fn(async () => ({ ok: false, erro: 'verificacao' })),
+    });
+    digitar('042137');
+    await confirmar();
+    fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: 'Ana Souza' } });
+    fireEvent.click(screen.getByRole('radio', { name: 'Campestre' }));
+    fireEvent.change(screen.getByLabelText('Turma'), { target: { value: 't1' } });
+    fireEvent.click(botao('Cadastrar e começar'));
+    await esperarAcoes();
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
   });
 });

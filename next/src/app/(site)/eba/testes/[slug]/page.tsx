@@ -6,13 +6,15 @@ import { Trilha, type TrilhaItem } from '@/components/ui/Trilha';
 import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { segredoDaSessao } from '@/lib/eba/sessao';
 import { ebaApiConfigurada, TIMEOUT_PAGINA_MS } from '@/lib/eba-api/client';
+import { emailConfigurado } from '@/lib/email/mailersend';
+import { verificacaoConfigurada } from '@/lib/strapi/verificacao';
 import { perguntasDoTeste, type Pergunta } from '@/lib/eba-api/perguntas';
 import { definicaoDoTeste, usaPerguntasDaApi, type DefinicaoTeste } from '@/lib/eba-api/testes';
 import { buildMetadata } from '@/lib/metadata';
 import { jsonLdSeguro, origemDoSite } from '@/lib/seo/json-ld';
 import { getGlobal } from '@/lib/strapi/queries/global';
 import { getTesteBySlug } from '@/lib/strapi/queries/testes';
-import { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair, sessaoAtual } from './acoes';
+import { aquecer, cadastrar, carregarPerguntas, confirmarCodigo, enviar, pedirCodigo, retomarCadastro, sair, sessaoAtual } from './acoes';
 import estilosEba from '../../eba.module.css';
 import styles from './page.module.css';
 
@@ -87,7 +89,8 @@ export default async function TesteEbaPage({ params }: PageProps) {
     { texto: 'Testes', href: '/eba/testes' },
     { texto: teste.nome },
   ];
-  const disponivel = ebaApiConfigurada() && segredoDaSessao() !== null;
+  // Sem o envio do código (MailerSend) ou sem o token das verificações, ninguém consegue se identificar.
+  const disponivel = ebaApiConfigurada() && segredoDaSessao() !== null && emailConfigurado() && verificacaoConfigurada();
 
   let tela;
   if (!disponivel) {
@@ -118,7 +121,7 @@ export default async function TesteEbaPage({ params }: PageProps) {
         perguntas={perguntas}
         perguntasIndisponiveis={indisponiveis}
         sessao={sessao}
-        acoes={{ identificar, cadastrar, enviar, sair, carregarPerguntas, aquecer }}
+        acoes={{ pedirCodigo, confirmarCodigo, retomarCadastro, cadastrar, enviar, sair, carregarPerguntas, aquecer }}
       />
     );
   }

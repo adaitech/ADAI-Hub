@@ -1,7 +1,13 @@
 import Link from 'next/link';
-import { useId, useState, type FormEvent, type RefCallback } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type RefCallback } from 'react';
 import { buttonClassName } from '@/components/ui/ButtonLink';
-import type { cadastrar as cadastrarAcao, identificar as identificarAcao, RespostaAcao } from '@/app/(site)/eba/testes/[slug]/acoes';
+import type {
+  cadastrar as cadastrarAcao,
+  confirmarCodigo as confirmarCodigoAcao,
+  pedirCodigo as pedirCodigoAcao,
+  RespostaAcao,
+  retomarCadastro as retomarCadastroAcao,
+} from '@/app/(site)/eba/testes/[slug]/acoes';
 import { UNIDADES } from '@/lib/eba-api/testes';
 import type { Turma } from '@/lib/eba-api/turmas';
 import { AvisoDeEspera } from './AvisoDeEspera';
@@ -21,6 +27,7 @@ const MENSAGENS: Record<CodigoErro, string> = {
   indisponivel: VERIFICAR_DEPOIS,
   sessao: VERIFICAR_DEPOIS,
   recusado: VERIFICAR_DEPOIS,
+  verificacao: 'Confirme seu e-mail de novo.',
 };
 
 function Erro({ id, erro, mensagens = MENSAGENS }: { id: string; erro: CodigoErro | null; mensagens?: Record<CodigoErro, string> }) {
@@ -43,15 +50,18 @@ function TentarDeNovo({ visivel, pendente, onClick }: { visivel: boolean; penden
 }
 
 export interface IdentificacaoProps {
-  identificar: typeof identificarAcao;
+  pedirCodigo: typeof pedirCodigoAcao;
+  /** Aparelho já verificado para este e-mail: segue direto. */
   onIdentificado: (sessao: SessaoTela) => void;
-  /** E-mail não encontrado: abre o Primeiro acesso com as turmas abertas. */
+  /** E-mail não encontrado (aparelho já verificado): abre o Primeiro acesso com as turmas abertas. */
   onNovo: (email: string, turmas: Turma[]) => void;
+  /** Código enviado ao e-mail: abre o passo do código. */
+  onCodigoEnviado: (email: string, emailMascarado: string) => void;
   tituloRef: RefCallback<HTMLElement>;
 }
 
 /** Pede o e-mail. O e-mail digitado fica só na memória da tela (nunca no storage nem no DataLayer). */
-export function Identificacao({ identificar, onIdentificado, onNovo, tituloRef }: IdentificacaoProps) {
+export function Identificacao({ pedirCodigo, onIdentificado, onNovo, onCodigoEnviado, tituloRef }: IdentificacaoProps) {
   const id = useId();
   const [email, setEmail] = useState('');
   const [erro, setErro] = useState<CodigoErro | null>(null);
@@ -71,9 +81,10 @@ export function Identificacao({ identificar, onIdentificado, onNovo, tituloRef }
     setPendente(true);
     setErro(null);
     try {
-      const resposta = await identificar(valor);
+      const resposta = await pedirCodigo(valor);
       if (resposta.ok && resposta.dados) {
-        if ('novo' in resposta.dados) onNovo(valor, resposta.dados.turmas);
+        if ('codigoEnviado' in resposta.dados) onCodigoEnviado(valor, resposta.dados.emailMascarado);
+        else if ('novo' in resposta.dados) onNovo(valor, resposta.dados.turmas);
         else onIdentificado(resposta.dados);
         return;
       }
@@ -130,8 +141,8 @@ export interface CadastroProps {
   email: string;
   turmas: Turma[];
   cadastrar: typeof cadastrarAcao;
-  /** "Tentar de novo" refaz a identificação (turmas atualizadas ou e-mail já cadastrado). */
-  identificar: typeof identificarAcao;
+  /** "Tentar de novo" refaz a identificação do e-mail já verificado (turmas atualizadas ou e-mail já cadastrado). */
+  retomarCadastro: typeof retomarCadastroAcao;
   onIdentificado: (sessao: SessaoTela) => void;
   onNovo: (email: string, turmas: Turma[]) => void;
   onOutroEmail: () => void;
@@ -145,7 +156,7 @@ const MENSAGENS_CADASTRO: Record<CodigoErro, string> = {
 };
 
 /** Primeiro acesso: nome, unidade e turma (uma vez só; nos próximos testes basta o e-mail). */
-export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado, onNovo, onOutroEmail, tituloRef }: CadastroProps) {
+export function Cadastro({ email, turmas, cadastrar, retomarCadastro, onIdentificado, onNovo, onOutroEmail, tituloRef }: CadastroProps) {
   const id = useId();
   const [nome, setNome] = useState('');
   const [unidade, setUnidade] = useState('');
@@ -185,12 +196,13 @@ export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado
     setPendente(true);
     setErro(null);
     try {
-      const resposta = await identificar(email);
+      const resposta = await retomarCadastro(email);
       if (resposta.ok && resposta.dados) {
         if ('novo' in resposta.dados) onNovo(email, resposta.dados.turmas);
         else onIdentificado(resposta.dados);
         return;
       }
+      if (!resposta.ok && resposta.erro === 'verificacao') return onOutroEmail();
       setErro(resposta.ok ? 'indisponivel' : resposta.erro);
     } catch {
       setErro('indisponivel');
@@ -214,6 +226,8 @@ export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado
         onIdentificado(resposta.dados);
         return;
       }
+      // A verificação do e-mail venceu (15 min): volta ao e-mail para pedir um código novo.
+      if (!resposta.ok && resposta.erro === 'verificacao') return onOutroEmail();
       setErro(resposta.ok ? 'indisponivel' : resposta.erro);
     } catch {
       setErro('indisponivel');
@@ -313,6 +327,178 @@ export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado
           <TentarDeNovo visivel={erro === 'indisponivel'} pendente={pendente} onClick={() => void tentarDeNovo()} />
           {outroEmail}
         </div>
+      </form>
+    </>
+  );
+}
+
+const SEGUNDOS_REENVIO = 60;
+
+type ErroCodigo =
+  | { tipo: 'errado'; restantes: number }
+  | { tipo: 'vencido' }
+  | { tipo: 'incompleto' }
+  | { tipo: 'acao'; erro: CodigoErro };
+
+function mensagemDoCodigo(erro: ErroCodigo): string {
+  switch (erro.tipo) {
+    case 'errado':
+      return `Código incorreto. Você tem mais ${erro.restantes} ${erro.restantes === 1 ? 'tentativa' : 'tentativas'}.`;
+    case 'vencido':
+      return 'Este código não vale mais. Enviamos um novo?';
+    case 'incompleto':
+      return 'Digite os 6 dígitos do código.';
+    case 'acao':
+      return MENSAGENS[erro.erro];
+  }
+}
+
+export interface ConfirmarCodigoProps {
+  email: string;
+  emailMascarado: string;
+  confirmar: typeof confirmarCodigoAcao;
+  /** Reenvio do código (a mesma ação do passo do e-mail). */
+  reenviar: typeof pedirCodigoAcao;
+  onIdentificado: (sessao: SessaoTela) => void;
+  onNovo: (email: string, turmas: Turma[]) => void;
+  onOutroEmail: () => void;
+  /** Resultado de cada conferência (medição `confirmar_codigo`, sem dado pessoal). */
+  onResultado: (resultado: 'ok' | 'errado' | 'esgotado' | 'vencido') => void;
+  tituloRef: RefCallback<HTMLElement>;
+}
+
+/**
+ * Passo do código de 6 dígitos enviado ao e-mail. O campo aceita o código colado com espaço ou traço
+ * (fica só com os dígitos); "Reenviar código" só depois de 60 s; uma conferência por vez.
+ */
+export function ConfirmarCodigo({ email, emailMascarado, confirmar, reenviar, onIdentificado, onNovo, onOutroEmail, onResultado, tituloRef }: ConfirmarCodigoProps) {
+  const id = useId();
+  const campo = useRef<HTMLInputElement>(null);
+  const conferindo = useRef(false);
+  const [codigo, setCodigo] = useState('');
+  const [erro, setErro] = useState<ErroCodigo | null>(null);
+  const [pendente, setPendente] = useState(false);
+  const [espera, setEspera] = useState(SEGUNDOS_REENVIO);
+
+  useEffect(() => {
+    if (espera <= 0) return;
+    const relogio = setTimeout(() => setEspera((s) => s - 1), 1000);
+    return () => clearTimeout(relogio);
+  }, [espera]);
+
+  async function enviar(evento: FormEvent) {
+    evento.preventDefault();
+    if (conferindo.current) return;
+    if (codigo.length !== 6) {
+      setErro({ tipo: 'incompleto' });
+      return;
+    }
+    conferindo.current = true;
+    setPendente(true);
+    setErro(null);
+    try {
+      const resposta = await confirmar(email, codigo);
+      if (resposta.ok && resposta.dados) {
+        onResultado('ok');
+        if ('novo' in resposta.dados) onNovo(email, resposta.dados.turmas);
+        else onIdentificado(resposta.dados);
+        return;
+      }
+      if (!resposta.ok && resposta.erro === 'codigo') {
+        onResultado(resposta.resultado);
+        setCodigo('');
+        setErro(resposta.resultado === 'errado' ? { tipo: 'errado', restantes: resposta.restantes } : { tipo: 'vencido' });
+        campo.current?.focus();
+        return;
+      }
+      setErro({ tipo: 'acao', erro: resposta.ok ? 'indisponivel' : resposta.erro });
+    } catch {
+      setErro({ tipo: 'acao', erro: 'indisponivel' });
+    } finally {
+      conferindo.current = false;
+      setPendente(false);
+    }
+  }
+
+  async function pedirNovo() {
+    setPendente(true);
+    setErro(null);
+    try {
+      const resposta = await reenviar(email);
+      if (resposta.ok && resposta.dados) {
+        if ('codigoEnviado' in resposta.dados) {
+          setCodigo('');
+          setEspera(SEGUNDOS_REENVIO);
+          campo.current?.focus();
+        } else if ('novo' in resposta.dados) onNovo(email, resposta.dados.turmas);
+        else onIdentificado(resposta.dados);
+        return;
+      }
+      setErro({ tipo: 'acao', erro: resposta.ok ? 'indisponivel' : resposta.erro });
+    } catch {
+      setErro({ tipo: 'acao', erro: 'indisponivel' });
+    } finally {
+      setPendente(false);
+    }
+  }
+
+  return (
+    <>
+      <h2 ref={tituloRef} tabIndex={-1} className={styles.subtitulo}>
+        Digite o código
+      </h2>
+      <p className={styles.texto}>Enviamos um código de 6 dígitos para {emailMascarado}.</p>
+      <form className={styles.formulario} onSubmit={enviar} noValidate>
+        <div className={styles.grupo}>
+          <label className={styles.rotulo} htmlFor={`${id}-codigo`}>
+            Código de 6 dígitos
+          </label>
+          <input
+            ref={campo}
+            id={`${id}-codigo`}
+            className={styles.campo}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]*"
+            required
+            value={codigo}
+            onChange={(e) => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            aria-invalid={erro?.tipo === 'errado' || erro?.tipo === 'incompleto' || undefined}
+            aria-describedby={erro ? `${id}-erro` : undefined}
+          />
+        </div>
+        {erro && (
+          <p id={`${id}-erro`} role="alert" className={styles.erro}>
+            {mensagemDoCodigo(erro)}
+          </p>
+        )}
+        <AvisoDeEspera ativo={pendente} />
+        <div className={styles.botoes}>
+          {erro?.tipo === 'vencido' ? (
+            <button type="button" className={buttonClassName()} disabled={pendente} onClick={() => void pedirNovo()}>
+              Enviar novo código
+            </button>
+          ) : (
+            <button type="submit" className={buttonClassName()} disabled={pendente}>
+              Confirmar
+            </button>
+          )}
+          <button type="button" className={buttonClassName({ estilo: 'contorno' })} onClick={onOutroEmail}>
+            Usar outro e-mail
+          </button>
+        </div>
+        <p className={styles.legal} aria-live="polite">
+          {espera > 0 ? (
+            <>Não chegou? Confira o spam ou reenvie em {espera} s.</>
+          ) : (
+            <>
+              Não chegou? Confira o spam.{' '}
+              <button type="button" className={styles.link} disabled={pendente} onClick={() => void pedirNovo()}>
+                Reenviar código
+              </button>
+            </>
+          )}
+        </p>
       </form>
     </>
   );

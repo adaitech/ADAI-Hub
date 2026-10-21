@@ -388,3 +388,27 @@ describe('respostasParaApi e podeEnviar', () => {
     expect(podeEnviar({ ...e, marcadas: [] }, [])).toBe(true);
   });
 });
+
+describe('passo do código por e-mail', () => {
+  const enviado = { tipo: 'codigoEnviado', email: 'ana@email.com', emailMascarado: 'a***@email.com' } as const;
+
+  it('código enviado: vai para "codigo" guardando o e-mail só na memória', () => {
+    const e = reducer(nota({ estado: 'email' }), enviado);
+    expect(e).toMatchObject({ estado: 'codigo', verificacao: { email: 'ana@email.com', emailMascarado: 'a***@email.com' } });
+    expect(JSON.stringify(progressoDe(e))).not.toContain('ana@email.com');
+  });
+
+  it('"Usar outro e-mail" volta ao e-mail e esquece a verificação', () => {
+    expect(reducer(reducer(nota({ estado: 'email' }), enviado), { tipo: 'outroEmail' })).toMatchObject({ estado: 'email', verificacao: null });
+  });
+
+  it('identificado ou Primeiro acesso esquecem a verificação', () => {
+    const noCodigo = reducer(nota({ estado: 'email' }), enviado);
+    expect(reducer(noCodigo, { tipo: 'identificado', sessao: { emailMascarado: 'a***@email.com', dono: 'dono-a' } }).verificacao).toBeNull();
+    expect(reducer(noCodigo, { tipo: 'novoAluno', email: 'ana@email.com', turmas: [] }).verificacao).toBeNull();
+  });
+
+  it('começa sem verificação', () => {
+    expect(nota().verificacao).toBeNull();
+  });
+});
