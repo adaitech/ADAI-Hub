@@ -1155,6 +1155,16 @@ describe('Questionario — código por e-mail', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
+  it('5ª errada (sem tentativas restantes) → "Este código não vale mais" e "Enviar novo código", nunca "mais 0 tentativas"', async () => {
+    await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: false, erro: 'codigo', resultado: 'errado', restantes: 0 })) });
+    digitar('111111');
+    await confirmar();
+    expect(screen.getByRole('alert')).toHaveTextContent('Este código não vale mais. Enviamos um novo?');
+    expect(screen.getByRole('button', { name: 'Enviar novo código' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Confirmar' })).toBeNull();
+    expect(registrarEvento).toHaveBeenCalledWith('confirmar_codigo', { teste: 'dons-servico', resultado: 'errado' });
+  });
+
   it('"Reenviar código" só depois de 60 s', async () => {
     jest.useFakeTimers();
     const { acoes } = await irParaCodigo();

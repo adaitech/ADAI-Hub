@@ -407,7 +407,8 @@ export function ConfirmarCodigo({ email, emailMascarado, confirmar, reenviar, on
       if (!resposta.ok && resposta.erro === 'codigo') {
         onResultado(resposta.resultado);
         setCodigo('');
-        setErro(resposta.resultado === 'errado' ? { tipo: 'errado', restantes: resposta.restantes } : { tipo: 'vencido' });
+        // Errado sem tentativas restantes (5ª errada): o código já morreu, como no "esgotado".
+        setErro(resposta.resultado === 'errado' && resposta.restantes > 0 ? { tipo: 'errado', restantes: resposta.restantes } : { tipo: 'vencido' });
         campo.current?.focus();
         return;
       }
