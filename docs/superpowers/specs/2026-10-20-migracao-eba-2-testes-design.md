@@ -131,6 +131,8 @@ components/eba/Questionario/   ilha cliente: estados, progresso, sessionStorage
 
 ### 5.3 Sessão
 
+> **Atualização 21/10/2026:** antes de abrir a sessão (ou de cadastrar), o e-mail é comprovado por um código de 6 dígitos enviado pelo MailerSend; o aparelho verificado fica lembrado por 30 dias. Desenho em `2026-10-21-migracao-eba-2-codigo-por-email-design.md`.
+
 - **Conteúdo do cookie `eba_sessao`:** `idStudent`, `idClass`, o e-mail mascarado para exibição (`a***@email.com`) e `emitidoEm`, com assinatura HMAC.
 - **Atributos:** `httpOnly`, `secure` em produção, `sameSite=lax`, `path=/eba/testes` e **sem** `maxAge`, ou seja, um cookie de sessão.
 - **Validade:** o servidor recusa a sessão se `agora − emitidoEm > 2 h` e a apaga. A tela mostra "Sua sessão foi encerrada".
