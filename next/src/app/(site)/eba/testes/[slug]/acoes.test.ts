@@ -1,5 +1,9 @@
 /** @jest-environment node */
-import { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair, sessaoAtual } from './acoes';
+import { aquecer, cadastrar, carregarPerguntas, confirmarCodigo, enviar, pedirCodigo, retomarCadastro, sair, sessaoAtual } from './acoes';
+import { assinarMarca, COOKIE_APARELHO, COOKIE_EMAIL_VERIFICADO } from '@/lib/eba/aparelho';
+import { hashDoCodigo, hashDoEmail } from '@/lib/eba/verificacao';
+import { EmailIndisponivel, emailConfigurado, enviarEmail } from '@/lib/email/mailersend';
+import { conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada } from '@/lib/strapi/verificacao';
 import { assinarSessao, COOKIE_SESSAO, donoDaSessao, OPCOES_COOKIE } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno } from '@/lib/eba-api/alunos';
 import { EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida, ebaApiConfigurada } from '@/lib/eba-api/client';
@@ -27,6 +31,17 @@ jest.mock('@/lib/eba-api/client', () => ({
 jest.mock('@/lib/eba-api/perguntas', () => ({ perguntasDoTeste: jest.fn() }));
 jest.mock('@/lib/eba-api/respostas', () => ({ enviarRespostas: jest.fn() }));
 jest.mock('@/lib/eba-api/turmas', () => ({ turmasAtivas: jest.fn(), aquecerApi: jest.fn() }));
+jest.mock('@/lib/strapi/verificacao', () => ({
+  ...jest.requireActual('@/lib/strapi/verificacao'),
+  emitirVerificacao: jest.fn(),
+  conferirVerificacao: jest.fn(),
+  verificacaoConfigurada: jest.fn(),
+}));
+jest.mock('@/lib/email/mailersend', () => ({
+  ...jest.requireActual('@/lib/email/mailersend'),
+  enviarEmail: jest.fn(),
+  emailConfigurado: jest.fn(),
+}));
 // Envio único real, recriado a cada teste (o guardado é do módulo e não deve vazar entre testes).
 jest.mock('@/lib/eba/envio-unico', () => {
   const real = jest.requireActual('@/lib/eba/envio-unico');
@@ -55,6 +70,11 @@ const perguntasMock = jest.mocked(perguntasDoTeste);
 const enviarMock = jest.mocked(enviarRespostas);
 const configuradaMock = jest.mocked(ebaApiConfigurada);
 const aquecerApiMock = jest.mocked(aquecerApi);
+const emitirMock = jest.mocked(emitirVerificacao);
+const conferirMock = jest.mocked(conferirVerificacao);
+const verificacaoConfiguradaMock = jest.mocked(verificacaoConfigurada);
+const enviarEmailMock = jest.mocked(enviarEmail);
+const emailConfiguradoMock = jest.mocked(emailConfigurado);
 /** Timeouts esperados (API fria): ações 45 s, envio 60 s. */
 const ACAO = { timeoutMs: 45_000 };
 const ENVIO = { timeoutMs: 60_000 };
@@ -68,9 +88,19 @@ function sessaoValida(emitidoEm = Date.now()) {
     SEGREDO,
   );
 }
-function comSessao(valor: string | undefined) {
-  cookieGet.mockImplementation((nome: string) => (nome === COOKIE_SESSAO && valor ? { value: valor } : undefined));
+/** Cookies que o servidor recebe neste teste (nome → valor). */
+let cookiesDoPedido: Record<string, string> = {};
+function comCookie(nome: string, valor: string | undefined) {
+  if (valor) cookiesDoPedido[nome] = valor;
+  else delete cookiesDoPedido[nome];
+  cookieGet.mockImplementation((n: string) => (cookiesDoPedido[n] ? { value: cookiesDoPedido[n] } : undefined));
 }
+function comSessao(valor: string | undefined) {
+  comCookie(COOKIE_SESSAO, valor);
+}
+/** Marca assinada para o e-mail (aparelho lembrado ou e-mail verificado). */
+const marca = (email: string, emitidoEm = Date.now()) => assinarMarca(hashDoEmail(email, SEGREDO), SEGREDO, emitidoEm);
+const nomesGravados = () => cookieSet.mock.calls.map(([nome]) => nome);
 const perguntas = (n: number) => Array.from({ length: n }, (_, i) => ({ numero: i + 1, texto: `p${i + 1}` }));
 const notas = (n: number, nota: number) => Array.from({ length: n }, (_, i) => ({ numero: i + 1, nota }));
 
@@ -86,8 +116,13 @@ beforeEach(() => {
   // IP distinto por teste (último item: o que o ingress acrescenta): o limitador é do módulo e não deve vazar entre testes
   delete process.env.EBA_PROXIES_CONFIAVEIS;
   headerGet.mockImplementation(() => `1.1.1.1, 10.0.0.${++ipSeq}`);
+  cookiesDoPedido = {};
   comSessao(undefined);
   turmasMock.mockResolvedValue(TURMAS);
+  verificacaoConfiguradaMock.mockReturnValue(true);
+  emailConfiguradoMock.mockReturnValue(true);
+  emitirMock.mockResolvedValue('emitido');
+  enviarEmailMock.mockResolvedValue(undefined);
   warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
   log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
   error = jest.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -96,54 +131,88 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe('identificar', () => {
-  it('e-mail existente: grava o cookie assinado e devolve só o e-mail mascarado e o dono opaco', async () => {
-    alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
-    const r = await identificar(`  ${EMAIL.toUpperCase()} `);
-    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
-    expect(JSON.stringify(r)).not.toMatch(/aluno-1|turma-1/);
-    expect(cookieSet).toHaveBeenCalledTimes(1);
-    const [nome, valor, opcoes] = cookieSet.mock.calls[0];
-    expect(nome).toBe(COOKIE_SESSAO);
-    expect(opcoes).toEqual(OPCOES_COOKIE);
-    expect(valor).toMatch(/^[\w-]+\.[\w-]+$/);
-  });
+describe('pedirCodigo', () => {
+  const ENVIADO = { ok: true, dados: { codigoEnviado: true, emailMascarado: 'a***@exemplo.com' } };
 
-  it('usa 45 s (API fria) na busca do aluno e das turmas', async () => {
-    alunoPorEmailMock.mockResolvedValue(null);
-    await identificar(EMAIL);
-    expect(alunoPorEmailMock).toHaveBeenCalledWith(EMAIL, ACAO);
-    expect(turmasMock).toHaveBeenCalledWith(ACAO);
-  });
-
-  it('e-mail novo: devolve as turmas e não grava cookie', async () => {
-    alunoPorEmailMock.mockResolvedValue(null);
-    const r = await identificar(EMAIL);
-    expect(r).toEqual({ ok: true, dados: { novo: true, turmas: TURMAS } });
-    expect(cookieSet).not.toHaveBeenCalled();
-  });
-
-  it('e-mail novo com turmasAtivas() falhando → indisponivel', async () => {
-    alunoPorEmailMock.mockResolvedValue(null);
-    turmasMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
-    expect(cookieSet).not.toHaveBeenCalled();
-  });
-
-  it('e-mail inválido ou com mais de 254 caracteres → invalido, sem chamar a API', async () => {
-    expect(await identificar('nao-e-email')).toEqual({ ok: false, erro: 'invalido' });
-    expect(await identificar(`${'a'.repeat(250)}@x.com`)).toEqual({ ok: false, erro: 'invalido' });
-    expect(await identificar(undefined as unknown as string)).toEqual({ ok: false, erro: 'invalido' });
+  it.each([
+    ['cadastrado', { idStudent: 'aluno-1', idClass: 'turma-1' }],
+    ['não cadastrado', null],
+  ])('e-mail %s sem aparelho lembrado: a mesma resposta, código enviado e nada da API da EBA', async (_n, aluno) => {
+    alunoPorEmailMock.mockResolvedValue(aluno);
+    expect(await pedirCodigo(`  ${EMAIL.toUpperCase()} `)).toEqual(ENVIADO);
     expect(alunoPorEmailMock).not.toHaveBeenCalled();
+    expect(enviarEmailMock).toHaveBeenCalledTimes(1);
+    const [email] = enviarEmailMock.mock.calls[0];
+    expect(email.para).toBe(EMAIL);
+    const codigo = email.assunto.match(/(\d{6})$/)?.[1] ?? '';
+    expect(codigo).toMatch(/^\d{6}$/);
+    const emitido = emitirMock.mock.calls[0][0];
+    expect(emitido.emailHash).toBe(hashDoEmail(EMAIL, SEGREDO));
+    expect(emitido.codigoHash).toBe(hashDoCodigo(emitido.emailHash, codigo, SEGREDO));
+    expect(emitido.expiraEm.getTime() - Date.now()).toBeGreaterThan(590_000);
+    expect(cookieSet).not.toHaveBeenCalled();
+  });
+
+  it('limite de envios no Strapi: mesma resposta e nenhum e-mail', async () => {
+    emitirMock.mockResolvedValue('limite');
+    expect(await pedirCodigo(EMAIL)).toEqual(ENVIADO);
+    expect(enviarEmailMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['MailerSend fora', () => enviarEmailMock.mockRejectedValue(new EmailIndisponivel(500))],
+    ['Strapi fora', () => emitirMock.mockRejectedValue(new VerificacaoIndisponivel(500))],
+  ])('%s → indisponivel, sem o e-mail no log', async (_n, preparar) => {
+    preparar();
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(JSON.stringify([warn.mock.calls, log.mock.calls, error.mock.calls])).not.toContain('ana.silva');
+  });
+
+  it('aparelho lembrado para o mesmo e-mail: segue sem código (aluno cadastrado → sessão)', async () => {
+    comCookie(COOKIE_APARELHO, marca(EMAIL));
+    alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
+    const r = await pedirCodigo(`  ${EMAIL.toUpperCase()} `);
+    expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
+    expect(alunoPorEmailMock).toHaveBeenCalledWith(EMAIL, ACAO);
+    expect(enviarEmailMock).not.toHaveBeenCalled();
+    expect(nomesGravados()).toContain(COOKIE_SESSAO);
+  });
+
+  it('aparelho lembrado e e-mail sem cadastro: devolve as turmas e marca o e-mail como verificado', async () => {
+    comCookie(COOKIE_APARELHO, marca(EMAIL));
+    alunoPorEmailMock.mockResolvedValue(null);
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: true, dados: { novo: true, turmas: TURMAS } });
+    expect(turmasMock).toHaveBeenCalledWith(ACAO);
+    expect(nomesGravados()).toEqual([COOKIE_EMAIL_VERIFICADO]);
+  });
+
+  it('aparelho lembrado da ana e outra pessoa digita outro e-mail: manda código', async () => {
+    comCookie(COOKIE_APARELHO, marca(EMAIL));
+    expect(await pedirCodigo('alice@exemplo.com')).toEqual({ ok: true, dados: { codigoEnviado: true, emailMascarado: 'a***@exemplo.com' } });
+    expect(enviarEmailMock).toHaveBeenCalledTimes(1);
+    expect(alunoPorEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('aparelho lembrado vencido (30 dias + 1 ms): manda código', async () => {
+    comCookie(COOKIE_APARELHO, marca(EMAIL, Date.now() - 2_592_000_001));
+    expect(await pedirCodigo(EMAIL)).toEqual(ENVIADO);
+  });
+
+  it('e-mail inválido ou com mais de 254 caracteres → invalido, sem enviar nada', async () => {
+    expect(await pedirCodigo('nao-e-email')).toEqual({ ok: false, erro: 'invalido' });
+    expect(await pedirCodigo(`${'a'.repeat(250)}@x.com`)).toEqual({ ok: false, erro: 'invalido' });
+    expect(await pedirCodigo(undefined as unknown as string)).toEqual({ ok: false, erro: 'invalido' });
+    expect(emitirMock).not.toHaveBeenCalled();
+    expect(enviarEmailMock).not.toHaveBeenCalled();
   });
 
   it('a 11ª chamada no minuto, do mesmo IP, devolve limite antes de validar ou chamar a API', async () => {
     headerGet.mockReturnValue('8.8.8.8, 9.9.9.9');
     alunoPorEmailMock.mockResolvedValue(null);
-    for (let i = 0; i < 10; i++) expect((await identificar(EMAIL)).ok).toBe(true);
+    for (let i = 0; i < 10; i++) expect((await pedirCodigo(EMAIL)).ok).toBe(true);
     alunoPorEmailMock.mockClear();
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'limite' });
-    expect(await identificar('lixo')).toEqual({ ok: false, erro: 'limite' });
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'limite' });
+    expect(await pedirCodigo('lixo')).toEqual({ ok: false, erro: 'limite' });
     expect(alunoPorEmailMock).not.toHaveBeenCalled();
   });
 
@@ -151,8 +220,8 @@ describe('identificar', () => {
     let forjado = 0;
     headerGet.mockImplementation(() => `6.6.${++forjado}.1, 4.4.4.4`);
     alunoPorEmailMock.mockResolvedValue(null);
-    for (let i = 0; i < 10; i++) expect((await identificar(EMAIL)).ok).toBe(true);
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'limite' });
+    for (let i = 0; i < 10; i++) expect((await pedirCodigo(EMAIL)).ok).toBe(true);
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'limite' });
   });
 
   it('EBA_PROXIES_CONFIAVEIS=2: a chave é o penúltimo item (cliente antes do Front Door + ingress)', async () => {
@@ -160,45 +229,136 @@ describe('identificar', () => {
     let proxy = 0;
     headerGet.mockImplementation(() => `3.3.3.3, 10.9.9.${++proxy}`);
     alunoPorEmailMock.mockResolvedValue(null);
-    for (let i = 0; i < 10; i++) expect((await identificar(EMAIL)).ok).toBe(true);
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'limite' });
+    for (let i = 0; i < 10; i++) expect((await pedirCodigo(EMAIL)).ok).toBe(true);
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'limite' });
   });
 
   it('sem x-forwarded-for usa a chave local', async () => {
     headerGet.mockReturnValue(null);
     alunoPorEmailMock.mockResolvedValue(null);
-    expect((await identificar(EMAIL)).ok).toBe(true);
+    expect((await pedirCodigo(EMAIL)).ok).toBe(true);
   });
 
-  it('falha da API → indisponivel', async () => {
-    alunoPorEmailMock.mockRejectedValue(new EbaApiError(503, null));
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+  it.each([
+    ['sem token do MailerSend', () => emailConfiguradoMock.mockReturnValue(false)],
+    ['sem token das verificações', () => verificacaoConfiguradaMock.mockReturnValue(false)],
+    ['API da EBA não configurada', () => configuradaMock.mockReturnValue(false)],
+    ['sem segredo', () => delete process.env.EBA_SESSAO_SEGREDO],
+  ])('%s → indisponivel, sem enviar nada', async (_n, preparar) => {
+    preparar();
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(enviarEmailMock).not.toHaveBeenCalled();
+    expect(emitirMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('confirmarCodigo', () => {
+  const emailHash = () => hashDoEmail(EMAIL, SEGREDO);
+
+  it('código colado com espaço ou traço: confere só os 6 dígitos', async () => {
+    conferirMock.mockResolvedValue({ resultado: 'errado', restantes: 4 });
+    await confirmarCodigo(EMAIL, ' 123 456\n');
+    await confirmarCodigo(EMAIL, '123-456');
+    for (const [chamada] of conferirMock.mock.calls) {
+      expect(chamada).toEqual({ emailHash: emailHash(), codigoHash: hashDoCodigo(emailHash(), '123456', SEGREDO) });
+    }
   });
 
-  it('Student com formato inválido → indisponivel, sem cookie', async () => {
-    alunoPorEmailMock.mockRejectedValue(new EbaApiRespostaInvalida('Student (GET) sem id/idClass'));
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
-    expect(cookieSet).not.toHaveBeenCalled();
+  it.each(['12345', '1234567', 'abcdef', ''])('código %j → invalido sem chamar o Strapi', async (codigo) => {
+    expect(await confirmarCodigo(EMAIL, codigo)).toEqual({ ok: false, erro: 'invalido' });
+    expect(conferirMock).not.toHaveBeenCalled();
   });
 
-  it.each([undefined, '', 'curto'])('segredo ausente ou curto (%p) → indisponivel, sem cookie', async (segredo) => {
-    if (segredo === undefined) delete process.env.EBA_SESSAO_SEGREDO;
-    else process.env.EBA_SESSAO_SEGREDO = segredo;
+  it('certo + aluno cadastrado: abre a sessão e lembra o aparelho por 30 dias', async () => {
+    conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 4 });
     alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
-    expect(cookieSet).not.toHaveBeenCalled();
+    expect(await confirmarCodigo(` ${EMAIL.toUpperCase()}`, '123456')).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
+    expect(cookieSet).toHaveBeenCalledWith(COOKIE_SESSAO, expect.any(String), OPCOES_COOKIE);
+    expect(cookieSet).toHaveBeenCalledWith(COOKIE_APARELHO, expect.any(String), { ...OPCOES_COOKIE, maxAge: 2_592_000 });
   });
 
-  it('API não configurada → indisponivel sem chamar a API', async () => {
-    configuradaMock.mockReturnValue(false);
-    expect(await identificar(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+  it('certo + e-mail novo: devolve as turmas e marca o e-mail como verificado por 15 min', async () => {
+    conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 4 });
+    alunoPorEmailMock.mockResolvedValue(null);
+    expect(await confirmarCodigo(EMAIL, '123456')).toEqual({ ok: true, dados: { novo: true, turmas: TURMAS } });
+    expect(cookieSet).toHaveBeenCalledWith(COOKIE_EMAIL_VERIFICADO, expect.any(String), { ...OPCOES_COOKIE, maxAge: 900 });
+    expect(nomesGravados()).not.toContain(COOKIE_SESSAO);
+  });
+
+  it.each([
+    [{ resultado: 'errado', restantes: 3 }],
+    [{ resultado: 'vencido', restantes: 0 }],
+    [{ resultado: 'esgotado', restantes: 0 }],
+  ] as const)('%j → erro "codigo" com o resultado, sem cookie nem API da EBA', async (conferido) => {
+    conferirMock.mockResolvedValue(conferido);
+    expect(await confirmarCodigo(EMAIL, '123456')).toEqual({ ok: false, erro: 'codigo', ...conferido });
+    expect(cookieSet).not.toHaveBeenCalled();
+    expect(alunoPorEmailMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['Strapi fora', () => conferirMock.mockRejectedValue(new VerificacaoIndisponivel())],
+    ['API da EBA fora depois do código certo', () => {
+      conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 4 });
+      alunoPorEmailMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
+    }],
+  ])('%s → indisponivel, sem sessão', async (_n, preparar) => {
+    preparar();
+    expect(await confirmarCodigo(EMAIL, '123456')).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(nomesGravados()).not.toContain(COOKIE_SESSAO);
+  });
+
+  it('e-mail inválido → invalido', async () => {
+    expect(await confirmarCodigo('nao-e-email', '123456')).toEqual({ ok: false, erro: 'invalido' });
+  });
+});
+
+describe('retomarCadastro', () => {
+  it('com o e-mail verificado: devolve as turmas de novo', async () => {
+    comCookie(COOKIE_EMAIL_VERIFICADO, marca(EMAIL));
+    alunoPorEmailMock.mockResolvedValue(null);
+    expect(await retomarCadastro(EMAIL)).toEqual({ ok: true, dados: { novo: true, turmas: TURMAS } });
+  });
+
+  it('com o e-mail verificado e o aluno já cadastrado (outro aparelho): abre a sessão', async () => {
+    comCookie(COOKIE_EMAIL_VERIFICADO, marca(EMAIL));
+    alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
+    expect(await retomarCadastro(EMAIL)).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
+  });
+
+  it.each([
+    ['sem marca', undefined],
+    ['marca de outro e-mail', 'alice@exemplo.com'],
+  ])('%s → verificacao, sem chamar a API', async (_n, outro) => {
+    if (outro) comCookie(COOKIE_EMAIL_VERIFICADO, marca(outro));
+    expect(await retomarCadastro(EMAIL)).toEqual({ ok: false, erro: 'verificacao' });
     expect(alunoPorEmailMock).not.toHaveBeenCalled();
   });
 });
 
 describe('cadastrar', () => {
   const dados = { email: EMAIL, nome: '  Ana Silva ', unidade: 'colorado', idTurma: 'turma-1' };
-  beforeEach(() => alunoPorEmailMock.mockResolvedValue(null));
+  beforeEach(() => {
+    alunoPorEmailMock.mockResolvedValue(null);
+    comCookie(COOKIE_EMAIL_VERIFICADO, marca(EMAIL));
+  });
+
+  it.each([
+    ['sem e-mail verificado', undefined],
+    ['com a marca de outro e-mail', 'alice@exemplo.com'],
+  ])('%s → verificacao, sem chamar a API', async (_n, outro) => {
+    comCookie(COOKIE_EMAIL_VERIFICADO, outro ? marca(outro) : undefined);
+    expect(await cadastrar(dados)).toEqual({ ok: false, erro: 'verificacao' });
+    expect(alunoPorEmailMock).not.toHaveBeenCalled();
+    expect(cadastrarAlunoMock).not.toHaveBeenCalled();
+  });
+
+  it('ao abrir a sessão: lembra o aparelho e apaga a marca do e-mail verificado', async () => {
+    cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
+    await cadastrar(dados);
+    expect(nomesGravados()).toEqual(expect.arrayContaining([COOKIE_SESSAO, COOKIE_APARELHO]));
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_EMAIL_VERIFICADO, path: OPCOES_COOKIE.path });
+  });
 
   it('confere o e-mail (normalizado) antes do POST', async () => {
     cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
@@ -622,13 +782,13 @@ describe('aquecer', () => {
     expect(aquecerApiMock).not.toHaveBeenCalled();
   });
 
-  it('limite próprio de 5 por minuto por IP: a 6ª não chama a API e não gasta o limite do identificar', async () => {
+  it('limite próprio de 5 por minuto por IP: a 6ª não chama a API e não gasta o limite do pedirCodigo', async () => {
     headerGet.mockReturnValue('8.8.8.8, 5.5.5.5');
     aquecerApiMock.mockResolvedValue(undefined);
     for (let i = 0; i < 6; i++) await aquecer();
     expect(aquecerApiMock).toHaveBeenCalledTimes(5);
     alunoPorEmailMock.mockResolvedValue(null);
-    expect((await identificar(EMAIL)).ok).toBe(true);
+    expect((await pedirCodigo(EMAIL)).ok).toBe(true);
   });
 
   it('API não configurada → não chama a API', async () => {
@@ -680,7 +840,7 @@ describe('carregarPerguntas', () => {
     expect(perguntasMock).not.toHaveBeenCalled();
   });
 
-  it('usa o limite por IP do identificar', async () => {
+  it('usa o limite por IP do pedirCodigo', async () => {
     headerGet.mockReturnValue('6.6.6.6');
     perguntasMock.mockResolvedValue(perguntas(3));
     for (let i = 0; i < 10; i++) expect((await carregarPerguntas('dons-servico')).ok).toBe(true);
@@ -689,9 +849,10 @@ describe('carregarPerguntas', () => {
 });
 
 describe('sair e sessaoAtual', () => {
-  it('sair apaga o cookie no mesmo path', async () => {
+  it('sair apaga a sessão e esquece o aparelho, no mesmo path', async () => {
     await sair();
     expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_APARELHO, path: OPCOES_COOKIE.path });
   });
 
   it('sessaoAtual devolve só o e-mail mascarado', async () => {
@@ -747,13 +908,16 @@ describe('sair e sessaoAtual', () => {
 describe('privacidade dos logs', () => {
   it('nenhum console.* recebe o e-mail, o nome ou ids, em nenhuma ação', async () => {
     const nome = 'Ana Silva Secreta';
+    // Aparelho lembrado: o pedirCodigo chega à API da EBA; e-mail verificado: o cadastrar também.
+    comCookie(COOKIE_APARELHO, marca(EMAIL));
+    comCookie(COOKIE_EMAIL_VERIFICADO, marca(EMAIL));
     alunoPorEmailMock.mockRejectedValueOnce(new EbaApiError(503, 'COD'));
-    await identificar(EMAIL);
+    await pedirCodigo(EMAIL);
     alunoPorEmailMock.mockRejectedValueOnce(new EbaApiIndisponivel('rede'));
-    await identificar(EMAIL);
+    await pedirCodigo(EMAIL);
     alunoPorEmailMock.mockResolvedValueOnce(null);
     turmasMock.mockRejectedValueOnce(new EbaApiIndisponivel('rede'));
-    await identificar(EMAIL);
+    await pedirCodigo(EMAIL);
     cadastrarAlunoMock.mockRejectedValueOnce(new EbaApiError(400, 'COD'));
     await cadastrar({ email: EMAIL, nome, unidade: 'colorado', idTurma: 'turma-1' });
     comSessao(sessaoValida());

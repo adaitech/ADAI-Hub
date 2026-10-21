@@ -3,6 +3,16 @@
 import { createHash } from 'node:crypto';
 import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
+import { emailDoCodigo } from '@/lib/eba/codigo-email';
+import {
+  assinarMarca,
+  COOKIE_APARELHO,
+  COOKIE_EMAIL_VERIFICADO,
+  lerMarca,
+  opcoesCookieMarca,
+  VALIDADE_APARELHO_MS,
+  VALIDADE_EMAIL_VERIFICADO_MS,
+} from '@/lib/eba/aparelho';
 import { criarEnvioUnico } from '@/lib/eba/envio-unico';
 import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
 import {
@@ -29,11 +39,17 @@ import { perguntasDoTeste, type Pergunta } from '@/lib/eba-api/perguntas';
 import { enviarRespostas, type Resultado } from '@/lib/eba-api/respostas';
 import { definicaoDoTeste, UNIDADES, usaPerguntasDaApi, type SlugTeste } from '@/lib/eba-api/testes';
 import { aquecerApi, turmasAtivas, type Turma } from '@/lib/eba-api/turmas';
+import { gerarCodigo, hashDoCodigo, hashDoEmail, soDigitos, VALIDADE_CODIGO_MS } from '@/lib/eba/verificacao';
+import { emailConfigurado, enviarEmail } from '@/lib/email/mailersend';
+import { conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type ResultadoVerificacao } from '@/lib/strapi/verificacao';
 
 /**
  * Únicas ações que ligam a tela dos testes à API da EBA. Regras de segurança:
  * - ids do aluno só vêm da sessão assinada (cookie httpOnly), nunca do cliente;
- * - sem `EBA_SESSAO_SEGREDO` válido ou sem API configurada, tudo falha fechado (`indisponivel`);
+ * - sem `EBA_SESSAO_SEGREDO` válido, sem API, sem MailerSend ou sem o token das verificações, tudo
+ *   falha fechado (`indisponivel`);
+ * - sessão e cadastro só depois do código de 6 dígitos enviado ao e-mail (ou do aparelho já
+ *   verificado para o mesmo e-mail); a resposta ao pedir o código não revela se o e-mail é de aluno;
  * - logs só com classe do erro/status/código: nunca e-mail, nome ou ids.
  *
  * API fria: o banco da API pausa quando fica ocioso e a primeira chamada leva de 10 a 45 s. Por
@@ -43,9 +59,15 @@ import { aquecerApi, turmasAtivas, type Turma } from '@/lib/eba-api/turmas';
 
 export type RespostaAcao<T = undefined> =
   | { ok: true; dados?: T }
-  | { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao' | 'recusado' };
+  | { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
 
-type Falha = { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao' | 'recusado' };
+type Falha = { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
+
+/** Quem confirmou o código: sessão aberta (aluno cadastrado) ou turmas para o Primeiro acesso. */
+export type Identificado = SessaoVisivel | { novo: true; turmas: Turma[] };
+
+/** Código conferido e recusado: errado (com tentativas restantes), vencido ou esgotado. */
+export type FalhaCodigo = { ok: false; erro: 'codigo'; resultado: Exclude<ResultadoVerificacao['resultado'], 'ok'>; restantes: number };
 
 const falha = (erro: Falha['erro']): Falha => ({ ok: false, erro });
 
@@ -60,7 +82,7 @@ const ENVIO = { timeoutMs: TIMEOUT_ENVIO_MS };
 /** Segredo válido e API configurada; senão as ações falham fechado. */
 function configuracao(): { segredo: string } | null {
   const s = segredoDaSessao();
-  return s && ebaApiConfigurada() ? { segredo: s } : null;
+  return s && ebaApiConfigurada() && emailConfigurado() && verificacaoConfigurada() ? { segredo: s } : null;
 }
 
 function registrarFalha(acao: string, erro: unknown): void {
@@ -89,8 +111,29 @@ export type SessaoVisivel = { emailMascarado: string; dono: string };
 async function abrirSessao(aluno: { idStudent: string; idClass: string }, email: string, chave: string): Promise<SessaoVisivel> {
   const emailMascarado = mascararEmail(email);
   const sessao: SessaoAluno = { ...aluno, emailMascarado, emitidoEm: Date.now() };
-  (await cookies()).set(COOKIE_SESSAO, assinarSessao(sessao, chave), OPCOES_COOKIE);
+  const cofre = await cookies();
+  cofre.set(COOKIE_SESSAO, assinarSessao(sessao, chave), OPCOES_COOKIE);
+  cofre.set(COOKIE_APARELHO, assinarMarca(hashDoEmail(email, chave), chave, Date.now()), opcoesCookieMarca(VALIDADE_APARELHO_MS));
+  cofre.delete({ name: COOKIE_EMAIL_VERIFICADO, path: OPCOES_COOKIE.path });
   return { emailMascarado, dono: donoDaSessao(aluno.idStudent, chave) };
+}
+
+/** Marca assinada do cookie `nome`, se for do mesmo e-mail e estiver na validade. */
+async function marcaDoEmail(nome: string, validadeMs: number, emailHash: string, segredo: string): Promise<boolean> {
+  const marca = lerMarca((await cookies()).get(nome)?.value, segredo, Date.now(), validadeMs);
+  return marca?.emailHash === emailHash;
+}
+
+/**
+ * E-mail comprovado (código certo, aparelho lembrado ou e-mail verificado): aluno cadastrado → sessão;
+ * sem cadastro → turmas do Primeiro acesso e a marca `eba_email_verificado` (15 min) para o `cadastrar`.
+ */
+async function seguirVerificado(email: string, segredo: string): Promise<Identificado> {
+  const aluno = await alunoPorEmail(email, ACAO);
+  if (aluno) return abrirSessao(aluno, email, segredo);
+  const turmas = await turmasAtivas(ACAO);
+  (await cookies()).set(COOKIE_EMAIL_VERIFICADO, assinarMarca(hashDoEmail(email, segredo), segredo, Date.now()), opcoesCookieMarca(VALIDADE_EMAIL_VERIFICADO_MS));
+  return { novo: true, turmas };
 }
 
 const esquemaEmail = z.string().trim().max(254).pipe(z.email());
@@ -114,9 +157,14 @@ async function sessaoDoCookie(segredo: string): Promise<SessaoAluno | null> {
   return sessao;
 }
 
-export async function identificar(
+/**
+ * Primeiro passo da identificação. Aparelho já verificado para este e-mail → segue direto (sessão ou
+ * Primeiro acesso). Senão, gera o código, guarda só os hashes no Strapi e manda o e-mail; a resposta é
+ * a mesma para e-mail de aluno ou não, e também quando o limite de envios do e-mail já foi atingido.
+ */
+export async function pedirCodigo(
   email: string,
-): Promise<RespostaAcao<SessaoVisivel | { novo: true; turmas: Turma[] }>> {
+): Promise<RespostaAcao<Identificado | { codigoEnviado: true; emailMascarado: string }>> {
   if (!(await dentroDoLimite())) return falha('limite');
   const config = configuracao();
   if (!config) return falha('indisponivel');
@@ -124,15 +172,65 @@ export async function identificar(
   const valido = esquemaEmail.safeParse(email);
   if (!valido.success) return falha('invalido');
   const emailNormalizado = normalizarEmail(valido.data);
+  const emailHash = hashDoEmail(emailNormalizado, config.segredo);
 
   try {
-    const aluno = await alunoPorEmail(emailNormalizado, ACAO);
-    if (aluno) {
-      return { ok: true, dados: await abrirSessao(aluno, emailNormalizado, config.segredo) };
+    if (await marcaDoEmail(COOKIE_APARELHO, VALIDADE_APARELHO_MS, emailHash, config.segredo)) {
+      return { ok: true, dados: await seguirVerificado(emailNormalizado, config.segredo) };
     }
-    return { ok: true, dados: { novo: true, turmas: await turmasAtivas(ACAO) } };
+    const codigo = gerarCodigo();
+    const emitido = await emitirVerificacao({
+      emailHash,
+      codigoHash: hashDoCodigo(emailHash, codigo, config.segredo),
+      expiraEm: new Date(Date.now() + VALIDADE_CODIGO_MS),
+    });
+    if (emitido === 'emitido') await enviarEmail({ para: emailNormalizado, ...emailDoCodigo(codigo) });
+    return { ok: true, dados: { codigoEnviado: true, emailMascarado: mascararEmail(emailNormalizado) } };
   } catch (erro) {
-    registrarFalha('identificar', erro);
+    registrarFalha('pedirCodigo', erro);
+    return falha('indisponivel');
+  }
+}
+
+/** Confere o código digitado (só os 6 dígitos contam). Certo → sessão ou Primeiro acesso. */
+export async function confirmarCodigo(email: string, codigo: string): Promise<RespostaAcao<Identificado> | FalhaCodigo> {
+  if (!(await dentroDoLimite())) return falha('limite');
+  const config = configuracao();
+  if (!config) return falha('indisponivel');
+
+  const valido = esquemaEmail.safeParse(email);
+  const digitos = soDigitos(codigo);
+  if (!valido.success || !digitos) return falha('invalido');
+  const emailNormalizado = normalizarEmail(valido.data);
+  const emailHash = hashDoEmail(emailNormalizado, config.segredo);
+
+  try {
+    const conferido = await conferirVerificacao({ emailHash, codigoHash: hashDoCodigo(emailHash, digitos, config.segredo) });
+    if (conferido.resultado !== 'ok') return { ok: false, erro: 'codigo', resultado: conferido.resultado, restantes: conferido.restantes };
+    return { ok: true, dados: await seguirVerificado(emailNormalizado, config.segredo) };
+  } catch (erro) {
+    registrarFalha('confirmarCodigo', erro);
+    return falha('indisponivel');
+  }
+}
+
+/** "Tentar de novo" do Primeiro acesso: exige o e-mail verificado (marca de 15 min). */
+export async function retomarCadastro(email: string): Promise<RespostaAcao<Identificado>> {
+  if (!(await dentroDoLimite())) return falha('limite');
+  const config = configuracao();
+  if (!config) return falha('indisponivel');
+
+  const valido = esquemaEmail.safeParse(email);
+  if (!valido.success) return falha('invalido');
+  const emailNormalizado = normalizarEmail(valido.data);
+  if (!(await marcaDoEmail(COOKIE_EMAIL_VERIFICADO, VALIDADE_EMAIL_VERIFICADO_MS, hashDoEmail(emailNormalizado, config.segredo), config.segredo))) {
+    return falha('verificacao');
+  }
+
+  try {
+    return { ok: true, dados: await seguirVerificado(emailNormalizado, config.segredo) };
+  } catch (erro) {
+    registrarFalha('retomarCadastro', erro);
     return falha('indisponivel');
   }
 }
@@ -159,6 +257,9 @@ export async function cadastrar(dados: {
   if (!valido.success) return falha('invalido');
   const { nome, unidade, idTurma } = valido.data;
   const email = normalizarEmail(valido.data.email);
+  if (!(await marcaDoEmail(COOKIE_EMAIL_VERIFICADO, VALIDADE_EMAIL_VERIFICADO_MS, hashDoEmail(email, config.segredo), config.segredo))) {
+    return falha('verificacao');
+  }
 
   try {
     // E-mail já cadastrado (outra aba, clique duplo, cadastro feito em outro aparelho): abre a
@@ -303,8 +404,11 @@ export async function carregarPerguntas(slug: string): Promise<RespostaAcao<Perg
   }
 }
 
+/** Encerra a sessão e esquece o aparelho ("Não é você?" e "Sair"; celular compartilhado). */
 export async function sair(): Promise<void> {
-  (await cookies()).delete({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
+  const cofre = await cookies();
+  cofre.delete({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
+  cofre.delete({ name: COOKIE_APARELHO, path: OPCOES_COOKIE.path });
 }
 
 export async function sessaoAtual(): Promise<SessaoVisivel | null> {
