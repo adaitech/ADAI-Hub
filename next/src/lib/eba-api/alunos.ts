@@ -1,6 +1,6 @@
 import 'server-only';
 import { z } from 'zod';
-import { ebaFetch, EbaApiError, EbaApiRespostaInvalida } from './client';
+import { ebaFetch, EbaApiError, EbaApiRespostaInvalida, type OpcoesChamada } from './client';
 import type { EbaStudentApi, EbaStudentNovoApi } from './tipos';
 
 export interface AlunoIdentificado {
@@ -23,9 +23,9 @@ function alunoDaResposta(retorno: unknown, origem: 'GET' | 'POST'): AlunoIdentif
 }
 
 /** Aluno pelo e-mail; null se não existe (404). Nunca registra e-mail ou nome. */
-export async function alunoPorEmail(email: string): Promise<AlunoIdentificado | null> {
+export async function alunoPorEmail(email: string, opcoes: OpcoesChamada = {}): Promise<AlunoIdentificado | null> {
   try {
-    const aluno = await ebaFetch<EbaStudentApi>(`Student/email/${encodeURIComponent(normalizarEmail(email))}`);
+    const aluno = await ebaFetch<EbaStudentApi>(`Student/email/${encodeURIComponent(normalizarEmail(email))}`, { ...opcoes });
     return alunoDaResposta(aluno, 'GET');
   } catch (error) {
     if (error instanceof EbaApiError && error.status === 404) return null;
@@ -33,18 +33,21 @@ export async function alunoPorEmail(email: string): Promise<AlunoIdentificado | 
   }
 }
 
-export async function cadastrarAluno(dados: {
-  nome: string;
-  email: string;
-  unidade: string;
-  idTurma: string;
-}): Promise<AlunoIdentificado> {
+export async function cadastrarAluno(
+  dados: {
+    nome: string;
+    email: string;
+    unidade: string;
+    idTurma: string;
+  },
+  opcoes: OpcoesChamada = {},
+): Promise<AlunoIdentificado> {
   const corpo: EbaStudentNovoApi = {
     name: dados.nome,
     email: normalizarEmail(dados.email),
     room: dados.unidade,
     idClass: dados.idTurma,
   };
-  const aluno = await ebaFetch<EbaStudentApi>('Student', { metodo: 'POST', corpo });
+  const aluno = await ebaFetch<EbaStudentApi>('Student', { metodo: 'POST', corpo, ...opcoes });
   return alunoDaResposta(aluno, 'POST');
 }

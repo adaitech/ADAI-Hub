@@ -53,6 +53,8 @@ export interface EstadoQuestionario extends Progresso {
 
 export type Acao =
   | { tipo: 'restaurar'; progresso: Progresso | null }
+  /** Perguntas que chegaram depois da renderização (a busca do servidor falhou: API fria). */
+  | { tipo: 'perguntas'; perguntas: Pergunta[] }
   | { tipo: 'comecar' }
   | { tipo: 'identificado'; emailMascarado: string }
   | { tipo: 'novoAluno'; email: string; turmas: Turma[] }
@@ -92,7 +94,8 @@ export function paginaTemperamento(passo: number): { grupo: GrupoTemperamento; o
   return { grupo: pagina[0].grupo, opcoes: pagina.map(({ id, texto }) => ({ id, texto })) };
 }
 
-function telasDoTeste(tipo: TipoTeste, perguntas: Pergunta[]): number {
+/** Quantidade de telas de pergunta do teste. */
+export function telasDoTeste(tipo: TipoTeste, perguntas: Pergunta[]): number {
   switch (tipo) {
     case 'talentos':
       return 2;
@@ -156,6 +159,8 @@ export function reducer(s: EstadoQuestionario, a: Acao): EstadoQuestionario {
       const restaurado = { ...s, ...(progresso ?? {}), carregado: true };
       return s.emailMascarado ? assumir(restaurado, s.emailMascarado) : restaurado;
     }
+    case 'perguntas':
+      return { ...s, total: telasDoTeste(s.tipo, a.perguntas) };
     case 'comecar':
       return s.emailMascarado ? assumir({ ...s, estado: 'pergunta' }, s.emailMascarado) : { ...s, estado: 'email' };
     case 'identificado': {

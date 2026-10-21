@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import classes from './__fixtures__/classes.json';
 import { ebaFetch } from './client';
-import { turmasAtivas } from './turmas';
+import { aquecerApi, turmasAtivas } from './turmas';
 
 jest.mock('./client');
 const ebaFetchMock = jest.mocked(ebaFetch);
@@ -14,6 +14,15 @@ describe('turmasAtivas', () => {
     await turmasAtivas();
     expect(ebaFetchMock).toHaveBeenCalledWith('ClassEBA?page-size=100', {
       cache: { revalidate: 600, tags: ['eba-testes'] },
+    });
+  });
+
+  it('repassa timeoutMs ao ebaFetch, com o mesmo cache', async () => {
+    ebaFetchMock.mockResolvedValue(classes);
+    await turmasAtivas({ timeoutMs: 45_000 });
+    expect(ebaFetchMock).toHaveBeenCalledWith('ClassEBA?page-size=100', {
+      cache: { revalidate: 600, tags: ['eba-testes'] },
+      timeoutMs: 45_000,
     });
   });
 
@@ -37,5 +46,22 @@ describe('turmasAtivas', () => {
       ],
     });
     expect((await turmasAtivas()).map((t) => t.nome)).toEqual(['Álamo', 'Beta', 'Zeta']);
+  });
+});
+
+describe('aquecerApi', () => {
+  beforeEach(() => ebaFetchMock.mockReset());
+
+  it('faz um GET leve (ClassEBA?page-size=1) sem cache, com o timeout pedido, e não devolve dados', async () => {
+    ebaFetchMock.mockResolvedValue(classes);
+    await expect(aquecerApi({ timeoutMs: 45_000 })).resolves.toBeUndefined();
+    expect(ebaFetchMock).toHaveBeenCalledWith('ClassEBA?page-size=1', { timeoutMs: 45_000 });
+    expect(ebaFetchMock.mock.calls[0][1]).not.toHaveProperty('cache');
+  });
+
+  it('propaga o erro (quem chama decide ignorar)', async () => {
+    const erro = new Error('x');
+    ebaFetchMock.mockRejectedValue(erro);
+    await expect(aquecerApi()).rejects.toBe(erro);
   });
 });

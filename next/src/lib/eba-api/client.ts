@@ -1,7 +1,22 @@
 import 'server-only';
 import type { EbaErroApi } from './tipos';
 
-const TIMEOUT_MS = 10_000;
+/**
+ * Timeouts por tipo de chamada. O banco da API pausa quando fica ocioso e a primeira chamada depois
+ * da pausa leva de 10 a 45 s: só a renderização da página fica com 10 s (ela não pode travar).
+ */
+/** Perguntas buscadas ao renderizar a página (padrão de `ebaFetch`). */
+export const TIMEOUT_PAGINA_MS = 10_000;
+/** Chamadas dentro de Server Actions (identificar, cadastrar, carregar perguntas, aquecer). */
+export const TIMEOUT_ACAO_MS = 45_000;
+/** `POST SurveyResponse`. */
+export const TIMEOUT_ENVIO_MS = 60_000;
+
+/** Opção aceita pelas funções de `lib/eba-api`; sem ela, vale `TIMEOUT_PAGINA_MS`. */
+export interface OpcoesChamada {
+  timeoutMs?: number;
+}
+
 const PREFIXO = 'api/v1/eba';
 
 /** A API respondeu 4xx/5xx. A mensagem traz só o status e o código: nunca o corpo enviado nem a chave. */
@@ -44,7 +59,7 @@ export function ebaApiConfigurada(): boolean {
   return configuracao() !== null;
 }
 
-interface EbaFetchInit {
+interface EbaFetchInit extends OpcoesChamada {
   metodo?: 'GET' | 'POST';
   corpo?: unknown;
   cache?: { revalidate: number; tags: string[] };
@@ -70,7 +85,7 @@ export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Pro
       method: metodo,
       headers,
       ...(metodo === 'POST' ? { body: JSON.stringify(init.corpo ?? {}), cache: 'no-store' as const } : init.cache ? { next: init.cache } : { cache: 'no-store' as const }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(init.timeoutMs ?? TIMEOUT_PAGINA_MS),
     });
   } catch (error) {
     const timeout = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');

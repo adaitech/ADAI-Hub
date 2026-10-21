@@ -1,5 +1,14 @@
 /** @jest-environment node */
-import { ebaApiConfigurada, ebaFetch, EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida } from './client';
+import {
+  ebaApiConfigurada,
+  ebaFetch,
+  EbaApiError,
+  EbaApiIndisponivel,
+  EbaApiRespostaInvalida,
+  TIMEOUT_ACAO_MS,
+  TIMEOUT_ENVIO_MS,
+  TIMEOUT_PAGINA_MS,
+} from './client';
 
 const URL_BASE = 'https://eba-adai-api.azure-api.net';
 const KEY = 'chave-apim-teste';
@@ -72,6 +81,33 @@ describe('ebaFetch', () => {
     await ebaFetch('x');
     expect(espiao).toHaveBeenCalledWith(10_000);
     espiao.mockRestore();
+  });
+
+  it('GET sem cache leva cache no-store e nenhum next', async () => {
+    fetchMock.mockResolvedValue(new Response('[]', { status: 200 }));
+    await ebaFetch('ClassEBA?page-size=1');
+    const init = fetchMock.mock.calls[0][1];
+    expect(init.method).toBe('GET');
+    expect(init.cache).toBe('no-store');
+    expect(init.next).toBeUndefined();
+  });
+
+  it.each([
+    ['GET', {}],
+    ['POST', { metodo: 'POST' as const, corpo: {} }],
+  ])('%s: timeoutMs é repassado a AbortSignal.timeout', async (_m, init) => {
+    const espiao = jest.spyOn(AbortSignal, 'timeout');
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    await ebaFetch('x', { ...init, timeoutMs: 45_000 });
+    expect(espiao).toHaveBeenCalledWith(45_000);
+    expect(espiao).not.toHaveBeenCalledWith(10_000);
+    espiao.mockRestore();
+  });
+
+  it('constantes de timeout: página 10 s, ação 45 s, envio 60 s', () => {
+    expect(TIMEOUT_PAGINA_MS).toBe(10_000);
+    expect(TIMEOUT_ACAO_MS).toBe(45_000);
+    expect(TIMEOUT_ENVIO_MS).toBe(60_000);
   });
 
   it('GET 2xx com corpo vazio ou não JSON vira EbaApiIndisponivel (nada foi gravado)', async () => {

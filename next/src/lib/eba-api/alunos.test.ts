@@ -16,8 +16,20 @@ describe('alunos', () => {
   it('alunoPorEmail busca com o e-mail normalizado e codificado na URL', async () => {
     ebaFetchMock.mockResolvedValue(aluno);
     const r = await alunoPorEmail('  Ana+Teste@Exemplo.com ');
-    expect(ebaFetchMock).toHaveBeenCalledWith('Student/email/ana%2Bteste%40exemplo.com');
+    expect(ebaFetchMock).toHaveBeenCalledWith('Student/email/ana%2Bteste%40exemplo.com', {});
     expect(r).toEqual({ idStudent: aluno.id, idClass: aluno.idClass });
+  });
+
+  it('alunoPorEmail repassa timeoutMs ao ebaFetch', async () => {
+    ebaFetchMock.mockResolvedValue(aluno);
+    await alunoPorEmail('ana@exemplo.com', { timeoutMs: 45_000 });
+    expect(ebaFetchMock).toHaveBeenCalledWith('Student/email/ana%40exemplo.com', { timeoutMs: 45_000 });
+  });
+
+  it('cadastrarAluno repassa timeoutMs ao ebaFetch', async () => {
+    ebaFetchMock.mockResolvedValue(aluno);
+    await cadastrarAluno({ nome: 'Ana', email: 'ana@exemplo.com', unidade: 'campestre', idTurma: aluno.idClass }, { timeoutMs: 45_000 });
+    expect(ebaFetchMock).toHaveBeenCalledWith('Student', expect.objectContaining({ metodo: 'POST', timeoutMs: 45_000 }));
   });
 
   it('404 devolve null', async () => {

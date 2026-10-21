@@ -5,14 +5,14 @@ import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Trilha, type TrilhaItem } from '@/components/ui/Trilha';
 import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { segredoDaSessao } from '@/lib/eba/sessao';
-import { ebaApiConfigurada } from '@/lib/eba-api/client';
+import { ebaApiConfigurada, TIMEOUT_PAGINA_MS } from '@/lib/eba-api/client';
 import { perguntasDoTeste, type Pergunta } from '@/lib/eba-api/perguntas';
 import { definicaoDoTeste, type DefinicaoTeste } from '@/lib/eba-api/testes';
 import { buildMetadata } from '@/lib/metadata';
 import { jsonLdSeguro, origemDoSite } from '@/lib/seo/json-ld';
 import { getGlobal } from '@/lib/strapi/queries/global';
 import { getTesteBySlug } from '@/lib/strapi/queries/testes';
-import { cadastrar, enviar, identificar, sair, sessaoAtual } from './acoes';
+import { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair, sessaoAtual } from './acoes';
 import estilosEba from '../../eba.module.css';
 import styles from './page.module.css';
 
@@ -51,10 +51,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 }
 
-/** API ou APIM fora ao abrir: a abertura aparece e "Começar" avisa (nunca 404). Estilo pessoal não usa a API (lista vazia). */
+/**
+ * API ou APIM fora ao abrir (ou fria: o banco pausa e a 1ª chamada passa dos 10 s): a abertura
+ * aparece e "Começar" busca de novo pela ação `carregarPerguntas` (nunca 404). A página não espera
+ * mais que `TIMEOUT_PAGINA_MS`. Estilo pessoal não usa a API (lista vazia).
+ */
 async function buscarPerguntas(teste: DefinicaoTeste): Promise<{ perguntas: Pergunta[]; indisponiveis: boolean }> {
   try {
-    return { perguntas: await perguntasDoTeste(teste.slug), indisponiveis: false };
+    return { perguntas: await perguntasDoTeste(teste.slug, { timeoutMs: TIMEOUT_PAGINA_MS }), indisponiveis: false };
   } catch (erro) {
     // Só a classe do erro: nada de URL, chave ou dado do aluno no log.
     console.warn(`[eba-testes] perguntas de ${teste.slug}: ${erro instanceof Error ? erro.name : 'erro desconhecido'}`);
@@ -106,7 +110,7 @@ export default async function TesteEbaPage({ params }: PageProps) {
         perguntas={perguntas}
         perguntasIndisponiveis={indisponiveis}
         sessao={sessao}
-        acoes={{ identificar, cadastrar, enviar, sair }}
+        acoes={{ identificar, cadastrar, enviar, sair, carregarPerguntas, aquecer }}
       />
     );
   }

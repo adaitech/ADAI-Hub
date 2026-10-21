@@ -9,9 +9,9 @@ Ilha cliente (`'use client'`) da página `/eba/testes/<slug>`: a tela em que o a
 | Nome | tipo "Testes da EBA" do Strapi; sem o teste lá, `TESTES` (a página monta a prop `teste`) |
 | "Teste N de 5", "Próximo teste" | `TESTES` em `lib/eba-api/testes.ts` (ordem da apostila) |
 | Resumo, Perguntas/Resposta, "Como responder", aula | tipo "Testes da EBA" do Strapi (prop `abertura`, montada pela página) |
-| Perguntas de nota e talentos | API da EBA (`GET Question/{id}`), buscadas pelo servidor (prop `perguntas`). API fora ao abrir → `perguntasIndisponiveis`: a abertura aparece e "Começar" mostra "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." |
+| Perguntas de nota e talentos | API da EBA (`GET Question/{id}`), buscadas pelo servidor (prop `perguntas`, timeout de 10 s). API fora ou fria ao abrir → `perguntasIndisponiveis`: a abertura aparece e "Começar" busca de novo pela ação `carregarPerguntas` (ver "API fria" abaixo) |
 | Pares do estilo e opções do temperamento | dados locais em `lib/eba-api/conteudo-local.ts` |
-| Identificação, cadastro, envio, sair | Server Actions de `app/(site)/eba/testes/[slug]/acoes.ts`, recebidas pela prop `acoes` (testes e vitrine passam versões de mentira) |
+| Identificação, cadastro, envio, sair, carregar perguntas, aquecer | Server Actions de `app/(site)/eba/testes/[slug]/acoes.ts`, recebidas pela prop `acoes` (testes e vitrine passam versões de mentira) |
 | Fotos (decorativas, `alt=""`) | `fotoDoTeste` em `lib/eba/fotos-testes.ts` |
 
 Não está no Strapi: o fluxo, as escalas e a agregação das respostas são regras do teste, não conteúdo editorial.
@@ -28,6 +28,11 @@ Não está no Strapi: o fluxo, as escalas e a agregação das respostas são reg
 - **Identificação indisponível:** API fora ou turmas que não carregam (no e-mail ou no Primeiro acesso) mostram "Tentar de novo", que refaz a identificação; no Primeiro acesso o formulário preenchido é mantido e a lista de turmas é atualizada. Nome e turma inválidos têm mensagem própria ligada por `aria-describedby`, como a unidade; nome com caractere de controle é recusado.
 - **Sessão de outra aba:** o envio leva o `respondidoComo` (dono das respostas). Se o cookie for de outra pessoa (o e-mail foi trocado ou a sessão venceu e outra pessoa entrou em outra aba), o servidor devolve `sessao` sem chamar a API; a tela mostra "Sua sessão foi encerrada" e, se quem se identifica é outra pessoa, o teste recomeça da primeira pergunta, sem reenviar. Limite: dois e-mails com a mesma máscara (`a***@x.com`) não se distinguem.
 - **Sem resultado:** se a API grava as respostas (2xx) mas devolve um corpo ilegível (vazio, HTML, timeout na leitura), um resultado fora do formato ou uma lista vazia, a tela mostra "Respostas enviadas" e "Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.", sem "Tentar de novo" (reenviar duplicaria a gravação); o progresso é apagado e `concluir_teste` dispara.
+
+- **API fria (2026-10-21):** o banco da API pausa quando fica ocioso e a primeira chamada leva de 10 a 45 s.
+  - **Aquecimento:** ao montar na abertura, a tela chama `acoes.aquecer()` uma vez, sem esperar a resposta (GET leve no servidor, só para acordar o banco). Na vitrine (`estadoInicial`) não chama; `aquecer` é opcional na prop `acoes`.
+  - **Preparando o teste:** com `perguntasIndisponiveis`, "Começar" mostra "Preparando o teste…" (`role="status"`, botão desabilitado: uma chamada por vez) e chama `acoes.carregarPerguntas(slug)`. Sucesso: usa as perguntas recebidas, restaura o progresso salvo (que fica intacto até lá) e segue para a identificação ou as perguntas. Falha (ou lista vazia em nota/talentos): "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." e o botão vira "Tentar de novo".
+  - **Aviso de espera:** se identificar, cadastrar (e o "Tentar de novo" dele), carregar perguntas ou enviar passar de 5 s, aparece "A primeira conexão do dia pode levar até um minuto. Aguarde, por favor.": dentro da região de status que já existe ("Preparando o teste…", "Calculando seu resultado…") ou numa região `role="status"` própria na identificação e no cadastro (`AvisoDeEspera.tsx`). Some quando a ação termina.
 
 - **Nota (0–5):** radios nativos. Escolher com mouse ou toque avança; pelo teclado (setas, espaço) só marca, e "Próxima pergunta" segue (WCAG 2.1.1 e 3.2.2). Voltar mostra a resposta escolhida. Nome acessível "N — Rótulo".
 - **Talentos:** etapa 1 marca as habilidades (sem limite); etapa 2 escolhe até 3 entre as marcadas ("Concluir" exige uma). Envia 1 para as escolhidas e 0 para as demais.
@@ -49,7 +54,7 @@ Dois eventos novos, sem dado pessoal: **`iniciar_teste`** (`teste` = slug), uma 
 ## Testes
 
 - `estado.test.ts`: transições do reducer, leitura do progresso salvo, agregação das respostas por tipo.
-- `Questionario.test.tsx`: cada estado, avançar/voltar mantendo a resposta, restauração só da chave do slug sem duplicar (Foco 2), envio único com botão desabilitado (Foco 4), sessão encerrada e erro, talentos com a 4ª escolha desabilitada (Foco 5), nomes acessíveis, foco, fotos e eventos.
+- `Questionario.test.tsx`: aquecimento (uma vez na abertura, nunca na vitrine), "Preparando o teste…" com sucesso, falha e "Tentar de novo" (uma chamada por vez, progresso restaurado), aviso de espera depois de 5 s (timers falsos) em cada ação; cada estado, avançar/voltar mantendo a resposta, restauração só da chave do slug sem duplicar (Foco 2), envio único com botão desabilitado (Foco 4), sessão encerrada e erro, talentos com a 4ª escolha desabilitada (Foco 5), nomes acessíveis, foco, fotos e eventos.
 - `Resultado.test.tsx`: barras, destaque, porcentagem com máximo 0, talentos, estilo, sem resultado, próximo teste e sair.
 - Vitrine: `lib/showcase/catalog.test.tsx` e `__tests__/caracteristicas/acessibilidade-e-seo.test.tsx` (todas as variantes e o controle "Tipo de teste").
 

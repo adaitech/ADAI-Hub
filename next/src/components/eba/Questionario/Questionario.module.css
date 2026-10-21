@@ -215,6 +215,13 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* Espera de API fria: "Preparando o teste…" e o aviso depois de 5 s */
+.preparando,
+.espera {
+  display: grid;
+  gap: var(--space-8);
+}
+
 .legal {
   margin: 0;
   color: var(--color-text-muted);

@@ -85,17 +85,17 @@ A rota `/eba/testes/[slug]` é mais específica que `/eba/[slug]` e tem precedê
 
 ```
 lib/eba-api/            ← integração nova (só servidor)
-  client.ts             fetch com base APIM + chave no header, timeout, erro tipado
+  client.ts             fetch com base APIM + chave no header, timeout por chamada, erro tipado
   tipos.ts              JSON cru da API
   testes.ts             mapa slug → idQuestion, tipo de resposta e escala (fonte única)
   perguntas.ts          perguntas normalizadas por teste (cache 1 h, tag `eba-testes`)
   alunos.ts             buscar por e-mail, cadastrar
-  turmas.ts             turmas ativas (cache 10 min)
+  turmas.ts             turmas ativas (cache 10 min) e aquecimento (GET leve, sem cache)
   respostas.ts          enviar respostas → resultado normalizado
 lib/eba/sessao.ts       cria/lê/apaga o cookie de sessão (HMAC-SHA256, expira em 2 h)
 app/(site)/eba/testes/[slug]/
   page.tsx              abertura (Strapi `teste`) + perguntas (API) → <Questionario>
-  acoes.ts              Server Actions: identificar, cadastrar, enviar, sair
+  acoes.ts              Server Actions: identificar, cadastrar, enviar, sair, carregarPerguntas, aquecer
 components/eba/Questionario/   ilha cliente: estados, progresso, sessionStorage
 ```
 
@@ -115,6 +115,17 @@ components/eba/Questionario/   ilha cliente: estados, progresso, sessionStorage
 - **Envio:** o `idStudent` e o `idClass` vêm **da sessão**, nunca do formulário.
 - **Limite de tentativas** da identificação: 10 por minuto por IP, em memória. Freia quem tenta descobrir e-mails cadastrados.
 - **Logs:** nunca registram e-mail nem nome; só o código de erro da API.
+- **API fria (2026-10-21):** o banco Azure SQL da API pausa quando fica ocioso; a primeira chamada depois da pausa leva de 10 a 45 s (medido: `Student/email` em 44 s, a seguinte em 0,6 s). Por isso o timeout é por tipo de chamada (`ebaFetch(caminho, { timeoutMs })`; constantes em `client.ts`):
+
+  | Constante | Valor | Uso |
+  | --- | --- | --- |
+  | `TIMEOUT_PAGINA_MS` | 10 s | Perguntas buscadas ao renderizar a página (padrão de `ebaFetch` e das funções de `lib/eba-api`): a página não pode travar. |
+  | `TIMEOUT_ACAO_MS` | 45 s | Chamadas dentro de Server Actions: `alunoPorEmail`, `cadastrarAluno`, `turmasAtivas`, `carregarPerguntas`, as perguntas da validação do `enviar` e o aquecimento. |
+  | `TIMEOUT_ENVIO_MS` | 60 s | `POST SurveyResponse` (padrão de `enviarRespostas`). |
+
+  As regras de erro não mudam (POST com 2xx ilegível continua `EbaApiRespostaInvalida`).
+- **Aquecimento:** a ação `aquecer()` faz um GET leve e sem cache (`ClassEBA?page-size=1`, 45 s) só para acordar o banco. A tela a chama uma vez, sem esperar, quando monta na abertura (nunca na vitrine). Ela nunca lança nem devolve dados; erros só vão para o log com a classe. Limite próprio de 5 por minuto por IP (mesma chave do `identificar`, sem gastar as tentativas dele); sem variáveis ou sem segredo, não chama a API. Como o Next despacha as Server Actions uma por vez por cliente, um `identificar` feito logo depois espera o aquecimento terminar (que é o tempo de o banco acordar).
+- **Perguntas depois da abertura:** se a busca da página falhar, a ação `carregarPerguntas(slug)` busca de novo com 45 s (slug inválido → `invalido`; falha → `indisponivel`; estilo pessoal → `[]`; mesmo limite por IP do `identificar`).
 
 ### 5.3 Sessão
 
@@ -164,7 +175,9 @@ A tela tem os estados do protótipo:
 
 | Situação | Comportamento |
 | --- | --- |
-| API ou APIM fora ao abrir o teste | A abertura aparece. "Começar" mostra: "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." Não é 404. |
+| API ou APIM fora (ou fria, mais de 10 s) ao abrir o teste | A abertura aparece. "Começar" mostra "Preparando o teste…" (`role="status"`) e chama `carregarPerguntas` (45 s), uma chamada por vez. Sucesso: segue o fluxo normal (identificação ou perguntas), com o progresso salvo restaurado. Falha: "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." e o botão "Tentar de novo", que chama de novo. Não é 404. |
+| API fria na identificação, no cadastro ou no envio | As ações esperam até 45 s (envio: 60 s) em vez de falhar aos 10 s. |
+| Ação demorando (identificar, cadastrar, carregar perguntas, enviar) | Depois de 5 s, junto do estado de espera, aparece "A primeira conexão do dia pode levar até um minuto. Aguarde, por favor." numa região `role="status"`; some quando a ação termina. |
 | Turmas não carregam no Primeiro acesso | Mensagem com "Tentar de novo"; sem cadastro. |
 | A API recusa o envio (400) | "Algumas respostas não foram aceitas." O código da API vai para o log. As respostas são mantidas. |
 | Falha de rede ou 5xx no envio | Estado **Erro no envio**, com "Tentar de novo". |

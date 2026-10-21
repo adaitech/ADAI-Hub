@@ -4,8 +4,8 @@
  * - `/eba/testes/[slug]` → textos da abertura do Strapi (tipo `teste`) + perguntas da API da EBA
  *   (APIM simulado com os fixtures reais) + sessão (cookie) → Questionário.
  */
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { cookies, draftMode } from 'next/headers';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { cookies, draftMode, headers } from 'next/headers';
 import TestesPage, { generateMetadata as metadataTestes } from '@/app/(site)/eba/testes/page';
 import TestePage, { generateMetadata as metadataTeste } from '@/app/(site)/eba/testes/[slug]/page';
 import hero from '@/components/sections/HeroSection/HeroSection.mock.json';
@@ -82,6 +82,8 @@ const params = (slug: string) => ({ params: Promise.resolve({ slug }) });
 const jsonLd = (container: HTMLElement) =>
   [...container.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.textContent ?? '{}') as { '@type': string });
 const comecar = () => fireEvent.click(screen.getByRole('button', { name: /começar o teste/i }));
+/** Chamadas de perguntas (`Question/...`); o aquecimento (`ClassEBA?page-size=1`) fica de fora. */
+const chamadasDePerguntas = () => api.mock.calls.filter(([url]) => String(url).includes('/Question/'));
 
 describe('/eba/testes — página do Strapi (não cai no 404 da rota dos testes)', () => {
   it('monta a página "eba-testes" com um h1, a Lista de testes, trilha e BreadcrumbList', async () => {
@@ -165,6 +167,48 @@ describe('/eba/testes/[slug] — tela do teste', () => {
     expect(screen.getByText(/a\*\*\*@exemplo\.com/)).toBeInTheDocument();
   });
 
+  it('a busca de perguntas na renderização continua com timeout de 10 s (a página não pode travar)', async () => {
+    const espiao = jest.spyOn(AbortSignal, 'timeout');
+    await TestePage(params('dons-servico'));
+    expect(chamadasDePerguntas()).toHaveLength(1);
+    expect(espiao).toHaveBeenCalledTimes(1);
+    expect(espiao).toHaveBeenCalledWith(10_000);
+    espiao.mockRestore();
+  });
+
+  it('ao abrir, a tela aquece a API: um GET ClassEBA?page-size=1 sem cache, com 45 s', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    // IP próprio: o limite do aquecimento (5 por minuto) é por IP e do módulo.
+    const cabecalhos = jest.mocked(headers).getMockImplementation()!;
+    jest.mocked(headers).mockImplementation(async () => new Headers({ 'x-nonce': 'nonce-de-teste', 'x-forwarded-for': '203.0.113.7' }) as never);
+    const espiao = jest.spyOn(AbortSignal, 'timeout');
+    render(await TestePage(params('dons-servico')));
+    await act(async () => {});
+    jest.mocked(headers).mockImplementation(cabecalhos);
+    const aquecimento = api.mock.calls.filter(([url]) => String(url).includes('ClassEBA?page-size=1'));
+    expect(aquecimento).toHaveLength(1);
+    expect((aquecimento[0][1] as RequestInit).cache).toBe('no-store');
+    expect(espiao).toHaveBeenCalledWith(45_000);
+    espiao.mockRestore();
+    warn.mockRestore();
+  });
+
+  it('API fria: a busca da página estoura os 10 s; "Começar" prepara o teste e segue com as perguntas', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    cookieSessao = assinarSessao({ idStudent: 'aluno-1', idClass: 'turma-1', emailMascarado: 'a***@exemplo.com', emitidoEm: Date.now() }, SEGREDO);
+    const normal = api.getMockImplementation()!;
+    api.mockImplementationOnce(() => Promise.reject(Object.assign(new Error('timeout'), { name: 'TimeoutError' })));
+    render(await TestePage(params('dons-servico')));
+    api.mockImplementation(normal);
+    comecar();
+    expect(screen.getByRole('status')).toHaveTextContent('Preparando o teste…');
+    await act(async () => {});
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', String(questaoServico.length));
+    expect(screen.getByText(questaoServico[0].text)).toBeInTheDocument();
+    expect(chamadasDePerguntas()).toHaveLength(2);
+    warn.mockRestore();
+  });
+
   it('sem sessão, "Começar" pede o e-mail', async () => {
     render(await TestePage(params('dons-servico')));
     comecar();
@@ -174,7 +218,7 @@ describe('/eba/testes/[slug] — tela do teste', () => {
   it('estilo pessoal: perguntas locais, sem chamar a API (lista vazia não é indisponibilidade)', async () => {
     cookieSessao = assinarSessao({ idStudent: 'aluno-1', idClass: 'turma-1', emailMascarado: 'a***@exemplo.com', emitidoEm: Date.now() }, SEGREDO);
     render(await TestePage(params('estilo-pessoal')));
-    expect(api).not.toHaveBeenCalled();
+    expect(chamadasDePerguntas()).toHaveLength(0);
     comecar();
     expect(screen.queryByRole('alert')).toBeNull();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -192,8 +236,10 @@ describe('/eba/testes/[slug] — indisponibilidade (nunca 404)', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Temperamento pessoal' })).toBeInTheDocument();
     expect(screen.getByText(/mistura de temperamentos/)).toBeInTheDocument();
     comecar();
-    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as perguntas agora. Tente em alguns minutos.');
+    // "Começar" tenta de novo pela ação (45 s); a API continua fora.
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não conseguimos carregar as perguntas agora. Tente em alguns minutos.');
     expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
     expect(warn.mock.calls.flat().join(' ')).not.toContain('chave-de-teste');
     warn.mockRestore();
   });

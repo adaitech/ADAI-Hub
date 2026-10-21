@@ -4,6 +4,7 @@ import { buttonClassName } from '@/components/ui/ButtonLink';
 import type { cadastrar as cadastrarAcao, identificar as identificarAcao, RespostaAcao } from '@/app/(site)/eba/testes/[slug]/acoes';
 import { UNIDADES } from '@/lib/eba-api/testes';
 import type { Turma } from '@/lib/eba-api/turmas';
+import { AvisoDeEspera } from './AvisoDeEspera';
 import styles from './Questionario.module.css';
 
 type CodigoErro = Extract<RespostaAcao, { ok: false }>['erro'];
@@ -109,6 +110,7 @@ export function Identificacao({ identificar, onIdentificado, onNovo, tituloRef }
           />
         </div>
         <Erro id={`${id}-erro`} erro={erro} />
+        <AvisoDeEspera ativo={pendente} />
         <div className={styles.botoes}>
           <button type="submit" className={buttonClassName()} disabled={pendente}>
             Continuar
@@ -302,6 +304,7 @@ export function Cadastro({ email, turmas, cadastrar, identificar, onIdentificado
           )}
         </div>
         <Erro id={`${id}-erro`} erro={erro} mensagens={MENSAGENS_CADASTRO} />
+        <AvisoDeEspera ativo={pendente} />
         <div className={styles.botoes}>
           <button type="submit" className={buttonClassName()} disabled={pendente}>
             Cadastrar e começar

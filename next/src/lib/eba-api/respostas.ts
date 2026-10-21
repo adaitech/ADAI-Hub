@@ -1,6 +1,6 @@
 import 'server-only';
 import { z } from 'zod';
-import { ebaFetch, EbaApiRespostaInvalida } from './client';
+import { ebaFetch, EbaApiRespostaInvalida, TIMEOUT_ENVIO_MS, type OpcoesChamada } from './client';
 import { descricaoDoEstilo, descricaoDoTemperamento } from './conteudo-local';
 import { definicaoDoTeste, type SlugTeste } from './testes';
 import type { EbaSurveyResponseEnvioApi } from './tipos';
@@ -39,14 +39,17 @@ const esquemaEstilo = z.union([esquemaMensagem, z.tuple([esquemaMensagem], esque
 /**
  * Envia as respostas (já no formato da API: a UI agrega) e devolve o resultado do teste.
  * Nunca registra dados do aluno. Corpo 2xx fora do formato → `EbaApiRespostaInvalida` (as respostas
- * já foram gravadas pela API: quem chama não deve reenviar).
+ * já foram gravadas pela API: quem chama não deve reenviar). Timeout padrão: `TIMEOUT_ENVIO_MS`.
  */
-export async function enviarRespostas(e: {
-  slug: SlugTeste;
-  idStudent: string;
-  idClass: string;
-  respostas: { numero: number; nota: number }[];
-}): Promise<Resultado> {
+export async function enviarRespostas(
+  e: {
+    slug: SlugTeste;
+    idStudent: string;
+    idClass: string;
+    respostas: { numero: number; nota: number }[];
+  },
+  opcoes: OpcoesChamada = {},
+): Promise<Resultado> {
   const teste = definicaoDoTeste(e.slug);
   if (!teste) throw new Error(`[eba-api] teste desconhecido: ${e.slug}`);
 
@@ -59,7 +62,9 @@ export async function enviarRespostas(e: {
       rate: r.nota,
     })),
   };
-  const retorno = await ebaFetch<unknown>('SurveyResponse', { metodo: 'POST', corpo });
+  // 60 s por padrão: na API fria a gravação passa de 10 s, e um timeout antes dos cabeçalhos vira
+  // `indisponivel` (o "Tentar de novo" poderia gravar em dobro).
+  const retorno = await ebaFetch<unknown>('SurveyResponse', { metodo: 'POST', corpo, timeoutMs: opcoes.timeoutMs ?? TIMEOUT_ENVIO_MS });
 
   if (teste.tipo === 'estilo') {
     const valido = esquemaEstilo.safeParse(retorno);

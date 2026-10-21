@@ -21,6 +21,15 @@ describe('perguntasDoTeste', () => {
     });
   });
 
+  it('repassa timeoutMs ao ebaFetch, com o mesmo cache', async () => {
+    ebaFetchMock.mockResolvedValue(perguntasDons);
+    await perguntasDoTeste('dons-servico', { timeoutMs: 45_000 });
+    expect(ebaFetchMock).toHaveBeenCalledWith('Question/80cd890e-e0c2-45f2-84ac-2447185e85c3', {
+      cache: { revalidate: 3600, tags: ['eba-testes'] },
+      timeoutMs: 45_000,
+    });
+  });
+
   it('estilo-pessoal não tem perguntas na API: devolve [] sem chamar a API', async () => {
     expect(await perguntasDoTeste('estilo-pessoal')).toEqual([]);
     expect(ebaFetchMock).not.toHaveBeenCalled();

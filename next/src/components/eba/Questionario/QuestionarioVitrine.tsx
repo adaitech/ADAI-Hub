@@ -37,6 +37,8 @@ export function QuestionarioVitrine({ teste, tela }: QuestionarioVitrineProps) {
     cadastrar: async () => ({ ok: true, dados: sessao }),
     enviar: async () => ({ ok: true, dados: resultado }),
     sair: async () => undefined,
+    carregarPerguntas: async () => ({ ok: true, dados: mock.testes[teste].perguntas }),
+    aquecer: async () => undefined,
   } as unknown as QuestionarioProps['acoes'];
   const iniciais: Record<TelaVitrine, Partial<EstadoQuestionario>> = {
     abertura: {},

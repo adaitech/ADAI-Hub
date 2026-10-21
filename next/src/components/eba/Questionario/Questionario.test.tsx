@@ -26,6 +26,8 @@ function criarAcoes(extra: Partial<Record<keyof Acoes, jest.Mock>> = {}) {
     cadastrar: jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'n***@email.com' } })),
     enviar: jest.fn(async () => ({ ok: true, dados: resultadoNota })),
     sair: jest.fn(async () => undefined),
+    aquecer: jest.fn(async () => undefined),
+    carregarPerguntas: jest.fn(async () => ({ ok: false, erro: 'indisponivel' })),
     ...extra,
   };
   return acoes as typeof acoes & Acoes;
@@ -118,12 +120,213 @@ describe('Questionario — abertura', () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
-  it.each<SlugTeste>(['temperamento-pessoal', 'dons-servico'])('perguntasIndisponiveis (%s, API fora ao abrir) → mensagem, sem sair da abertura', (slug) => {
-    montar(slug, { perguntasIndisponiveis: true });
+});
+
+/** Promessa controlada pelo teste (ação em andamento). */
+function adiada<T = unknown>() {
+  let concluir: (valor: T) => void = () => {};
+  const promessa = new Promise<T>((resolve) => (concluir = resolve));
+  return { promessa, concluir };
+}
+
+const ESPERA = 'A primeira conexão do dia pode levar até um minuto. Aguarde, por favor.';
+const SEM_PERGUNTAS = 'Não conseguimos carregar as perguntas agora. Tente em alguns minutos.';
+
+describe('Questionario — aquecimento da API', () => {
+  it('chama aquecer uma vez ao montar na abertura, sem esperar a resposta', () => {
+    const aquecer = jest.fn(() => new Promise<void>(() => {}));
+    const { rerender, props } = montar('dons-servico', { acoes: criarAcoes({ aquecer }) });
+    expect(aquecer).toHaveBeenCalledTimes(1);
+    expect(aquecer).toHaveBeenCalledWith();
+    rerender(<Questionario {...props} />);
+    comecar();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(aquecer).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['abertura', {}],
+    ['pergunta', { estado: 'pergunta' as const }],
+  ])('não chama aquecer na vitrine (estadoInicial %s)', (_n, estadoInicial) => {
+    const { acoes } = montar('dons-servico', { estadoInicial });
+    expect(acoes.aquecer).not.toHaveBeenCalled();
+  });
+
+  it('aquecer falhando (rede) ou ausente não quebra a tela', async () => {
+    const { unmount } = montar('dons-servico', { acoes: criarAcoes({ aquecer: jest.fn().mockRejectedValue(new Error('rede')) }) });
+    await esperarAcoes();
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    unmount();
+    const semAquecer = criarAcoes();
+    delete (semAquecer as Partial<typeof semAquecer>).aquecer;
+    montar('dons-servico', { acoes: semAquecer });
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+  });
+});
+
+describe('Questionario — perguntas indisponíveis na abertura (API fria)', () => {
+  it('"Começar" mostra "Preparando o teste…" e, com sucesso, segue com as perguntas recebidas', async () => {
+    const carga = adiada();
+    const carregarPerguntas = jest.fn(() => carga.promessa);
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
     expect(screen.queryByRole('alert')).toBeNull();
     comecar();
-    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as perguntas agora. Tente em alguns minutos.');
+    expect(carregarPerguntas).toHaveBeenCalledWith('dons-servico');
+    expect(screen.getByRole('status')).toHaveTextContent('Preparando o teste…');
     expect(screen.queryByRole('progressbar')).toBeNull();
+    await act(async () => carga.concluir({ ok: true, dados: perguntasCurtas }));
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '3');
+    expect(screen.getByText(perguntasCurtas[0].texto)).toBeInTheDocument();
+  });
+
+  it('sem sessão, depois de carregar segue para a identificação', async () => {
+    const carregarPerguntas = jest.fn().mockResolvedValue({ ok: true, dados: perguntasCurtas });
+    montar('dons-servico', { sessao: null, perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
+    comecar();
+    await esperarAcoes();
+    expect(screen.getByRole('heading', { level: 2, name: 'Antes de começar' })).toBeInTheDocument();
+  });
+
+  it('só uma chamada por vez: cliques repetidos enquanto prepara não chamam de novo', async () => {
+    const carga = adiada();
+    const carregarPerguntas = jest.fn(() => carga.promessa);
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
+    comecar();
+    const botaoComecar = botao(/começar o teste/i);
+    expect(botaoComecar).toBeDisabled();
+    fireEvent.click(botaoComecar);
+    fireEvent.click(botaoComecar);
+    expect(carregarPerguntas).toHaveBeenCalledTimes(1);
+    await act(async () => carga.concluir({ ok: false, erro: 'indisponivel' }));
+  });
+
+  it.each([
+    ['indisponivel', () => jest.fn().mockResolvedValue({ ok: false, erro: 'indisponivel' })],
+    ['a ação lança (rede)', () => jest.fn().mockRejectedValue(new Error('rede'))],
+    ['lista vazia num teste de nota', () => jest.fn().mockResolvedValue({ ok: true, dados: [] })],
+  ])('falha (%s) → mensagem e "Tentar de novo", que chama de novo e segue no sucesso', async (_n, criar) => {
+    const carregarPerguntas = criar();
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
+    comecar();
+    await esperarAcoes();
+    expect(screen.getByRole('alert')).toHaveTextContent(SEM_PERGUNTAS);
+    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.queryByRole('status')).toBeNull();
+    carregarPerguntas.mockReset().mockResolvedValue({ ok: true, dados: perguntasCurtas });
+    fireEvent.click(botao('Tentar de novo'));
+    await esperarAcoes();
+    expect(carregarPerguntas).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '3');
+  });
+
+  it('temperamento: sucesso com lista vazia segue (o teste usa as opções locais)', async () => {
+    const carregarPerguntas = jest.fn().mockResolvedValue({ ok: true, dados: [] });
+    montar('temperamento-pessoal', { perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
+    comecar();
+    await esperarAcoes();
+    expect(carregarPerguntas).toHaveBeenCalledWith('temperamento-pessoal');
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '20');
+  });
+
+  it('progresso salvo não se perde: é restaurado depois que as perguntas chegam', async () => {
+    const chave = chaveProgresso('dons-servico');
+    const salvo = JSON.stringify({ passo: 1, respostas: { 1: 3 }, marcadas: [], escolhidas: [], respondidoComo: 'a***@email.com' });
+    sessionStorage.setItem(chave, salvo);
+    const carregarPerguntas = jest.fn().mockResolvedValue({ ok: true, dados: perguntasCurtas });
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas }) });
+    expect(sessionStorage.getItem(chave)).toBe(salvo);
+    comecar();
+    await esperarAcoes();
+    expect(screen.getByText('Pergunta 2 de 3')).toBeInTheDocument();
+    expect(JSON.parse(sessionStorage.getItem(chave)!).respostas).toEqual({ 1: 3 });
+  });
+});
+
+describe('Questionario — aviso de espera (API fria)', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  const passar = (ms: number) => act(() => jest.advanceTimersByTime(ms));
+
+  it('carregando as perguntas: aparece depois de 5 s, junto de "Preparando o teste…", e some ao terminar', async () => {
+    const carga = adiada();
+    montar('dons-servico', { perguntas: [], perguntasIndisponiveis: true, acoes: criarAcoes({ carregarPerguntas: jest.fn(() => carga.promessa) }) });
+    comecar();
+    passar(4_999);
+    expect(screen.queryByText(ESPERA)).toBeNull();
+    passar(1);
+    expect(screen.getByRole('status')).toHaveTextContent(ESPERA);
+    expect(screen.getByRole('status')).toHaveTextContent('Preparando o teste…');
+    await act(async () => carga.concluir({ ok: false, erro: 'indisponivel' }));
+    expect(screen.queryByText(ESPERA)).toBeNull();
+  });
+
+  it('enviando: aparece depois de 5 s no aviso "Calculando seu resultado…" e some ao terminar', async () => {
+    const envio = adiada();
+    montar('dons-servico', { acoes: criarAcoes({ enviar: jest.fn(() => envio.promessa) }) });
+    responderTudo();
+    fireEvent.click(botao('Enviar respostas'));
+    passar(4_999);
+    expect(screen.queryByText(ESPERA)).toBeNull();
+    passar(1);
+    expect(screen.getByRole('status')).toHaveTextContent('Calculando seu resultado…');
+    expect(screen.getByRole('status')).toHaveTextContent(ESPERA);
+    await act(async () => envio.concluir({ ok: false, erro: 'indisponivel' }));
+    expect(screen.queryByText(ESPERA)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
+  });
+
+  it('identificar: aparece depois de 5 s numa região de status e some ao terminar', async () => {
+    const verificacao = adiada();
+    montar('dons-servico', { sessao: null, acoes: criarAcoes({ identificar: jest.fn(() => verificacao.promessa) }) });
+    comecar();
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
+    fireEvent.click(botao('Continuar'));
+    passar(4_999);
+    expect(screen.queryByText(ESPERA)).toBeNull();
+    passar(1);
+    expect(screen.getByRole('status')).toHaveTextContent(ESPERA);
+    await act(async () => verificacao.concluir({ ok: false, erro: 'indisponivel' }));
+    expect(screen.queryByText(ESPERA)).toBeNull();
+  });
+
+  it('cadastrar e "Tentar de novo" do cadastro: aparece depois de 5 s e some ao terminar', async () => {
+    const cadastro = adiada();
+    const identificar = jest.fn().mockResolvedValue({ ok: true, dados: { novo: true, turmas: [{ id: 't1', nome: 'Turma 1' }] } });
+    montar('dons-servico', { sessao: null, acoes: criarAcoes({ identificar, cadastrar: jest.fn(() => cadastro.promessa) }) });
+    comecar();
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'nova@email.com' } });
+    fireEvent.click(botao('Continuar'));
+    await esperarAcoes();
+    fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: 'Ana Souza' } });
+    fireEvent.click(screen.getByRole('radio', { name: 'Anália Franco' }));
+    fireEvent.change(screen.getByLabelText('Turma'), { target: { value: 't1' } });
+    fireEvent.click(botao('Cadastrar e começar'));
+    passar(5_000);
+    expect(screen.getByRole('status')).toHaveTextContent(ESPERA);
+    await act(async () => cadastro.concluir({ ok: false, erro: 'indisponivel' }));
+    expect(screen.queryByText(ESPERA)).toBeNull();
+
+    const nova = adiada();
+    identificar.mockImplementation(() => nova.promessa);
+    fireEvent.click(botao('Tentar de novo'));
+    passar(5_000);
+    expect(screen.getByRole('status')).toHaveTextContent(ESPERA);
+    await act(async () => nova.concluir({ ok: false, erro: 'indisponivel' }));
+    expect(screen.queryByText(ESPERA)).toBeNull();
+  });
+
+  it('ação rápida (menos de 5 s): o aviso não aparece', async () => {
+    const verificacao = adiada();
+    montar('dons-servico', { sessao: null, acoes: criarAcoes({ identificar: jest.fn(() => verificacao.promessa) }) });
+    comecar();
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@email.com' } });
+    fireEvent.click(botao('Continuar'));
+    passar(2_000);
+    await act(async () => verificacao.concluir({ ok: false, erro: 'indisponivel' }));
+    passar(10_000);
+    expect(screen.queryByText(ESPERA)).toBeNull();
   });
 });
 

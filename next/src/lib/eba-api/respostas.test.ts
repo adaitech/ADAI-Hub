@@ -32,7 +32,17 @@ describe('enviarRespostas', () => {
           { idStudent: 'aluno-1', idClass: 'turma-1', idQuestion: '80cd890e-e0c2-45f2-84ac-2447185e85c3', numberQuestion: 2, rate: 0 },
         ],
       },
+      timeoutMs: 60_000,
     });
+  });
+
+  it('usa 60 s de timeout por padrão e aceita outro valor', async () => {
+    ebaFetchMock.mockResolvedValue(nota);
+    await enviarRespostas({ ...base, slug: 'dons-servico', respostas: [{ numero: 1, nota: 5 }] });
+    expect(ebaFetchMock.mock.calls[0][1]).toEqual(expect.objectContaining({ timeoutMs: 60_000 }));
+    ebaFetchMock.mockClear();
+    await enviarRespostas({ ...base, slug: 'dons-servico', respostas: [{ numero: 1, nota: 5 }] }, { timeoutMs: 30_000 });
+    expect(ebaFetchMock.mock.calls[0][1]).toEqual(expect.objectContaining({ timeoutMs: 30_000 }));
   });
 
   it('nota: itens por total decrescente, maximo 25 e mensagem vazia vira null', async () => {

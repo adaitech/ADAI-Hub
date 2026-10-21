@@ -1,11 +1,11 @@
 /** @jest-environment node */
-import { cadastrar, enviar, identificar, sair, sessaoAtual } from './acoes';
+import { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair, sessaoAtual } from './acoes';
 import { assinarSessao, COOKIE_SESSAO, OPCOES_COOKIE } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno } from '@/lib/eba-api/alunos';
 import { EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida, ebaApiConfigurada } from '@/lib/eba-api/client';
 import { perguntasDoTeste } from '@/lib/eba-api/perguntas';
 import { enviarRespostas, type Resultado } from '@/lib/eba-api/respostas';
-import { turmasAtivas } from '@/lib/eba-api/turmas';
+import { aquecerApi, turmasAtivas } from '@/lib/eba-api/turmas';
 
 const cookieGet = jest.fn();
 const cookieSet = jest.fn();
@@ -26,7 +26,7 @@ jest.mock('@/lib/eba-api/client', () => ({
 }));
 jest.mock('@/lib/eba-api/perguntas', () => ({ perguntasDoTeste: jest.fn() }));
 jest.mock('@/lib/eba-api/respostas', () => ({ enviarRespostas: jest.fn() }));
-jest.mock('@/lib/eba-api/turmas', () => ({ turmasAtivas: jest.fn() }));
+jest.mock('@/lib/eba-api/turmas', () => ({ turmasAtivas: jest.fn(), aquecerApi: jest.fn() }));
 
 const SEGREDO = 'segredo-de-teste-com-mais-de-32-caracteres';
 const EMAIL = 'ana.silva@exemplo.com';
@@ -41,6 +41,10 @@ const turmasMock = jest.mocked(turmasAtivas);
 const perguntasMock = jest.mocked(perguntasDoTeste);
 const enviarMock = jest.mocked(enviarRespostas);
 const configuradaMock = jest.mocked(ebaApiConfigurada);
+const aquecerApiMock = jest.mocked(aquecerApi);
+/** Timeouts esperados (API fria): ações 45 s, envio 60 s. */
+const ACAO = { timeoutMs: 45_000 };
+const ENVIO = { timeoutMs: 60_000 };
 
 let ipSeq = 0;
 function sessaoValida(emitidoEm = Date.now()) {
@@ -86,6 +90,13 @@ describe('identificar', () => {
     expect(nome).toBe(COOKIE_SESSAO);
     expect(opcoes).toEqual(OPCOES_COOKIE);
     expect(valor).toMatch(/^[\w-]+\.[\w-]+$/);
+  });
+
+  it('usa 45 s (API fria) na busca do aluno e das turmas', async () => {
+    alunoPorEmailMock.mockResolvedValue(null);
+    await identificar(EMAIL);
+    expect(alunoPorEmailMock).toHaveBeenCalledWith(EMAIL, ACAO);
+    expect(turmasMock).toHaveBeenCalledWith(ACAO);
   });
 
   it('e-mail novo: devolve as turmas e não grava cookie', async () => {
@@ -158,7 +169,7 @@ describe('cadastrar', () => {
   it('confere o e-mail (normalizado) antes do POST', async () => {
     cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
     await cadastrar({ ...dados, email: ` ${EMAIL.toUpperCase()} ` });
-    expect(alunoPorEmailMock).toHaveBeenCalledWith(EMAIL);
+    expect(alunoPorEmailMock).toHaveBeenCalledWith(EMAIL, ACAO);
     expect(alunoPorEmailMock.mock.invocationCallOrder[0]).toBeLessThan(cadastrarAlunoMock.mock.invocationCallOrder[0]);
   });
 
@@ -192,12 +203,16 @@ describe('cadastrar', () => {
     cadastrarAlunoMock.mockResolvedValue({ idStudent: 'aluno-9', idClass: 'turma-1' });
     const r = await cadastrar(dados);
     expect(r).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
-    expect(cadastrarAlunoMock).toHaveBeenCalledWith({
-      nome: 'Ana Silva',
-      email: EMAIL,
-      unidade: 'colorado',
-      idTurma: 'turma-1',
-    });
+    expect(cadastrarAlunoMock).toHaveBeenCalledWith(
+      {
+        nome: 'Ana Silva',
+        email: EMAIL,
+        unidade: 'colorado',
+        idTurma: 'turma-1',
+      },
+      ACAO,
+    );
+    expect(turmasMock).toHaveBeenCalledWith(ACAO);
     expect(cookieSet).toHaveBeenCalledWith(COOKIE_SESSAO, expect.any(String), OPCOES_COOKIE);
   });
 
@@ -251,12 +266,21 @@ describe('enviar', () => {
   it('usa idStudent/idClass da sessão e devolve o resultado', async () => {
     const r = await enviar('dons-servico', notas(3, 4), COMO);
     expect(r).toEqual({ ok: true, dados: resultado });
-    expect(enviarMock).toHaveBeenCalledWith({
-      slug: 'dons-servico',
-      idStudent: 'aluno-1',
-      idClass: 'turma-1',
-      respostas: notas(3, 4),
-    });
+    expect(enviarMock).toHaveBeenCalledWith(
+      {
+        slug: 'dons-servico',
+        idStudent: 'aluno-1',
+        idClass: 'turma-1',
+        respostas: notas(3, 4),
+      },
+      ENVIO,
+    );
+  });
+
+  it('usa 60 s no envio e 45 s nas perguntas da validação', async () => {
+    await enviar('dons-servico', notas(3, 4), COMO);
+    expect(enviarMock).toHaveBeenCalledWith(expect.anything(), ENVIO);
+    expect(perguntasMock).toHaveBeenCalledWith('dons-servico', ACAO);
   });
 
   it('ignora ids que o cliente tente mandar dentro das respostas', async () => {
@@ -264,6 +288,7 @@ describe('enviar', () => {
     await enviar('dons-servico', maliciosas, COMO);
     expect(enviarMock).toHaveBeenCalledWith(
       expect.objectContaining({ idStudent: 'aluno-1', idClass: 'turma-1', respostas: notas(3, 1) }),
+      ENVIO,
     );
   });
 
@@ -467,6 +492,126 @@ describe('enviar', () => {
       enviarMock.mockRejectedValue(new Error('boom'));
       expect(await enviar('dons-servico', notas(3, 1), COMO)).toEqual({ ok: false, erro: 'indisponivel' });
     });
+  });
+});
+
+describe('aquecer', () => {
+  it('acorda a API com 45 s e não devolve dados', async () => {
+    aquecerApiMock.mockResolvedValue(undefined);
+    await expect(aquecer()).resolves.toBeUndefined();
+    expect(aquecerApiMock).toHaveBeenCalledTimes(1);
+    expect(aquecerApiMock).toHaveBeenCalledWith(ACAO);
+  });
+
+  it('pelo client real: um GET ClassEBA?page-size=1 sem cache, com AbortSignal.timeout(45_000)', async () => {
+    const { aquecerApi: real } = jest.requireActual<typeof import('@/lib/eba-api/turmas')>('@/lib/eba-api/turmas');
+    aquecerApiMock.mockImplementation(real);
+    const fetchOriginal = global.fetch;
+    const envOriginal = { ...process.env };
+    Object.assign(process.env, { EBA_API_URL: 'https://eba.exemplo.test', EBA_API_KEY: 'chave-teste' });
+    const fetchMock = jest.fn().mockResolvedValue(new Response('{"data":[]}', { status: 200 }));
+    global.fetch = fetchMock;
+    const espiao = jest.spyOn(AbortSignal, 'timeout');
+    try {
+      await expect(aquecer()).resolves.toBeUndefined();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [url, init] = fetchMock.mock.calls[0];
+      expect(String(url)).toBe('https://eba.exemplo.test/api/v1/eba/ClassEBA?page-size=1');
+      expect(init.method).toBe('GET');
+      expect(init.cache).toBe('no-store');
+      expect(init.next).toBeUndefined();
+      expect(espiao).toHaveBeenCalledWith(45_000);
+    } finally {
+      global.fetch = fetchOriginal;
+      process.env = envOriginal;
+    }
+  });
+
+  it.each([
+    ['EbaApiIndisponivel', new EbaApiIndisponivel('timeout')],
+    ['EbaApiError', new EbaApiError(503, 'COD')],
+    ['erro qualquer', new Error(`falha com ${EMAIL}`)],
+    ['valor que não é Error', 'x'],
+  ])('nunca lança (%s) e registra só a classe do erro', async (_n, erro) => {
+    aquecerApiMock.mockRejectedValue(erro);
+    await expect(aquecer()).resolves.toBeUndefined();
+    const tudo = JSON.stringify(warn.mock.calls);
+    expect(tudo).toContain('[eba-testes] aquecer');
+    expect(tudo).not.toContain(EMAIL);
+    expect(tudo).not.toContain('COD');
+  });
+
+  it('nunca lança, mesmo se a leitura dos cabeçalhos falhar', async () => {
+    headerGet.mockImplementation(() => {
+      throw new Error('sem cabeçalhos');
+    });
+    await expect(aquecer()).resolves.toBeUndefined();
+    expect(aquecerApiMock).not.toHaveBeenCalled();
+  });
+
+  it('limite próprio de 5 por minuto por IP: a 6ª não chama a API e não gasta o limite do identificar', async () => {
+    headerGet.mockReturnValue('5.5.5.5, 8.8.8.8');
+    aquecerApiMock.mockResolvedValue(undefined);
+    for (let i = 0; i < 6; i++) await aquecer();
+    expect(aquecerApiMock).toHaveBeenCalledTimes(5);
+    alunoPorEmailMock.mockResolvedValue(null);
+    expect((await identificar(EMAIL)).ok).toBe(true);
+  });
+
+  it('API não configurada → não chama a API', async () => {
+    configuradaMock.mockReturnValue(false);
+    await expect(aquecer()).resolves.toBeUndefined();
+    expect(aquecerApiMock).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, 'curto'])('segredo ausente ou curto (%p) → não chama a API', async (segredo) => {
+    if (segredo === undefined) delete process.env.EBA_SESSAO_SEGREDO;
+    else process.env.EBA_SESSAO_SEGREDO = segredo;
+    await expect(aquecer()).resolves.toBeUndefined();
+    expect(aquecerApiMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('carregarPerguntas', () => {
+  it('sucesso → lista de perguntas, buscada com 45 s', async () => {
+    perguntasMock.mockResolvedValue(perguntas(3));
+    expect(await carregarPerguntas('dons-servico')).toEqual({ ok: true, dados: perguntas(3) });
+    expect(perguntasMock).toHaveBeenCalledWith('dons-servico', ACAO);
+  });
+
+  it('estilo-pessoal → [] sem chamar a API', async () => {
+    expect(await carregarPerguntas('estilo-pessoal')).toEqual({ ok: true, dados: [] });
+    expect(perguntasMock).not.toHaveBeenCalled();
+  });
+
+  it.each([['nao-existe'], [''], ['Dons-Servico'], [undefined], [3]])('slug inválido (%p) → invalido, sem chamar a API', async (slug) => {
+    expect(await carregarPerguntas(slug as unknown as string)).toEqual({ ok: false, erro: 'invalido' });
+    expect(perguntasMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['EbaApiIndisponivel', new EbaApiIndisponivel('timeout')],
+    ['EbaApiError', new EbaApiError(503, null)],
+    ['EbaApiRespostaInvalida', new EbaApiRespostaInvalida('x')],
+  ])('falha (%s) → indisponivel', async (_n, erro) => {
+    perguntasMock.mockRejectedValue(erro);
+    expect(await carregarPerguntas('dons-servico')).toEqual({ ok: false, erro: 'indisponivel' });
+  });
+
+  it('sem configuração ou segredo → indisponivel, sem chamar a API', async () => {
+    configuradaMock.mockReturnValue(false);
+    expect(await carregarPerguntas('dons-servico')).toEqual({ ok: false, erro: 'indisponivel' });
+    configuradaMock.mockReturnValue(true);
+    delete process.env.EBA_SESSAO_SEGREDO;
+    expect(await carregarPerguntas('dons-servico')).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(perguntasMock).not.toHaveBeenCalled();
+  });
+
+  it('usa o limite por IP do identificar', async () => {
+    headerGet.mockReturnValue('6.6.6.6');
+    perguntasMock.mockResolvedValue(perguntas(3));
+    for (let i = 0; i < 10; i++) expect((await carregarPerguntas('dons-servico')).ok).toBe(true);
+    expect(await carregarPerguntas('dons-servico')).toEqual({ ok: false, erro: 'limite' });
   });
 });
 

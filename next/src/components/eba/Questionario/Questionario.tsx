@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useCallback, useEffect, useId, useReducer, useRef, useState } from 'react';
 import { preload } from 'react-dom';
 import { buttonClassName } from '@/components/ui/ButtonLink';
-import type { cadastrar, enviar, identificar, sair } from '@/app/(site)/eba/testes/[slug]/acoes';
+import type { aquecer, cadastrar, carregarPerguntas, enviar, identificar, sair } from '@/app/(site)/eba/testes/[slug]/acoes';
 import { registrarEvento } from '@/lib/analytics/datalayer';
 import type { Pergunta } from '@/lib/eba-api/perguntas';
 import { TESTES, type DefinicaoTeste } from '@/lib/eba-api/testes';
@@ -22,9 +22,11 @@ import {
   reducer,
   respondidas,
   respostasParaApi,
+  telasDoTeste,
   temProgresso,
   type EstadoQuestionario,
 } from './estado';
+import { TextoEspera, useEsperaLonga } from './AvisoDeEspera';
 import { Cadastro, Identificacao } from './Identificacao';
 import { PerguntaEstilo } from './PerguntaEstilo';
 import { PerguntaMarcar } from './PerguntaMarcar';
@@ -40,9 +42,20 @@ export interface QuestionarioProps {
   abertura: { resumo: string; perguntas: string | null; resposta: string | null; comoResponder: string | null; aula: string | null };
   perguntas: Pergunta[];
   sessao: { emailMascarado: string } | null;
-  /** A API falhou ao buscar as perguntas no servidor: a abertura aparece, mas "Começar" só avisa. */
+  /**
+   * A API falhou ao buscar as perguntas no servidor (API fria passa dos 10 s da página): a abertura
+   * aparece e "Começar" tenta de novo pela ação `carregarPerguntas` (45 s).
+   */
   perguntasIndisponiveis?: boolean;
-  acoes: { identificar: typeof identificar; cadastrar: typeof cadastrar; enviar: typeof enviar; sair: typeof sair };
+  acoes: {
+    identificar: typeof identificar;
+    cadastrar: typeof cadastrar;
+    enviar: typeof enviar;
+    sair: typeof sair;
+    carregarPerguntas: typeof carregarPerguntas;
+    /** Acorda a API ao abrir (opcional: a vitrine não aquece). */
+    aquecer?: typeof aquecer;
+  };
   /**
    * Só para a vitrine: abre direto num estado. Nesse modo a tela não lê nem grava o
    * `sessionStorage` e não envia eventos ao DataLayer.
@@ -89,11 +102,24 @@ function momentoDaFoto(s: EstadoQuestionario): MomentoFoto {
  * Tela de um teste do CDV (ilha cliente): abertura → identificação → perguntas → envio → resultado.
  * Progresso no `sessionStorage` (só respostas, por slug); dados pessoais só no servidor.
  */
-export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndisponiveis = false, acoes, estadoInicial }: QuestionarioProps) {
+export function Questionario({
+  teste,
+  abertura,
+  perguntas: perguntasIniciais,
+  sessao,
+  perguntasIndisponiveis = false,
+  acoes,
+  estadoInicial,
+}: QuestionarioProps) {
   const id = useId();
   const demonstracao = estadoInicial !== undefined;
-  const [s, dispatch] = useReducer(reducer, undefined, () => ({ ...criarEstado({ tipo: teste.tipo, perguntas, sessao }), ...estadoInicial }));
+  const [s, dispatch] = useReducer(reducer, undefined, () => ({ ...criarEstado({ tipo: teste.tipo, perguntas: perguntasIniciais, sessao }), ...estadoInicial }));
   const [semPerguntas, setSemPerguntas] = useState(false);
+  // Perguntas da renderização ou, se a API estava fria, as que `carregarPerguntas` trouxe depois.
+  const [perguntas, setPerguntas] = useState(perguntasIniciais);
+  const [indisponiveis, setIndisponiveis] = useState(perguntasIndisponiveis);
+  const [preparando, setPreparando] = useState(false);
+  const esperaLonga = useEsperaLonga(preparando || s.estado === 'enviando');
   const chave = chaveProgresso(teste.slug);
 
   // Foco: vai para o enunciado (ou o título do estado) a cada troca de pergunta ou de estado.
@@ -112,18 +138,37 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
 
   // Progresso: lê uma vez a chave deste teste; depois grava a cada resposta e apaga no resultado
   // ou quando não há mais progresso (trocar e-mail, respostas de outra pessoa descartadas).
-  useEffect(() => {
-    if (demonstracao) return;
+  function restaurarProgresso(lista: Pergunta[]) {
     let salvo: string | null = null;
     try {
       salvo = sessionStorage.getItem(chave);
     } catch {
       // Storage bloqueado (modo privado, política do navegador): segue sem restaurar.
     }
-    dispatch({ tipo: 'restaurar', progresso: lerProgresso(salvo, { tipo: teste.tipo, total: s.total, perguntas }) });
+    const total = telasDoTeste(teste.tipo, lista);
+    dispatch({ tipo: 'restaurar', progresso: lerProgresso(salvo, { tipo: teste.tipo, total, perguntas: lista }) });
+  }
+  useEffect(() => {
+    // Sem as perguntas, o progresso salvo seria descartado (números que "não existem"): espera
+    // `carregarPerguntas`. Até restaurar, a tela também não grava (não apaga o que está salvo).
+    if (demonstracao || perguntasIndisponiveis) return;
+    restaurarProgresso(perguntasIniciais);
     // Só na montagem: restaurar depois apagaria respostas novas.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chave, demonstracao]);
+
+  // Aquecimento: o banco da API pausa quando fica ocioso; acorda enquanto a pessoa lê a abertura.
+  // Uma vez, sem esperar a resposta; nunca na vitrine.
+  const aqueceu = useRef(false);
+  useEffect(() => {
+    if (demonstracao || aqueceu.current || s.estado !== 'abertura' || !acoes.aquecer) return;
+    aqueceu.current = true;
+    acoes.aquecer().catch(() => {
+      // Só uma tentativa: a próxima ação mostra a falha real.
+    });
+    // Só na montagem.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (demonstracao || !s.carregado) return;
@@ -178,8 +223,41 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
     if (reenviar) void enviarRespostas(s.respondidoComo ?? emailMascarado);
   }
 
+  const precisaDePerguntas = teste.tipo === 'nota' || teste.tipo === 'talentos';
+
+  // Perguntas que não vieram na renderização: uma chamada por vez (sem clique duplo).
+  const preparandoAgora = useRef(false);
+  async function prepararTeste() {
+    if (preparandoAgora.current) return;
+    preparandoAgora.current = true;
+    setPreparando(true);
+    setSemPerguntas(false);
+    try {
+      const resposta = await acoes.carregarPerguntas(teste.slug);
+      const lista = resposta.ok ? (resposta.dados ?? []) : null;
+      if (!lista || (precisaDePerguntas && lista.length === 0)) {
+        setSemPerguntas(true);
+        return;
+      }
+      setPerguntas(lista);
+      setIndisponiveis(false);
+      dispatch({ tipo: 'perguntas', perguntas: lista });
+      if (!demonstracao) restaurarProgresso(lista);
+      dispatch({ tipo: 'comecar' });
+    } catch {
+      setSemPerguntas(true);
+    } finally {
+      preparandoAgora.current = false;
+      setPreparando(false);
+    }
+  }
+
   function comecar() {
-    if (perguntasIndisponiveis || ((teste.tipo === 'nota' || teste.tipo === 'talentos') && perguntas.length === 0)) {
+    if (indisponiveis) {
+      void prepararTeste();
+      return;
+    }
+    if (precisaDePerguntas && perguntas.length === 0) {
       setSemPerguntas(true);
       return;
     }
@@ -366,9 +444,15 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
                 Não conseguimos carregar as perguntas agora. Tente em alguns minutos.
               </p>
             )}
+            {preparando && (
+              <div className={styles.preparando} role="status">
+                <p className={styles.texto}>Preparando o teste…</p>
+                <TextoEspera visivel={esperaLonga} />
+              </div>
+            )}
             <div className={styles.botoes}>
-              <button type="button" className={buttonClassName()} onClick={comecar}>
-                {temProgresso(s) ? 'Continuar o teste' : 'Começar o teste'}
+              <button type="button" className={buttonClassName()} disabled={preparando} onClick={comecar}>
+                {indisponiveis && semPerguntas ? 'Tentar de novo' : temProgresso(s) ? 'Continuar o teste' : 'Começar o teste'}
               </button>
             </div>
           </>
@@ -403,6 +487,7 @@ export function Questionario({ teste, abertura, perguntas, sessao, perguntasIndi
             <div ref={focar} tabIndex={-1} className={styles.aviso} role="status">
               <span className={styles.girando} aria-hidden="true" />
               <p className={styles.corpo}>Calculando seu resultado…</p>
+              <TextoEspera visivel={esperaLonga} />
             </div>
             <div className={styles.botoes}>{botaoEnviar}</div>
           </>

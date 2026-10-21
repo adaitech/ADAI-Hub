@@ -12,6 +12,7 @@ import {
   reducer,
   respondidas,
   respostasParaApi,
+  telasDoTeste,
   temProgresso,
   type Acao,
   type EstadoQuestionario,
@@ -51,6 +52,15 @@ describe('criarEstado', () => {
 
   it('nota sem perguntas ainda tem 1 tela (sem divisão por zero)', () => {
     expect(criarEstado({ tipo: 'nota', perguntas: [], sessao: null }).total).toBe(1);
+  });
+
+  it('perguntas carregadas depois (API fria): o total passa a contar as perguntas recebidas', () => {
+    const vazio = criarEstado({ tipo: 'nota', perguntas: [], sessao: null });
+    expect(reducer(vazio, { tipo: 'perguntas', perguntas }).total).toBe(3);
+    expect(telasDoTeste('nota', perguntas)).toBe(3);
+    expect(telasDoTeste('talentos', [])).toBe(2);
+    const temperamento = criarEstado({ tipo: 'temperamento', perguntas: [], sessao: null });
+    expect(reducer(temperamento, { tipo: 'perguntas', perguntas }).total).toBe(20);
   });
 
   it('guarda o e-mail mascarado da sessão', () => {
