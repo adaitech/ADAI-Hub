@@ -87,4 +87,15 @@ describe('eventosDoClique', () => {
     const tel = eventosDoClique({ secao: 'footer', texto: 'Ligar', destino: 'tel:+5511959879085', card: null });
     expect(tel.at(-1)?.[1]).toMatchObject({ destino: 'tel:' });
   });
+
+  it('inscrição em curso da EBA (link com data-curso) → inscrever_curso + clique_cta', () => {
+    const eventos = eventosDoClique({ secao: 'curso-cabecalho', texto: 'Quero me inscrever', destino: 'https://forms.gle/BtMpykm2Gs6zM1Mm6', card: null, curso: 'talmidim' });
+    expect(eventos[0]).toEqual(['inscrever_curso', { origem: 'curso-cabecalho', curso: 'talmidim' }]);
+    expect(nomes(eventos)).toEqual(['inscrever_curso', 'clique_cta']);
+  });
+
+  it('sem curso → só clique_cta (mesmo com texto "inscrever")', () => {
+    expect(nomes(eventosDoClique({ secao: 'hero', texto: 'Quero me inscrever', destino: 'https://forms.gle/x', card: null }))).toEqual(['clique_cta']);
+  });
 });
+

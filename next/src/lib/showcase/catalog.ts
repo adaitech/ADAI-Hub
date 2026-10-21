@@ -13,7 +13,13 @@ import { serieAtualShowcase } from '@/components/sections/SerieAtualSection/Seri
 import { textoBotoesShowcase } from '@/components/sections/TextoBotoesSection/TextoBotoesSection.showcase';
 import { textoRicoShowcase } from '@/components/sections/TextoRicoSection/TextoRicoSection.showcase';
 import { buttonLinkShowcase } from '@/components/ui/ButtonLink/ButtonLink.showcase';
+import { cursoCabecalhoShowcase } from '@/components/layout/CursoCabecalho/CursoCabecalho.showcase';
+import { catalogoCursosShowcase } from '@/components/sections/CatalogoCursosSection/CatalogoCursosSection.showcase';
+import { cardCursoShowcase } from '@/components/ui/CardCurso/CardCurso.showcase';
+import { listaTestesShowcase } from '@/components/sections/ListaTestesSection/ListaTestesSection.showcase';
+import { chipsShowcase } from '@/components/ui/Chips/Chips.showcase';
 import { textLinkShowcase } from '@/components/ui/TextLink/TextLink.showcase';
+import { trilhaShowcase } from '@/components/ui/Trilha/Trilha.showcase';
 import type { ShowcaseCategoria, ShowcaseEntry } from './types';
 import { pixShowcase } from '@/components/sections/PixSection/PixSection.showcase';
 import { copyButtonShowcase } from '@/components/ui/CopyButton/CopyButton.showcase';
@@ -38,6 +44,12 @@ export const showcaseCatalog: ShowcaseEntry[] = [
   bannerCookiesShowcase,
   buttonLinkShowcase,
   textLinkShowcase,
+  chipsShowcase,
+  trilhaShowcase,
+  cardCursoShowcase,
+  catalogoCursosShowcase,
+  cursoCabecalhoShowcase,
+  listaTestesShowcase,
 ];
 
 export const categoriaLabel: Record<ShowcaseCategoria, string> = {

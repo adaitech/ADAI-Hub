@@ -1,0 +1,67 @@
+/* Proposta 🟡 (protótipo da EBA, navegação A). Mobile: só o nível anterior com "‹". */
+.trilha {
+  padding-top: var(--space-24);
+}
+
+.lista {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-legenda);
+}
+
+.item {
+  display: none;
+}
+
+.anterior {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.anterior .link::before {
+  content: "‹";
+  margin-right: var(--space-4);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--color-text-primary);
+}
+
+.atual {
+  font-weight: var(--font-weight-bold);
+}
+
+/* tier: tablet */
+@media (min-width: 769px) {
+  .item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .anterior .link::before {
+    content: none;
+  }
+
+  .item + .item::before,
+  .item + .anterior::before,
+  .anterior + .item::before {
+    content: "›";
+    color: var(--color-text-muted);
+  }
+}

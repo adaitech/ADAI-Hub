@@ -118,4 +118,23 @@ describe('RastreadorAnalytics', () => {
     fireEvent.click(screen.getByRole('link', { name: 'Como chegar' }));
     expect(window.dataLayer![0]).toMatchObject({ event: 'como_chegar', unidade: 'campestre' });
   });
+
+  it('botão de inscrição com data-curso → inscrever_curso com o slug do curso', () => {
+    render(
+      <main>
+        <div data-section="curso-cabecalho">
+          <a href="https://forms.gle/x" data-curso="reset">Quero me inscrever</a>
+          <a href="#perguntas-frequentes">Perguntas frequentes</a>
+        </div>
+        <RastreadorAnalytics />
+      </main>,
+    );
+    fireEvent.click(screen.getByRole('link', { name: 'Quero me inscrever' }));
+    expect(eventos()).toEqual(['inscrever_curso', 'clique_cta']);
+    expect(window.dataLayer![0]).toMatchObject({ curso: 'reset', origem: 'curso-cabecalho' });
+    window.dataLayer = [];
+    fireEvent.click(screen.getByRole('link', { name: 'Perguntas frequentes' }));
+    expect(eventos()).toEqual(['clique_cta']);
+  });
 });
+

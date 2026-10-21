@@ -2,8 +2,10 @@ import type { ComponentType } from 'react';
 import { PixSection, pixPopulate } from '@/components/sections/PixSection';
 import { AgendaEventosSection, agendaEventosPopulate } from '@/components/sections/AgendaEventosSection';
 import { CarrosselCardsSection, carrosselCardsPopulate } from '@/components/sections/CarrosselCardsSection';
+import { CatalogoCursosSection, catalogoCursosPopulate } from '@/components/sections/CatalogoCursosSection';
 import { HeroSection, heroPopulate } from '@/components/sections/HeroSection';
 import { ImagemTextoSection, imagemTextoPopulate } from '@/components/sections/ImagemTextoSection';
+import { ListaTestesSection, listaTestesPopulate } from '@/components/sections/ListaTestesSection';
 import { MinisteriosSection, ministeriosPopulate } from '@/components/sections/MinisteriosSection';
 import { PerguntasFrequentesSection, perguntasFrequentesPopulate } from '@/components/sections/PerguntasFrequentesSection';
 import { ProximosEventosSection, proximosEventosPopulate } from '@/components/sections/ProximosEventosSection';
@@ -41,6 +43,8 @@ export const sectionRegistry: Record<string, SectionRegistryEntry> = {
   'sections.serie-atual': defineSection(SerieAtualSection, serieAtualPopulate),
   'sections.proximos-eventos': defineSection(ProximosEventosSection, proximosEventosPopulate),
   'sections.texto-rico': defineSection(TextoRicoSection, textoRicoPopulate),
+  'sections.catalogo-cursos': defineSection(CatalogoCursosSection, catalogoCursosPopulate),
+  'sections.lista-testes': defineSection(ListaTestesSection, listaTestesPopulate),
 };
 
 export function getSection(key: string): SectionRegistryEntry | null {

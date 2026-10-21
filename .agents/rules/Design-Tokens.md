@@ -173,6 +173,7 @@ Mapeamento de estilos:
 | --- | --- | --- | --- |
 | `--space-gutter` | 43,2px (3%) | `clamp(16px, 3vw, 57.6px)` | ✅ header/top bar / 🟡 mobile |
 | `--space-section` | 120px (recorrente) | `clamp(64px, 8.333vw, 120px)` | ✅ desktop (derivado) / 🟡 mobile |
+| `--space-menu` | 32px (gap do menu, Figma) | `clamp(1rem, 2.2vw, 2rem)` | 🟡 proposta: 6 links do menu (EBA) cabem em 1024px sem quebrar os botões |
 | `--space-page-margin` | 80px | `clamp(16px, 5.556vw, 80px)` | ✅ desktop / 🟡 mobile — margem lateral das seções |
 | `--container-max` | 1440px | `90rem` | ✅ shell |
 | `--content-max` | 1280px | `80rem` | ✅ conteúdo das seções |

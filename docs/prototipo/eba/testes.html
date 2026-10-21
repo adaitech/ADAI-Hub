@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testes de dons e talentos — EBA | ADAI</title>
+<meta name="description" content="Dons de serviço, dons ministeriais, talentos naturais, estilo pessoal e temperamento: conheça os testes do CDV.">
+<meta name="robots" content="noindex, nofollow">
+<!-- Protótipo da migração da EBA (entrega 1). Base visual: docs/prototipo/index.html (design system).
+     Conteúdo real do site atual eba.adai.com.br. Nada aqui é código de produção. -->
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="eba.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="logo-uso" viewBox="0 0 99.21 32.6">
+    <g transform="translate(19.46 3.29)" fill="currentColor"><path d="M13.01 0C5.82 0 0 5.83 0 13.01C0 20.19 5.83 26.02 13.01 26.02C20.19 26.02 26.02 20.19 26.02 13.01C26.02 5.83 20.19 0 13.01 0ZM14.27 18.35L14.25 15.75H16.31L13.02 10.12L9.76 15.75H11.7V18.35H5.12L9.06 11.53L13 4.71L16.94 11.53L20.88 18.35H14.26H14.27Z"/></g>
+    <g transform="translate(48.71 7.15)" fill="currentColor"><path d="M5.93 17.09L5.49 13.75H3L2.49 17.09H0L2.85 0H5.85L8.7 17.09H5.93ZM4.34 4.49L3.34 11.47H5.19L4.34 4.49Z"/><path d="M13.91 17.09H9.75V0H13.91C16.37 0 17.81 1.54 17.81 4.08V13.11C17.81 15.68 16.37 17.09 13.91 17.09ZM15.09 4.06C15.09 2.98 14.68 2.44 13.73 2.44H12.47V14.68H13.73C14.68 14.68 15.09 14.12 15.09 13.06V4.05V4.06Z"/><path d="M24.5 17.09L24.06 13.75H21.57L21.06 17.09H18.57L21.42 0H24.42L27.27 17.09H24.5ZM22.91 4.49L21.91 11.47H23.76L22.91 4.49Z"/><path d="M28.33 17.09V0H31.05V17.09H28.33Z"/></g>
+  </symbol>
+</svg>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="prototipo-barra" role="region" aria-label="Controles do protótipo">
+  <strong>Protótipo · EBA no ADAI Hub · entrega 1</strong>
+  <nav aria-label="Telas do protótipo">
+    <ul role="list">
+      <li><a href="index.html">/eba</a></li>
+      <li><a href="cursos.html">/eba/cursos</a></li>
+      <li><a href="talmidim.html">Talmidim</a></li>
+      <li><a href="reset.html">Reset</a></li>
+      <li><a href="start.html">Start</a></li>
+      <li><a href="cdv.html">CDV</a></li>
+      <li><a href="testes.html">/eba/testes</a></li>
+      <li><a href="teste-dons-servico.html">Teste (entrega 2)</a></li>
+      <li><a href="estados.html">Estados</a></li>
+    </ul>
+  </nav>
+  <div class="alternancias">
+    <div class="grupo-nav" role="group" aria-label="Navegação interna da EBA" hidden>
+      <span>Navegação:</span>
+      <button type="button" class="alternar" data-nav="a" aria-pressed="true">A · conteúdo + trilha</button>
+      <button type="button" class="alternar" data-nav="b" aria-pressed="false">B · barra da área</button>
+    </div>
+    <button type="button" class="alternar" id="alternar-anotacoes" aria-pressed="false" hidden>Mostrar marcações O/D/P</button>
+  </div>
+</div>
+
+<nav class="topbar" aria-label="Institucional">
+  <ul role="list">
+    <li><a href="/sobre-nos/nossa-historia">Sobre nós</a></li>
+    <li><a href="/unidades">Localidades</a></li>
+    <li><a href="/contribua">Contribua</a></li>
+    <li><a href="/contato">Contato</a></li>
+  </ul>
+</nav>
+
+<header class="header" data-anotada>
+  <div class="header__barra">
+    <a class="logo" href="/" aria-label="ADAI, página inicial">
+      <svg viewBox="0 0 99.21 32.6" aria-hidden="true" focusable="false"><use href="#logo-uso"/></svg>
+    </a>
+    <button type="button" class="menu-botao" aria-expanded="false" aria-controls="menu-principal" hidden>
+      <span class="menu-botao__icone" aria-hidden="true"></span>Menu
+    </button>
+    <div class="header__painel" id="menu-principal">
+      <nav class="nav-principal" aria-label="Principal">
+        <ul role="list">
+          <li><a href="/unidades">Unidades</a></li>
+          <li><a href="/mensagens">Mensagens</a></li>
+          <li><a href="/agenda">Agenda</a></li>
+          <li><a href="/ministerios">Ministérios</a></li>
+          <li><a href="/contribua">Contribua</a></li>
+          <li><a href="index.html" aria-current="true">EBA</a></li>
+        </ul>
+      </nav>
+      <div class="header__acoes">
+        <a class="botao botao--contorno-escuro botao--baixo" href="/ao-vivo">Ao vivo</a>
+        <a class="botao botao--primario botao--baixo" href="/planeje-sua-visita">Planeje sua visita</a>
+      </div>
+    </div>
+  </div>
+</header>
+<p class="anotacao container"><span class="selo selo--o">Observado</span><span>Header 233:48 · 80px · menu gap 32</span><span class="selo selo--p">Proposto</span><span>“EBA” é o 6º link (limite do cabeçalho), cadastrado no Strapi sem código</span><span class="selo selo--p">Proposto</span><span>aria-current marca a área da EBA</span></p>
+<nav class="area-nav" aria-label="Escola Bíblica ADAI" data-anotada>
+    <div class="area-nav__barra">
+      <a class="area-nav__marca" href="index.html"><img src="assets/logo-eba.webp" alt="EBA, início da Escola Bíblica ADAI" width="400" height="118"></a>
+      <ul role="list">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="cursos.html">Cursos</a></li>
+        <li><a href="testes.html" aria-current="page">Testes</a></li>
+        <li><a href="https://eba.adai.com.br/login" class="externo" data-externo>Área da equipe<span class="sr-only"> (no site atual da EBA)</span></a></li>
+      </ul>
+    </div>
+  </nav>
+  <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Barra da área (opção B): logo da EBA + links editáveis no Strapi; rola na horizontal no celular</span><span class="selo selo--p">Proposto</span><span>Testes vira página do Hub (/eba/testes); Área da equipe leva ao login do site atual até a entrega 4</span></p>
+<main id="conteudo" tabindex="-1">
+<nav class="trilha container" aria-label="Trilha" data-anotada>
+      <ol role="list"><li><a href="/">ADAI</a></li><li><a href="index.html">EBA</a></li><li><span aria-current="page">Testes</span></li></ol>
+    </nav>
+    <p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Trilha (opção A): completa a partir de 769px; no celular vira “‹ voltar” ao nível anterior</span><span class="selo selo--p">Proposto</span><span>Gera o BreadcrumbList no HTML do servidor</span></p>
+<section class="container curso-topo" aria-labelledby="testes-h1" data-anotada>
+  <div class="curso-topo__texto">
+    <p class="curso-topo__vertente">Parte do curso CDV</p>
+    <h1 class="t-display" id="testes-h1">Testes de dons e talentos</h1>
+    <p class="t-corpo curso-topo__resumo">Cinco testes para você se conhecer melhor: seus dons espirituais, seus talentos, seu estilo e seu temperamento. Juntos, eles ajudam a encontrar o seu lugar para servir na igreja.</p>
+    <div class="botoes"><a class="botao botao--primario" href="#os-testes">Ver os testes</a><a class="botao botao--contorno-escuro" href="cdv.html">Conhecer o CDV</a></div>
+    <p class="aviso-externo">Os testes são feitos no site atual da EBA, pelo celular ou computador.</p>
+  </div>
+  <img class="curso-topo__foto" src="assets/cdv-info.webp" alt="Alunos durante uma aula do CDV." width="1200" height="800" loading="eager" fetchpriority="high">
+</section>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Página “eba-testes” do Strapi, no mesmo modelo das páginas da EBA (/eba/[slug])</span><span class="selo selo--d">Derivado</span><span>Abertura no mesmo formato do topo do curso</span><span class="selo selo--d">Derivado</span><span>Conteúdo resumido da apostila do CDV (EBA 2023), aulas 5, 6, 7, 10 e 11; validar com a EBA</span></p>
+
+<section class="secao" aria-labelledby="como-titulo" data-anotada>
+  <div class="container">
+    <div class="cabecalho-secao">
+      <h2 class="t-h1" id="como-titulo">Como funciona</h2>
+      <p class="t-corpo">Os testes não dão nota nem dizem se você é melhor ou pior. Eles são um retrato de como Deus fez você.</p>
+    </div>
+    <ol class="caminho" role="list">
+      <li><strong class="t-h4">Responda com sinceridade</strong><span>Pense em como você é hoje, não em como gostaria de ser. Na dúvida, lembre do que as pessoas próximas dizem de você.</span></li>
+      <li><strong class="t-h4">Veja o resultado</strong><span>Cada teste mostra quais dons, talentos e características aparecem com mais força em você.</span></li>
+      <li><strong class="t-h4">Converse na consultoria</strong><span>No fim do CDV, você revisa os resultados com a equipe da EBA e indica dois ministérios em que deseja servir.</span></li>
+    </ol>
+  </div>
+</section>
+<p class="anotacao container"><span class="selo selo--d">Derivado</span><span>Passos derivados das aulas 5 a 12 (a aula 12 é a consultoria)</span><span class="selo selo--d">Derivado</span><span>Lista numerada em caixas, a mesma de “Por onde começar”</span></p>
+
+<section class="secao" aria-labelledby="os-testes-titulo" id="os-testes" data-anotada>
+  <div class="container">
+    <div class="cabecalho-secao">
+      <h2 class="t-h1" id="os-testes-titulo">Os 5 testes</h2>
+      <p class="t-corpo">Na ordem em que aparecem no curso. Você pode ir direto a um deles:</p>
+      <ul class="cta__links" role="list"><li><a href="#dons-servico">Dons de serviço prático</a></li><li><a href="#dons-ministerio">Dons ministeriais</a></li><li><a href="#talentos-naturais">Talentos naturais</a></li><li><a href="#estilo-pessoal">Estilo pessoal</a></li><li><a href="#temperamento-pessoal">Temperamento pessoal</a></li></ul>
+    </div>
+    <div class="testes">
+    <article class="teste" id="dons-servico" aria-labelledby="dons-servico-titulo">
+      <div class="teste__abertura">
+        <p class="teste__numero t-micro"><span>Teste 1 de 5</span><span>Aula 5 do CDV</span></p>
+        <h2 class="t-h2" id="dons-servico-titulo">Dons de serviço prático</h2>
+        <p class="t-corpo">Mostra quais dons espirituais aparecem com mais força no seu jeito de servir no dia a dia da igreja.</p>
+        <dl class="card-curso__meta teste__formato"><div><dt>Perguntas</dt><dd>55 afirmações</dd></div><div><dt>Resposta</dt><dd>nota de 0 a 5</dd></div></dl>
+        <div class="botoes"><a class="botao botao--primario" href="teste-dons-servico.html">Fazer o teste<span class="sr-only"> de dons de serviço prático</span></a></div>
+      </div>
+      <div class="teste__corpo">
+        <div class="teste__parte"><h3 class="t-h4">O que é</h3><p class="t-corpo-pequeno">Dom é uma capacidade dada pelo Espírito Santo para edificar a igreja. Não se aprende como uma técnica: se reconhece, se desenvolve e se coloca a serviço dos outros. O teste ajuda a perceber quais desses dons já se manifestam na sua vida.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Os 11 dons do teste</h3><ul class="etiquetas" role="list"><li>Profecia</li><li>Serviço</li><li>Ensino</li><li>Exortação</li><li>Contribuição</li><li>Presidir (liderança)</li><li>Misericórdia</li><li>Administração</li><li>Socorro</li><li>Hospitalidade</li><li>Intercessão</li></ul></div>
+        <div class="teste__parte"><h3 class="t-h4">Como responder</h3><p class="t-corpo-pequeno">Para cada afirmação, pergunte-se: “isso tem sido a minha experiência?”. Responda pelo que você vive hoje, não pelo que gostaria de viver.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Como ler o resultado</h3><p class="t-corpo-pequeno">Cada dom soma as notas de 5 afirmações e vai de 0 a 25. Quanto maior a soma, mais esse dom aparece na sua vida. Os dons com as maiores somas são os seus pontos de partida.</p></div>
+      </div>
+    </article>
+    <article class="teste" id="dons-ministerio" aria-labelledby="dons-ministerio-titulo">
+      <div class="teste__abertura">
+        <p class="teste__numero t-micro"><span>Teste 2 de 5</span><span>Aula 6 do CDV</span></p>
+        <h2 class="t-h2" id="dons-ministerio-titulo">Dons ministeriais</h2>
+        <p class="t-corpo">Identifica qual dos cinco ministérios de Efésios 4.11 tem mais a ver com o seu chamado.</p>
+        <dl class="card-curso__meta teste__formato"><div><dt>Perguntas</dt><dd>25 afirmações</dd></div><div><dt>Resposta</dt><dd>nota de 0 a 5</dd></div></dl>
+        <div class="botoes"><a class="botao botao--primario" href="teste-dons-servico.html">Fazer o teste<span class="sr-only"> de dons ministeriais</span></a></div>
+      </div>
+      <div class="teste__corpo">
+        <div class="teste__parte"><h3 class="t-h4">O que é</h3><p class="t-corpo-pequeno">São os dons dados para preparar a igreja para o serviço e fazê-la crescer. Eles não são cargos: descrevem o tipo de contribuição que cada pessoa traz para o corpo de Cristo.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Os 5 dons do teste</h3><ul class="etiquetas" role="list"><li>Apóstolo</li><li>Profeta</li><li>Evangelista</li><li>Pastor</li><li>Mestre (professor)</li></ul></div>
+        <div class="teste__parte"><h3 class="t-h4">Como responder</h3><p class="t-corpo-pequeno">Funciona como o teste de dons de serviço: dê uma nota para cada afirmação, com sinceridade, pensando na sua experiência real.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Como ler o resultado</h3><p class="t-corpo-pequeno">Cada dom soma as notas de 5 afirmações, de 0 a 25. A maior soma indica o dom ministerial mais presente em você.</p></div>
+      </div>
+    </article>
+    <article class="teste" id="talentos-naturais" aria-labelledby="talentos-naturais-titulo">
+      <div class="teste__abertura">
+        <p class="teste__numero t-micro"><span>Teste 3 de 5</span><span>Aula 7 do CDV</span></p>
+        <h2 class="t-h2" id="talentos-naturais-titulo">Talentos naturais</h2>
+        <p class="t-corpo">Ajuda a reconhecer as habilidades que você já tem e que podem servir a Deus junto com os seus dons.</p>
+        <dl class="card-curso__meta teste__formato"><div><dt>Perguntas</dt><dd>lista de 26 habilidades</dd></div><div><dt>Resposta</dt><dd>marcar as que você tem</dd></div></dl>
+        <div class="botoes"><a class="botao botao--primario" href="teste-dons-servico.html">Fazer o teste<span class="sr-only"> de talentos naturais</span></a></div>
+      </div>
+      <div class="teste__corpo">
+        <div class="teste__parte"><h3 class="t-h4">O que é</h3><p class="t-corpo-pequeno">Talento não é dom. Talento é uma habilidade que a pessoa aprende e aperfeiçoa com a prática, como cantar, ensinar ou consertar. Dom é dado pelo Espírito. Os dois funcionam melhor juntos: cantar pode ser talento; encorajar pessoas pelo louvor é dom.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Alguns dos 26 talentos da lista</h3><ul class="etiquetas" role="list"><li>Ensinar</li><li>Planejar</li><li>Aconselhar</li><li>Escrever</li><li>Música</li><li>Hospitalidade</li><li>Reparar</li><li>Contabilidade</li><li>Artes e fotografia</li><li>Decoração</li></ul></div>
+        <div class="teste__parte"><h3 class="t-h4">Como responder</h3><p class="t-corpo-pequeno">Marque as habilidades que você reconhece em si. Muita gente tem habilidades que não percebe: vale lembrar do que faz no trabalho, em casa e com os amigos.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Como ler o resultado</h3><p class="t-corpo-pequeno">Escolha as 3 habilidades mais fortes. Elas mostram onde os seus talentos podem somar com os seus dons no ministério.</p></div>
+      </div>
+    </article>
+    <article class="teste" id="estilo-pessoal" aria-labelledby="estilo-pessoal-titulo">
+      <div class="teste__abertura">
+        <p class="teste__numero t-micro"><span>Teste 4 de 5</span><span>Aula 10 do CDV</span></p>
+        <h2 class="t-h2" id="estilo-pessoal-titulo">Estilo pessoal</h2>
+        <p class="t-corpo">Revela o que te motiva e como você prefere se organizar para servir.</p>
+        <dl class="card-curso__meta teste__formato"><div><dt>Perguntas</dt><dd>pares de frases opostas</dd></div><div><dt>Resposta</dt><dd>escala de 1 a 5</dd></div></dl>
+        <div class="botoes"><a class="botao botao--primario" href="teste-dons-servico.html">Fazer o teste<span class="sr-only"> de estilo pessoal</span></a></div>
+      </div>
+      <div class="teste__corpo">
+        <div class="teste__parte"><h3 class="t-h4">O que é</h3><p class="t-corpo-pequeno">Deus fez cada pessoa única. O estilo pessoal é o jeito como você usa a sua energia: algumas pessoas se animam com tarefas cumpridas, outras com pessoas por perto; algumas preferem planejar tudo, outras preferem flexibilidade.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Os dois eixos do teste</h3><ul class="etiquetas" role="list"><li>Motivado por tarefas</li><li>Motivado por pessoas</li><li>Estruturado</li><li>Não estruturado</li></ul></div>
+        <div class="teste__parte"><h3 class="t-h4">Como responder</h3><p class="t-corpo-pequeno">Em cada par de frases, marque na escala de 1 a 5 o ponto mais próximo de como você é. Não há resposta certa: os dois lados são bons.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Como ler o resultado</h3><p class="t-corpo-pequeno">A soma de cada parte mostra a sua posição em dois eixos: motivação (tarefas ou pessoas) e organização (estruturado ou não estruturado). Juntos, eles mostram em que tipo de ambiente você rende mais.</p></div>
+      </div>
+    </article>
+    <article class="teste" id="temperamento-pessoal" aria-labelledby="temperamento-pessoal-titulo">
+      <div class="teste__abertura">
+        <p class="teste__numero t-micro"><span>Teste 5 de 5</span><span>Aula 11 do CDV</span></p>
+        <h2 class="t-h2" id="temperamento-pessoal-titulo">Temperamento pessoal</h2>
+        <p class="t-corpo">Mostra a mistura de temperamentos que influencia como você reage, decide e se relaciona.</p>
+        <dl class="card-curso__meta teste__formato"><div><dt>Perguntas</dt><dd>4 listas de características</dd></div><div><dt>Resposta</dt><dd>marcar as que descrevem você</dd></div></dl>
+        <div class="botoes"><a class="botao botao--primario" href="teste-dons-servico.html">Fazer o teste<span class="sr-only"> de temperamento pessoal</span></a></div>
+      </div>
+      <div class="teste__corpo">
+        <div class="teste__parte"><h3 class="t-h4">O que é</h3><p class="t-corpo-pequeno">O temperamento é o jeito natural de cada pessoa e acompanha a vida toda. O Espírito Santo transforma o caráter, mas não troca o temperamento. Conhecer o seu ajuda a entender suas forças e fraquezas e a conviver melhor com quem é diferente.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Os 4 temperamentos</h3><ul class="etiquetas" role="list"><li>Sanguíneo</li><li>Colérico</li><li>Melancólico</li><li>Fleumático</li></ul></div>
+        <div class="teste__parte"><h3 class="t-h4">Como responder</h3><p class="t-corpo-pequeno">Em cada temperamento, marque as características (forças e fraquezas) que descrevem você. Seja honesto também com as fraquezas: todo temperamento tem as suas.</p></div>
+        <div class="teste__parte"><h3 class="t-h4">Como ler o resultado</h3><p class="t-corpo-pequeno">O resultado mostra a porcentagem de cada temperamento em você. Quase todo mundo é uma mistura, com um temperamento predominante.</p></div>
+      </div>
+    </article>
+    </div>
+  </div>
+</section>
+<p class="anotacao container"><span class="selo selo--p">Proposto</span><span>Um bloco por teste: abertura (nome, resumo, formato, botão) + 4 partes fixas</span><span class="selo selo--p">Proposto</span><span>No Strapi: tipo “teste” com campos fixos, para a entrega 2 reaproveitar quando os testes vierem para o Hub</span><span class="selo selo--p">Proposto</span><span>Entrega 2: “Fazer o teste” abre /eba/testes/<slug> no Hub (no protótipo, todos levam ao teste de dons); QR codes do site atual redirecionam com 301</span></p>
+
+<section class="secao" aria-labelledby="faq-testes-titulo" data-section="perguntas-frequentes" data-anotada>
+  <div class="container">
+    <div class="cabecalho-secao"><h2 class="t-h1" id="faq-testes-titulo">Perguntas frequentes</h2></div>
+    <div class="faq">
+      <details><summary>Dom e talento são a mesma coisa?</summary><div class="t-corpo-pequeno"><p>Não. Talento é uma habilidade que se aprende e se aperfeiçoa. Dom é uma capacidade dada pelo Espírito Santo para edificar a igreja. Por isso há testes separados para cada um.</p></div></details>
+      <details><summary>O resultado diz em qual ministério vou servir?</summary><div class="t-corpo-pequeno"><p>Sozinho, não. Os resultados são o ponto de partida da consultoria no fim do CDV, quando você conversa com a equipe da EBA e indica dois ministérios.</p></div></details>
+      <details><summary>Preciso fazer todos os testes?</summary><div class="t-corpo-pequeno"><p>Sim. Cada teste mostra uma parte de quem você é, e a consultoria usa os cinco resultados juntos.</p></div></details>
+      <details><summary>Posso fazer os testes sem estar no CDV?</summary><div class="t-corpo-pequeno"><p>Os testes fazem parte do <a href="cdv.html">CDV</a> e são explicados em aula. Para entender bem o resultado, faça o curso.</p></div></details>
+    </div>
+  </div>
+</section>
+<p class="anotacao container"><span class="selo selo--d">Derivado</span><span>Respostas derivadas da apostila; “Posso fazer sem estar no CDV?” precisa da validação da EBA</span></p>
+
+<section class="secao" aria-labelledby="cdv-cta-titulo">
+  <div class="container">
+    <div class="cta">
+      <h2 class="t-h1" id="cdv-cta-titulo">Faça os testes no CDV</h2>
+      <p class="t-corpo cta__apoio">No curso, cada teste é explicado em aula e, no fim, você recebe a orientação da equipe para encontrar o seu ministério.</p>
+      <div class="botoes"><a class="botao botao--primario" href="cdv.html">Conhecer o CDV</a></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grade">
+      <div class="footer__marca">
+        <a class="logo" href="/" aria-label="ADAI, página inicial">
+          <svg viewBox="19 3 62 27" style="width:62px;height:27px" aria-hidden="true" focusable="false"><use href="#logo-uso" x="0" y="0" width="99.21" height="32.6"/></svg>
+        </a>
+        <p>Somos uma igreja que ama a Deus, serve as pessoas e influencia o mundo.</p>
+      </div>
+      <nav class="footer__colunas" aria-label="Rodapé">
+        <div class="footer__coluna">
+          <h2>Igreja</h2>
+          <ul role="list">
+            <li><a href="/sobre-nos/nossa-historia">Nossa história</a></li>
+            <li><a href="/sobre-nos/a-igreja-que-vemos">A igreja que vemos</a></li>
+            <li><a href="/sobre-nos/no-que-acreditamos">No que acreditamos</a></li>
+            <li><a href="/jesus">Jesus</a></li>
+          </ul>
+        </div>
+        <div class="footer__coluna">
+          <h2>Participe</h2>
+          <ul role="list">
+            <li><a href="/unidades">Unidades</a></li>
+            <li><a href="/agenda">Agenda</a></li>
+            <li><a href="/ministerios">Ministérios</a></li>
+            <li><a href="index.html">Escola Bíblica (EBA)</a></li>
+          </ul>
+        </div>
+        <div class="footer__coluna">
+          <h2>Contato</h2>
+          <ul role="list">
+            <li><a href="mailto:contato@adai.com.br">E-mail<span class="sr-only"> contato@adai.com.br</span></a></li>
+            <li><a href="/contato">Fale com a gente</a></li>
+            <li><a href="/contribua">Contribua</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="footer__legal">
+      <p>© 2026 ADAI. Todos os direitos reservados. <a href="/politica-de-privacidade">Política de Privacidade</a></p>
+      <p>Amar · Servir · Influenciar.</p>
+    </div>
+  </div>
+  <p class="footer__mega" aria-hidden="true">ADAI</p>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="prototipo.js"></script>
+</body>
+</html>

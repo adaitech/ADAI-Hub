@@ -1,0 +1,4 @@
+/* Trilha das páginas internas da EBA: mesma margem lateral das seções. */
+.trilha {
+  padding-inline: var(--space-gutter);
+}

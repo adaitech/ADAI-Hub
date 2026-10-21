@@ -1,6 +1,6 @@
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { caminhoDaPagina } from '@/lib/paginas/caminho';
+import { caminhoDaPagina, caminhoDoCurso } from '@/lib/paginas/caminho';
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   const secret = searchParams.get('secret');
   const slug = searchParams.get('slug') ?? 'home';
   const status = searchParams.get('status');
+  const tipo = searchParams.get('tipo');
 
   if (!process.env.PREVIEW_SECRET || secret !== process.env.PREVIEW_SECRET) {
     return new Response('Token inválido', { status: 401 });
@@ -22,5 +23,5 @@ export async function GET(request: Request) {
   if (status === 'draft') draft.enable();
   else draft.disable();
 
-  redirect(caminhoDaPagina(slug));
+  redirect(tipo === 'curso' ? caminhoDoCurso(slug) : caminhoDaPagina(slug));
 }

@@ -22,13 +22,15 @@ export default ({ env }) => ({
     config: {
       allowedOrigins: [env('CLIENT_URL')],
       async handler(uid, { documentId, status }) {
-        if (uid !== 'api::page.page') return null;
+        // Páginas e cursos da EBA têm pré-visualização; o Next decide o endereço pelo tipo.
+        if (uid !== 'api::page.page' && uid !== 'api::curso.curso') return null;
 
         const document = await strapi.documents(uid).findOne({ documentId, fields: ['slug'] });
         const params = new URLSearchParams({
           secret: env('PREVIEW_SECRET'),
           slug: document?.slug ?? 'home',
           status,
+          ...(uid === 'api::curso.curso' ? { tipo: 'curso' } : {}),
         });
         return `${env('CLIENT_URL')}/api/preview?${params}`;
       },

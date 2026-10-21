@@ -16,6 +16,8 @@ export interface ContextoClique {
   card: string | null;
   /** Título (h1) da página: nas páginas de unidade, o nome da unidade. */
   pagina?: string | null;
+  /** `data-curso` do próprio link clicado (botão de inscrição de um curso da EBA). */
+  curso?: string | null;
   /** URL atual, usada apenas para distinguir navegação de rolagem por âncora. Nunca enviada ao GA4. */
   paginaUrl?: string;
   evento?: string;
@@ -48,7 +50,7 @@ function destinoSeguro(u: URL | null, destino: string): string {
   return /^https?:$/.test(u.protocol) ? `${u.origin}${u.pathname}` : u.protocol;
 }
 
-export function eventosDoClique({ secao, texto, destino, card, pagina = null, paginaUrl, evento = '', eventoId, unidade = '', local = '', acaoEvento = false }: ContextoClique): EventoGerado[] {
+export function eventosDoClique({ secao, texto, destino, card, pagina = null, curso = null, paginaUrl, evento = '', eventoId, unidade = '', local = '', acaoEvento = false }: ContextoClique): EventoGerado[] {
   const u = url(destino);
   const caminho = u?.pathname ?? '';
   const eventos: EventoGerado[] = [];
@@ -72,6 +74,7 @@ export function eventosDoClique({ secao, texto, destino, card, pagina = null, pa
   if (caminho.startsWith('/contribua') || /contribu|d[ií]zimo|ofert|doa[cç]/i.test(texto)) {
     eventos.push(['contribuir', { origem: secao, texto }]);
   }
+  if (curso) eventos.push(['inscrever_curso', { origem: secao, curso }]);
   if (u?.hostname === 'apps.apple.com') eventos.push(['baixar_app', { origem: secao, loja: 'app_store' }]);
   if (u?.hostname === 'play.google.com') eventos.push(['baixar_app', { origem: secao, loja: 'google_play' }]);
   if ((secao === 'proximos-eventos' || secao === 'agenda-eventos') && card) {

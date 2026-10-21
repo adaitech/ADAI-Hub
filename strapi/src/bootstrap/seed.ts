@@ -1,16 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
+import { ensureCursos, ensurePaginasEba, ensureTestes, type Imagem, type StrapiSeed } from './seed-eba';
 
 /**
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 18;
+const SEED_VERSION = 21;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
 type Upload = { id: number };
+
+const MIME: Record<string, string> = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 
 /** Reaproveita a imagem se já estiver na Biblioteca de Mídia; senão, faz o upload. */
 async function image(strapi: Core.Strapi, fileName: string, alternativeText: string): Promise<number> {
@@ -22,7 +25,7 @@ async function image(strapi: Core.Strapi, fileName: string, alternativeText: str
   const filepath = path.join(SEED_DIR, fileName);
   const [file] = (await strapi.plugin('upload').service('upload').upload({
     data: { fileInfo: { name: fileName, alternativeText, caption: alternativeText } },
-    files: { filepath, originalFilename: fileName, mimetype: 'image/jpeg', size: fs.statSync(filepath).size },
+    files: { filepath, originalFilename: path.basename(fileName), mimetype: MIME[path.extname(fileName).toLowerCase()] ?? 'image/jpeg', size: fs.statSync(filepath).size },
   })) as Upload[];
   return file.id;
 }
@@ -43,6 +46,7 @@ const header = {
     { texto: 'Agenda', url: '/agenda' },
     { texto: 'Ministérios', url: '/ministerios' },
     { texto: 'Contribua', url: '/contribua' },
+    { texto: 'EBA', url: '/eba' },
   ],
   botoes: [
     { texto: 'Ao vivo', url: '/ao-vivo', estilo: 'contorno' },
@@ -69,6 +73,7 @@ const footer = {
         { texto: 'Agenda', url: '/agenda' },
         { texto: 'Ministérios', url: '/ministerios' },
         { texto: 'Contribua', url: '/contribua' },
+        { texto: 'Escola Bíblica (EBA)', url: '/eba' },
       ],
     },
     {
@@ -664,8 +669,8 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     await strapi.documents('api::global.global').create({ data: { header, footer, seo } as never });
     strapi.log.info('[seed] Configurações do site (cabeçalho e rodapé) criadas.');
   } else if (storedVersion < SEED_VERSION) {
-    await strapi.documents('api::global.global').update({ documentId: global.documentId, data: { footer } as never });
-    strapi.log.warn(`[seed] Rodapé reconstruído (seed v${storedVersion} → v${SEED_VERSION}).`);
+    await strapi.documents('api::global.global').update({ documentId: global.documentId, data: { header, footer } as never });
+    strapi.log.warn(`[seed] Cabeçalho e rodapé reconstruídos (seed v${storedVersion} → v${SEED_VERSION}).`);
   }
 
   const agenda = await pages.findFirst({ filters: { slug: 'agenda' } });
@@ -755,6 +760,14 @@ export async function seedInitialContent(strapi: Core.Strapi) {
     await publishPage(strapi, politica.documentId);
     strapi.log.warn(`[seed] Política de Privacidade reconstruída (seed v${storedVersion} → v${SEED_VERSION}).`);
   }
+
+  // EBA (Escola Bíblica ADAI): cursos, testes do CDV + páginas /eba, /eba/cursos e /eba/testes (entrega 1 da migração).
+  // seed-eba.ts tipa só o pedaço do Strapi que usa (sem @strapi/strapi, para o typecheck do Next).
+  const strapiEba = strapi as unknown as StrapiSeed;
+  const imagemEba: Imagem = (_strapi, arquivo, alt) => image(strapi, arquivo, alt);
+  await ensureCursos(strapiEba, imagemEba, storedVersion < SEED_VERSION);
+  await ensureTestes(strapiEba, storedVersion < SEED_VERSION);
+  await ensurePaginasEba(strapiEba, imagemEba, storedVersion < SEED_VERSION);
 
   for (const p of PAGINAS_INSTITUCIONAIS) {
     const existente = await pages.findFirst({ filters: { slug: p.slug } });

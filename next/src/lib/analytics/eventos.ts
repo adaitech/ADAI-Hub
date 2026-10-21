@@ -44,6 +44,8 @@ export interface EventosAnalytics {
   web_vitals: { metrica: string; valor: number; avaliacao: string };
   /** Escolha no banner de cookies. */
   consentimento_cookies: { escolha: 'aceito' | 'recusado' };
+  /** Conversão: clique no botão de inscrição de um curso da EBA (`curso` = slug). */
+  inscrever_curso: Origem & { curso: string };
 }
 
 export type NomeEvento = keyof EventosAnalytics;
@@ -66,4 +68,5 @@ export const NOMES_EVENTOS: NomeEvento[] = [
   'acessar_evento',
   'filtrar_agenda',
   'buscar_evento',
+  'inscrever_curso',
 ];

@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_sections_catalogos_cursos",
+  "info": {
+    "displayName": "Catálogo de cursos",
+    "icon": "book",
+    "description": "Lista automática dos cursos da EBA publicados (tipo Cursos da EBA), em cards."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": { "type": "string", "required": true, "maxLength": 80 },
+    "texto_apoio": { "type": "text", "maxLength": 240 },
+    "vertente": { "type": "enumeration", "enum": ["todas", "integracao", "consolidacao"], "default": "todas", "required": true },
+    "quantidade": { "type": "integer", "min": 1, "max": 12 },
+    "link_ver_todos": { "type": "boolean", "default": true }
+  }
+}

@@ -1,4 +1,4 @@
-import { montarSitemap, paginaNoSitemap, type PaginaSitemap } from './sitemap';
+import { montarSitemap, montarSitemapCursos, paginaNoSitemap, type PaginaSitemap } from './sitemap';
 
 const SITE = 'https://adai.com.br';
 const pagina = (slug: string, extra: Partial<PaginaSitemap> = {}): PaginaSitemap => ({ slug, updatedAt: '2026-10-02T15:30:00.000Z', seo: null, ...extra });
@@ -55,6 +55,37 @@ describe('montarSitemap', () => {
   it('páginas "sobre-nos-…" aparecem em /sobre-nos/… (endereço do site atual)', () => {
     const [pagina] = montarSitemap([{ slug: 'sobre-nos-nossa-historia', updatedAt: '2026-10-04T10:00:00.000Z' }], SITE);
     expect(pagina.url).toBe(`${SITE}/sobre-nos/nossa-historia`);
+  });
+});
+
+describe('montarSitemapCursos (cursos da EBA)', () => {
+  const site = 'https://adai.com.br';
+
+  it('curso vira /eba/cursos/<slug>, prioridade 0,7, com a data do Strapi', () => {
+    expect(montarSitemapCursos([{ slug: 'reset', updatedAt: '2026-10-18T12:00:00.000Z' }], site)).toEqual([
+      { url: 'https://adai.com.br/eba/cursos/reset', lastModified: '2026-10-18', priority: 0.7 },
+    ]);
+  });
+
+  it('noindex, canonical para outra URL e slug inválido ficam de fora; canonical para o próprio curso mantém', () => {
+    const cursos: PaginaSitemap[] = [
+      { slug: 'reset', seo: { metaRobots: 'noindex' } },
+      { slug: 'start', seo: { canonicalURL: 'https://adai.com.br/eba' } },
+      { slug: 'cdv', seo: { canonicalURL: 'https://adai.com.br/eba/cursos/cdv' } },
+      { slug: 'Talmidim' },
+    ];
+    expect(montarSitemapCursos(cursos, site).map((e) => e.url)).toEqual(['https://adai.com.br/eba/cursos/cdv']);
+  });
+
+  it('ordena os cursos pelo endereço (sitemap estável entre gerações)', () => {
+    expect(montarSitemapCursos([{ slug: 'talmidim' }, { slug: 'reset' }], site).map((e) => e.url)).toEqual([
+      'https://adai.com.br/eba/cursos/reset',
+      'https://adai.com.br/eba/cursos/talmidim',
+    ]);
+  });
+
+  it('a página "eba-cursos" do Strapi aparece em /eba/cursos', () => {
+    expect(montarSitemap([{ slug: 'eba-cursos' }], site).map((e) => e.url)).toEqual(['https://adai.com.br/eba/cursos']);
   });
 });
 

@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "testes",
+  "info": {
+    "singularName": "teste",
+    "pluralName": "testes",
+    "displayName": "Testes da EBA",
+    "description": "Testes do CDV (dons, talentos, estilo, temperamento): explicados na página /eba/testes pela seção Lista de testes."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nome": { "type": "string", "required": true, "maxLength": 60 },
+    "slug": { "type": "uid", "targetField": "nome", "required": true, "regex": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "aula": { "type": "string", "maxLength": 30 },
+    "resumo": { "type": "text", "required": true, "maxLength": 200 },
+    "o_que_e": { "type": "text", "maxLength": 600 },
+    "itens_titulo": { "type": "string", "maxLength": 60 },
+    "itens": { "type": "text", "maxLength": 600 },
+    "perguntas": { "type": "string", "maxLength": 60 },
+    "resposta": { "type": "string", "maxLength": 60 },
+    "como_responder": { "type": "text", "maxLength": 400 },
+    "como_ler_resultado": { "type": "text", "maxLength": 400 },
+    "link_teste": { "type": "string", "maxLength": 300 },
+    "ordem": { "type": "integer", "min": 0, "default": 100 }
+  }
+}
