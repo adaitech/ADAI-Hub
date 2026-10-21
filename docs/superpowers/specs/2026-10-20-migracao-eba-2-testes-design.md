@@ -29,7 +29,8 @@ O caminho completo que precisa funcionar:
 - O painel da equipe (`/dashboard/*`) e o login da equipe: entrega 4.
 - A página de resultado por id (`/teste/resultado/<id>`): entrega 3.
 - Mudar perguntas, escalas, cálculo, mensagens ou o banco da API.
-- Login com senha para o aluno e envio de e-mail com código.
+- Login com senha para o aluno.
+- ~~Envio de e-mail com código~~: **entrou no escopo** depois da revisão do PR #15 (21/10/2026). Desenho em `2026-10-21-migracao-eba-2-codigo-por-email-design.md`.
 
 ## 4. Como funciona hoje (levantado no código de `adaitech/eba-adai`)
 
@@ -269,7 +270,7 @@ Os testes são o objetivo da área, então ganham **2 eventos novos**, sem dado 
 ## 12. Riscos
 
 - **A API fora derruba os testes.** Hoje também derruba. A mensagem de erro e as respostas guardadas na aba reduzem o impacto.
-- **Enumeração de e-mails.** O Primeiro acesso revela se um e-mail existe. Mitigação: o limite de tentativas e nenhum dado do cadastro na tela.
+- **Enumeração de e-mails.** O Primeiro acesso revela se um e-mail existe. Mitigação: o limite de tentativas e nenhum dado do cadastro na tela. **Fechado** pelo código por e-mail (`2026-10-21-migracao-eba-2-codigo-por-email-design.md` §6): o "é novo?" só aparece depois do código certo.
 - **Turmas inativas.** Sem turma ativa, ninguém consegue se cadastrar. A mensagem orienta a falar com a equipe da EBA.
 - **Divergência de conteúdo local.** As tabelas do estilo e do temperamento ficam copiadas no Hub. Um teste confere a quantidade de itens contra a fonte atual.
 
