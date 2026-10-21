@@ -2,6 +2,8 @@
  * Seed de desenvolvimento da EBA (strapi/src/bootstrap/seed-eba.ts) com um Strapi simulado:
  * as páginas só são montadas (e as imagens buscadas) quando vão ser criadas ou reconstruídas.
  */
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { CURSOS_EBA, TESTES_EBA, ebaSections, ebaTestesSections, ensureCursos, ensurePaginasEba, ensureTestes } from '../../../../strapi/src/bootstrap/seed-eba';
 
 function strapiFake(existentes: string[]) {
@@ -121,9 +123,24 @@ describe('home da EBA e CDV apontam para /eba/testes', () => {
     expect(secoes.find((s) => s.titulo === 'Área da equipe da EBA')).toMatchObject({
       botoes: [{ texto: 'Entrar na área da equipe', url: 'https://eba.adai.com.br/login' }],
     });
-    expect(texto).toContain('/eba/testes#dons-servico');
     expect(texto).not.toContain('eba.adai.com.br/teste/');
     expect(secoes[0]).toMatchObject({ botoes: expect.arrayContaining([{ texto: 'Conhecer os testes', url: '/eba/testes', estilo: 'contorno' }]) });
+  });
+
+  it('home: "Descubra seus dons e talentos" é Imagem e texto (foto colorida à direita, 3 caixas, botão para /eba/testes)', async () => {
+    const imagem = jest.fn(async (_strapi: unknown, arquivo: string) => (arquivo === 'eba/testes-dons.webp' ? 9 : 1));
+    const secoes = (await ebaSections({} as never, imagem)) as Secao[];
+    const bloco = secoes.find((s) => s.titulo === 'Descubra seus dons e talentos');
+    expect(bloco).toMatchObject({
+      __component: 'sections.imagem-texto',
+      imagem: 9,
+      posicao_imagem: 'direita',
+      preto_e_branco: false,
+      rotulo: 'Testes do CDV',
+      botao: { texto: 'Conhecer os testes', url: '/eba/testes', estilo: 'solido' },
+    });
+    expect((bloco as unknown as { lista: { titulo: string }[] }).lista.map((i) => i.titulo)).toEqual(['Dons', 'Talentos naturais', 'Estilo e temperamento']);
+    expect(secoes.map((s) => s.__component)).not.toContain('sections.texto-rico');
   });
 
   it('CDV: "Os testes do CDV" leva a /eba/testes#<teste>', async () => {
@@ -139,5 +156,12 @@ describe('home da EBA e CDV apontam para /eba/testes', () => {
     expect(texto).toContain('/eba/testes#temperamento-pessoal');
     expect(texto).not.toContain('eba.adai.com.br/teste/');
     expect(CURSOS_EBA.filter((c) => c.testes).map((c) => c.slug)).toEqual(['cdv']);
+  });
+});
+
+describe('seed-eba.ts no typecheck do Next', () => {
+  it('não importa pacotes do Strapi (o CI do Next não instala as dependências do Strapi)', () => {
+    const fonte = readFileSync(join(process.cwd(), '..', 'strapi/src/bootstrap/seed-eba.ts'), 'utf8');
+    expect(fonte).not.toMatch(/from ['"]@strapi\//);
   });
 });

@@ -1,5 +1,3 @@
-import type { Core } from '@strapi/strapi';
-
 /**
  * Conteúdo de desenvolvimento da EBA (Escola Bíblica ADAI) — entrega 1 da migração.
  * Textos do site atual (eba.adai.com.br), revisados no protótipo aprovado (docs/prototipo/eba/).
@@ -7,8 +5,28 @@ import type { Core } from '@strapi/strapi';
  * a equipe da EBA precisa validar antes da produção.
  */
 
+/** Documento devolvido pela Document Service (só o que o seed lê). */
+type DocumentoSeed = { documentId: string } | null;
+
+/** Operações da Document Service que o seed usa em cada tipo (cursos, testes, páginas). */
+interface ColecaoSeed {
+  findFirst(params: { filters: { slug: string } }): Promise<DocumentoSeed>;
+  create(params: { data: never }): Promise<DocumentoSeed>;
+  update(params: { documentId: string; data: never }): Promise<DocumentoSeed>;
+  publish(params: { documentId: string }): Promise<unknown>;
+}
+
+/**
+ * O pedaço do Strapi que o seed da EBA usa. Não importa `@strapi/strapi`: o typecheck do Next lê este
+ * arquivo (seed-eba.test.ts) e o CI do Next não instala as dependências do Strapi. O seed.ts faz a ponte.
+ */
+export interface StrapiSeed {
+  documents(uid: 'api::curso.curso' | 'api::teste.teste' | 'api::page.page'): ColecaoSeed;
+  log: { info(mensagem: string): void };
+}
+
 /** Upload (ou reaproveitamento) de uma imagem de `strapi/seed/`; devolve o id da mídia. */
-export type Imagem = (strapi: Core.Strapi, arquivo: string, alt: string) => Promise<number>;
+export type Imagem = (strapi: StrapiSeed, arquivo: string, alt: string) => Promise<number>;
 
 const SITE_ATUAL = 'https://eba.adai.com.br';
 const CONTATO = 'mailto:contato@adai.com.br';
@@ -346,7 +364,7 @@ export const CURSOS_EBA: CursoSeed[] = [
   },
 ];
 
-async function dadosDoCurso(strapi: Core.Strapi, c: CursoSeed, imagem: Imagem) {
+async function dadosDoCurso(strapi: StrapiSeed, c: CursoSeed, imagem: Imagem) {
   const capa = await imagem(strapi, ...c.capa);
   const info = await imagem(strapi, ...c.info);
   const testes = c.testes
@@ -381,7 +399,7 @@ async function dadosDoCurso(strapi: Core.Strapi, c: CursoSeed, imagem: Imagem) {
 }
 
 /** Cria ou atualiza (na subida de versão do seed) os 4 cursos e publica. Idempotente pelo slug. */
-export async function ensureCursos(strapi: Core.Strapi, imagem: Imagem, reconstruir: boolean): Promise<void> {
+export async function ensureCursos(strapi: StrapiSeed, imagem: Imagem, reconstruir: boolean): Promise<void> {
   const cursos = strapi.documents('api::curso.curso');
   for (const c of CURSOS_EBA) {
     const existente = await cursos.findFirst({ filters: { slug: c.slug } });
@@ -396,9 +414,10 @@ export async function ensureCursos(strapi: Core.Strapi, imagem: Imagem, reconstr
 }
 
 /** Página `eba` (/eba): home da Escola Bíblica. */
-export async function ebaSections(strapi: Core.Strapi, imagem: Imagem) {
+export async function ebaSections(strapi: StrapiSeed, imagem: Imagem) {
   const hero = await imagem(strapi, 'eba/eba-hero.webp', 'Professora da EBA sorri no palco diante dos alunos.');
   const biblia = await imagem(strapi, 'eba/eba-biblia.webp', 'Mão segura uma Bíblia aberta no Evangelho de João, capítulo 3.');
+  const testes = await imagem(strapi, 'eba/testes-dons.webp', 'Alunos sorriem segurando placas: "É proibida a entrada de pessoas perfeitas" e "Bem-vindo".');
   // Logo da EBA (branco, fundo transparente) fica na Biblioteca de Mídia para o time usar.
   await imagem(strapi, 'eba/logo-eba.webp', 'EBA — Escola Bíblica ADAI');
   return [
@@ -435,9 +454,20 @@ export async function ebaSections(strapi: Core.Strapi, imagem: Imagem) {
       link_ver_todos: true,
     },
     {
-      __component: 'sections.texto-rico',
+      // Mesma seção do "Formar discípulos maduros", espelhada (foto à direita, colorida).
+      __component: 'sections.imagem-texto',
+      imagem: testes,
+      posicao_imagem: 'direita',
+      preto_e_branco: false,
+      rotulo: 'Testes do CDV',
       titulo: 'Descubra seus dons e talentos',
-      conteudo: `Os testes da EBA ajudam você a entender seu temperamento, seu estilo pessoal, seus talentos naturais e seus dons para servir na igreja.\n\n${listaDeTestes}\n\n[Conhecer os testes](/eba/testes)`,
+      texto: 'Os testes da EBA ajudam você a entender quem você é e onde servir na igreja.',
+      lista: [
+        { titulo: 'Dons', texto: 'Dons de serviço prático e dons ministeriais: como Deus capacitou você para servir.' },
+        { titulo: 'Talentos naturais', texto: 'As habilidades que você já tem e pode colocar a serviço do Reino.' },
+        { titulo: 'Estilo e temperamento', texto: 'Como você se relaciona, decide e trabalha melhor com outras pessoas.' },
+      ],
+      botao: { texto: 'Conhecer os testes', url: '/eba/testes', estilo: 'solido' },
     },
     faq('Perguntas frequentes', [
       [
@@ -496,7 +526,7 @@ export function ebaCursosSections() {
 }
 
 /** Cria ou atualiza (na subida de versão do seed) os testes do CDV e publica. Idempotente pelo slug. */
-export async function ensureTestes(strapi: Core.Strapi, reconstruir: boolean): Promise<void> {
+export async function ensureTestes(strapi: StrapiSeed, reconstruir: boolean): Promise<void> {
   const testes = strapi.documents('api::teste.teste');
   for (const t of TESTES_EBA) {
     const existente = await testes.findFirst({ filters: { slug: t.slug } });
@@ -511,7 +541,7 @@ export async function ensureTestes(strapi: Core.Strapi, reconstruir: boolean): P
 }
 
 /** Página `eba-testes` (/eba/testes): explicação dos 5 testes do CDV (protótipo docs/prototipo/eba/testes.html). */
-export async function ebaTestesSections(strapi: Core.Strapi, imagem: Imagem) {
+export async function ebaTestesSections(strapi: StrapiSeed, imagem: Imagem) {
   const foto = await imagem(strapi, 'eba/cdv-info.webp', 'Alunos durante uma aula do CDV.');
   return [
     {
@@ -568,12 +598,12 @@ export async function ebaTestesSections(strapi: Core.Strapi, imagem: Imagem) {
  * Páginas da EBA. `titulo` é o nome no painel e o último item da trilha (ADAI › EBA › <titulo>);
  * `tituloSeo`, quando existe, é o título na aba e no Google (padrão: o próprio `titulo`).
  */
-const PAGINAS_EBA: { slug: string; titulo: string; tituloSeo?: string; descricao: string; secoes: (strapi: Core.Strapi, imagem: Imagem) => Promise<unknown[]> }[] = [
+const PAGINAS_EBA: { slug: string; titulo: string; tituloSeo?: string; descricao: string; secoes: (strapi: StrapiSeed, imagem: Imagem) => Promise<unknown[]> }[] = [
   {
     slug: 'eba',
     titulo: 'EBA — Escola Bíblica ADAI',
     descricao: 'Cursos e testes da Escola Bíblica ADAI: formação para cada fase da caminhada cristã.',
-    secoes: (strapi: Core.Strapi, imagem: Imagem) => ebaSections(strapi, imagem),
+    secoes: (strapi: StrapiSeed, imagem: Imagem) => ebaSections(strapi, imagem),
   },
   {
     slug: 'eba-cursos',
@@ -586,7 +616,7 @@ const PAGINAS_EBA: { slug: string; titulo: string; tituloSeo?: string; descricao
     titulo: 'Testes',
     tituloSeo: 'Testes de dons e talentos — EBA',
     descricao: 'Dons de serviço, dons ministeriais, talentos naturais, estilo pessoal e temperamento: conheça os testes do CDV.',
-    secoes: (strapi: Core.Strapi, imagem: Imagem) => ebaTestesSections(strapi, imagem),
+    secoes: (strapi: StrapiSeed, imagem: Imagem) => ebaTestesSections(strapi, imagem),
   },
 ];
 
@@ -594,7 +624,7 @@ const PAGINAS_EBA: { slug: string; titulo: string; tituloSeo?: string; descricao
  * Cria (banco novo) ou reconstrói (versão nova do seed) as páginas `eba`, `eba-cursos` e `eba-testes` e publica.
  * Fora desses casos não monta nada: as imagens só são buscadas quando a página vai ser gravada.
  */
-export async function ensurePaginasEba(strapi: Core.Strapi, imagem: Imagem, reconstruir: boolean): Promise<void> {
+export async function ensurePaginasEba(strapi: StrapiSeed, imagem: Imagem, reconstruir: boolean): Promise<void> {
   const pages = strapi.documents('api::page.page');
   for (const p of PAGINAS_EBA) {
     const existente = await pages.findFirst({ filters: { slug: p.slug } });

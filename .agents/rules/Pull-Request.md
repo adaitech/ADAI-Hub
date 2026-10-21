@@ -77,17 +77,6 @@ Base: [`docs/design-system.md`](../../docs/design-system.md) · style guide `doc
 - [ ] **Responsivo e interação:** mobile empilhado e sem scroll lateral em 375; alvos de toque ≥ 44 × 44; foco visível (anel de 3px) em todo controle; hover, ativo e desabilitado conferidos; `prefers-reduced-motion` respeitado.
 - [ ] **Doc do design system atualizado:** token, componente ou padrão novo entra em `docs/design-system.md` (com Observado / Derivado / Proposto), em `.agents/rules/Design-Tokens.md` e, se for token compartilhado, também no `:root` dos dois HTMLs de referência.
 
-### A4.1 Design system (obrigatório se o PR mexe em UI, CSS, tokens ou HTML de referência)
-
-Base: [`docs/design-system.md`](../../docs/design-system.md) · style guide `docs/design-system.html` · template `templates/adai-page-template.html` · tokens `next/src/styles/tokens.css`. O teste `src/__tests__/caracteristicas/design-system.test.ts` (dentro do `yarn quality`) já cobre tokens, inventário e contraste; os itens abaixo são a conferência que o teste não faz.
-
-- [ ] **Tokens:** cor, tipografia, espaço e raio vêm de token canônico (`--font-size-h1`, `--radius-sm`, `--space-section`…). Nada de alias de migração (`--font-size-lead`, `--font-size-body`, `--font-size-xs`) em código novo; valor que não existe no `tokens.css` não é inventado no PR — vira `[VALOR NÃO ENCONTRADO]` e pergunta ao design.
-- [ ] **Tipografia do Figma:** título de seção e de página em **H1** (78 no desktop, linha 0,95); H2 (48) só para subtítulo; card em H3; data em Número / Data. Bold em títulos, números e ações; Book em textos, menus e legendas. Títulos longos quebram sem cortar em 375.
-- [ ] **Contraste WCAG 2.2 AA:** texto secundário em `--color-text-muted` (#6B6B6B), nunca o `#777` do Figma em texto; **nunca** texto suave sobre `--color-bg-subtle-2` (#E8E8E8, 4,35:1); texto sobre foto só com `--gradient-media-overlay`.
-- [ ] **Componentes do Figma:** botão, card, header, footer e barra de anúncio seguem a anatomia de `docs/design-system.md` §8 (medidas, raio, estados). Estado ou variação que não está no Figma é marcado como **Proposto** no doc do componente e na descrição do PR — nunca apresentado como Observado.
-- [ ] **Responsivo e interação:** mobile empilhado e sem scroll lateral em 375; alvos de toque ≥ 44 × 44; foco visível (anel de 3px) em todo controle; hover, ativo e desabilitado conferidos; `prefers-reduced-motion` respeitado.
-- [ ] **Doc do design system atualizado:** token, componente ou padrão novo entra em `docs/design-system.md` (com Observado / Derivado / Proposto), em `.agents/rules/Design-Tokens.md` e, se for token compartilhado, também no `:root` dos dois HTMLs de referência.
-
 ### A5. Segurança
 
 - [ ] Nenhum segredo no diff: `.env`, tokens, chaves de API, senhas, e-mails/telefones pessoais. Conferir com:

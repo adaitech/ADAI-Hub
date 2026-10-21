@@ -95,6 +95,7 @@ A `ListaTestes` expõe `id="os-testes"` no `<section>` (uma lista por página), 
 - **Home da EBA:**
   - o botão do Hero passa de "Fazer um teste" (site atual) para "Conhecer os testes" → `/eba/testes`;
   - a seção "Descubra seus dons e talentos" lista os 5 testes com link para `/eba/testes#<slug>` e termina com o link "Conhecer os testes".
+  - **Atualização 2026-10-20 (seed v21):** no teste local, o bloco em Texto rico destoava do Hub. Jonatan escolheu, entre duas opções de layout, a seção **Imagem e texto** (mesma do "Formar discípulos maduros", espelhada): rótulo "Testes do CDV", foto colorida à direita (`strapi/seed/eba/testes-dons.webp`), três caixas (Dons; Talentos naturais; Estilo e temperamento) e botão sólido "Conhecer os testes" → `/eba/testes`. Os links por âncora para cada teste saem da home e continuam na página do CDV e em `/eba/testes`.
 - **Página do CDV:** "Os testes do CDV" aponta para `/eba/testes#<slug>`.
 
 ## 5. Área da equipe
