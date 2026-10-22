@@ -88,20 +88,22 @@ function Estilo({ resultado }: { resultado: Extract<ResultadoApi, { tipo: 'estil
         <h3 className={styles.titulo4}>{resultado.combinacao}</h3>
         {resultado.descricao && <p className={styles.texto}>{resultado.descricao}</p>}
       </div>
-      <dl className={styles.formato}>
-        <div>
-          <dt>Motivação</dt>
-          <dd>
-            {resultado.motivacao} de {MAXIMO_EIXO}
-          </dd>
-        </div>
-        <div>
-          <dt>Organização</dt>
-          <dd>
-            {resultado.organizacao} de {MAXIMO_EIXO}
-          </dd>
-        </div>
-      </dl>
+      {resultado.motivacao !== null && resultado.organizacao !== null && (
+        <dl className={styles.formato}>
+          <div>
+            <dt>Motivação</dt>
+            <dd>
+              {resultado.motivacao} de {MAXIMO_EIXO}
+            </dd>
+          </div>
+          <div>
+            <dt>Organização</dt>
+            <dd>
+              {resultado.organizacao} de {MAXIMO_EIXO}
+            </dd>
+          </div>
+        </dl>
+      )}
     </>
   );
 }
@@ -110,6 +112,17 @@ function Conteudo({ teste, resultado }: { teste: DefinicaoTeste; resultado: Excl
   if (resultado.tipo === 'estilo') return <Estilo resultado={resultado} />;
   if (teste.tipo === 'talentos') return <Talentos itens={resultado.itens} />;
   return <Pontuacao itens={resultado.itens} maximo={resultado.maximo} porcentagem={teste.tipo === 'temperamento'} />;
+}
+
+/**
+ * Miolo do resultado (sem título, botões nem "Sair"): usado pela tela do teste e pela página do
+ * resultado salvo (`/eba/resultado/<codigo>`). `sem-resultado` vira só o aviso.
+ */
+export function ConteudoResultado({ teste, resultado }: { teste: DefinicaoTeste; resultado: ResultadoApi }) {
+  if (resultado.tipo === 'sem-resultado') {
+    return <p className={styles.texto}>Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.</p>;
+  }
+  return <Conteudo teste={teste} resultado={resultado} />;
 }
 
 /**

@@ -3,7 +3,7 @@ import type { Resultado as ResultadoApi } from '@/lib/eba-api/respostas';
 import { definicaoDoTeste, type SlugTeste } from '@/lib/eba-api/testes';
 import { auditarAcessibilidade } from '@/test-utils/auditoria';
 import mock from './Questionario.mock.json';
-import { Resultado } from './Resultado';
+import { ConteudoResultado, Resultado } from './Resultado';
 
 const montar = (slug: SlugTeste, resultado: ResultadoApi, extra: Partial<Parameters<typeof Resultado>[0]> = {}) =>
   render(<Resultado teste={definicaoDoTeste(slug)!} resultado={resultado} emailMascarado="a***@email.com" saiu={false} onSair={jest.fn()} {...extra} />);
@@ -104,5 +104,31 @@ describe('Resultado', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Você saiu.');
     rerender(<Resultado teste={definicaoDoTeste('dons-servico')!} resultado={mock.resultados.nota as ResultadoApi} emailMascarado={null} saiu={false} onSair={onSair} />);
     expect(screen.queryByRole('button', { name: 'Sair' })).toBeNull();
+  });
+
+  describe('ConteudoResultado (resultado salvo, sem botões nem "Sair")', () => {
+    it('mostra só o conteúdo do resultado, sem "Próximo teste" nem "Sair"', () => {
+      render(<ConteudoResultado teste={definicaoDoTeste('dons-servico')!} resultado={{ tipo: 'pontuacao', itens: itens(3), maximo: 25 }} />);
+      expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(3);
+      expect(screen.queryByRole('link')).toBeNull();
+      expect(screen.queryByRole('button')).toBeNull();
+    });
+
+    it('estilo salvo (sem as somas dos eixos): combinação e descrição, sem a lista Motivação/Organização', () => {
+      render(
+        <ConteudoResultado
+          teste={definicaoDoTeste('estilo-pessoal')!}
+          resultado={{ tipo: 'estilo', combinacao: 'Tarefa Estruturado', descricao: 'Descrição', motivacao: null, organizacao: null }}
+        />,
+      );
+      expect(screen.getByRole('heading', { level: 3, name: 'Tarefa Estruturado' })).toBeInTheDocument();
+      expect(screen.queryByText('Motivação')).toBeNull();
+      expect(screen.queryByText(/NaN|null/)).toBeNull();
+    });
+
+    it('sem-resultado: aviso, sem lista', () => {
+      render(<ConteudoResultado teste={definicaoDoTeste('dons-servico')!} resultado={{ tipo: 'sem-resultado' }} />);
+      expect(screen.getByText(/Não conseguimos mostrar o resultado/)).toBeInTheDocument();
+    });
   });
 });

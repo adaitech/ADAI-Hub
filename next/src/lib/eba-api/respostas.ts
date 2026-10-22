@@ -2,7 +2,7 @@ import 'server-only';
 import { z } from 'zod';
 import { ebaFetch, EbaApiRespostaInvalida, TIMEOUT_ENVIO_MS, type OpcoesChamada } from './client';
 import { descricaoDoEstilo, descricaoDoTemperamento } from './conteudo-local';
-import { definicaoDoTeste, type SlugTeste } from './testes';
+import { definicaoDoTeste, type DefinicaoTeste, type SlugTeste } from './testes';
 import type { EbaSurveyResponseEnvioApi } from './tipos';
 
 export interface ItemResultado {
@@ -13,7 +13,7 @@ export interface ItemResultado {
 
 export type Resultado =
   | { tipo: 'pontuacao'; itens: ItemResultado[]; maximo: number }
-  | { tipo: 'estilo'; combinacao: string; descricao: string | null; motivacao: number; organizacao: number }
+  | { tipo: 'estilo'; combinacao: string; descricao: string | null; motivacao: number | null; organizacao: number | null }
   /**
    * A API gravou as respostas (2xx), mas devolveu um resultado fora do formato esperado: a tela
    * avisa que as respostas foram enviadas, sem "Tentar de novo" (reenviar duplicaria a gravação).
@@ -80,8 +80,16 @@ export async function enviarRespostas(
     };
   }
 
+  return resultadoDeItens(teste, retorno);
+}
+
+/**
+ * Lista de name/totalRate/message (resposta do `POST SurveyResponse` ou do `GET SurveyResult`) →
+ * resultado de pontuação, já em ordem. Lista fora do formato ou vazia → `EbaApiRespostaInvalida`.
+ */
+export function resultadoDeItens(teste: DefinicaoTeste, retorno: unknown): Extract<Resultado, { tipo: 'pontuacao' }> {
   const valido = esquemaItens.safeParse(retorno);
-  if (!valido.success) throw new EbaApiRespostaInvalida('SurveyResponse sem lista de name/totalRate');
+  if (!valido.success) throw new EbaApiRespostaInvalida('resultado sem lista de name/totalRate');
   const itens: ItemResultado[] = valido.data
     .map((i) => {
       // Temperamento: a API manda `name` fixo ("Temperamento Pessoal") e o temperamento em `message`.
