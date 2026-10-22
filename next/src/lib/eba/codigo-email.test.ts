@@ -1,4 +1,5 @@
 import { emailDoCodigo } from './codigo-email';
+import { VALIDADE_CODIGO_MS } from './verificacao';
 
 describe('emailDoCodigo', () => {
   const email = emailDoCodigo('042137');
@@ -22,6 +23,10 @@ describe('emailDoCodigo', () => {
   it('só aceita 6 dígitos (nada vira HTML)', () => {
     expect(() => emailDoCodigo('<b>')).toThrow();
     expect(() => emailDoCodigo('12345')).toThrow();
+  });
+
+  it('a validade do texto vem da mesma constante que vale no Strapi (VALIDADE_CODIGO_MS)', () => {
+    expect(email.texto).toContain(`${VALIDADE_CODIGO_MS / 60_000} minutos`);
   });
 
   describe('para o link do resultado', () => {

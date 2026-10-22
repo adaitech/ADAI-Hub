@@ -3,7 +3,9 @@
  * dado pessoal: só o código, a validade e o aviso para quem não pediu.
  */
 
-const VALIDADE = '10 minutos';
+import { VALIDADE_CODIGO_MS } from './verificacao';
+
+const VALIDADE = `${VALIDADE_CODIGO_MS / 60_000} minutos`;
 
 /** `teste` (padrão): começar os testes. `resultado`: receber o link do resultado dos testes. */
 export function emailDoCodigo(codigo: string, finalidade: 'teste' | 'resultado' = 'teste'): { assunto: string; html: string; texto: string } {
