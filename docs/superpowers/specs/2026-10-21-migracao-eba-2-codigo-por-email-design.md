@@ -13,7 +13,7 @@ Só quem tem acesso à caixa de e-mail consegue abrir a sessão dos testes. Ante
 | Prova de posse do e-mail | **Código de 6 dígitos por e-mail** (não link mágico: o e-mail costuma ser aberto em outro aparelho que não o do QR code). |
 | Envio | **MailerSend**, como no site atual (`adaitech/adai`, `src/utils/sendMail.ts`): `POST https://api.mailersend.com/v1/email`, remetente `no-reply@adai.com.br` (domínio já verificado no MailerSend). Token **novo e exclusivo do Hub**, só com permissão de envio, em `MAILERSEND_API_TOKEN` (só servidor). Sem a biblioteca `mailersend`: `fetch` direto. |
 | Texto do e-mail | **No código do Hub** (HTML simples + texto), versionado e testado. Sem template do painel do MailerSend. |
-| Frequência | **Lembrar o aparelho por 30 dias** (cookie assinado). "Não é você? Trocar e-mail" esquece o aparelho. |
+| Frequência | **Lembrar o aparelho por 7 dias** (reduzido de 30 em 22/10/2026, revisão de segurança) (cookie assinado). "Não é você? Trocar e-mail" esquece o aparelho. |
 | Onde guardar o código | **Strapi**: tipo privado `verificacao-eba` com rotas próprias, acessado só pelo servidor do Next com token próprio. Funciona com várias réplicas do Next. |
 
 ## 3. Fora do escopo
@@ -29,7 +29,7 @@ Só quem tem acesso à caixa de e-mail consegue abrir a sessão dos testes. Ante
    - Senão: o Hub responde **sempre** "Enviamos um código de 6 dígitos para a\*\*\*@email.com", exista ou não um aluno com esse e-mail.
 2. **Código.** Tela nova com um campo de 6 dígitos, "Confirmar", "Reenviar código" (liberado 60 s depois do último envio) e "Usar outro e-mail". O código vale **10 min** e aceita **5 tentativas**.
 3. **Código certo.**
-   - Aluno cadastrado: abre a sessão de 2 h (cookie `eba_sessao`, sem mudança) e grava `eba_aparelho` (30 dias).
+   - Aluno cadastrado: abre a sessão de 2 h (cookie `eba_sessao`, sem mudança) e grava `eba_aparelho` (7 dias).
    - E-mail novo: grava `eba_email_verificado` (15 min) e vai ao Primeiro acesso. O `cadastrar` só aceita o e-mail desse cookie; ao cadastrar, abre a sessão e grava `eba_aparelho`.
 4. **"Não é você? Trocar e-mail"** e **"Sair"** apagam `eba_sessao` **e** `eba_aparelho`.
 5. As respostas já dadas continuam salvas na aba (`sessionStorage`) durante todo o fluxo, como antes.
@@ -130,6 +130,6 @@ Sem qualquer uma delas, os testes ficam "indisponíveis" (falha fechado), como j
 
 - Sem o código, nenhuma sessão é aberta e nenhum cadastro é feito.
 - A resposta ao pedir o código é a mesma para e-mail cadastrado e não cadastrado.
-- Aparelho verificado não pede código de novo por 30 dias para o mesmo e-mail.
+- Aparelho verificado não pede código de novo por 7 dias para o mesmo e-mail.
 - Em homologação: código recebido pelo MailerSend, sessão aberta e resultado do teste no painel atual.
 - `yarn quality`, `yarn build` (Next e Strapi) e `yarn smoke` passam.

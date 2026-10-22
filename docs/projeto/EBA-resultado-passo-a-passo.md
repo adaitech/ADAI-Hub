@@ -35,7 +35,7 @@ O que conferir no navegador (375, 768 e 1440):
 | `EBA_SESSAO_SEGREDO` | você gera: `openssl rand -base64 48` |
 | `EBA_RESULTADO_SEGREDO` | você gera outro valor, diferente do da sessão: `openssl rand -base64 48` |
 | `MAILERSEND_API_TOKEN` | token do MailerSend só do Hub, só com permissão de envio |
-| `STRAPI_TOKEN_VERIFICACAO` | Strapi: Settings > API Tokens > tipo Custom, só `emitir` e `conferir` do `verificacao-eba` |
+| `STRAPI_TOKEN_VERIFICACAO` | Strapi: Settings > API Tokens > tipo Custom, só `emitir`, `conferir` e `cancelar` do `verificacao-eba` (o `cancelar` é novo: token antigo precisa ganhar essa permissão) |
 | `EBA_PROXIES_CONFIAVEIS` | opcional. 1 (padrão) com só o ingress; 2 com Front Door + ingress |
 
 Em homologação e produção, os mesmos nomes vão no cofre da infraestrutura (Key Vault) e na configuração do AKS. Trocar `EBA_RESULTADO_SEGREDO` invalida todos os links já enviados (é a revogação geral).
@@ -78,18 +78,21 @@ Precisa de autorização da EBA: grava um **aluno de teste** no banco real.
 - Validação humana: leitor de tela e celular real.
 - Decisões em aberto (spec §7): validade de 7 dias; fechar o `GET Student/{id}` anônimo da API; manter o `/teste/resultado/<id>` do site atual até a entrega 4.
 
-## 7. Achados da revisão (rodada de 22/10/2026)
+## 7. Achados da revisão (rodada de 22/10/2026): todos tratados
 
-Quase todos são do código do PR #15, que o #20 reaproveita. Não alterei esse código neste PR.
+Quase todos eram do código do PR #15, que o #20 reaproveita. Foram corrigidos na branch do #20 (commits `fix(eba): ...`), cada um com teste.
 
-| # | Onde | Resumo | Sugestão |
-| --- | --- | --- | --- |
-| 1 | `next/package.json` | `zod` é importado, mas não está em `dependencies` (só entra pelo lockfile, de forma transitiva) | Declarar `zod@^4` nas dependências no #15 |
-| 2 | `acoes.ts` dos testes e `acoes.ts` do resultado | O código é consumido ao conferir; se a API da EBA falhar logo depois (API fria), digitar o mesmo código de novo dá "vencido" e o aluno precisa de um código novo (3 por 15 min) | Marcar o e-mail verificado antes das chamadas à API, ou consumir o código só depois delas |
-| 3 | Strapi `verificacao-eba` | Quem sabe um e-mail pode gastar os 3 envios e invalidar o código dele | Aceitar como risco ou limitar por IP também no Strapi |
-| 4 | `acoes.ts` | Falha do MailerSend gasta um envio da cota, e o limite responde "código enviado" | Devolver erro quando o envio falha; revisar a resposta no limite |
-| 5 | `limite.ts` | Limite por IP depende de `EBA_PROXIES_CONFIAVEIS` certo | Conferir o valor em homologação (log do ingress) |
-| 6 | `enviar` | Sem limite por IP | Aplicar `dentroDoLimite` |
-| 7 | `aparelho.ts` | Aparelho lembrado por 30 dias pula o código; `sair` não apaga `eba_email_verificado` | Reduzir o prazo ou pedir confirmação; apagar as duas marcas no `sair` |
+| # | Achado | O que foi feito |
+| --- | --- | --- |
+| 1 | `zod` fora do `package.json` | Declarado em `dependencies` (`^4.6.5`) |
+| 2 | Código gasto antes das chamadas à API | Marca de e-mail verificado gravada antes; a tela oferece "Tentar de novo" sem novo código (testes e resultado) |
+| 3 | Quem sabe um e-mail pode gastar os envios dele | Parcial: aviso honesto no limite e cota devolvida quando o e-mail não sai; **risco residual aceito** (ver `docs/componentes/questionario-eba.md`) |
+| 4 | Falha do MailerSend gastava a cota e o limite fingia envio | Nova rota `cancelar` no Strapi devolve a cota; o limite responde `emails` com mensagem própria |
+| 5 | Limite por IP depende de `EBA_PROXIES_CONFIAVEIS` | Valor inválido vira 1; em produção o log avisa uma vez se a variável faltar ou faltar o `x-forwarded-for`. **Conferir o valor em homologação** |
+| 6 | `enviar` sem limite por IP | 6 por minuto por IP |
+| 7 | Aparelho de 30 dias e `sair` incompleto | Aparelho em 7 dias; `sair` apaga as duas marcas |
+| 8 | Validade do envio único contada do começo; resposta ilegível não guardada | Conta do fim da gravação; "sem resultado" fica guardado |
+| 9 | Validade do código escrita em dois lugares | O e-mail usa `VALIDADE_CODIGO_MS` |
+| 10 | Tentativas relidas depois do incremento | `UPDATE … RETURNING` (testado no knex/SQLite do Strapi) |
 
-O item 2 vale também para o pedido do link do resultado (#20): se a API falhar depois de o código ser aceito, o aluno pede um código novo.
+Ações suas por causa disso: dar a permissão `cancelar` ao token `STRAPI_TOKEN_VERIFICACAO` e conferir `EBA_PROXIES_CONFIAVEIS` (1 com só o ingress; 2 com Front Door + ingress).

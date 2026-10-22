@@ -35,7 +35,7 @@ describe('marcas do aparelho e do e-mail verificado', () => {
   });
 
   it.each([
-    ['vencida (aparelho: 30 dias + 1 ms)', VALIDADE_APARELHO_MS, VALIDADE_APARELHO_MS + 1],
+    ['vencida (aparelho: 7 dias + 1 ms)', VALIDADE_APARELHO_MS, VALIDADE_APARELHO_MS + 1],
     ['vencida (e-mail verificado: 15 min + 1 ms)', VALIDADE_EMAIL_VERIFICADO_MS, VALIDADE_EMAIL_VERIFICADO_MS + 1],
     ['emitida mais de 60 s no futuro', VALIDADE_APARELHO_MS, -60_001],
   ])('recusa marca %s', (_n, validade, idade) => {

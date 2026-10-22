@@ -14,7 +14,7 @@ import {
   VALIDADE_EMAIL_VERIFICADO_MS,
 } from '@/lib/eba/aparelho';
 import { criarEnvioUnico } from '@/lib/eba/envio-unico';
-import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
+import { criarLimitador, ipParaLimite } from '@/lib/eba/limite';
 import {
   assinarSessao,
   COOKIE_SESSAO,
@@ -97,14 +97,9 @@ function registrarFalha(acao: string, erro: unknown): void {
   }
 }
 
-/** Proxies confiáveis na frente do Next (padrão 1: o ingress). Ver `ipDoCliente`. */
-function proxiesConfiaveis(): number {
-  return Number(process.env.EBA_PROXIES_CONFIAVEIS ?? 1);
-}
-
 async function dentroDoLimite(limitar = limitarTentativas): Promise<boolean> {
   const cabecalhos = await headers();
-  return limitar(ipDoCliente(cabecalhos.get('x-forwarded-for'), proxiesConfiaveis()), Date.now());
+  return limitar(ipParaLimite(cabecalhos.get('x-forwarded-for')), Date.now());
 }
 
 /** O que a tela recebe da sessão: o e-mail mascarado (para mostrar) e o dono opaco (para comparar). */

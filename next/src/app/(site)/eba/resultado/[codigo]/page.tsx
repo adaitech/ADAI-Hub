@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { ConteudoResultado } from '@/components/eba/Questionario/Resultado';
 import { ButtonLink } from '@/components/ui/ButtonLink';
-import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
+import { criarLimitador, ipParaLimite } from '@/lib/eba/limite';
 import { lerLinkResultado, segredoDoResultado } from '@/lib/eba/link-resultado';
 import { ebaApiConfigurada } from '@/lib/eba-api/client';
 import { resultadosDoAluno, type ResultadoDoTeste } from '@/lib/eba-api/resultados';
@@ -37,8 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function ResultadoEbaPage({ params }: PageProps) {
   const cabecalhos = await headers();
-  const proxies = Number(process.env.EBA_PROXIES_CONFIAVEIS ?? 1);
-  if (!limitarAberturas(ipDoCliente(cabecalhos.get('x-forwarded-for'), proxies), agora())) notFound();
+  if (!limitarAberturas(ipParaLimite(cabecalhos.get('x-forwarded-for')), agora())) notFound();
 
   const segredo = segredoDoResultado();
   if (!segredo) notFound();

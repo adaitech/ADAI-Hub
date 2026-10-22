@@ -43,3 +43,38 @@ export function ipDoCliente(xff: string | null | undefined, proxiesConfiaveis: n
   const saltos = Number.isInteger(proxiesConfiaveis) && proxiesConfiaveis >= 1 ? proxiesConfiaveis : 1;
   return itens[Math.max(itens.length - saltos, 0)];
 }
+
+/** Proxies confiáveis na frente do Next (`EBA_PROXIES_CONFIAVEIS`, padrão 1: o ingress). Valor inválido → 1. */
+export function proxiesConfiaveis(env: NodeJS.ProcessEnv = process.env): number {
+  const bruto = env.EBA_PROXIES_CONFIAVEIS;
+  const valor = bruto === undefined || bruto.trim() === '' ? 1 : Number(bruto);
+  return Number.isInteger(valor) && valor >= 1 ? valor : 1;
+}
+
+let avisouProxies = false;
+let avisouSemIp = false;
+
+/** Só para os testes: o aviso é uma vez por processo. */
+export function reiniciarAvisosDoLimite(): void {
+  avisouProxies = false;
+  avisouSemIp = false;
+}
+
+/**
+ * Chave do limite por IP a partir do `x-forwarded-for`, com `EBA_PROXIES_CONFIAVEIS`. Em produção, avisa
+ * uma vez (sem IP nem dado pessoal) quando a configuração provavelmente está errada: variável ausente
+ * (atrás de Front Door + ingress, o valor certo é 2; com 1 todos os visitantes dividiriam o IP do Front
+ * Door) ou sem `x-forwarded-for` (todos cairiam na mesma chave).
+ */
+export function ipParaLimite(xff: string | null | undefined): string {
+  const producao = process.env.NODE_ENV === 'production';
+  if (producao && process.env.EBA_PROXIES_CONFIAVEIS === undefined && !avisouProxies) {
+    avisouProxies = true;
+    console.warn('[eba-limite] EBA_PROXIES_CONFIAVEIS ausente: usando 1 proxy confiável (confira o valor atrás de Front Door + ingress)');
+  }
+  if (producao && !xff && !avisouSemIp) {
+    avisouSemIp = true;
+    console.warn('[eba-limite] requisição sem x-forwarded-for: o limite por IP vira uma chave única para todos');
+  }
+  return ipDoCliente(xff, proxiesConfiaveis());
+}

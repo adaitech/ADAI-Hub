@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { assinarMarca, COOKIE_RESULTADO_VERIFICADO, lerMarca, opcoesCookieResultado, VALIDADE_EMAIL_VERIFICADO_MS } from '@/lib/eba/aparelho';
 import { emailDoCodigo } from '@/lib/eba/codigo-email';
 import { emailDoLinkResultado } from '@/lib/eba/email-resultado';
-import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
+import { criarLimitador, ipParaLimite } from '@/lib/eba/limite';
 import { emitirLinkResultado, segredoDoResultado } from '@/lib/eba/link-resultado';
 import { mascararEmail, segredoDaSessao } from '@/lib/eba/sessao';
 import { gerarCodigo, hashDoCodigo, hashDoEmail, soDigitos, VALIDADE_CODIGO_MS } from '@/lib/eba/verificacao';
@@ -39,8 +39,7 @@ const falha = (erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'verifi
 
 async function dentroDoLimite(): Promise<boolean> {
   const cabecalhos = await headers();
-  const proxies = Number(process.env.EBA_PROXIES_CONFIAVEIS ?? 1);
-  return limitarTentativas(ipDoCliente(cabecalhos.get('x-forwarded-for'), proxies), Date.now());
+  return limitarTentativas(ipParaLimite(cabecalhos.get('x-forwarded-for')), Date.now());
 }
 
 function configuracao(): { segredo: string; segredoResultado: string } | null {
