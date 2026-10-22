@@ -45,7 +45,7 @@ export function PedirResultado({ acoes }: PedirResultadoProps) {
   const titulo = useRef<HTMLHeadingElement>(null);
   const campoCodigo = useRef<HTMLInputElement>(null);
   const conferindo = useRef(false);
-  const primeiro = useRef(true);
+  const passoAnterior = useRef<Passo>('email');
   const [passo, setPasso] = useState<Passo>('email');
   const [email, setEmail] = useState('');
   const [mascarado, setMascarado] = useState('');
@@ -55,12 +55,10 @@ export function PedirResultado({ acoes }: PedirResultadoProps) {
   const [pendente, setPendente] = useState(false);
   const [espera, setEspera] = useState(SEGUNDOS_REENVIO);
 
-  // Foco no título de cada passo (não na carga da página).
+  // Foco no título de cada passo novo (não na carga da página, nem na repetição do efeito no modo estrito).
   useEffect(() => {
-    if (primeiro.current) {
-      primeiro.current = false;
-      return;
-    }
+    if (passoAnterior.current === passo) return;
+    passoAnterior.current = passo;
     titulo.current?.focus();
   }, [passo]);
 

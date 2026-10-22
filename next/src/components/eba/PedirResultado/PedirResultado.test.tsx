@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { auditarAcessibilidade } from '@/test-utils/auditoria';
 import { PedirResultado, type PedirResultadoProps } from './PedirResultado';
@@ -23,6 +24,20 @@ async function ateOCodigo(a = acoes()) {
 }
 
 describe('PedirResultado', () => {
+  it('ao abrir a página o foco não é movido (nem no modo estrito do React, que roda o efeito duas vezes)', () => {
+    render(
+      <StrictMode>
+        <PedirResultado acoes={acoes() as unknown as PedirResultadoProps['acoes']} />
+      </StrictMode>,
+    );
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it('a cada passo novo o foco vai para o título do passo', async () => {
+    await ateOCodigo();
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Digite o código' }));
+  });
+
   it('abre pedindo o e-mail, com o aviso de privacidade e sem dado pessoal', () => {
     const { container } = montar();
     expect(screen.getByRole('heading', { level: 1, name: 'Receber meu resultado' })).toBeInTheDocument();
