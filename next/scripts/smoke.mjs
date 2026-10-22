@@ -141,6 +141,7 @@ async function principal() {
   for (const caminho of PAGINAS_INTERNAS) await conferirPagina(caminho, { interna: true });
   await conferirSeo();
   await esperarStatus('rota inexistente → 404', '/rota-que-nao-existe-smoke', 404);
+  await esperarStatus('resultado da EBA com código inválido → 404 (falha fechada)', '/eba/resultado/codigo-invalido-smoke', 404);
   await esperarStatus('curso da EBA inexistente → 404', '/eba/cursos/curso-que-nao-existe-smoke', 404);
   const { local } = await esperarStatus('/home → redireciona para /', '/home', [307, 308]);
   if (local && new URL(local, BASE).pathname !== '/') registrar(false, '/home → redireciona para /', `foi para ${local}`);
