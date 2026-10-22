@@ -59,7 +59,7 @@ import { cancelarVerificacao, conferirVerificacao, emitirVerificacao, verificaca
 
 export type RespostaAcao<T = undefined> =
   | { ok: true; dados?: T }
-  | { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
+  | { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao'; codigoAceito?: true };
 
 type Falha = { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
 
@@ -215,10 +215,19 @@ export async function confirmarCodigo(email: string, codigo: string): Promise<Re
   try {
     const conferido = await conferirVerificacao({ emailHash, codigoHash: hashDoCodigo(emailHash, digitos, config.segredo) });
     if (conferido.resultado !== 'ok') return { ok: false, erro: 'codigo', resultado: conferido.resultado, restantes: conferido.restantes };
-    return { ok: true, dados: await seguirVerificado(emailNormalizado, config.segredo) };
   } catch (erro) {
     registrarFalha('confirmarCodigo', erro);
     return falha('indisponivel');
+  }
+
+  // Código aceito (já gasto no Strapi, uso único). Marca o e-mail como verificado antes das chamadas à API da
+  // EBA: se elas falharem (API fria), o "Tentar de novo" (`retomarCadastro`) segue sem pedir outro código.
+  (await cookies()).set(COOKIE_EMAIL_VERIFICADO, assinarMarca(emailHash, config.segredo, Date.now()), opcoesCookieMarca(VALIDADE_EMAIL_VERIFICADO_MS));
+  try {
+    return { ok: true, dados: await seguirVerificado(emailNormalizado, config.segredo) };
+  } catch (erro) {
+    registrarFalha('confirmarCodigo', erro);
+    return { ok: false, erro: 'indisponivel', codigoAceito: true };
   }
 }
 

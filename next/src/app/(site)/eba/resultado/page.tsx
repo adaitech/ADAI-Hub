@@ -5,7 +5,7 @@ import { Trilha, type TrilhaItem } from '@/components/ui/Trilha';
 import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { segredoDoResultado } from '@/lib/eba/link-resultado';
 import { jsonLdSeguro, origemDoSite } from '@/lib/seo/json-ld';
-import { confirmarLinkResultado, pedirCodigoResultado } from './acoes';
+import { confirmarLinkResultado, pedirCodigoResultado, reenviarLinkResultado } from './acoes';
 import estilosEba from '../eba.module.css';
 import styles from './resultado.module.css';
 
@@ -37,7 +37,7 @@ export default function PedirResultadoPage() {
       </div>
       <section className={styles.tela} aria-label="Receber meu resultado" data-section="pedir-resultado-eba">
         <div className={styles.caixa}>
-          <PedirResultado acoes={{ pedirCodigo: pedirCodigoResultado, confirmar: confirmarLinkResultado }} />
+          <PedirResultado acoes={{ pedirCodigo: pedirCodigoResultado, confirmar: confirmarLinkResultado, reenviar: reenviarLinkResultado }} />
         </div>
       </section>
     </>

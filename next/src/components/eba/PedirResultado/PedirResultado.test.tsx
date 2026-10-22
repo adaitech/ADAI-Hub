@@ -6,6 +6,7 @@ import { PedirResultado, type PedirResultadoProps } from './PedirResultado';
 const acoes = () => ({
   pedirCodigo: jest.fn().mockResolvedValue({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } }),
   confirmar: jest.fn().mockResolvedValue({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } }),
+  reenviar: jest.fn().mockResolvedValue({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } }),
 });
 const montar = (a = acoes()) => ({ a, ...render(<PedirResultado acoes={a as unknown as PedirResultadoProps['acoes']} />) });
 const digitarEmail = (v = 'ana@exemplo.com') => fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: v } });
@@ -70,6 +71,47 @@ describe('PedirResultado', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Se existir resultado para este e-mail, enviamos o link para a***@exemplo.com. Ele vale por 7 dias.');
     expect(container.innerHTML).not.toContain('/eba/resultado/');
     expect(screen.getByRole('link', { name: 'Ver todos os testes' })).toHaveAttribute('href', '/eba/testes');
+  });
+
+  describe('código aceito, mas a API ou o e-mail falharam em seguida (o código já foi gasto)', () => {
+    const ACEITO = { ok: false, erro: 'indisponivel', codigoAceito: true };
+
+    it('avisa e oferece "Tentar de novo", que reenvia o link sem pedir outro código', async () => {
+      const a = acoes();
+      a.confirmar.mockResolvedValueOnce(ACEITO);
+      await ateOCodigo(a);
+      digitarCodigo('042137');
+      await confirmar();
+      expect(screen.getByRole('alert')).toHaveTextContent('Código confirmado, mas não conseguimos enviar o link agora. Tente de novo.');
+      expect(screen.queryByRole('button', { name: 'Confirmar' })).toBeNull();
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' })));
+      expect(a.reenviar).toHaveBeenCalledWith('ana@exemplo.com');
+      expect(a.confirmar).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('heading', { level: 2, name: 'Confira seu e-mail' })).toBeInTheDocument();
+    });
+
+    it('"Tentar de novo" com a marca vencida (verificacao) → volta ao e-mail para pedir outro código', async () => {
+      const a = acoes();
+      a.confirmar.mockResolvedValueOnce(ACEITO);
+      a.reenviar.mockResolvedValueOnce({ ok: false, erro: 'verificacao' });
+      await ateOCodigo(a);
+      digitarCodigo('042137');
+      await confirmar();
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' })));
+      expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
+    });
+
+    it('"Tentar de novo" com a API ainda fora → continua oferecendo', async () => {
+      const a = acoes();
+      a.confirmar.mockResolvedValueOnce(ACEITO);
+      a.reenviar.mockResolvedValueOnce(ACEITO);
+      await ateOCodigo(a);
+      digitarCodigo('042137');
+      await confirmar();
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' })));
+      expect(screen.getByRole('alert')).toHaveTextContent('Código confirmado, mas não conseguimos enviar o link agora.');
+      expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
+    });
   });
 
   it('menos de 6 dígitos → pede os 6 dígitos, sem chamar o servidor', async () => {

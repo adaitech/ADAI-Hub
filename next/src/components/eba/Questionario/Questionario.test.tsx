@@ -1128,6 +1128,45 @@ describe('Questionario — código por e-mail', () => {
     expect(acoes.confirmarCodigo).toHaveBeenCalledWith('ana@email.com', '123456');
   });
 
+  describe('código aceito, mas a API da EBA falhou em seguida (o código já foi gasto)', () => {
+    const ACEITO = { ok: false, erro: 'indisponivel', codigoAceito: true };
+
+    it('avisa que o código foi confirmado e oferece "Tentar de novo", sem pedir outro código', async () => {
+      const retomarCadastro = jest.fn(async () => ({ ok: true, dados: { emailMascarado: 'a***@email.com', dono: 'dono-1' } }));
+      const { acoes } = await irParaCodigo({ confirmarCodigo: jest.fn(async () => ACEITO), retomarCadastro });
+      digitar('042137');
+      await confirmar();
+      expect(screen.getByRole('alert')).toHaveTextContent('Código confirmado, mas não conseguimos continuar agora.');
+      expect(screen.queryByRole('button', { name: 'Confirmar' })).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+      await esperarAcoes();
+      expect(retomarCadastro).toHaveBeenCalledWith('ana@email.com');
+      expect(acoes.confirmarCodigo).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Pergunta 1 de 3')).toBeInTheDocument();
+    });
+
+    it('"Tentar de novo" com a marca vencida (verificacao) → volta ao e-mail para pedir outro código', async () => {
+      const retomarCadastro = jest.fn(async () => ({ ok: false, erro: 'verificacao' }));
+      await irParaCodigo({ confirmarCodigo: jest.fn(async () => ACEITO), retomarCadastro });
+      digitar('042137');
+      await confirmar();
+      fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+      await esperarAcoes();
+      expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
+    });
+
+    it('"Tentar de novo" ainda com a API fora → continua oferecendo', async () => {
+      const retomarCadastro = jest.fn(async () => ({ ok: false, erro: 'indisponivel' }));
+      await irParaCodigo({ confirmarCodigo: jest.fn(async () => ACEITO), retomarCadastro });
+      digitar('042137');
+      await confirmar();
+      fireEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+      await esperarAcoes();
+      expect(screen.getByRole('alert')).toHaveTextContent('Código confirmado, mas não conseguimos continuar agora.');
+      expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
+    });
+  });
+
   it('código errado → "Código incorreto. Você tem mais 3 tentativas." e campo limpo', async () => {
     await irParaCodigo({ confirmarCodigo: jest.fn(async () => ({ ok: false, erro: 'codigo', resultado: 'errado', restantes: 3 })) });
     digitar('111111');

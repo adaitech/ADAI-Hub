@@ -494,6 +494,7 @@ export function Questionario({
             emailMascarado={s.verificacao?.emailMascarado ?? ''}
             confirmar={acoes.confirmarCodigo}
             reenviar={acoes.pedirCodigo}
+            retomar={acoes.retomarCadastro}
             onIdentificado={aoIdentificar}
             onNovo={(email, turmas) => dispatch({ tipo: 'novoAluno', email, turmas })}
             onOutroEmail={() => dispatch({ tipo: 'outroEmail' })}

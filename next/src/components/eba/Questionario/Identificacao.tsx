@@ -336,6 +336,7 @@ export function Cadastro({ email, turmas, cadastrar, retomarCadastro, onIdentifi
 const SEGUNDOS_REENVIO = 60;
 
 type ErroCodigo =
+  | { tipo: 'aceito' }
   | { tipo: 'errado'; restantes: number }
   | { tipo: 'vencido' }
   | { tipo: 'incompleto' }
@@ -343,6 +344,8 @@ type ErroCodigo =
 
 function mensagemDoCodigo(erro: ErroCodigo): string {
   switch (erro.tipo) {
+    case 'aceito':
+      return 'Código confirmado, mas não conseguimos continuar agora. Tente de novo.';
     case 'errado':
       return `Código incorreto. Você tem mais ${erro.restantes} ${erro.restantes === 1 ? 'tentativa' : 'tentativas'}.`;
     case 'vencido':
@@ -360,6 +363,8 @@ export interface ConfirmarCodigoProps {
   confirmar: typeof confirmarCodigoAcao;
   /** Reenvio do código (a mesma ação do passo do e-mail). */
   reenviar: typeof pedirCodigoAcao;
+  /** Código aceito, mas a API da EBA falhou em seguida: segue sem pedir outro código (o e-mail já está verificado). */
+  retomar: typeof retomarCadastroAcao;
   onIdentificado: (sessao: SessaoTela) => void;
   onNovo: (email: string, turmas: Turma[]) => void;
   onOutroEmail: () => void;
@@ -372,7 +377,7 @@ export interface ConfirmarCodigoProps {
  * Passo do código de 6 dígitos enviado ao e-mail. O campo aceita o código colado com espaço ou traço
  * (fica só com os dígitos); "Reenviar código" só depois de 60 s; uma conferência por vez.
  */
-export function ConfirmarCodigo({ email, emailMascarado, confirmar, reenviar, onIdentificado, onNovo, onOutroEmail, onResultado, tituloRef }: ConfirmarCodigoProps) {
+export function ConfirmarCodigo({ email, emailMascarado, confirmar, reenviar, retomar, onIdentificado, onNovo, onOutroEmail, onResultado, tituloRef }: ConfirmarCodigoProps) {
   const id = useId();
   const campo = useRef<HTMLInputElement>(null);
   const conferindo = useRef(false);
@@ -413,11 +418,36 @@ export function ConfirmarCodigo({ email, emailMascarado, confirmar, reenviar, on
         campo.current?.focus();
         return;
       }
+      if (!resposta.ok && resposta.erro === 'indisponivel' && resposta.codigoAceito) {
+        setErro({ tipo: 'aceito' });
+        return;
+      }
       setErro({ tipo: 'acao', erro: resposta.ok ? 'indisponivel' : resposta.erro });
     } catch {
       setErro({ tipo: 'acao', erro: 'indisponivel' });
     } finally {
       conferindo.current = false;
+      setPendente(false);
+    }
+  }
+
+  /** "Tentar de novo" depois do código aceito: refaz só as chamadas à API (o e-mail já está verificado). */
+  async function tentarDeNovo() {
+    setPendente(true);
+    setErro(null);
+    try {
+      const resposta = await retomar(email);
+      if (resposta.ok && resposta.dados) {
+        if ('novo' in resposta.dados) onNovo(email, resposta.dados.turmas);
+        else onIdentificado(resposta.dados);
+        return;
+      }
+      // A verificação venceu (15 min): volta ao e-mail para pedir um código novo.
+      if (!resposta.ok && resposta.erro === 'verificacao') return onOutroEmail();
+      setErro(resposta.ok || resposta.erro === 'indisponivel' ? { tipo: 'aceito' } : { tipo: 'acao', erro: resposta.erro });
+    } catch {
+      setErro({ tipo: 'aceito' });
+    } finally {
       setPendente(false);
     }
   }
@@ -476,7 +506,11 @@ export function ConfirmarCodigo({ email, emailMascarado, confirmar, reenviar, on
         )}
         <AvisoDeEspera ativo={pendente} />
         <div className={styles.botoes}>
-          {erro?.tipo === 'vencido' ? (
+          {erro?.tipo === 'aceito' ? (
+            <button type="button" className={buttonClassName()} disabled={pendente} onClick={() => void tentarDeNovo()}>
+              Tentar de novo
+            </button>
+          ) : erro?.tipo === 'vencido' ? (
             <button type="button" className={buttonClassName()} disabled={pendente} onClick={() => void pedirNovo()}>
               Enviar novo código
             </button>

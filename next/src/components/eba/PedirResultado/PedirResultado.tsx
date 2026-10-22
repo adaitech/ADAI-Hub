@@ -2,18 +2,18 @@
 
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import type { confirmarLinkResultado, pedirCodigoResultado } from '@/app/(site)/eba/resultado/acoes';
+import type { confirmarLinkResultado, pedirCodigoResultado, reenviarLinkResultado } from '@/app/(site)/eba/resultado/acoes';
 import { DIAS_VALIDADE_LINK } from '@/app/(site)/eba/resultado/validade';
 import { buttonClassName, ButtonLink } from '@/components/ui/ButtonLink';
 import styles from '../Questionario/Questionario.module.css';
 
 export interface PedirResultadoProps {
-  acoes: { pedirCodigo: typeof pedirCodigoResultado; confirmar: typeof confirmarLinkResultado };
+  acoes: { pedirCodigo: typeof pedirCodigoResultado; confirmar: typeof confirmarLinkResultado; reenviar: typeof reenviarLinkResultado };
 }
 
 type Passo = 'email' | 'codigo' | 'enviado';
 type Falha = 'invalido' | 'limite' | 'emails' | 'indisponivel';
-type ErroCodigo = { tipo: 'errado'; restantes: number } | { tipo: 'vencido' } | { tipo: 'incompleto' } | { tipo: 'acao'; erro: Falha };
+type ErroCodigo = { tipo: 'aceito' } | { tipo: 'errado'; restantes: number } | { tipo: 'vencido' } | { tipo: 'incompleto' } | { tipo: 'acao'; erro: Falha };
 
 const SEGUNDOS_REENVIO = 60;
 const MENSAGENS: Record<Falha, string> = {
@@ -25,6 +25,8 @@ const MENSAGENS: Record<Falha, string> = {
 
 function mensagemDoCodigo(erro: ErroCodigo): string {
   switch (erro.tipo) {
+    case 'aceito':
+      return 'Código confirmado, mas não conseguimos enviar o link agora. Tente de novo.';
     case 'errado':
       return `Código incorreto. Você tem mais ${erro.restantes} ${erro.restantes === 1 ? 'tentativa' : 'tentativas'}.`;
     case 'vencido':
@@ -87,7 +89,7 @@ export function PedirResultado({ acoes }: PedirResultadoProps) {
         setEspera(SEGUNDOS_REENVIO);
         return true;
       }
-      const erro: Falha = resposta.ok || resposta.erro === 'codigo' ? 'indisponivel' : resposta.erro;
+      const erro: Falha = resposta.ok || resposta.erro === 'codigo' || resposta.erro === 'verificacao' ? 'indisponivel' : resposta.erro;
       if (passo === 'email') setErroEmail(erro);
       else setErroCodigo({ tipo: 'acao', erro });
     } catch {
@@ -132,11 +134,39 @@ export function PedirResultado({ acoes }: PedirResultadoProps) {
         campoCodigo.current?.focus();
         return;
       }
-      setErroCodigo({ tipo: 'acao', erro: resposta.ok ? 'indisponivel' : resposta.erro });
+      if (!resposta.ok && resposta.erro === 'indisponivel' && resposta.codigoAceito) {
+        setErroCodigo({ tipo: 'aceito' });
+        return;
+      }
+      setErroCodigo({ tipo: 'acao', erro: resposta.ok || resposta.erro === 'verificacao' ? 'indisponivel' : resposta.erro });
     } catch {
       setErroCodigo({ tipo: 'acao', erro: 'indisponivel' });
     } finally {
       conferindo.current = false;
+      setPendente(false);
+    }
+  }
+
+  /** "Tentar de novo" depois do código aceito: reenvia o link sem pedir outro código (o e-mail já está verificado). */
+  async function tentarDeNovo() {
+    setPendente(true);
+    setErroCodigo(null);
+    try {
+      const resposta = await acoes.reenviar(email.trim());
+      if (resposta.ok && resposta.dados) {
+        setMascarado(resposta.dados.emailMascarado);
+        setPasso('enviado');
+        return;
+      }
+      // A verificação venceu (15 min): volta ao e-mail para pedir um código novo.
+      if (!resposta.ok && resposta.erro === 'verificacao') {
+        voltarAoEmail();
+        return;
+      }
+      setErroCodigo(!resposta.ok && resposta.erro === 'limite' ? { tipo: 'acao', erro: 'limite' } : { tipo: 'aceito' });
+    } catch {
+      setErroCodigo({ tipo: 'aceito' });
+    } finally {
       setPendente(false);
     }
   }
@@ -222,7 +252,11 @@ export function PedirResultado({ acoes }: PedirResultadoProps) {
               </p>
             )}
             <div className={styles.botoes}>
-              {erroCodigo?.tipo === 'vencido' ? (
+              {erroCodigo?.tipo === 'aceito' ? (
+                <button type="button" className={buttonClassName()} disabled={pendente} onClick={() => void tentarDeNovo()}>
+                  Tentar de novo
+                </button>
+              ) : erroCodigo?.tipo === 'vencido' ? (
                 <button type="button" className={buttonClassName()} disabled={pendente} onClick={() => void reenviar()}>
                   Enviar novo código
                 </button>

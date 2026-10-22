@@ -2,6 +2,8 @@ import {
   assinarMarca,
   COOKIE_APARELHO,
   COOKIE_EMAIL_VERIFICADO,
+  COOKIE_RESULTADO_VERIFICADO,
+  opcoesCookieResultado,
   lerMarca,
   opcoesCookieMarca,
   VALIDADE_APARELHO_MS,
@@ -11,6 +13,13 @@ import { OPCOES_COOKIE } from './sessao';
 
 const SEGREDO = 'segredo-de-teste-com-mais-de-32-caracteres';
 const T0 = 1_760_000_000_000;
+
+describe('marca do e-mail verificado do pedido do resultado', () => {
+  it('cookie próprio, 15 min, no caminho /eba/resultado (os cookies dos testes não valem lá e vice-versa)', () => {
+    expect(COOKIE_RESULTADO_VERIFICADO).toBe('eba_resultado_verificado');
+    expect(opcoesCookieResultado()).toEqual({ ...OPCOES_COOKIE, path: '/eba/resultado', maxAge: 900 });
+  });
+});
 
 describe('marcas do aparelho e do e-mail verificado', () => {
   it('nomes e validades da spec', () => {

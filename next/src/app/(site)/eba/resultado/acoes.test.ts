@@ -1,5 +1,6 @@
 /** @jest-environment node */
-import { confirmarLinkResultado, pedirCodigoResultado } from './acoes';
+import { confirmarLinkResultado, pedirCodigoResultado, reenviarLinkResultado } from './acoes';
+import { assinarMarca, COOKIE_RESULTADO_VERIFICADO, opcoesCookieResultado } from '@/lib/eba/aparelho';
 import { hashDoCodigo, hashDoEmail } from '@/lib/eba/verificacao';
 import { lerLinkResultado } from '@/lib/eba/link-resultado';
 import { enviarEmail, emailConfigurado } from '@/lib/email/mailersend';
@@ -8,7 +9,13 @@ import { alunoPorEmail } from '@/lib/eba-api/alunos';
 import { EbaApiIndisponivel, ebaApiConfigurada } from '@/lib/eba-api/client';
 
 const headerGet = jest.fn();
-jest.mock('next/headers', () => ({ headers: async () => ({ get: headerGet }) }));
+const cookieGet = jest.fn();
+const cookieSet = jest.fn();
+const cookieDelete = jest.fn();
+jest.mock('next/headers', () => ({
+  headers: async () => ({ get: headerGet }),
+  cookies: async () => ({ get: cookieGet, set: cookieSet, delete: cookieDelete }),
+}));
 jest.mock('@/lib/eba-api/alunos', () => ({ ...jest.requireActual('@/lib/eba-api/alunos'), alunoPorEmail: jest.fn() }));
 jest.mock('@/lib/eba-api/client', () => ({ ...jest.requireActual('@/lib/eba-api/client'), ebaApiConfigurada: jest.fn() }));
 jest.mock('@/lib/strapi/verificacao', () => ({
@@ -46,6 +53,7 @@ beforeEach(() => {
   conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 5 });
   alunoMock.mockResolvedValue({ idStudent: ID, idClass: 'turma-1' } as never);
   enviarMock.mockResolvedValue(undefined);
+  cookieGet.mockReturnValue(undefined);
   ipSeq += 1;
   headerGet.mockReturnValue(`203.0.113.${ipSeq}`);
   warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -131,6 +139,13 @@ describe('confirmarLinkResultado', () => {
     expect(texto).not.toContain(ID);
   });
 
+  it('grava a marca do e-mail verificado ANTES das chamadas à API e a apaga depois de enviar o link', async () => {
+    await confirmarLinkResultado(EMAIL, '042137');
+    expect(cookieSet).toHaveBeenCalledWith(COOKIE_RESULTADO_VERIFICADO, expect.any(String), opcoesCookieResultado());
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_RESULTADO_VERIFICADO, path: '/eba/resultado' });
+    expect(cookieSet.mock.invocationCallOrder[0]).toBeLessThan(alunoMock.mock.invocationCallOrder[0]);
+  });
+
   it('e-mail sem cadastro → a MESMA resposta, sem e-mail e sem pistas', async () => {
     alunoMock.mockResolvedValue(null);
     expect(await confirmarLinkResultado(EMAIL, '042137')).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
@@ -149,15 +164,22 @@ describe('confirmarLinkResultado', () => {
     expect(conferirMock).not.toHaveBeenCalled();
   });
 
-  it('API da EBA fora → indisponivel, sem e-mail', async () => {
-    alunoMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
+  it('Strapi fora ao conferir → indisponivel, sem dizer que o código foi aceito', async () => {
+    conferirMock.mockRejectedValue(new VerificacaoIndisponivel(500));
     expect(await confirmarLinkResultado(EMAIL, '042137')).toEqual({ ok: false, erro: 'indisponivel' });
-    expect(enviarMock).not.toHaveBeenCalled();
+    expect(cookieSet).not.toHaveBeenCalled();
   });
 
-  it('MailerSend fora → indisponivel (o log não traz e-mail nem id)', async () => {
+  it('API da EBA fora depois do código certo → indisponivel com codigoAceito (o "Tentar de novo" não pede outro código), sem e-mail', async () => {
+    alunoMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
+    expect(await confirmarLinkResultado(EMAIL, '042137')).toEqual({ ok: false, erro: 'indisponivel', codigoAceito: true });
+    expect(enviarMock).not.toHaveBeenCalled();
+    expect(cookieDelete).not.toHaveBeenCalled();
+  });
+
+  it('MailerSend fora → indisponivel com codigoAceito (o log não traz e-mail nem id)', async () => {
     enviarMock.mockRejectedValue(new Error('x'));
-    expect(await confirmarLinkResultado(EMAIL, '042137')).toEqual({ ok: false, erro: 'indisponivel' });
+    expect(await confirmarLinkResultado(EMAIL, '042137')).toEqual({ ok: false, erro: 'indisponivel', codigoAceito: true });
     const log = JSON.stringify(warn.mock.calls);
     expect(log).not.toContain(ID);
     expect(log).not.toContain('exemplo.com');
@@ -173,5 +195,58 @@ describe('confirmarLinkResultado', () => {
     headerGet.mockReturnValue('198.51.100.8');
     for (let i = 0; i < 10; i += 1) await confirmarLinkResultado(EMAIL, '042137');
     expect(await confirmarLinkResultado(EMAIL, '042137')).toEqual({ ok: false, erro: 'limite' });
+  });
+});
+
+describe('reenviarLinkResultado ("Tentar de novo" depois do código aceito)', () => {
+  const marca = (email = EMAIL, emitidoEm = Date.now()) => assinarMarca(hashDoEmail(email, SEGREDO), SEGREDO, emitidoEm);
+  const comMarca = (valor: string | undefined) => cookieGet.mockImplementation((nome: string) => (nome === COOKIE_RESULTADO_VERIFICADO && valor ? { value: valor } : undefined));
+
+  it('com a marca do mesmo e-mail: envia o link sem pedir outro código e apaga a marca', async () => {
+    comMarca(marca());
+    expect(await reenviarLinkResultado(` ${EMAIL.toUpperCase()}`)).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(conferirMock).not.toHaveBeenCalled();
+    const { para, texto } = enviarMock.mock.calls[0][0];
+    expect(para).toBe(EMAIL);
+    const link = /https:\/\/adai\.com\.br\/eba\/resultado\/(\S+)/.exec(texto)!;
+    expect(lerLinkResultado(link[1], SEGREDO_RESULTADO, Date.now())).toEqual({ idStudent: ID });
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_RESULTADO_VERIFICADO, path: '/eba/resultado' });
+  });
+
+  it.each([
+    ['sem marca', undefined],
+    ['marca de outro e-mail', marca('outra@exemplo.com')],
+    ['marca vencida (15 min + 1 ms)', marca(EMAIL, Date.now() - 900_001)],
+    ['marca adulterada', marca().slice(0, -3) + 'abc'],
+  ])('%s → verificacao (volta ao e-mail), sem enviar nada', async (_n, valor) => {
+    comMarca(valor);
+    expect(await reenviarLinkResultado(EMAIL)).toEqual({ ok: false, erro: 'verificacao' });
+    expect(alunoMock).not.toHaveBeenCalled();
+    expect(enviarMock).not.toHaveBeenCalled();
+  });
+
+  it('e-mail sem cadastro: a mesma resposta de sucesso, sem e-mail', async () => {
+    comMarca(marca());
+    alunoMock.mockResolvedValue(null);
+    expect(await reenviarLinkResultado(EMAIL)).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(enviarMock).not.toHaveBeenCalled();
+  });
+
+  it('API ainda fora → indisponivel com codigoAceito, e a marca continua valendo', async () => {
+    comMarca(marca());
+    alunoMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
+    expect(await reenviarLinkResultado(EMAIL)).toEqual({ ok: false, erro: 'indisponivel', codigoAceito: true });
+    expect(cookieDelete).not.toHaveBeenCalled();
+  });
+
+  it('e-mail inválido → invalido; desligado → indisponivel; limite por IP', async () => {
+    comMarca(marca());
+    expect(await reenviarLinkResultado('lixo')).toEqual({ ok: false, erro: 'invalido' });
+    delete process.env.EBA_RESULTADO_SEGREDO;
+    expect(await reenviarLinkResultado(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+    process.env.EBA_RESULTADO_SEGREDO = SEGREDO_RESULTADO;
+    headerGet.mockReturnValue('198.51.100.9');
+    for (let i = 0; i < 10; i += 1) await reenviarLinkResultado(EMAIL);
+    expect(await reenviarLinkResultado(EMAIL)).toEqual({ ok: false, erro: 'limite' });
   });
 });

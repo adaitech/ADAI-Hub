@@ -309,16 +309,33 @@ describe('confirmarCodigo', () => {
     expect(alunoPorEmailMock).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ['Strapi fora', () => conferirMock.mockRejectedValue(new VerificacaoIndisponivel())],
-    ['API da EBA fora depois do código certo', () => {
-      conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 4 });
-      alunoPorEmailMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
-    }],
-  ])('%s → indisponivel, sem sessão', async (_n, preparar) => {
-    preparar();
+  it('Strapi fora → indisponivel, sem sessão e sem dizer que o código foi aceito', async () => {
+    conferirMock.mockRejectedValue(new VerificacaoIndisponivel());
     expect(await confirmarCodigo(EMAIL, '123456')).toEqual({ ok: false, erro: 'indisponivel' });
     expect(nomesGravados()).not.toContain(COOKIE_SESSAO);
+  });
+
+  describe('API da EBA fora depois do código certo (o código já foi gasto)', () => {
+    beforeEach(() => {
+      conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 4 });
+      alunoPorEmailMock.mockRejectedValue(new EbaApiIndisponivel('rede'));
+    });
+
+    it('marca o e-mail como verificado ANTES e avisa que o código foi aceito (codigoAceito), sem abrir sessão', async () => {
+      expect(await confirmarCodigo(EMAIL, '123456')).toEqual({ ok: false, erro: 'indisponivel', codigoAceito: true });
+      expect(cookieSet).toHaveBeenCalledWith(COOKIE_EMAIL_VERIFICADO, expect.any(String), { ...OPCOES_COOKIE, maxAge: 900 });
+      expect(nomesGravados()).not.toContain(COOKIE_SESSAO);
+    });
+
+    it('com a marca gravada, o "Tentar de novo" (retomarCadastro) segue sem pedir outro código', async () => {
+      await confirmarCodigo(EMAIL, '123456');
+      const [, valor] = cookieSet.mock.calls.find(([nome]) => nome === COOKIE_EMAIL_VERIFICADO)!;
+      comCookie(COOKIE_EMAIL_VERIFICADO, valor);
+      alunoPorEmailMock.mockReset();
+      alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
+      expect(await retomarCadastro(EMAIL)).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
+      expect(conferirMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('e-mail inválido → invalido', async () => {

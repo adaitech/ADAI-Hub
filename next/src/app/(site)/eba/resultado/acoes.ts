@@ -1,7 +1,8 @@
 'use server';
 
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { z } from 'zod';
+import { assinarMarca, COOKIE_RESULTADO_VERIFICADO, lerMarca, opcoesCookieResultado, VALIDADE_EMAIL_VERIFICADO_MS } from '@/lib/eba/aparelho';
 import { emailDoCodigo } from '@/lib/eba/codigo-email';
 import { emailDoLinkResultado } from '@/lib/eba/email-resultado';
 import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
@@ -26,14 +27,15 @@ import { cancelarVerificacao, conferirVerificacao, emitirVerificacao, verificaca
 
 export type RespostaPedido<T = undefined> =
   | { ok: true; dados?: T }
-  | { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' }
+  /** `codigoAceito`: o código já foi gasto e a falha veio depois (API ou e-mail): a tela oferece "Tentar de novo". */
+  | { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'verificacao'; codigoAceito?: true }
   | { ok: false; erro: 'codigo'; resultado: Exclude<ResultadoVerificacao['resultado'], 'ok'>; restantes: number };
 
 const limitarTentativas = criarLimitador(10, 60_000);
 const esquemaEmail = z.string().trim().max(254).pipe(z.email());
 const ACAO = { timeoutMs: TIMEOUT_ACAO_MS };
 
-const falha = (erro: 'invalido' | 'limite' | 'emails' | 'indisponivel') => ({ ok: false, erro }) as const;
+const falha = (erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'verificacao') => ({ ok: false, erro }) as const;
 
 async function dentroDoLimite(): Promise<boolean> {
   const cabecalhos = await headers();
@@ -100,19 +102,54 @@ export async function confirmarLinkResultado(email: string, codigo: string): Pro
   try {
     const conferido = await conferirVerificacao({ emailHash, codigoHash: hashDoCodigo(emailHash, digitos, config.segredo) });
     if (conferido.resultado !== 'ok') return { ok: false, erro: 'codigo', resultado: conferido.resultado, restantes: conferido.restantes };
-
-    const aluno = await alunoPorEmail(emailNormalizado, ACAO);
-    if (aluno) {
-      const codigoDoLink = emitirLinkResultado(aluno.idStudent, {
-        segredo: config.segredoResultado,
-        validadeMs: DIAS_VALIDADE_LINK * 86_400_000,
-        agora: Date.now(),
-      });
-      await enviarEmail({ para: emailNormalizado, ...emailDoLinkResultado(`${origemDoSite()}/eba/resultado/${codigoDoLink}`, DIAS_VALIDADE_LINK) });
-    }
-    return { ok: true, dados: { emailMascarado: mascararEmail(emailNormalizado) } };
   } catch (erro) {
     registrarFalha('confirmarLinkResultado', erro);
     return falha('indisponivel');
+  }
+
+  // Código aceito (já gasto no Strapi, uso único). Grava a marca antes das chamadas à API e ao MailerSend:
+  // se falharem, o "Tentar de novo" (`reenviarLinkResultado`) segue sem pedir outro código.
+  (await cookies()).set(COOKIE_RESULTADO_VERIFICADO, assinarMarca(emailHash, config.segredo, Date.now()), opcoesCookieResultado());
+  return enviarLink(emailNormalizado, config.segredoResultado, 'confirmarLinkResultado');
+}
+
+/**
+ * "Tentar de novo" depois de o código ser aceito e a API ou o e-mail falharem: exige a marca de 15 min do
+ * mesmo e-mail (gravada ao aceitar o código) e envia o link, sem pedir outro código.
+ */
+export async function reenviarLinkResultado(email: string): Promise<RespostaPedido<{ emailMascarado: string }>> {
+  if (!(await dentroDoLimite())) return falha('limite');
+  const config = configuracao();
+  if (!config) return falha('indisponivel');
+
+  const valido = esquemaEmail.safeParse(email);
+  if (!valido.success) return falha('invalido');
+  const emailNormalizado = normalizarEmail(valido.data);
+  const marca = lerMarca((await cookies()).get(COOKIE_RESULTADO_VERIFICADO)?.value, config.segredo, Date.now(), VALIDADE_EMAIL_VERIFICADO_MS);
+  if (marca?.emailHash !== hashDoEmail(emailNormalizado, config.segredo)) return falha('verificacao');
+
+  return enviarLink(emailNormalizado, config.segredoResultado, 'reenviarLinkResultado');
+}
+
+/**
+ * Busca o aluno pelo e-mail e envia o link por e-mail. Sem cadastro: a mesma resposta de sucesso, sem
+ * e-mail. Falha (API ou e-mail) com a marca já gravada: `codigoAceito`, para a tela oferecer "Tentar de novo".
+ */
+async function enviarLink(email: string, segredoResultado: string, acao: string): Promise<RespostaPedido<{ emailMascarado: string }>> {
+  try {
+    const aluno = await alunoPorEmail(email, ACAO);
+    if (aluno) {
+      const codigoDoLink = emitirLinkResultado(aluno.idStudent, {
+        segredo: segredoResultado,
+        validadeMs: DIAS_VALIDADE_LINK * 86_400_000,
+        agora: Date.now(),
+      });
+      await enviarEmail({ para: email, ...emailDoLinkResultado(`${origemDoSite()}/eba/resultado/${codigoDoLink}`, DIAS_VALIDADE_LINK) });
+    }
+    (await cookies()).delete({ name: COOKIE_RESULTADO_VERIFICADO, path: '/eba/resultado' });
+    return { ok: true, dados: { emailMascarado: mascararEmail(email) } };
+  } catch (erro) {
+    registrarFalha(acao, erro);
+    return { ok: false, erro: 'indisponivel', codigoAceito: true };
   }
 }

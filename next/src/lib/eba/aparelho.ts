@@ -9,6 +9,8 @@ import { OPCOES_COOKIE } from './sessao';
 
 export const COOKIE_APARELHO = 'eba_aparelho';
 export const COOKIE_EMAIL_VERIFICADO = 'eba_email_verificado';
+/** Código certo do pedido do link do resultado: permite o "Tentar de novo" sem outro código (15 min). */
+export const COOKIE_RESULTADO_VERIFICADO = 'eba_resultado_verificado';
 export const VALIDADE_APARELHO_MS = 604_800_000;
 export const VALIDADE_EMAIL_VERIFICADO_MS = 900_000;
 const TOLERANCIA_RELOGIO_MS = 60_000;
@@ -27,4 +29,9 @@ export function lerMarca(valor: string | undefined, segredo: string, agora: numb
 
 export function opcoesCookieMarca(validadeMs: number) {
   return { ...OPCOES_COOKIE, maxAge: Math.round(validadeMs / 1000) };
+}
+
+/** Opções do cookie do pedido do resultado: no caminho da própria página, não no dos testes. */
+export function opcoesCookieResultado() {
+  return { ...opcoesCookieMarca(VALIDADE_EMAIL_VERIFICADO_MS), path: '/eba/resultado' };
 }
