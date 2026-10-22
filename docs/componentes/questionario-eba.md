@@ -70,7 +70,7 @@ Implementado (Tarefa 7). A página `/eba/testes/[slug]` que monta o componente c
 
 ## Resultado salvo — `/eba/resultado/<codigo>` (entrega 3)
 
-Página do servidor (`app/(site)/eba/resultado/[codigo]/page.tsx`) que mostra os resultados já gravados dos 5 testes, reaproveitando `ConteudoResultado` (o miolo do `Resultado`, sem "Próximo teste" nem "Sair"). Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-3-resultado-design.md`.
+Página do servidor (`app/(restrito)/eba/resultado/[codigo]/page.tsx`) que mostra os resultados já gravados dos 5 testes, reaproveitando `ConteudoResultado` (o miolo do `Resultado`, sem "Próximo teste" nem "Sair"). Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-3-resultado-design.md`.
 
 - **Desligada por padrão:** sem `EBA_RESULTADO_SEGREDO` (32+ caracteres), tudo responde 404. Ligar só depois das perguntas em aberto da spec (§7: autorização da API para ler `SurveyResult` e quem emite o link).
 - **Privacidade:** o `codigo` é opaco (AES-256-GCM, `lib/eba/link-resultado.ts`), não o id do aluno; vale no máximo 30 dias. A tela mostra só resultados: sem nome, e-mail, turma ou id. Código inválido, expirado, limite estourado (20 aberturas por minuto por IP) e aluno sem resultado dão o mesmo 404. `noindex, nofollow`, `referrer: no-referrer`, fora do sitemap.
@@ -81,9 +81,9 @@ Página do servidor (`app/(site)/eba/resultado/[codigo]/page.tsx`) que mostra os
 ### Pedido do link — `/eba/resultado` e as entradas
 
 - **Entradas (só com `EBA_RESULTADO_SEGREDO` configurado):** faixa `ConsultarResultado` ("Já fez os testes? Consultar meus resultados") logo depois da trilha de `/eba/testes`, e "Quer rever depois? Receber o link por e-mail" na tela de resultado de cada teste (prop `linkResultado` do `Questionario`/`Resultado`). A faixa é código, não Strapi: só existe quando o recurso está ligado, o que o editor não controla.
-- **Página `/eba/resultado`:** `components/eba/PedirResultado` (ilha cliente): e-mail → código de 6 dígitos → "Confira seu e-mail". O link do resultado vai **só por e-mail** (validade de 7 dias, `app/(site)/eba/resultado/validade.ts`) e nunca aparece na tela. A resposta é igual para e-mail de aluno ou não. Sem o segredo, 404.
+- **Página `/eba/resultado`:** `components/eba/PedirResultado` (ilha cliente): e-mail → código de 6 dígitos → "Confira seu e-mail". O link do resultado vai **só por e-mail** (validade de 7 dias, `app/(restrito)/eba/resultado/validade.ts`) e nunca aparece na tela. A resposta é igual para e-mail de aluno ou não. Sem o segredo, 404.
 - **Server Actions:** `pedirCodigoResultado` (manda o código, não consulta a API) e `confirmarLinkResultado` (confere o código, busca o aluno por e-mail e envia o link). Limite de 10 tentativas por minuto por IP; falha fechada sem `EBA_RESULTADO_SEGREDO`, API, MailerSend ou token das verificações.
-- **Medição:** coberto por `clique_cta` (faixa, botões e links) e `data-section` (`consultar-resultado`, `pedir-resultado-eba`); sem evento novo e sem e-mail, código ou link em parâmetro algum.
+- **Medição:** a faixa e o botão do fim do teste (páginas do site) geram `clique_cta`. As páginas `/eba/resultado` e `/eba/resultado/<codigo>` ficam no grupo `(restrito)`, **sem GTM, rastreador nem aviso de cookies**: o código do link é uma credencial e não pode ir para o GA4. Sem evento novo e sem e-mail, código ou link em parâmetro algum.
 - **Testes:** `PedirResultado.test.tsx`, `ConsultarResultado.test.tsx`, `acoes.test.ts` (resultado), `email-resultado.test.ts`, `codigo-email.test.ts` e `__tests__/integracao/eba-resultado.test.tsx`.
 
 ### Revisão de 22/10/2026 (código por e-mail e envio)

@@ -142,6 +142,9 @@ async function principal() {
   await conferirSeo();
   await esperarStatus('rota inexistente → 404', '/rota-que-nao-existe-smoke', 404);
   await esperarStatus('resultado da EBA com código inválido → 404 (falha fechada)', '/eba/resultado/codigo-invalido-smoke', 404);
+  // Área da equipe: sem sessão nunca abre (404 se desligada, redirecionamento ao login se ligada).
+  await esperarStatus('área da equipe sem sessão → 404 ou login', '/eba/equipe/consultas', [307, 308, 404]);
+  await esperarStatus('detalhe de aluno sem sessão → 404 ou login', '/eba/equipe/consultas/11111111-2222-4333-8444-555555555555', [307, 308, 404]);
   await esperarStatus('curso da EBA inexistente → 404', '/eba/cursos/curso-que-nao-existe-smoke', 404);
   const { local } = await esperarStatus('/home → redireciona para /', '/home', [307, 308]);
   if (local && new URL(local, BASE).pathname !== '/') registrar(false, '/home → redireciona para /', `foi para ${local}`);

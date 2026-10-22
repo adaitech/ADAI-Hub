@@ -1,6 +1,6 @@
-# EBA — resultado dos testes: checklist final do que falta você fazer
+# EBA — resultado dos testes e área da equipe: checklist final do que falta você fazer
 
-Entrega 3 da migração da EBA (PR #20). Este é o **documento mestre**: tudo que depende de uma pessoa (acesso, segredo, decisão, aparelho real) está aqui, na ordem de execução. Marque `[x]` conforme for fazendo. Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-3-resultado-design.md`.
+Entregas 3 (resultado) e 4 (área logada da equipe) da migração da EBA, na mesma branch (PR #20). Este é o **documento mestre**: tudo que depende de uma pessoa (acesso, segredo, decisão, aparelho real) está aqui, na ordem de execução. Marque `[x]` conforme for fazendo. Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-3-resultado-design.md`.
 
 > Valores de segredo nunca vão para o Git, para o chat nem para o PR. Abaixo só aparecem **nomes** de variáveis.
 
@@ -106,16 +106,30 @@ Precisa de autorização da EBA: grava um **aluno de teste** no banco real.
 
 ## 10. Decisões em aberto (spec §7)
 
-- [ ] Validade do link: **7 dias** implementado como proposta (`app/(site)/eba/resultado/validade.ts`). Confirmar ou trocar.
+- [ ] Validade do link: **7 dias** implementado como proposta (`app/(restrito)/eba/resultado/validade.ts`). Confirmar ou trocar.
 - [ ] Caminho por e-mail com código: implementado como proposta. Confirmar.
 - [ ] Manter o `/teste/resultado/<id>` do site atual (tela da equipe) até a entrega 4: proposta é manter e não redirecionar.
 - [ ] Revogação de um link só: hoje só dá para invalidar todos (trocar o segredo). Aceitar ou pedir lista de revogação.
 - [ ] Aparelho lembrado em **7 dias** (era 30): confirmar o prazo.
 - [ ] Risco residual do item 3 da seção 9: aceitar ou pedir limite por IP também no Strapi.
 
-## 11. Depois do lançamento (fora da entrega 3)
+## 11. Entrega 4: área da equipe (`/eba/equipe`)
+
+Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-4-area-logada-design.md`. Nasce desligada: sem `EBA_EQUIPE_SEGREDO` tudo responde 404.
+
+- [ ] **APIM:** expor o `POST /login` (e, se for usar renovação, o `/refresh`) do Identity para a assinatura `adai-hub`. Sem isso o login do Hub não funciona (spec §8, pergunta 1).
+- [ ] **Usuário de teste:** pedir ao responsável pelo banco uma conta do Identity só para homologação (o Hub não cria contas; hoje só pelo banco).
+- [ ] **Variável:** gerar `EBA_EQUIPE_SEGREDO` (`openssl rand -base64 48`, valor diferente das outras) e configurar no cofre e no AKS. Trocar o valor encerra todas as sessões.
+- [ ] **Paginação da API:** o Hub pede `page=N&page-size=M` (como os links da própria API). Conferir em homologação que `page-size=20` devolve 20 alunos e `page-size=100` devolve até 100 turmas (se a API ignorar o parâmetro, vêm só 10 por página e a lista continua paginada, mas as turmas passariam de 10 sem aparecer).
+- [ ] **Teste de ponta a ponta:** entrar com o usuário de teste; abrir `/eba/equipe/consultas` (lista paginada), buscar por e-mail e por nome, abrir um aluno e conferir o resultado dos 5 testes; criar, editar e tentar apagar uma turma **com** alunos (deve recusar) e **sem** alunos (apaga); sair e conferir que `/eba/equipe/consultas` volta ao login.
+- [ ] **Sessão:** conferir a validade (a do token do Identity, padrão 1 h, no máximo 8 h) e se a equipe quer renovação automática com `/refresh` (pergunta 5).
+- [ ] **GTM (defesa em profundidade):** no container do Google Tag Manager, excluir `/eba/equipe*` e `/eba/resultado*` de todos os gatilhos (page view e mudança de histórico). O Hub já não carrega o GTM nessas rotas, mas o GTM de uma página do site pode continuar vivo numa navegação interna.
+- [ ] **Medição e leitor de tela:** conferir no `window.dataLayer` que nenhuma ação na área gera evento; leitor de tela no login, na busca, na tabela e no diálogo de apagar turma.
+- [ ] **Perguntas da spec §8 (decidir antes de ligar):** papéis; quem assiste às aulas e onde ficam os vídeos (Vimeo e restrição por domínio); gerenciar aluno e baixar resultado (ficam fora).
+- [ ] **Próximas fatias** (quando as perguntas forem respondidas): aulas em vídeo no Strapi, QR codes dos testes (precisa das imagens do site atual) e redirecionar `/dashboard/*` na virada.
+
+## 12. Depois do lançamento (fora da entrega 3)
 
 - [ ] Pedir à API que feche o `GET Student/{id}` anônimo (hoje devolve nome e e-mail para quem tiver o Guid). O site atual e o painel dependem dele; planejar a troca.
 - [ ] Fechar o acesso direto ao App Service da API, deixando só o APIM, e girar a senha do SQL (spec da entrega 2, §10).
-- [ ] Entrega 4: painel e login da equipe no Hub (a equipe vê nome, e-mail e turma junto do resultado, nunca nesta URL).
 - [ ] Depois do merge do #15 e do #20, atualizar `docs/projeto/CONTROLE.md` com os números dos PRs e o status.

@@ -67,7 +67,7 @@ No API Management, a operação nova deve (1) existir só no produto da assinatu
 | `next/src/lib/eba-api/resultados.ts` | `resultadosDoAluno(idStudent)`: os 5 `GET Hub/SurveyResult/Student/{id}/Question/{idQuestion}` em paralelo; devolve `{ teste, resultado }[]` só dos testes feitos. 404 → teste não feito. Outro erro (401/403/5xx/timeout) → lança. |
 | `next/src/lib/eba-api/respostas.ts` | A normalização da lista de itens (nota, talentos, temperamento) vira função compartilhada com o `POST SurveyResponse`. |
 | `next/src/components/eba/Questionario/Resultado.tsx` | Exporta `ConteudoResultado` (o miolo, sem botões de próximo teste nem "Sair"). O estilo salvo não traz as somas dos eixos: `motivacao`/`organizacao` ficam `null` e a tela só omite essa lista. |
-| `next/src/app/(site)/eba/resultado/[codigo]/page.tsx` | Server Component dinâmico: limite → decifra → busca → monta. `generateMetadata` com `noindex`. |
+| `next/src/app/(restrito)/eba/resultado/[codigo]/page.tsx` | Server Component dinâmico: limite → decifra → busca → monta. `generateMetadata` com `noindex`. |
 | `next/.env.example`, `README.md` | `EBA_RESULTADO_SEGREDO`. |
 
 Resultado salvo e o `result`: a API marca o resultado vigente em `result`. A busca fica com as linhas `result === true` quando houver; senão, com todas. **Confirmar em homologação** (pergunta 4).
@@ -84,7 +84,7 @@ No fim do teste o botão leva a `/eba/resultado` e **pede o e-mail de novo** (a 
 
 ## 6. Medição, SEO e acessibilidade
 
-- **Medição:** coberto por `clique_cta` (links "Ver todos os testes" e "Fazer outro teste") e `ver_secao`. Sem evento novo, e sem o token ou o Guid em parâmetro algum (o `destino` dos cliques é o caminho interno dos testes, nunca o da própria página).
+- **Medição (atualizado):** as páginas `/eba/resultado*` ficam no grupo de rotas `(restrito)`, **sem GTM, rastreador nem aviso de cookies** (o código do link vai na URL e o GTM mandaria o endereço ao GA4). Cobertura antiga: `clique_cta` (links "Ver todos os testes" e "Fazer outro teste") e `ver_secao`. Sem evento novo, e sem o token ou o Guid em parâmetro algum (o `destino` dos cliques é o caminho interno dos testes, nunca o da própria página).
 - **SEO:** `noindex, nofollow`, um `h1`, `h2` por teste, fora do sitemap.
 - **Acessibilidade:** reaproveita as listas ordenadas e `visually-hidden` do `Resultado`; `data-section="resultado-eba"`.
 

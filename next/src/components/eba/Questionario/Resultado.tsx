@@ -1,5 +1,5 @@
 import type { RefCallback } from 'react';
-import { ButtonLink } from '@/components/ui/ButtonLink';
+import { ButtonLink, buttonClassName } from '@/components/ui/ButtonLink';
 import { PARES_ESTILO } from '@/lib/eba-api/conteudo-local';
 import type { ItemResultado, Resultado as ResultadoApi } from '@/lib/eba-api/respostas';
 import { proximoTeste, type DefinicaoTeste } from '@/lib/eba-api/testes';
@@ -152,9 +152,11 @@ export function Resultado({ teste, resultado, emailMascarado, saiu, onSair, link
           <h3 className={styles.titulo4}>Quer rever depois?</h3>
           <p className={styles.texto}>Enviamos por e-mail um link particular com o resultado de todos os seus testes.</p>
           <div className={styles.botoes}>
-            <ButtonLink href="/eba/resultado" estilo="contorno">
+            {/* Link comum (carga completa) de propósito: `/eba/resultado` não tem Google Tag Manager. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            <a href="/eba/resultado" className={buttonClassName({ estilo: 'contorno' })}>
               Receber o link por e-mail
-            </ButtonLink>
+            </a>
           </div>
         </div>
       )}

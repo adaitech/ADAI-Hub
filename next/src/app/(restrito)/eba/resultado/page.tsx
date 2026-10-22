@@ -6,7 +6,7 @@ import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { segredoDoResultado } from '@/lib/eba/link-resultado';
 import { jsonLdSeguro, origemDoSite } from '@/lib/seo/json-ld';
 import { confirmarLinkResultado, pedirCodigoResultado, reenviarLinkResultado } from './acoes';
-import estilosEba from '../eba.module.css';
+import estilosEba from '@/app/(site)/eba/eba.module.css';
 import styles from './resultado.module.css';
 
 /** Tela de ação, não de conteúdo: `noindex, nofollow` e fora do sitemap. */

@@ -4,8 +4,10 @@
  */
 import { screen, within } from '@testing-library/react';
 import { draftMode, headers } from 'next/headers';
-import PedirPage, { generateMetadata as metadataPedir } from '@/app/(site)/eba/resultado/page';
-import ResultadoPage, { generateMetadata } from '@/app/(site)/eba/resultado/[codigo]/page';
+import RestritoLayout from '@/app/(restrito)/layout';
+import SiteLayout from '@/app/(site)/layout';
+import PedirPage, { generateMetadata as metadataPedir } from '@/app/(restrito)/eba/resultado/page';
+import ResultadoPage, { generateMetadata } from '@/app/(restrito)/eba/resultado/[codigo]/page';
 import TestesPage from '@/app/(site)/eba/testes/page';
 import hero from '@/components/sections/HeroSection/HeroSection.mock.json';
 import listaTestes from '@/components/sections/ListaTestesSection/ListaTestesSection.mock.json';
@@ -22,6 +24,10 @@ jest.mock('next/headers', () => ({
   draftMode: jest.fn(),
 }));
 jest.mock('@/lib/analytics/datalayer', () => ({ registrarEvento: jest.fn() }));
+// O GTM usa `next/script` (injetado só no navegador): sentinelas visíveis no HTML provam o que cada layout monta.
+jest.mock('@/components/analytics/GoogleTagManager', () => ({ GoogleTagManager: () => <i data-analytics-sentinela="gtm" /> }));
+jest.mock('@/components/analytics/RastreadorAnalytics', () => ({ RastreadorAnalytics: () => <i data-analytics-sentinela="rastreador" /> }));
+jest.mock('@/components/layout/BannerCookies', () => ({ BannerCookies: () => <i data-analytics-sentinela="banner" /> }));
 
 const API = 'https://eba-api.exemplo.test';
 const SEGREDO = 'segredo-do-resultado-com-mais-de-32-caracteres';
@@ -104,6 +110,33 @@ describe('faixa "Consultar meus resultados" em /eba/testes', () => {
     delete process.env.EBA_RESULTADO_SEGREDO;
     await renderizarServidor(await TestesPage());
     expect(screen.queryByRole('link', { name: 'Consultar meus resultados' })).toBeNull();
+  });
+});
+
+describe('layout das páginas restritas (sem analytics)', () => {
+  beforeEach(() => {
+    (draftMode as jest.Mock).mockResolvedValue({ isEnabled: false });
+    const strapi = criarStrapiFake();
+    globalThis.fetch = jest.fn((url: string, init?: RequestInit) => strapi.fetch(url, init)) as unknown as typeof fetch;
+    process.env.NEXT_PUBLIC_GTM_ID = 'GTM-TESTE123';
+  });
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_GTM_ID;
+  });
+
+  const sentinelas = (container: HTMLElement) => [...container.querySelectorAll('[data-analytics-sentinela]')].map((e) => e.getAttribute('data-analytics-sentinela'));
+
+  it('restrito: Header, conteúdo e Footer, mas sem GTM, rastreador de cliques nem aviso de cookies', async () => {
+    const { container } = await renderizarServidor(<RestritoLayout><p>conteúdo restrito</p></RestritoLayout>);
+    expect(container.querySelector('[data-section="header"]')).not.toBeNull();
+    expect(container.querySelector('[data-section="footer"]')).not.toBeNull();
+    expect(screen.getByText('conteúdo restrito')).toBeInTheDocument();
+    expect(sentinelas(container)).toEqual([]);
+  });
+
+  it('contraprova: o layout do site monta GTM, rastreador e aviso de cookies', async () => {
+    const { container } = await renderizarServidor(<SiteLayout><p>conteúdo do site</p></SiteLayout>);
+    expect(sentinelas(container).sort()).toEqual(['banner', 'gtm', 'rastreador']);
   });
 });
 

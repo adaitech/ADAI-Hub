@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import type { confirmarLinkResultado, pedirCodigoResultado, reenviarLinkResultado } from '@/app/(site)/eba/resultado/acoes';
-import { DIAS_VALIDADE_LINK } from '@/app/(site)/eba/resultado/validade';
+import type { confirmarLinkResultado, pedirCodigoResultado, reenviarLinkResultado } from '@/app/(restrito)/eba/resultado/acoes';
+import { DIAS_VALIDADE_LINK } from '@/app/(restrito)/eba/resultado/validade';
 import { buttonClassName, ButtonLink } from '@/components/ui/ButtonLink';
 import styles from '../Questionario/Questionario.module.css';
 

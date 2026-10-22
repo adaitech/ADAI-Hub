@@ -38,7 +38,7 @@ Esta entrega é **parcial de propósito**: o levantamento (seção 2) achou deci
 
 | Tema | Decisão |
 | --- | --- |
-| Onde mora | `/eba/equipe/...`, `noindex, nofollow`, fora do sitemap. Visual do Hub, com menu lateral próprio da área. O site atual continua no ar até a virada. |
+| Onde mora | `/eba/equipe/...`, `noindex, nofollow`, fora do sitemap. Visual do Hub, com menu próprio da área. O site atual continua no ar até a virada. As rotas ficam no grupo `(restrito)`, **sem GTM, rastreador de cliques nem aviso de cookies** (o endereço de um aluno não pode ir para o GA4; vale também para `/eba/resultado*`). |
 | Login | **No servidor do Hub.** O formulário chama uma Server Action, que faz o `POST /login` no APIM; o bearer **nunca chega ao navegador**: fica num cookie `httpOnly`, cifrado (AES-256-GCM), de sessão, com validade igual à do token. Sem `localStorage`. |
 | Chamadas à API | Só do servidor, com `Authorization: Bearer` mais a chave da assinatura do Hub no APIM. Resposta 401 → sessão encerrada e volta ao login. |
 | Guarda | **Toda** rota de `/eba/equipe/*` confere a sessão no servidor (inclusive aulas, QR codes e ajuda). Sem sessão válida → redireciona para o login. Sem `EBA_EQUIPE_SEGREDO` → 404. |
@@ -61,17 +61,18 @@ Esta entrega é **parcial de propósito**: o levantamento (seção 2) achou deci
 
 | Arquivo | Papel |
 | --- | --- |
-| `next/src/lib/eba/equipe/sessao.ts` | `segredoDaEquipe()`, `abrirSessaoEquipe`/`lerSessaoEquipe` (cifra e decifra o bearer com a validade), cookie e opções. |
+| `next/src/lib/eba/selo.ts` | Selo AES-256-GCM genérico por uso (`equipe`, `resultado`): o selo de um recurso não abre em outro. |
+| `next/src/lib/eba/equipe/` | `sessao.ts` (cookie cifrado, validade do token e teto de 8 h), `servidor.ts` (`exigirSessaoDaEquipe`: 404 desligada, login sem sessão) e `formato.ts`. |
 | `next/src/lib/eba-api/client.ts` | `ebaFetch` ganha a opção `bearer` e o caminho de raiz (`/login` não fica sob `/api/v1/eba`). |
 | `next/src/lib/eba-api/equipe.ts` | `entrar`, `listarAlunos`, `buscarAlunos`, `alunoDaEquipe`, `listarTurmas`, `criarTurma`, `editarTurma`, `apagarTurma`, todas com bearer; 401 vira `SessaoEncerrada`. |
-| `next/src/app/(site)/eba/equipe/` | Layout com menu e "Sair", `login`, `consultas`, `consultas/[idStudent]`, `turmas`. |
+| `next/src/app/(restrito)/eba/equipe/` | Layout com menu e "Sair", `login`, `consultas`, `consultas/[idStudent]`, `turmas`, `acoes.ts`. |
 | `next/src/components/eba/Equipe/` | Telas de apresentação (login, busca, tabela de alunos, detalhe, turmas). |
 
 Fica para as próximas fatias (dependem das perguntas): aulas, QR codes e ajuda.
 
 ## 6. Medição, SEO e acessibilidade
 
-- **Medição:** a área da equipe **não** manda eventos de DataLayer com dado pessoal. `clique_cta` nos botões segue a regra do projeto (texto e destino sem dado pessoal). Sem evento novo.
+- **Medição:** a área da equipe **não manda nenhum evento**: o layout `(restrito)` não carrega GTM nem rastreador (o GA4 receberia o endereço e o nome do aluno). Os links do site para a área comuns (`<a>`, carga completa) para o GTM do site não continuar na página. Defesa em profundidade: excluir `/eba/equipe*` e `/eba/resultado*` dos gatilhos do container do GTM.
 - **SEO:** `noindex, nofollow`, um `h1` por tela, fora do sitemap.
 - **Acessibilidade:** formulários com rótulo, erro em `role="alert"` ligado por `aria-describedby`, tabela com `caption` e cabeçalhos, foco gerenciado entre telas, diálogo de confirmação acessível.
 

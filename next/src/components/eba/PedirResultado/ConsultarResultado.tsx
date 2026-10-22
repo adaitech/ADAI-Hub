@@ -1,4 +1,4 @@
-import { ButtonLink } from '@/components/ui/ButtonLink';
+import { buttonClassName } from '@/components/ui/ButtonLink';
 import styles from './ConsultarResultado.module.css';
 
 /**
@@ -15,9 +15,12 @@ export function ConsultarResultado() {
         </h2>
         <p className={styles.texto}>Receba por e-mail um link particular com o seu resultado.</p>
       </div>
-      <ButtonLink href="/eba/resultado" estilo="contorno">
+      {/* Link comum (carga completa) de propósito: `/eba/resultado` não tem Google Tag Manager, e uma navegação
+          do `next/link` manteria o GTM do site na página. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a href="/eba/resultado" className={buttonClassName({ estilo: 'contorno' })}>
         Consultar meus resultados
-      </ButtonLink>
+      </a>
     </section>
   );
 }
