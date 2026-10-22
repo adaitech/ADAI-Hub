@@ -1,6 +1,6 @@
-From 241e6302e4b2a357917f6957c40ac08725577aee Mon Sep 17 00:00:00 2001
-From: Claude <noreply@anthropic.com>
-Date: Thu, 22 Oct 2026 15:27:43 +0000
+From 7f4bff910b69c326491835010525faf9f64f98e9 Mon Sep 17 00:00:00 2001
+From: Jonatan Cardoso Saraiva <jonatan.cardoso@hotmail.com.br>
+Date: Thu, 22 Oct 2026 15:35:31 +0000
 Subject: [PATCH] feat(api): rota de leitura do resultado por aluno para o ADAI
  Hub, fechada por chave interna
 
