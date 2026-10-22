@@ -42,7 +42,7 @@ function Pontuacao({ itens, maximo, porcentagem }: { itens: ItemResultado[]; max
         {itens.map((item, i) => {
           const largura = proporcao(item.total, maximo);
           return (
-            <li key={item.nome} data-destaque={i < 3} className={i < 3 ? styles.destaque : undefined}>
+            <li key={`${item.nome}-${i}`} data-destaque={i < 3} className={i < 3 ? styles.destaque : undefined}>
               <span className={styles.resultadoNome}>{item.nome}</span>
               <span className={styles.resultadoBarra} aria-hidden="true">
                 <span data-barra style={{ width: `${largura}%` }} />
@@ -72,8 +72,8 @@ function Talentos({ itens }: { itens: ItemResultado[] }) {
     <>
       <p className={styles.texto}>Estas são as habilidades que você escolheu como as mais fortes.</p>
       <ul role="list" className={styles.talentos}>
-        {escolhidos.map((item) => (
-          <li key={item.nome}>{item.nome}</li>
+        {escolhidos.map((item, i) => (
+          <li key={`${item.nome}-${i}`}>{item.nome}</li>
         ))}
       </ul>
       <Mensagem item={escolhidos[0]} />
