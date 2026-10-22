@@ -25,11 +25,23 @@ describe('criarEnvioUnico', () => {
     expect(fazer).toHaveBeenCalledTimes(1);
   });
 
+  it('a validade conta a partir do fim de uma execução lenta (API fria), não do começo', async () => {
+    const agoraDoRelogio = jest.spyOn(performance, 'now');
+    agoraDoRelogio.mockReturnValueOnce(0).mockReturnValue(50_000);
+    const enviarUnico = criarEnvioUnico<string>(10 * MINUTO);
+    const fazer = jest.fn(async () => 'resultado');
+    await enviarUnico('lenta', 0, fazer);
+    // 10 min depois do começo, mas só 9 min e 10 s depois do fim: ainda vale.
+    await expect(enviarUnico('lenta', 10 * MINUTO, fazer)).resolves.toBe('resultado');
+    expect(fazer).toHaveBeenCalledTimes(1);
+    agoraDoRelogio.mockRestore();
+  });
+
   it('passada a validade, executa de novo', async () => {
     const enviarUnico = criarEnvioUnico<string>(10 * MINUTO);
     const fazer = jest.fn(async () => 'resultado');
     await enviarUnico('k', 0, fazer);
-    await enviarUnico('k', 10 * MINUTO, fazer);
+    await enviarUnico('k', 10 * MINUTO + 1_000, fazer);
     expect(fazer).toHaveBeenCalledTimes(2);
   });
 

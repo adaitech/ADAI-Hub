@@ -72,6 +72,8 @@ export type FalhaCodigo = { ok: false; erro: 'codigo'; resultado: Exclude<Result
 const falha = (erro: Falha['erro']): Falha => ({ ok: false, erro });
 
 const limitarTentativas = criarLimitador(10, 60_000);
+/** `enviar` busca perguntas na API e grava respostas: limite próprio, mais baixo (mesma chave: IP). */
+const limitarEnvios = criarLimitador(6, 60_000);
 /** Mesmo aluno, teste e respostas em 10 min: uma gravação só na API (duas abas, reenvio após sucesso). */
 const enviarUmaVez = criarEnvioUnico<Resultado>(600_000);
 /** Aquecimento: limite próprio (não gasta as tentativas do identificar), mesma chave (IP). */
@@ -340,6 +342,7 @@ export async function enviar(
 ): Promise<RespostaAcao<Resultado>> {
   const config = configuracao();
   if (!config) return falha('indisponivel');
+  if (!(await dentroDoLimite(limitarEnvios))) return falha('limite');
 
   const sessao = await sessaoDoCookie(config.segredo);
   if (!sessao) return falha('sessao');
@@ -357,7 +360,17 @@ export async function enviar(
     const envio = { slug: teste.slug, idStudent: sessao.idStudent, idClass: sessao.idClass, respostas: lista.data };
     // Chave sem dado pessoal em claro: hash do aluno, turma, teste e respostas.
     const chave = createHash('sha256').update(JSON.stringify(envio)).digest('base64url');
-    const resultado = await enviarUmaVez(chave, Date.now(), () => enviarRespostas(envio, ENVIO));
+    const resultado = await enviarUmaVez(chave, Date.now(), () =>
+      // 2xx com corpo fora do formato: a API já gravou. Fica guardado como "sem resultado" para o
+      // reenvio das mesmas respostas não gravar de novo.
+      enviarRespostas(envio, ENVIO).catch((erro: unknown): Resultado => {
+        if (erro instanceof EbaApiRespostaInvalida) {
+          registrarFalha('enviar', erro);
+          return { tipo: 'sem-resultado' };
+        }
+        throw erro;
+      }),
+    );
     return { ok: true, dados: resultado };
   } catch (erro) {
     registrarFalha('enviar', erro);
@@ -404,11 +417,12 @@ export async function carregarPerguntas(slug: string): Promise<RespostaAcao<Perg
   }
 }
 
-/** Encerra a sessão e esquece o aparelho ("Não é você?" e "Sair"; celular compartilhado). */
+/** Encerra a sessão e esquece o aparelho e o e-mail verificado ("Não é você?" e "Sair"; celular compartilhado). */
 export async function sair(): Promise<void> {
   const cofre = await cookies();
   cofre.delete({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
   cofre.delete({ name: COOKIE_APARELHO, path: OPCOES_COOKIE.path });
+  cofre.delete({ name: COOKIE_EMAIL_VERIFICADO, path: OPCOES_COOKIE.path });
 }
 
 export async function sessaoAtual(): Promise<SessaoVisivel | null> {

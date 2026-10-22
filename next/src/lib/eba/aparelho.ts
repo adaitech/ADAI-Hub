@@ -3,13 +3,13 @@ import { OPCOES_COOKIE } from './sessao';
 
 /**
  * Marcas assinadas do código por e-mail: `eba_aparelho` (este aparelho já confirmou o código deste
- * e-mail; 30 dias) e `eba_email_verificado` (código certo de um e-mail ainda sem cadastro; 15 min).
+ * e-mail; 7 dias: em aparelho compartilhado, quem digita o e-mail da pessoa entra sem código) e `eba_email_verificado` (código certo de um e-mail ainda sem cadastro; 15 min).
  * Guardam só o hash do e-mail e a data. A validade é conferida no servidor.
  */
 
 export const COOKIE_APARELHO = 'eba_aparelho';
 export const COOKIE_EMAIL_VERIFICADO = 'eba_email_verificado';
-export const VALIDADE_APARELHO_MS = 2_592_000_000;
+export const VALIDADE_APARELHO_MS = 604_800_000;
 export const VALIDADE_EMAIL_VERIFICADO_MS = 900_000;
 const TOLERANCIA_RELOGIO_MS = 60_000;
 

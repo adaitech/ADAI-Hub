@@ -18,10 +18,12 @@ export function criarEnvioUnico<T>(
     const andamento = emAndamento.get(chave);
     if (andamento) return andamento;
 
+    const inicio = performance.now();
     const execucao = fazer()
       .then((valor) => {
         feitos.delete(chave);
-        feitos.set(chave, { em: agora, valor });
+        // A validade conta do fim da execução (a API fria leva até 60 s para gravar).
+        feitos.set(chave, { em: agora + (performance.now() - inicio), valor });
         if (feitos.size > maxChaves) {
           const maisAntigo = feitos.keys().next().value;
           if (maisAntigo !== undefined) feitos.delete(maisAntigo);

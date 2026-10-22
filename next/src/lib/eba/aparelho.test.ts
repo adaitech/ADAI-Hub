@@ -16,7 +16,7 @@ describe('marcas do aparelho e do e-mail verificado', () => {
   it('nomes e validades da spec', () => {
     expect(COOKIE_APARELHO).toBe('eba_aparelho');
     expect(COOKIE_EMAIL_VERIFICADO).toBe('eba_email_verificado');
-    expect(VALIDADE_APARELHO_MS).toBe(30 * 24 * 60 * 60 * 1000);
+    expect(VALIDADE_APARELHO_MS).toBe(7 * 24 * 60 * 60 * 1000);
     expect(VALIDADE_EMAIL_VERIFICADO_MS).toBe(15 * 60 * 1000);
   });
 
@@ -41,7 +41,7 @@ describe('marcas do aparelho e do e-mail verificado', () => {
   });
 
   it('opções do cookie: as da sessão + maxAge em segundos', () => {
-    expect(opcoesCookieMarca(VALIDADE_APARELHO_MS)).toEqual({ ...OPCOES_COOKIE, maxAge: 2_592_000 });
+    expect(opcoesCookieMarca(VALIDADE_APARELHO_MS)).toEqual({ ...OPCOES_COOKIE, maxAge: 604_800 });
     expect(opcoesCookieMarca(VALIDADE_EMAIL_VERIFICADO_MS).maxAge).toBe(900);
   });
 });

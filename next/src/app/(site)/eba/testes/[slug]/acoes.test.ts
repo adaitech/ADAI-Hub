@@ -193,8 +193,8 @@ describe('pedirCodigo', () => {
     expect(alunoPorEmailMock).not.toHaveBeenCalled();
   });
 
-  it('aparelho lembrado vencido (30 dias + 1 ms): manda código', async () => {
-    comCookie(COOKIE_APARELHO, marca(EMAIL, Date.now() - 2_592_000_001));
+  it('aparelho lembrado vencido (7 dias + 1 ms): manda código', async () => {
+    comCookie(COOKIE_APARELHO, marca(EMAIL, Date.now() - 604_800_001));
     expect(await pedirCodigo(EMAIL)).toEqual(ENVIADO);
   });
 
@@ -269,12 +269,12 @@ describe('confirmarCodigo', () => {
     expect(conferirMock).not.toHaveBeenCalled();
   });
 
-  it('certo + aluno cadastrado: abre a sessão e lembra o aparelho por 30 dias', async () => {
+  it('certo + aluno cadastrado: abre a sessão e lembra o aparelho por 7 dias', async () => {
     conferirMock.mockResolvedValue({ resultado: 'ok', restantes: 4 });
     alunoPorEmailMock.mockResolvedValue({ idStudent: 'aluno-1', idClass: 'turma-1' });
     expect(await confirmarCodigo(` ${EMAIL.toUpperCase()}`, '123456')).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com', dono: COMO } });
     expect(cookieSet).toHaveBeenCalledWith(COOKIE_SESSAO, expect.any(String), OPCOES_COOKIE);
-    expect(cookieSet).toHaveBeenCalledWith(COOKIE_APARELHO, expect.any(String), { ...OPCOES_COOKIE, maxAge: 2_592_000 });
+    expect(cookieSet).toHaveBeenCalledWith(COOKIE_APARELHO, expect.any(String), { ...OPCOES_COOKIE, maxAge: 604_800 });
   });
 
   it('certo + e-mail novo: devolve as turmas e marca o e-mail como verificado por 15 min', async () => {
@@ -457,6 +457,15 @@ describe('enviar', () => {
     enviarMock.mockResolvedValue(resultado);
   });
 
+  it('limite por IP: a 7ª chamada no minuto → limite, sem chamar a API', async () => {
+    headerGet.mockImplementation(() => '1.1.1.1, 10.9.9.9');
+    for (let i = 0; i < 6; i += 1) await enviar('dons-servico', notas(3, i % 6), COMO);
+    enviarMock.mockClear();
+    expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: false, erro: 'limite' });
+    expect(enviarMock).not.toHaveBeenCalled();
+    expect(perguntasMock).toHaveBeenCalledTimes(6);
+  });
+
   it('usa idStudent/idClass da sessão e devolve o resultado', async () => {
     const r = await enviar('dons-servico', notas(3, 4), COMO);
     expect(r).toEqual({ ok: true, dados: resultado });
@@ -486,6 +495,13 @@ describe('enviar', () => {
   it('reenvio das mesmas respostas depois do sucesso devolve o mesmo resultado sem gravar de novo', async () => {
     await enviar('dons-servico', notas(3, 4), COMO);
     expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: true, dados: resultado });
+    expect(enviarMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('2xx com corpo ilegível (a API gravou): o reenvio das mesmas respostas não grava de novo e devolve "sem resultado"', async () => {
+    enviarMock.mockRejectedValue(new EbaApiRespostaInvalida('corpo'));
+    expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: true, dados: { tipo: 'sem-resultado' } });
+    expect(await enviar('dons-servico', notas(3, 4), COMO)).toEqual({ ok: true, dados: { tipo: 'sem-resultado' } });
     expect(enviarMock).toHaveBeenCalledTimes(1);
   });
 
@@ -849,8 +865,9 @@ describe('carregarPerguntas', () => {
 });
 
 describe('sair e sessaoAtual', () => {
-  it('sair apaga a sessão e esquece o aparelho, no mesmo path', async () => {
+  it('sair apaga a sessão e esquece o aparelho e o e-mail verificado, no mesmo path', async () => {
     await sair();
+    expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_EMAIL_VERIFICADO, path: OPCOES_COOKIE.path });
     expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_SESSAO, path: OPCOES_COOKIE.path });
     expect(cookieDelete).toHaveBeenCalledWith({ name: COOKIE_APARELHO, path: OPCOES_COOKIE.path });
   });
