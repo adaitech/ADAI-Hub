@@ -77,3 +77,11 @@ Página do servidor (`app/(site)/eba/resultado/[codigo]/page.tsx`) que mostra os
 - **Dados:** `lib/eba-api/resultados.ts` (`GET SurveyResult/Student/{id}/Question/{idQuestion}`, 5 em paralelo, 404 = teste não feito). O resultado de estilo salvo não traz as somas dos eixos, então `motivacao` e `organizacao` ficam `null` e a lista some.
 - **Medição:** coberto por `clique_cta` (link "Ver todos os testes") e `data-section="resultado-eba"`. Sem evento novo; nenhum parâmetro leva o código ou o id.
 - **Testes:** `link-resultado.test.ts`, `resultados.test.ts`, `Resultado.test.tsx` e `__tests__/integracao/eba-resultado.test.tsx`.
+
+### Pedido do link — `/eba/resultado` e as entradas
+
+- **Entradas (só com `EBA_RESULTADO_SEGREDO` configurado):** faixa `ConsultarResultado` ("Já fez os testes? Consultar meus resultados") logo depois da trilha de `/eba/testes`, e "Quer rever depois? Receber o link por e-mail" na tela de resultado de cada teste (prop `linkResultado` do `Questionario`/`Resultado`). A faixa é código, não Strapi: só existe quando o recurso está ligado, o que o editor não controla.
+- **Página `/eba/resultado`:** `components/eba/PedirResultado` (ilha cliente): e-mail → código de 6 dígitos → "Confira seu e-mail". O link do resultado vai **só por e-mail** (validade de 7 dias, `app/(site)/eba/resultado/validade.ts`) e nunca aparece na tela. A resposta é igual para e-mail de aluno ou não. Sem o segredo, 404.
+- **Server Actions:** `pedirCodigoResultado` (manda o código, não consulta a API) e `confirmarLinkResultado` (confere o código, busca o aluno por e-mail e envia o link). Limite de 10 tentativas por minuto por IP; falha fechada sem `EBA_RESULTADO_SEGREDO`, API, MailerSend ou token das verificações.
+- **Medição:** coberto por `clique_cta` (faixa, botões e links) e `data-section` (`consultar-resultado`, `pedir-resultado-eba`); sem evento novo e sem e-mail, código ou link em parâmetro algum.
+- **Testes:** `PedirResultado.test.tsx`, `ConsultarResultado.test.tsx`, `acoes.test.ts` (resultado), `email-resultado.test.ts`, `codigo-email.test.ts` e `__tests__/integracao/eba-resultado.test.tsx`.

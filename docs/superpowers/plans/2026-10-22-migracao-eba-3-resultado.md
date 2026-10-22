@@ -46,5 +46,13 @@
 - [ ] `yarn quality` e `yarn build` em `next/`.
 - [ ] `yarn smoke` com o site no ar (⏳ se Strapi não puder subir).
 
+### Task 6a: Pedido do link por e-mail
+**Files:** `lib/eba/email-resultado.ts`, `lib/eba/codigo-email.ts` (finalidade), `app/(site)/eba/resultado/{acoes.ts,validade.ts,page.tsx,resultado.module.css}`, `components/eba/PedirResultado/*`, `Resultado.tsx`/`Questionario.tsx` (prop `linkResultado`), `app/(site)/eba/{pagina-eba.tsx,testes/page.tsx}`
+- [x] Testes e implementação do e-mail do link e do e-mail do código ("resultado").
+- [x] Ações `pedirCodigoResultado` e `confirmarLinkResultado` (mesma resposta com e sem cadastro, falha fechada, limite por IP).
+- [x] `PedirResultado` (e-mail → código → confira seu e-mail) e a página `/eba/resultado` (404 sem o segredo).
+- [x] Entradas: faixa em `/eba/testes` e botão na tela de resultado, só com o recurso ligado.
+- [ ] Botão "Consultar meus resultados" no CTA de `/eba` (Strapi: seed + snapshot), pendente.
+
 ## Fora deste plano (depende da spec §7)
-Emissão do link (botão, e-mail ou painel), autorização da API para `SurveyResult`, fechar `GET Student/{id}` anônimo, confirmação do campo `result` em homologação.
+Autorização da API para `SurveyResult`, fechar `GET Student/{id}` anônimo, confirmação do campo `result` em homologação.

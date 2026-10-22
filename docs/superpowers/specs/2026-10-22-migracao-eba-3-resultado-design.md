@@ -6,7 +6,7 @@
 
 Substituir a página `/teste/resultado/<id>` do site atual da EBA por uma página do Hub que mostra os resultados dos 5 testes do CDV de um aluno **sem expor nome, e-mail, unidade, turma ou qualquer dado pessoal na URL ou na tela**.
 
-Esta entrega é **parcial de propósito**: o levantamento (seção 2) achou dois bloqueios que dependem de decisão de produto e de segurança (seção 7). Entra só o que é inequívoco: a rota, o link opaco, a busca e a tela, **desligados por padrão** (sem a variável do segredo, tudo responde 404).
+O levantamento (seção 2) achou dois bloqueios que dependem de decisão de produto e de segurança (seção 7). Tudo entra **desligado por padrão** (sem `EBA_RESULTADO_SEGREDO`, as rotas respondem 404 e nenhuma entrada aparece): a página do resultado, o link opaco, a busca e o **pedido do link** (seção 5.1), este último conforme o fluxo prototipado em `docs/prototipo/eba/resultado.html` e aprovado pelo Jonatan em 22/10/2026.
 
 ## 2. Como funciona hoje (levantado em `adaitech/eba-adai` e `adaitech/eba-ada-api`)
 
@@ -62,6 +62,16 @@ Risco aceito e documentado: o token é **stateless**; não dá para revogar um l
 
 Resultado salvo e o `result`: a API marca o resultado vigente em `result`. A busca fica com as linhas `result === true` quando houver; senão, com todas. **Confirmar em homologação** (pergunta 4).
 
+### 5.1 Como o aluno pede o link (jornada)
+
+1. **Entradas** (só com o recurso ligado): faixa "Já fez os testes? **Consultar meus resultados**" logo depois da trilha de `/eba/testes`; botão "Receber o link por e-mail" ("Quer rever depois?") na tela de resultado de cada teste; ambos levam a `/eba/resultado`. O botão equivalente na seção de testes de `/eba` fica para quando o seed do Strapi puder ser alterado (a faixa é código, o CTA de `/eba` é conteúdo do Strapi).
+2. `/eba/resultado` (noindex): e-mail → código de 6 dígitos (o mesmo mecanismo da identificação: hashes no Strapi, 10 min, 5 tentativas, 3 envios por e-mail a cada 15 min) → "Confira seu e-mail".
+3. O servidor busca o aluno por e-mail (`Student/email`, anônimo na API), emite o código opaco com **7 dias** de validade (`DIAS_VALIDADE_LINK`, `validade.ts`) e manda o link por e-mail (`emailDoLinkResultado`). **O link nunca volta na resposta nem aparece na tela.**
+4. A resposta é a mesma para e-mail de aluno ou não: o pedido do código nem consulta a API, e o passo final responde igual sem cadastro (sem e-mail enviado). Diferença de tempo entre os dois casos é risco aceito.
+5. Limite por IP de 10 tentativas por minuto nas duas ações (mesmo padrão das ações dos testes).
+
+No fim do teste o botão leva a `/eba/resultado` e **pede o e-mail de novo** (a sessão do aluno guarda só o e-mail mascarado e o id, não o e-mail), diferente do protótipo, que pulava para o código.
+
 ## 6. Medição, SEO e acessibilidade
 
 - **Medição:** coberto por `clique_cta` (links "Ver todos os testes" e "Fazer outro teste") e `ver_secao`. Sem evento novo, e sem o token ou o Guid em parâmetro algum (o `destino` dos cliques é o caminho interno dos testes, nunca o da própria página).
@@ -73,7 +83,7 @@ Resultado salvo e o `result`: a API marca o resultado vigente em `result`. A bus
 | # | Pergunta | Por que bloqueia | Recomendação |
 | --- | --- | --- | --- |
 | 1 | **Como o Hub é autorizado a ler `SurveyResult`?** Hoje a API pede o bearer do Identity da equipe. | Sem isso a página, com token válido, mostra "indisponível". | (a) Rota nova na API, só de leitura, sem dado pessoal e restrita à assinatura do Hub; ou (c) política do APIM que valide a assinatura e troque por credencial interna. Evitar (b) guardar usuário e senha da equipe no Hub. |
-| 2 | **Quem recebe o link e como ele nasce?** O aluno na tela de resultado ("Guardar este resultado")? Um e-mail depois do teste? A equipe, copiando do painel (entrega 4)? Qual a **validade** (a lib exige o valor)? | Sem emissor, ninguém tem um link. O código não tem botão de "copiar link" até a decisão. | Aluno vê o link só depois de concluir; validade curta (7 a 30 dias). |
+| 2 | **Quem recebe o link e como ele nasce?** _Implementado como proposta: aluno, por e-mail com código, 7 dias; confirmar._  O aluno na tela de resultado ("Guardar este resultado")? Um e-mail depois do teste? A equipe, copiando do painel (entrega 4)? Qual a **validade** (a lib exige o valor)? | Sem emissor, ninguém tem um link. O código não tem botão de "copiar link" até a decisão. | Aluno vê o link só depois de concluir; validade curta (7 a 30 dias). |
 | 3 | A equipe precisa ver nome, e-mail e turma junto do resultado? | Esses dados não entram nesta URL. | Ficam no painel autenticado (entrega 4). |
 | 4 | Aluno que refaz o teste: qual resultado vale? A API tem o `result` (vigente). | Normalização escolhe `result === true`. | Conferir em homologação com um aluno de teste que refez um teste. |
 | 5 | A API pode fechar `GET Student/{id}` (hoje anônimo, devolve nome e e-mail pelo Guid)? | Vazamento por quem souber um Guid. O site atual e o painel dependem dele. | Pedir à API: exigir autorização e deixar o Hub fora (ele usa `Student/email` só no servidor). |
@@ -86,6 +96,7 @@ Resultado salvo e o `result`: a API marca o resultado vigente em `result`. A bus
 - **`resultados`:** URL com o id codificado e a chave no header; 5 chamadas; 404 → teste omitido; 401/500/timeout → lança; Guid inválido → lança sem chamar a rede; `result` vigente; estilo sem somas; temperamento com o nome vindo de `message`.
 - **Página (integração):** token válido → `h1` único, um `h2` por teste feito, **nenhum** nome/e-mail/Guid no HTML; token inválido, sem segredo, limite estourado e aluno sem resultado → 404 idêntico; API fora → "indisponível" sem dado pessoal; `noindex` e `referrer`.
 - **Característica:** `seguranca-e-privacidade` já impede `NEXT_PUBLIC_EBA_`; `.env.example` sem valor; a rota nova tem teste (`testes-obrigatorios`).
+- **Pedido do link:** `lib/eba/email-resultado` (link só do caminho de resultado, sem HTML injetável), `emailDoCodigo(..., 'resultado')`, ações `pedirCodigoResultado`/`confirmarLinkResultado` (hashes, mesma resposta com e sem cadastro, código errado/vencido, falha fechada, limite, nenhum dado no log), componente `PedirResultado` (passos, erros, reenvio em 60 s, um toque por vez), faixa e botão só com o recurso ligado.
 - **Smoke:** `/eba/resultado/codigo-invalido` responde 404 e `noindex`.
 
 ## 9. Rollout e rollback
@@ -96,7 +107,6 @@ Resultado salvo e o `result`: a API marca o resultado vigente em `result`. A bus
 
 ## 10. Fora do escopo
 
-- Botão ou e-mail que gera o link (pergunta 2).
 - Painel e login da equipe (entrega 4).
 - Mudanças na API (perguntas 1 e 5).
 - "Baixar resultado" (PDF) do site atual.
