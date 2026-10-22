@@ -5,7 +5,7 @@ import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Trilha, type TrilhaItem } from '@/components/ui/Trilha';
 import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
 import { segredoDaSessao } from '@/lib/eba/sessao';
-import { ebaApiConfigurada, TIMEOUT_PAGINA_MS } from '@/lib/eba-api/client';
+import { TIMEOUT_PAGINA_MS } from '@/lib/eba-api/client';
 import { emailConfigurado } from '@/lib/email/mailersend';
 import { verificacaoConfigurada } from '@/lib/strapi/verificacao';
 import { perguntasDoTeste, type Pergunta } from '@/lib/eba-api/perguntas';
@@ -76,6 +76,17 @@ async function buscarPerguntas(teste: DefinicaoTeste): Promise<{ perguntas: Perg
   }
 }
 
+/** Nomes das variáveis de servidor que impedem os testes (ausentes, ou segredo da sessão curto demais). */
+function variaveisFaltando(): string[] {
+  const faltando: string[] = [];
+  if (!process.env.EBA_API_URL?.trim()) faltando.push('EBA_API_URL');
+  if (!process.env.EBA_API_KEY?.trim()) faltando.push('EBA_API_KEY');
+  if (segredoDaSessao() === null) faltando.push('EBA_SESSAO_SEGREDO (ausente ou com menos de 32 caracteres)');
+  if (!emailConfigurado()) faltando.push('MAILERSEND_API_TOKEN');
+  if (!verificacaoConfigurada()) faltando.push('STRAPI_TOKEN_VERIFICACAO');
+  return faltando;
+}
+
 /**
  * /eba/testes/<slug> — tela de um dos 5 testes do CDV. Dinâmica (lê o cookie de sessão).
  * Perguntas buscadas no servidor e entregues prontas à ilha do Questionário.
@@ -90,7 +101,10 @@ export default async function TesteEbaPage({ params }: PageProps) {
     { texto: teste.nome },
   ];
   // Sem o envio do código (MailerSend) ou sem o token das verificações, ninguém consegue se identificar.
-  const disponivel = ebaApiConfigurada() && segredoDaSessao() !== null && emailConfigurado() && verificacaoConfigurada();
+  const faltando = variaveisFaltando();
+  const disponivel = faltando.length === 0;
+  // Só os nomes das variáveis, nunca valores: é o que permite achar o ambiente mal configurado.
+  if (!disponivel) console.warn(`[eba-testes] indisponível, configuração ausente ou inválida: ${faltando.join(', ')}`);
 
   let tela;
   if (!disponivel) {
