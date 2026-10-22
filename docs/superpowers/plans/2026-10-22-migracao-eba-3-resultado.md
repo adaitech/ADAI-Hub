@@ -52,7 +52,8 @@
 - [x] Ações `pedirCodigoResultado` e `confirmarLinkResultado` (mesma resposta com e sem cadastro, falha fechada, limite por IP).
 - [x] `PedirResultado` (e-mail → código → confira seu e-mail) e a página `/eba/resultado` (404 sem o segredo).
 - [x] Entradas: faixa em `/eba/testes` e botão na tela de resultado, só com o recurso ligado.
+- [x] Leitura na API: rota nova só para o Hub (patch em `docs/superpowers/patches/`, não publicado) e o Hub chama `Hub/SurveyResult/...`.
 - [ ] Botão "Consultar meus resultados" no CTA de `/eba` (Strapi: seed + snapshot), pendente.
 
 ## Fora deste plano (depende da spec §7)
-Autorização da API para `SurveyResult`, fechar `GET Student/{id}` anônimo, confirmação do campo `result` em homologação.
+Publicar o patch na API e a política do APIM (`X-Hub-Key`), fechar `GET Student/{id}` anônimo, confirmação do campo `result` em homologação.

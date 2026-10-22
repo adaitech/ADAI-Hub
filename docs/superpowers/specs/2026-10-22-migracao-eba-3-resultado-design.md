@@ -49,12 +49,22 @@ O levantamento (seção 2) achou dois bloqueios que dependem de decisão de prod
 
 Risco aceito e documentado: o token é **stateless**; não dá para revogar um link só. Revogação geral = trocar `EBA_RESULTADO_SEGREDO` (invalida todos). Pergunta 7.
 
+## 4.1 Leitura na API: rota nova só para o Hub (decisão de 22/10/2026)
+
+A consulta existente (`GET SurveyResult/Student/{id}/Question/{idQuestion}`) exige o bearer do Identity da equipe, e a política padrão da API dá a qualquer usuário autenticado acesso a todos os endpoints protegidos (inclusive apagar aluno). O Hub **não guarda login algum**. Em vez disso, o patch `docs/superpowers/patches/2026-10-22-eba-ada-api-rota-resultado-hub.patch` (para `adaitech/eba-ada-api`, **não publicado**) cria:
+
+- `GET /api/v1/eba/Hub/SurveyResult/Student/{IdStudent}/Question/{IdQuestion}`, `[AllowAnonymous]`, mas **fechada por chave interna**: só responde com o cabeçalho `X-Hub-Key` igual a `HubResultados:ChaveInterna` (32+ caracteres, comparação em tempo constante). Sem a configuração, sem o cabeçalho ou com chave errada: **404** (nunca 401), igual ao "sem resultado".
+- Resposta só com `name`, `totalRate`, `message` e `result` (sem ids, datas, nome ou e-mail), o que o Hub já usa.
+- Reaproveita o mesmo caso de uso da consulta existente (`GetSurveyResultQuestionRequest`), então o resultado é o mesmo.
+
+No API Management, a operação nova deve (1) existir só no produto da assinatura **adai-hub** e (2) ter uma política `set-header name="X-Hub-Key" exists-action="override"` com o valor de um _named value_ secreto (o cliente nunca consegue mandar o cabeçalho). O Hub chama o APIM como já faz, sem variável nova. Nomes: `HubResultados__ChaveInterna` (App Service da API) e o named value do APIM. O patch não foi compilado nem testado aqui (sem .NET no ambiente): rodar `dotnet test` em `eba-ada-api` antes de publicar.
+
 ## 5. Arquitetura
 
 | Arquivo | Papel |
 | --- | --- |
 | `next/src/lib/eba/link-resultado.ts` | `segredoDoResultado()`, `emitirLinkResultado(idStudent, { segredo, validadeMs, agora })`, `lerLinkResultado(codigo, segredo, agora)`. Nunca lança na leitura. |
-| `next/src/lib/eba-api/resultados.ts` | `resultadosDoAluno(idStudent)`: os 5 `GET SurveyResult/Student/{id}/Question/{idQuestion}` em paralelo; devolve `{ teste, resultado }[]` só dos testes feitos. 404 → teste não feito. Outro erro (401/403/5xx/timeout) → lança. |
+| `next/src/lib/eba-api/resultados.ts` | `resultadosDoAluno(idStudent)`: os 5 `GET Hub/SurveyResult/Student/{id}/Question/{idQuestion}` em paralelo; devolve `{ teste, resultado }[]` só dos testes feitos. 404 → teste não feito. Outro erro (401/403/5xx/timeout) → lança. |
 | `next/src/lib/eba-api/respostas.ts` | A normalização da lista de itens (nota, talentos, temperamento) vira função compartilhada com o `POST SurveyResponse`. |
 | `next/src/components/eba/Questionario/Resultado.tsx` | Exporta `ConteudoResultado` (o miolo, sem botões de próximo teste nem "Sair"). O estilo salvo não traz as somas dos eixos: `motivacao`/`organizacao` ficam `null` e a tela só omite essa lista. |
 | `next/src/app/(site)/eba/resultado/[codigo]/page.tsx` | Server Component dinâmico: limite → decifra → busca → monta. `generateMetadata` com `noindex`. |
@@ -82,7 +92,7 @@ No fim do teste o botão leva a `/eba/resultado` e **pede o e-mail de novo** (a 
 
 | # | Pergunta | Por que bloqueia | Recomendação |
 | --- | --- | --- | --- |
-| 1 | **Como o Hub é autorizado a ler `SurveyResult`?** Hoje a API pede o bearer do Identity da equipe. | Sem isso a página, com token válido, mostra "indisponível". | (a) Rota nova na API, só de leitura, sem dado pessoal e restrita à assinatura do Hub; ou (c) política do APIM que valide a assinatura e troque por credencial interna. Evitar (b) guardar usuário e senha da equipe no Hub. |
+| 1 | _Decidido (22/10/2026): rota nova na API._ **Como o Hub é autorizado a ler `SurveyResult`?** Hoje a API pede o bearer do Identity da equipe. | Sem isso a página, com token válido, mostra "indisponível". | (a) Rota nova na API, só de leitura, sem dado pessoal e restrita à assinatura do Hub; ou (c) política do APIM que valide a assinatura e troque por credencial interna. Evitar (b) guardar usuário e senha da equipe no Hub. |
 | 2 | **Quem recebe o link e como ele nasce?** _Implementado como proposta: aluno, por e-mail com código, 7 dias; confirmar._  O aluno na tela de resultado ("Guardar este resultado")? Um e-mail depois do teste? A equipe, copiando do painel (entrega 4)? Qual a **validade** (a lib exige o valor)? | Sem emissor, ninguém tem um link. O código não tem botão de "copiar link" até a decisão. | Aluno vê o link só depois de concluir; validade curta (7 a 30 dias). |
 | 3 | A equipe precisa ver nome, e-mail e turma junto do resultado? | Esses dados não entram nesta URL. | Ficam no painel autenticado (entrega 4). |
 | 4 | Aluno que refaz o teste: qual resultado vale? A API tem o `result` (vigente). | Normalização escolhe `result === true`. | Conferir em homologação com um aluno de teste que refez um teste. |

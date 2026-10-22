@@ -23,11 +23,11 @@ function simular(porIdQuestion: Record<string, unknown>) {
 describe('resultadosDoAluno', () => {
   beforeEach(() => ebaFetchMock.mockReset());
 
-  it('busca os 5 testes em GET SurveyResult/Student/{id}/Question/{idQuestion}, com o id codificado', async () => {
+  it('busca os 5 testes na rota do Hub, GET Hub/SurveyResult/Student/{id}/Question/{idQuestion}', async () => {
     simular({});
     await resultadosDoAluno(ID);
     const caminhos = ebaFetchMock.mock.calls.map(([c]) => c).sort();
-    expect(caminhos).toEqual(TESTES.map((t) => `SurveyResult/Student/${ID}/Question/${t.idQuestion}`).sort());
+    expect(caminhos).toEqual(TESTES.map((t) => `Hub/SurveyResult/Student/${ID}/Question/${t.idQuestion}`).sort());
   });
 
   it('omite o teste que a API responde 404 (não feito) e mantém a ordem da apostila', async () => {

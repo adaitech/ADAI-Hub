@@ -74,7 +74,7 @@ Página do servidor (`app/(site)/eba/resultado/[codigo]/page.tsx`) que mostra os
 
 - **Desligada por padrão:** sem `EBA_RESULTADO_SEGREDO` (32+ caracteres), tudo responde 404. Ligar só depois das perguntas em aberto da spec (§7: autorização da API para ler `SurveyResult` e quem emite o link).
 - **Privacidade:** o `codigo` é opaco (AES-256-GCM, `lib/eba/link-resultado.ts`), não o id do aluno; vale no máximo 30 dias. A tela mostra só resultados: sem nome, e-mail, turma ou id. Código inválido, expirado, limite estourado (20 aberturas por minuto por IP) e aluno sem resultado dão o mesmo 404. `noindex, nofollow`, `referrer: no-referrer`, fora do sitemap.
-- **Dados:** `lib/eba-api/resultados.ts` (`GET SurveyResult/Student/{id}/Question/{idQuestion}`, 5 em paralelo, 404 = teste não feito). O resultado de estilo salvo não traz as somas dos eixos, então `motivacao` e `organizacao` ficam `null` e a lista some.
+- **Dados:** `lib/eba-api/resultados.ts` (`GET Hub/SurveyResult/Student/{id}/Question/{idQuestion}`, 5 em paralelo, 404 = teste não feito; rota da API só para o Hub, patch em `docs/superpowers/patches/`). O resultado de estilo salvo não traz as somas dos eixos, então `motivacao` e `organizacao` ficam `null` e a lista some.
 - **Medição:** coberto por `clique_cta` (link "Ver todos os testes") e `data-section="resultado-eba"`. Sem evento novo; nenhum parâmetro leva o código ou o id.
 - **Testes:** `link-resultado.test.ts`, `resultados.test.ts`, `Resultado.test.tsx` e `__tests__/integracao/eba-resultado.test.tsx`.
 

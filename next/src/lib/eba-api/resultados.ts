@@ -43,8 +43,8 @@ function normalizar(teste: DefinicaoTeste, retorno: unknown): Resultado {
 }
 
 /**
- * Resultados salvos dos testes feitos pelo aluno (`GET SurveyResult/Student/{id}/Question/{idQuestion}`,
- * os 5 em paralelo), na ordem da apostila. 404 = teste não feito: fica de fora. Qualquer outra falha
+ * Resultados salvos dos testes feitos pelo aluno (`GET Hub/SurveyResult/Student/{id}/Question/{idQuestion}`,
+ * os 5 em paralelo, rota da API só para o Hub: sem login da equipe e sem dado pessoal), na ordem da apostila. 404 = teste não feito: fica de fora. Qualquer outra falha
  * (401/403 da autorização, 5xx, timeout) lança. O id vira UUID validado antes de entrar no caminho.
  * Nunca registra id, nome nem corpo.
  */
@@ -55,7 +55,7 @@ export async function resultadosDoAluno(idStudent: string, opcoes: OpcoesChamada
   const buscas = await Promise.all(
     TESTES.map(async (teste) => {
       try {
-        const retorno = await ebaFetch<unknown>(`SurveyResult/Student/${id}/Question/${teste.idQuestion}`, { timeoutMs });
+        const retorno = await ebaFetch<unknown>(`Hub/SurveyResult/Student/${id}/Question/${teste.idQuestion}`, { timeoutMs });
         return { teste, resultado: normalizar(teste, retorno) };
       } catch (erro) {
         if (erro instanceof EbaApiError && erro.status === 404) return null;
