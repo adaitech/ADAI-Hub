@@ -65,9 +65,13 @@ export function ebaApiConfigurada(): boolean {
 }
 
 interface EbaFetchInit extends OpcoesChamada {
-  metodo?: 'GET' | 'POST';
+  metodo?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   corpo?: unknown;
   cache?: { revalidate: number; tags: string[] };
+  /** Bearer do Identity da equipe (`Authorization: Bearer`). Só servidor; nunca na URL, em log ou em erro. */
+  bearer?: string;
+  /** Caminho a partir da raiz da API, sem o prefixo `api/v1/eba` (ex.: `login`, do Identity). */
+  raiz?: boolean;
 }
 
 /**
@@ -80,16 +84,25 @@ export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Pro
   if (!config) throw new EbaApiIndisponivel('EBA_API_URL/EBA_API_KEY ausentes');
 
   const metodo = init.metodo ?? 'GET';
-  const url = `${config.url}/${PREFIXO}/${caminho.replace(/^\/+/, '')}`;
+  const base = init.raiz ? config.url : `${config.url}/${PREFIXO}`;
+  const url = `${base}/${caminho.replace(/^\/+/, '')}`;
   const headers: Record<string, string> = { 'Ocp-Apim-Subscription-Key': config.chave, Accept: 'application/json' };
-  if (metodo === 'POST') headers['Content-Type'] = 'application/json';
+  if (init.bearer) headers.Authorization = `Bearer ${init.bearer}`;
+  const comCorpo = metodo === 'POST' || metodo === 'PUT';
+  if (comCorpo) headers['Content-Type'] = 'application/json';
 
   let response: Response;
   try {
     response = await fetch(url, {
       method: metodo,
       headers,
-      ...(metodo === 'POST' ? { body: JSON.stringify(init.corpo ?? {}), cache: 'no-store' as const } : init.cache ? { next: init.cache } : { cache: 'no-store' as const }),
+      ...(comCorpo
+        ? { body: JSON.stringify(init.corpo ?? {}), cache: 'no-store' as const }
+        : metodo === 'DELETE'
+          ? { cache: 'no-store' as const }
+          : init.cache
+            ? { next: init.cache }
+            : { cache: 'no-store' as const }),
       signal: AbortSignal.timeout(init.timeoutMs ?? TIMEOUT_PAGINA_MS),
     });
   } catch (error) {
@@ -106,9 +119,9 @@ export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Pro
   } catch (error) {
     const timeout = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
     const motivo = timeout ? 'timeout' : 'resposta';
-    // POST com 2xx: a API já gravou. Corpo ilegível (vazio, HTML do APIM) ou timeout na leitura não
+    // POST, PUT ou DELETE com 2xx: a API já gravou ou alterou. Corpo ilegível (vazio, HTML do APIM) ou timeout na leitura não
     // pode virar "indisponível", senão a tela oferece "Tentar de novo" e reenvia o que já foi gravado.
-    if (metodo === 'POST') throw new EbaApiRespostaInvalida(`corpo 2xx ilegível (${motivo})`);
+    if (metodo !== 'GET') throw new EbaApiRespostaInvalida(`corpo 2xx ilegível (${motivo})`);
     throw new EbaApiIndisponivel(motivo);
   }
 }

@@ -204,3 +204,74 @@ describe('EbaApiRespostaInvalida', () => {
     expect(erro.message).toBe('[eba-api] resposta inválida: Student sem id');
   });
 });
+
+describe('ebaFetch: chamadas da equipe (bearer, raiz, PUT e DELETE)', () => {
+  const fetchOriginal = global.fetch;
+  const envOriginal = { ...process.env };
+  let fetchMock: jest.Mock;
+
+  beforeEach(() => {
+    Object.assign(process.env, { EBA_API_URL: URL_BASE, EBA_API_KEY: KEY });
+    fetchMock = jest.fn();
+    global.fetch = fetchMock;
+  });
+  afterEach(() => {
+    global.fetch = fetchOriginal;
+    process.env = { ...envOriginal };
+  });
+
+  it('bearer: Authorization: Bearer no header, além da chave do APIM, e nunca na URL', async () => {
+    fetchMock.mockResolvedValue(new Response('[]', { status: 200 }));
+    await ebaFetch('Student', { bearer: 'token-da-equipe' });
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(init.headers.Authorization).toBe('Bearer token-da-equipe');
+    expect(init.headers['Ocp-Apim-Subscription-Key']).toBe(KEY);
+    expect(String(url)).not.toContain('token-da-equipe');
+  });
+
+  it('sem bearer não manda Authorization', async () => {
+    fetchMock.mockResolvedValue(new Response('[]', { status: 200 }));
+    await ebaFetch('Student');
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBeUndefined();
+  });
+
+  it('raiz: o caminho não leva o prefixo /api/v1/eba (ex.: /login do Identity)', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    await ebaFetch('login', { metodo: 'POST', corpo: {}, raiz: true });
+    expect(String(fetchMock.mock.calls[0][0])).toBe(`${URL_BASE}/login`);
+  });
+
+  it('PUT leva corpo JSON e cache no-store', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    await ebaFetch('ClassEBA', { metodo: 'PUT', corpo: { id: 'x' } });
+    const init = fetchMock.mock.calls[0][1];
+    expect(init.method).toBe('PUT');
+    expect(init.headers['Content-Type']).toBe('application/json');
+    expect(init.body).toBe(JSON.stringify({ id: 'x' }));
+    expect(init.cache).toBe('no-store');
+  });
+
+  it('DELETE não leva corpo nem Content-Type, e usa cache no-store', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 200 }));
+    await ebaFetch('ClassEBA/abc', { metodo: 'DELETE' });
+    const init = fetchMock.mock.calls[0][1];
+    expect(init.method).toBe('DELETE');
+    expect(init.body).toBeUndefined();
+    expect(init.headers['Content-Type']).toBeUndefined();
+    expect(init.cache).toBe('no-store');
+  });
+
+  it.each(['PUT', 'DELETE'] as const)('%s 2xx com corpo ilegível vira EbaApiRespostaInvalida (a API já alterou)', async (metodo) => {
+    fetchMock.mockResolvedValue(new Response('', { status: 200 }));
+    const erro = await ebaFetch('ClassEBA', { metodo, corpo: {} }).catch((e: unknown) => e);
+    expect(erro).toBeInstanceOf(EbaApiRespostaInvalida);
+  });
+
+  it('401 vira EbaApiError com status 401, sem o bearer na mensagem', async () => {
+    fetchMock.mockResolvedValue(new Response('{}', { status: 401 }));
+    const erro = (await ebaFetch('Student', { bearer: 'token-secreto' }).catch((e: unknown) => e)) as EbaApiError;
+    expect(erro).toBeInstanceOf(EbaApiError);
+    expect(erro.status).toBe(401);
+    expect(erro.message).not.toContain('token-secreto');
+  });
+});
