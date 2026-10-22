@@ -30,8 +30,11 @@ const ACAO = { timeoutMs: TIMEOUT_ACAO_MS };
 const TAMANHO_PAGINA_TURMAS = 100;
 const MAX_PAGINAS = 50;
 
-const idValido = (id: string): string => {
-  if (!UUID.test(id)) throw new Error('[eba-equipe] id inválido');
+/** UUID da API (alunos e turmas), para validar antes de chamar. */
+export const idValido = (id: string): boolean => UUID.test(id);
+
+const exigirId = (id: string): string => {
+  if (!idValido(id)) throw new Error('[eba-equipe] id inválido');
   return id;
 };
 
@@ -107,10 +110,11 @@ export interface PaginaDeAlunos {
 }
 
 /** `GET Student?page=N&page-size=M`: a API é paginada (10 por página por padrão); a tela mostra todas as páginas. */
-export async function listarAlunos(bearer: string, { pagina, tamanho }: { pagina: number; tamanho: number }): Promise<PaginaDeAlunos> {
+export async function listarAlunos(bearer: string, { pagina, tamanho, idTurma }: { pagina: number; tamanho: number; idTurma?: string }): Promise<PaginaDeAlunos> {
   if (!Number.isInteger(pagina) || pagina < 1) throw new Error('[eba-equipe] página inválida');
   if (!Number.isInteger(tamanho) || tamanho < 1 || tamanho > 100) throw new Error('[eba-equipe] tamanho inválido');
-  const valido = esquemaPaginado.safeParse(await chamar<unknown>(bearer, `Student?page=${pagina}&page-size=${tamanho}`));
+  const filtro = idTurma === undefined ? '' : `&IdClass=${exigirId(idTurma)}`;
+  const valido = esquemaPaginado.safeParse(await chamar<unknown>(bearer, `Student?page=${pagina}&page-size=${tamanho}${filtro}`));
   if (!valido.success) throw invalida('Student');
   return { alunos: valido.data.data.map(aluno), pagina, totalPaginas: valido.data.pages.totalPages, total: valido.data.pages.totalRecords };
 }
@@ -134,7 +138,7 @@ export async function buscarAlunos(bearer: string, consulta: string): Promise<Al
 
 /** `GET Student/{id}`; 404 → null. */
 export async function alunoDaEquipe(bearer: string, id: string): Promise<AlunoEquipe | null> {
-  const seguro = idValido(id);
+  const seguro = exigirId(id);
   try {
     const valido = esquemaAluno.safeParse(await chamar<unknown>(bearer, `Student/${seguro}`));
     if (!valido.success) throw invalida('Student');
@@ -203,6 +207,9 @@ export interface DadosTurma {
   fim: string;
 }
 
+/** As regras da API para turma, para a tela validar antes de chamar. */
+export const turmaValida = (dados: DadosTurma): boolean => esquemaDadosTurma.safeParse(dados).success;
+
 function validarTurma(dados: DadosTurma) {
   const valido = esquemaDadosTurma.safeParse(dados);
   if (!valido.success) throw new Error('[eba-equipe] dados da turma inválidos');
@@ -215,11 +222,11 @@ export async function criarTurma(bearer: string, dados: DadosTurma): Promise<voi
 }
 
 export async function editarTurma(bearer: string, dados: DadosTurma & { id: string }): Promise<void> {
-  const id = idValido(dados.id);
+  const id = exigirId(dados.id);
   const d = validarTurma(dados);
   await chamar<unknown>(bearer, 'ClassEBA', { metodo: 'PUT', corpo: { id, name: d.nome, status: d.status, initialDate: d.inicio, endDate: d.fim } });
 }
 
 export async function apagarTurma(bearer: string, id: string): Promise<void> {
-  await chamar<unknown>(bearer, `ClassEBA/${idValido(id)}`, { metodo: 'DELETE' });
+  await chamar<unknown>(bearer, `ClassEBA/${exigirId(id)}`, { metodo: 'DELETE' });
 }

@@ -1,5 +1,6 @@
 /** @jest-environment node */
 import { ebaFetch, EbaApiError, EbaApiIndisponivel } from './client';
+import { SessaoEncerrada } from './equipe';
 import { resultadosDoAluno } from './resultados';
 import { TESTES } from './testes';
 import nota from './__fixtures__/survey-result-aluno-nota.json';
@@ -90,5 +91,28 @@ describe('resultadosDoAluno', () => {
   it.each([['../Student'], [''], ['abc'], ['3fa85f64-5717-4562-b3fc-2c963f66afa6/x']])('id inválido (%p) → lança sem chamar a rede', async (id) => {
     await expect(resultadosDoAluno(id)).rejects.toThrow();
     expect(ebaFetchMock).not.toHaveBeenCalled();
+  });
+
+  describe('com o bearer da equipe (consulta interna)', () => {
+    it('usa a consulta existente da API (SurveyResult/Student/...), sem o prefixo Hub, e manda o bearer', async () => {
+      simular({ [TESTES[0].idQuestion]: nota });
+      const r = await resultadosDoAluno(ID, { bearer: 'bearer-da-equipe' });
+      expect(r).toHaveLength(1);
+      const [caminho, init] = ebaFetchMock.mock.calls[0];
+      expect(String(caminho)).toMatch(/^SurveyResult\/Student\//);
+      expect(init).toMatchObject({ bearer: 'bearer-da-equipe' });
+    });
+
+    it('sem o bearer continua na rota do Hub, sem Authorization', async () => {
+      simular({});
+      await resultadosDoAluno(ID);
+      expect(String(ebaFetchMock.mock.calls[0][0])).toMatch(/^Hub\/SurveyResult\//);
+      expect(ebaFetchMock.mock.calls[0][1]).not.toHaveProperty('bearer');
+    });
+
+    it('401 → SessaoEncerrada (a sessão venceu)', async () => {
+      ebaFetchMock.mockRejectedValue(new EbaApiError(401, null));
+      await expect(resultadosDoAluno(ID, { bearer: 'bearer-da-equipe' })).rejects.toBeInstanceOf(SessaoEncerrada);
+    });
   });
 });

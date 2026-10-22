@@ -1,6 +1,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { ebaFetch, EbaApiError, EbaApiRespostaInvalida, TIMEOUT_ACAO_MS, type OpcoesChamada } from './client';
+import { SessaoEncerrada } from './equipe';
 import { descricaoDoEstilo } from './conteudo-local';
 import { resultadoDeItens, type Resultado } from './respostas';
 import { TESTES, type DefinicaoTeste } from './testes';
@@ -48,17 +49,21 @@ function normalizar(teste: DefinicaoTeste, retorno: unknown): Resultado {
  * (401/403 da autorização, 5xx, timeout) lança. O id vira UUID validado antes de entrar no caminho.
  * Nunca registra id, nome nem corpo.
  */
-export async function resultadosDoAluno(idStudent: string, opcoes: OpcoesChamada = {}): Promise<ResultadoDoTeste[]> {
+export async function resultadosDoAluno(idStudent: string, opcoes: OpcoesChamada & { bearer?: string } = {}): Promise<ResultadoDoTeste[]> {
   if (!UUID.test(idStudent)) throw new Error('[eba-api] id do aluno inválido');
   const id = encodeURIComponent(idStudent);
   const timeoutMs = opcoes.timeoutMs ?? TIMEOUT_ACAO_MS;
+  // Com o bearer da equipe: a consulta existente da API. Sem ele: a rota do Hub (fechada por chave interna).
+  const prefixo = opcoes.bearer ? '' : 'Hub/';
+  const autorizacao = opcoes.bearer ? { bearer: opcoes.bearer } : {};
   const buscas = await Promise.all(
     TESTES.map(async (teste) => {
       try {
-        const retorno = await ebaFetch<unknown>(`Hub/SurveyResult/Student/${id}/Question/${teste.idQuestion}`, { timeoutMs });
+        const retorno = await ebaFetch<unknown>(`${prefixo}SurveyResult/Student/${id}/Question/${teste.idQuestion}`, { timeoutMs, ...autorizacao });
         return { teste, resultado: normalizar(teste, retorno) };
       } catch (erro) {
         if (erro instanceof EbaApiError && erro.status === 404) return null;
+        if (opcoes.bearer && erro instanceof EbaApiError && erro.status === 401) throw new SessaoEncerrada();
         throw erro;
       }
     }),

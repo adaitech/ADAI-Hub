@@ -14,6 +14,8 @@ import {
   listarAlunos,
   listarTurmas,
   SessaoEncerrada,
+  idValido,
+  turmaValida,
 } from './equipe';
 
 jest.mock('./client', () => ({ ...jest.requireActual('./client'), ebaFetch: jest.fn() }));
@@ -65,6 +67,20 @@ describe('listarAlunos', () => {
       totalPaginas: 3,
       total: 45,
     });
+  });
+
+  it('com idTurma: filtra pela turma (IdClass) e valida o id', async () => {
+    ebaFetchMock.mockResolvedValue(pagina);
+    await listarAlunos(TOKEN, { pagina: 1, tamanho: 1, idTurma: TURMA });
+    expect(ebaFetchMock.mock.calls[0][0]).toBe(`Student?page=1&page-size=1&IdClass=${TURMA}`);
+    await expect(listarAlunos(TOKEN, { pagina: 1, tamanho: 1, idTurma: '../x' })).rejects.toThrow();
+  });
+
+  it('turmaValida e idValido: as mesmas regras da API, para a tela validar antes de chamar', () => {
+    expect(turmaValida({ nome: 'Turma Nova', status: 1, inicio: '2026-11-01', fim: '2027-03-01' })).toBe(true);
+    expect(turmaValida({ nome: 'ab', status: 1, inicio: '2026-11-01', fim: '2027-03-01' })).toBe(false);
+    expect(idValido(TURMA)).toBe(true);
+    expect(idValido('x')).toBe(false);
   });
 
   it.each([[0, 20], [-1, 20], [1.5, 20], [1, 0], [1, 101], [Number.NaN, 20]])('página/tamanho inválidos (%p, %p) → lança sem chamar a API', async (pagina, tamanho) => {
