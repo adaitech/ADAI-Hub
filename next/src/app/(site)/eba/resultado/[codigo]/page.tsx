@@ -7,7 +7,7 @@ import { criarLimitador, ipDoCliente } from '@/lib/eba/limite';
 import { lerLinkResultado, segredoDoResultado } from '@/lib/eba/link-resultado';
 import { ebaApiConfigurada } from '@/lib/eba-api/client';
 import { resultadosDoAluno, type ResultadoDoTeste } from '@/lib/eba-api/resultados';
-import styles from './page.module.css';
+import styles from '../resultado.module.css';
 
 interface PageProps {
   params: Promise<{ codigo: string }>;

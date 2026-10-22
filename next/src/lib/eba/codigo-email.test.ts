@@ -23,4 +23,21 @@ describe('emailDoCodigo', () => {
     expect(() => emailDoCodigo('<b>')).toThrow();
     expect(() => emailDoCodigo('12345')).toThrow();
   });
+
+  describe('para o link do resultado', () => {
+    const resultado = emailDoCodigo('042137', 'resultado');
+
+    it('assunto e texto falam do resultado, não de começar o teste', () => {
+      expect(resultado.assunto).toBe('Seu código para ver o resultado dos testes da EBA: 042137');
+      expect(resultado.texto).toContain('receber o link do seu resultado');
+      expect(resultado.texto).not.toContain('começar os testes');
+      expect(resultado.html).toContain('042137');
+      expect(resultado.html).toContain('10 minutos');
+    });
+
+    it('continua sem links nem imagens', () => {
+      expect(resultado.html).not.toMatch(/https?:\/\/|<img/i);
+      expect(resultado.texto).not.toMatch(/https?:\/\//);
+    });
+  });
 });

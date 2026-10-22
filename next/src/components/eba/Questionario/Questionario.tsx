@@ -48,6 +48,8 @@ export interface QuestionarioProps {
    * aparece e "Começar" tenta de novo pela ação `carregarPerguntas` (45 s).
    */
   perguntasIndisponiveis?: boolean;
+  /** `EBA_RESULTADO_SEGREDO` configurado: o resultado oferece o link por e-mail. */
+  linkResultado?: boolean;
   acoes: {
     pedirCodigo: typeof pedirCodigo;
     confirmarCodigo: typeof confirmarCodigo;
@@ -114,6 +116,7 @@ export function Questionario({
   perguntas: perguntasIniciais,
   sessao,
   perguntasIndisponiveis = false,
+  linkResultado = false,
   acoes,
   estadoInicial,
 }: QuestionarioProps) {
@@ -533,7 +536,7 @@ export function Questionario({
           </>
         );
       case 'resultado':
-        return s.resultado ? <Resultado teste={teste} resultado={s.resultado} emailMascarado={s.emailMascarado} saiu={s.saiu} onSair={() => void sairDaSessao()} tituloRef={focar} /> : null;
+        return s.resultado ? <Resultado teste={teste} resultado={s.resultado} emailMascarado={s.emailMascarado} saiu={s.saiu} onSair={() => void sairDaSessao()} linkResultado={linkResultado} tituloRef={focar} /> : null;
       case 'erro':
         return (
           <div className={`${styles.aviso} ${styles.avisoErro}`} role="alert">

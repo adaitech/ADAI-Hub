@@ -56,3 +56,8 @@
     padding: var(--space-40);
   }
 }
+
+.pedido {
+  display: grid;
+  gap: var(--space-16);
+}

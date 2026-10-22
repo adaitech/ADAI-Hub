@@ -106,6 +106,20 @@ describe('Resultado', () => {
     expect(screen.queryByRole('button', { name: 'Sair' })).toBeNull();
   });
 
+  describe('atalho para o link do resultado', () => {
+    it('ligado: "Quer rever depois?" com o botão para /eba/resultado', () => {
+      montar('dons-servico', { tipo: 'pontuacao', itens: itens(3), maximo: 25 }, { linkResultado: true });
+      expect(screen.getByRole('heading', { level: 3, name: 'Quer rever depois?' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Receber o link por e-mail' })).toHaveAttribute('href', '/eba/resultado');
+    });
+
+    it('desligado (padrão): nada aparece', () => {
+      montar('dons-servico', { tipo: 'pontuacao', itens: itens(3), maximo: 25 });
+      expect(screen.queryByText('Quer rever depois?')).toBeNull();
+      expect(screen.queryByRole('link', { name: 'Receber o link por e-mail' })).toBeNull();
+    });
+  });
+
   describe('ConteudoResultado (resultado salvo, sem botões nem "Sair")', () => {
     it('mostra só o conteúdo do resultado, sem "Próximo teste" nem "Sair"', () => {
       render(<ConteudoResultado teste={definicaoDoTeste('dons-servico')!} resultado={{ tipo: 'pontuacao', itens: itens(3), maximo: 25 }} />);

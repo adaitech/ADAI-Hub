@@ -4,6 +4,7 @@ import { Questionario, type QuestionarioProps } from '@/components/eba/Questiona
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Trilha, type TrilhaItem } from '@/components/ui/Trilha';
 import { schemaDaTrilha } from '@/lib/eba/dados-estruturados';
+import { segredoDoResultado } from '@/lib/eba/link-resultado';
 import { segredoDaSessao } from '@/lib/eba/sessao';
 import { ebaApiConfigurada, TIMEOUT_PAGINA_MS } from '@/lib/eba-api/client';
 import { emailConfigurado } from '@/lib/email/mailersend';
@@ -120,6 +121,7 @@ export default async function TesteEbaPage({ params }: PageProps) {
         abertura={abertura}
         perguntas={perguntas}
         perguntasIndisponiveis={indisponiveis}
+        linkResultado={segredoDoResultado() !== null}
         sessao={sessao}
         acoes={{ pedirCodigo, confirmarCodigo, retomarCadastro, cadastrar, enviar, sair, carregarPerguntas, aquecer }}
       />

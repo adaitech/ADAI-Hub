@@ -11,6 +11,8 @@ export interface ResultadoProps {
   emailMascarado: string | null;
   saiu: boolean;
   onSair: () => void;
+  /** Recurso ligado (`EBA_RESULTADO_SEGREDO`): mostra o atalho para receber o link do resultado por e-mail. */
+  linkResultado?: boolean;
   tituloRef?: RefCallback<HTMLElement>;
 }
 
@@ -129,7 +131,7 @@ export function ConteudoResultado({ teste, resultado }: { teste: DefinicaoTeste;
  * Resultado do teste: itens em ordem (já vêm ordenados), próximo teste e "Sair".
  * `sem-resultado`: a API gravou as respostas, mas o resultado não pôde ser lido; sem "Tentar de novo".
  */
-export function Resultado({ teste, resultado, emailMascarado, saiu, onSair, tituloRef }: ResultadoProps) {
+export function Resultado({ teste, resultado, emailMascarado, saiu, onSair, linkResultado = false, tituloRef }: ResultadoProps) {
   const proximo = proximoTeste(teste.slug);
   const semResultado = resultado.tipo === 'sem-resultado';
   return (
@@ -144,6 +146,17 @@ export function Resultado({ teste, resultado, emailMascarado, saiu, onSair, titu
           <Conteudo teste={teste} resultado={resultado} />
           <p className={styles.texto}>Seu resultado foi enviado para a equipe da EBA.</p>
         </>
+      )}
+      {linkResultado && (
+        <div className={styles.parte}>
+          <h3 className={styles.titulo4}>Quer rever depois?</h3>
+          <p className={styles.texto}>Enviamos por e-mail um link particular com o resultado de todos os seus testes.</p>
+          <div className={styles.botoes}>
+            <ButtonLink href="/eba/resultado" estilo="contorno">
+              Receber o link por e-mail
+            </ButtonLink>
+          </div>
+        </div>
       )}
       <div className={styles.botoes}>
         {proximo && <ButtonLink href={`/eba/testes/${proximo.slug}`}>{`Próximo teste: ${proximo.nome}`}</ButtonLink>}

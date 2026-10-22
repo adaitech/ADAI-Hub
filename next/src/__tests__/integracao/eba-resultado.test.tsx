@@ -3,8 +3,13 @@
  * (fixtures reais) e as garantias de privacidade da spec `2026-10-22-migracao-eba-3-resultado-design.md` §4.
  */
 import { screen, within } from '@testing-library/react';
-import { headers } from 'next/headers';
+import { draftMode, headers } from 'next/headers';
+import PedirPage, { generateMetadata as metadataPedir } from '@/app/(site)/eba/resultado/page';
 import ResultadoPage, { generateMetadata } from '@/app/(site)/eba/resultado/[codigo]/page';
+import TestesPage from '@/app/(site)/eba/testes/page';
+import hero from '@/components/sections/HeroSection/HeroSection.mock.json';
+import listaTestes from '@/components/sections/ListaTestesSection/ListaTestesSection.mock.json';
+import { criarStrapiFake } from '@/test-utils/strapi-fake';
 import { emitirLinkResultado } from '@/lib/eba/link-resultado';
 import notaAluno from '@/lib/eba-api/__fixtures__/survey-result-aluno-nota.json';
 import temperamento from '@/lib/eba-api/__fixtures__/survey-response-temperamento.json';
@@ -53,6 +58,53 @@ beforeEach(() => {
 });
 afterAll(() => {
   process.env = ORIGINAL;
+});
+
+describe('/eba/resultado — pedido do link', () => {
+  it('ligada: h1 único "Receber meu resultado", trilha, e-mail, noindex e seção medida', async () => {
+    const { container } = await renderizarServidor(PedirPage());
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual(['Receber meu resultado']);
+    expect(within(screen.getByRole('navigation', { name: 'Trilha' })).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['ADAI', 'EBA', 'Testes', 'Receber meu resultado']);
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
+    expect(container.querySelector('[data-section="pedir-resultado-eba"]')).not.toBeNull();
+    expect((await metadataPedir()).robots).toEqual({ index: false, follow: false });
+  });
+
+  it('desligada (sem EBA_RESULTADO_SEGREDO) → 404', () => {
+    delete process.env.EBA_RESULTADO_SEGREDO;
+    expect(() => PedirPage()).toThrow(expect.objectContaining({ digest: 'NEXT_HTTP_ERROR_FALLBACK;404' }));
+  });
+});
+
+describe('faixa "Consultar meus resultados" em /eba/testes', () => {
+  beforeEach(() => {
+    (draftMode as jest.Mock).mockResolvedValue({ isEnabled: false });
+    const strapi = criarStrapiFake();
+    strapi.paginas['eba-testes'] = {
+      id: 9,
+      documentId: 'eba-testes',
+      titulo: 'Testes',
+      slug: 'eba-testes',
+      seo: { id: 1, metaTitle: 'Testes da EBA | ADAI', metaDescription: 'Os 5 testes do CDV.' },
+      sections: [{ ...hero.unidade, id: 61 }, listaTestes.completo],
+    };
+    globalThis.fetch = jest.fn((url: string, init?: RequestInit) => strapi.fetch(url, init)) as unknown as typeof fetch;
+  });
+
+  it('ligada: aparece logo depois da trilha, antes do hero, com o link para /eba/resultado', async () => {
+    const { container } = await renderizarServidor(await TestesPage());
+    const link = screen.getByRole('link', { name: 'Consultar meus resultados' });
+    expect(link).toHaveAttribute('href', '/eba/resultado');
+    const trilha = screen.getByRole('navigation', { name: 'Trilha' });
+    const faixa = container.querySelector('[data-section="consultar-resultado"]')!;
+    expect(trilha.compareDocumentPosition(faixa) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('desligada: a faixa não aparece (nenhum link leva a uma página que daria 404)', async () => {
+    delete process.env.EBA_RESULTADO_SEGREDO;
+    await renderizarServidor(await TestesPage());
+    expect(screen.queryByRole('link', { name: 'Consultar meus resultados' })).toBeNull();
+  });
 });
 
 describe('/eba/resultado/[codigo]', () => {

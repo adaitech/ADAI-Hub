@@ -22,8 +22,8 @@ export async function metadataDaPaginaEba(slugStrapi: string | null): Promise<Me
   return buildMetadata(page.seo, global?.seo, caminhoDaPagina(slugStrapi));
 }
 
-/** Trilha ADAI › EBA › <título da página no Strapi>, com BreadcrumbList, e as seções da página. */
-export async function paginaEba(slugStrapi: string | null): Promise<ReactElement> {
+/** Trilha ADAI › EBA › <título da página no Strapi>, com BreadcrumbList, `aposATrilha` (opcional) e as seções da página. */
+export async function paginaEba(slugStrapi: string | null, aposATrilha?: ReactElement | null): Promise<ReactElement> {
   if (!slugStrapi) notFound();
   const page = await getPageBySlug(slugStrapi);
   if (!page) notFound();
@@ -35,6 +35,7 @@ export async function paginaEba(slugStrapi: string | null): Promise<ReactElement
       <div className={styles.trilha}>
         <Trilha itens={trilha} />
       </div>
+      {aposATrilha}
       <SectionRenderer sections={page.sections ?? []} />
     </>
   );
