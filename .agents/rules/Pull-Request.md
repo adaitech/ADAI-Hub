@@ -101,7 +101,8 @@ Base: [`docs/design-system.md`](../../docs/design-system.md) · style guide `doc
 
 - [ ] `git add` com **caminhos explícitos** (ou `git add -p`) — **nunca** `git add .` / `git add --all`.
 - [ ] Mensagem em **Conventional Commits, em português**: `feat(agenda): lista eventos da inChurch`, `fix(carrossel): impede scroll lateral no celular`, `test: cobre rotas da API`.
-- [ ] Agente de IA: commit/push **só com pedido explícito** do usuário; mensagem termina com a linha `Co-Authored-By:` do agente.
+- [ ] Agente de IA: commit/push **só com pedido explícito** do usuário.
+- [ ] Mensagem **sem nenhuma atribuição de IA** (nada de `Co-Authored-By` de ferramenta/agente, "Generated with", nomes de ferramentas de IA nem 🤖) — regra em [`AGENTS.md`](../../AGENTS.md) → "Git e ações externas" → "Mensagens de commit". Confira a mensagem completa antes de commitar.
 - [ ] `git push -u origin <branch>` (primeira vez) / `git push`. **Nunca** `--force` na `main`.
 
 ---
