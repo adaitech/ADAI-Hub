@@ -15,6 +15,54 @@
   padding: 0;
 }
 
+/* Composição institucional: capa sem sobreposição e coluna confortável de leitura. */
+.institucional > :global([data-section='texto-rico']:not([data-apresentacao='destaque'])) {
+  max-width: var(--texto-rico-max);
+  margin-inline: auto;
+}
+
+.institucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) + :global([data-section='texto-rico'][data-apresentacao='destaque']) {
+  margin-top: calc(var(--space-12) - var(--space-40));
+}
+
+.institucional :global([data-section='texto-rico'][data-apresentacao='destaque']) h2 {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+.institucional :global([data-section='texto-rico']) h3 {
+  font-size: var(--font-size-h3);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+/* Listas de navegação interna em textos institucionais: área de toque e leitura rápida. */
+.institucional :global([data-section='texto-rico']) ul:has(a[href^='#']) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+}
+
+.institucional :global([data-section='texto-rico']) ul a[href^='#'] {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target-min);
+}
+
+.institucional :global([data-section='texto-rico'][id]) {
+  scroll-margin-top: var(--space-96);
+}
+
+@media (min-width: 769px) {
+  .institucional :global([data-section='texto-rico']) ul:has(a[href^='#']) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-32);
+  }
+  .institucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) + :global([data-section='texto-rico'][data-apresentacao='destaque']) {
+    margin-top: calc(var(--space-12) - var(--space-56));
+  }
+}
+
 /* A citação continua o assunto dos cards anteriores, com um intervalo menor. */
 .editorial > :global([data-section='carrossel-cards']) + :global([data-section='texto-rico']:not(section)) {
   margin-top: calc(var(--space-32) - var(--space-40));
@@ -32,4 +80,20 @@
   .editorial > :global([data-section='imagem-texto']:not([data-sem-imagem='true'])):first-child > :first-child {
     aspect-ratio: 1;
   }
+}
+
+/* Variação de composição para declarações de visão e valores, reutilizando Texto rico. */
+.gradeInstitucional { gap: var(--space-16); }
+.institucional > :global([data-section='hero']) { margin-inline: auto; }
+.gradeInstitucional > :global([data-section]) { grid-column: 1 / -1; margin-block: var(--space-12); }
+.gradeInstitucional > :global([data-section='texto-rico']:not([data-apresentacao='destaque'])) { max-width: none; }
+.gradeInstitucional > :global([data-section='texto-rico']:not([data-apresentacao='destaque'])) > article { max-width: none; }
+.gradeInstitucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) { grid-column: auto; margin: 0; }
+.gradeInstitucional > :global([data-section='texto-rico'][data-apresentacao='destaque']) + :global([data-section='texto-rico'][data-apresentacao='destaque']) { margin-top: 0; }
+.gradeInstitucional > :global([data-section='texto-botoes']) { padding: var(--space-40); border-radius: var(--radius-lg); background: var(--color-bg-inverse); color: var(--color-text-inverse); }
+.gradeInstitucional > :global([data-section='texto-botoes']) h2 { font-size: var(--font-size-h3); line-height: var(--line-height-h3); }
+.gradeInstitucional > :global([data-section='texto-botoes']) p { color: var(--color-text-inverse); }
+@media (min-width: 769px) {
+  .gradeInstitucional { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gradeInstitucional > :global([data-section]:not([data-apresentacao='destaque'])) { margin-block: var(--space-20); }
 }

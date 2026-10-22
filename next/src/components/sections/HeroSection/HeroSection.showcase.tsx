@@ -7,7 +7,7 @@ import type { HeroData } from './types';
 const completo = mocks.completo as HeroData;
 const BOTOES = completo.botoes ?? [];
 
-export const heroShowcase = defineShowcase<HeroData & { somenteImagem?: boolean }>({
+export const heroShowcase = defineShowcase<HeroData & { somenteImagem?: boolean; preservarProporcao?: boolean }>({
   slug: 'hero',
   nome: 'Hero',
   categoria: 'secao',
@@ -17,8 +17,9 @@ export const heroShowcase = defineShowcase<HeroData & { somenteImagem?: boolean 
   quandoUsar: 'Primeira seção da Home e de páginas de ministério ou campanha. Apenas um por página.',
   doc: 'docs/componentes/hero.md',
   figma: 'https://www.figma.com/design/cN5RwPRMA6zw5oLoeXidk7/adai.com.br?node-id=1-32',
-  render: (data) => <HeroSection data={data} index={0} somenteImagem={data.somenteImagem} />,
+  render: (data) => <HeroSection data={data} index={0} somenteImagem={data.somenteImagem} preservarProporcao={data.preservarProporcao} />,
   variantes: [
+    { nome: 'foto_historica', titulo: 'Fotografia histórica em tamanho original', descricao: 'Imagem de acervo sem ampliação ou recorte; preserva a proporção e o limite da resolução original.', data: { __component: 'sections.hero', id: 91, imagem: { id: 91, url: '/mocks/paulo-silas.png', alternativeText: 'Pastor Paulo Silas, fundador da ADAI', width: 324, height: 213 }, somenteImagem: true, preservarProporcao: true } },
     { nome: 'imagem_evento', titulo: 'Imagem do evento', descricao: 'Uso por código: arte 16:9, sem texto sobreposto; sem imagem, mantém fundo de fallback.', data: { ...mocks.imagem_evento as HeroData, somenteImagem: true } },
     { nome: 'completo', titulo: 'Completo', descricao: 'Como está na Home (Figma).', data: mocks.completo as HeroData },
     {
@@ -32,6 +33,7 @@ export const heroShowcase = defineShowcase<HeroData & { somenteImagem?: boolean 
     { nome: 'sem_imagem', titulo: 'Sem foto', descricao: 'Estado incompleto: foto não enviada.', data: mocks.sem_imagem as HeroData },
   ],
   controles: [
+    alternarCampo<HeroData & { preservarProporcao?: boolean }, 'preservarProporcao'>('preservarProporcao', 'Preservar tamanho da fotografia', true),
     alternarCampo<HeroData, 'imagem'>('imagem', 'Foto de fundo', completo.imagem ?? null, 'Sem foto, o fundo fica cinza-escuro.'),
     alternarCampo<HeroData, 'texto_apoio'>('texto_apoio', 'Texto de apoio', completo.texto_apoio ?? null),
     {

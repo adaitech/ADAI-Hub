@@ -4,18 +4,18 @@
   "resumo": "Uma página do site. Você monta a página empilhando seções (Hero, e em breve outras) na ordem em que devem aparecer.",
   "ondeAparece": "No endereço do site definido em \"Endereço (URL)\". A página inicial usa o endereço home.",
   "boasPraticas": [
-    "Comece a página pelo Hero.",
+    "Use Hero na abertura ou Texto (documento) com título para páginas institucionais.",
     "Preencha o SEO: é o que aparece no Google e ao compartilhar no WhatsApp."
   ],
   "campos": [
     {
       "campo": "apresentacao",
       "label": "Apresentação da página",
-      "descricao": "Editorial alinha todas as seções em uma largura comum. Padrão mantém o layout próprio de cada seção.",
+      "descricao": "Editorial alinha as seções. Institucional usa capa sem título sobreposto e coluna de leitura; o primeiro Texto deve ter o título da página. Institucional-grade organiza textos em destaque em duas colunas. Padrão mantém o layout próprio de cada seção.",
       "placeholder": "",
       "ondeAparece": "Margens e espaçamento do conteúdo entre cabeçalho e rodapé.",
       "obrigatorio": false,
-      "limite": "Padrão ou editorial",
+      "limite": "Padrão, editorial, institucional ou institucional-grade",
       "exemplo": "editorial"
     },
     {
