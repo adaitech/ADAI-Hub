@@ -84,6 +84,14 @@ describe('enviarRespostas', () => {
     expect(r.itens[0].mensagem).not.toBe('x');
   });
 
+  it('temperamento: aceita também a API com o temperamento em name', async () => {
+    ebaFetchMock.mockResolvedValue([{ name: 'Sanguíneo', totalRate: 60 }, { name: 'Colérico', totalRate: 40 }]);
+    const r = await enviarRespostas({ ...base, slug: 'temperamento-pessoal', respostas: [1, 2, 3, 4].map((numero) => ({ numero, nota: 10 })) });
+    if (r.tipo !== 'pontuacao') throw new Error('esperava pontuacao');
+    expect(r.itens.map((i) => i.nome)).toEqual(['Sanguíneo', 'Colérico']);
+    expect(r.itens[0].mensagem).toMatch(/sanguíneo/i);
+  });
+
   it('estilo: combinação da API, descrição local e motivação/organização dos itens 1 e 2', async () => {
     ebaFetchMock.mockResolvedValue(estilo);
     const r = await enviarRespostas({
