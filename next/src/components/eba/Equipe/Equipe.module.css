@@ -159,3 +159,34 @@
     padding: var(--space-40);
   }
 }
+
+.qrLista {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-24);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qrCartao {
+  display: grid;
+  align-content: start;
+  gap: var(--space-12);
+  padding: var(--space-20);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 769px) {
+  .qrLista {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .qrLista {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

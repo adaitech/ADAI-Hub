@@ -10,6 +10,7 @@ import EquipePage from '@/app/(restrito)/eba/equipe/page';
 import ConsultasPage from '@/app/(restrito)/eba/equipe/consultas/page';
 import DetalhePage from '@/app/(restrito)/eba/equipe/consultas/[idStudent]/page';
 import TurmasPage from '@/app/(restrito)/eba/equipe/turmas/page';
+import QrCodesPage from '@/app/(restrito)/eba/equipe/qr-codes/page';
 import { abrirSessaoEquipe, COOKIE_EQUIPE } from '@/lib/eba/equipe/sessao';
 import classes from '@/lib/eba-api/__fixtures__/classes.json';
 import pagina from '@/lib/eba-api/__fixtures__/students-pagina.json';
@@ -77,6 +78,7 @@ describe('área desligada e guarda de sessão', () => {
     expect(e404(await erroDe(EquipeLayout({ children: null })))).toBe(true);
     expect(e404(await erroDe(ConsultasPage(props())))).toBe(true);
     expect(e404(await erroDe(TurmasPage()))).toBe(true);
+    expect(e404(await erroDe(QrCodesPage()))).toBe(true);
     expect(e404(await erroDe(DetalhePage({ params: Promise.resolve({ idStudent: ID }) })))).toBe(true);
     expect(api).not.toHaveBeenCalled();
   });
@@ -84,6 +86,7 @@ describe('área desligada e guarda de sessão', () => {
   it.each([
     ['consultas', () => ConsultasPage(props())],
     ['turmas', () => TurmasPage()],
+    ['qr-codes', () => QrCodesPage()],
     ['detalhe', () => DetalhePage({ params: Promise.resolve({ idStudent: ID }) })],
   ])('%s sem sessão → redireciona ao login, sem chamar a API', async (_nome, chamar) => {
     cookieEquipe = undefined;
@@ -111,7 +114,7 @@ describe('layout e login', () => {
   it('com sessão: menu com Consultas, Turmas e o e-mail de quem entrou', async () => {
     await renderizarServidor(await EquipeLayout({ children: <p>conteúdo</p> }));
     const nav = screen.getByRole('navigation', { name: 'Área da equipe' });
-    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Consultas', 'Turmas']);
+    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Consultas', 'Turmas', 'QR codes']);
     expect(screen.getByText('ana@adai.com.br')).toBeInTheDocument();
     expect(screen.getByText('conteúdo')).toBeInTheDocument();
   });
@@ -232,5 +235,18 @@ describe('turmas', () => {
     await renderizarServidor(await TurmasPage());
     expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as turmas agora');
     aviso.mockRestore();
+  });
+});
+
+describe('qr-codes', () => {
+  it('com sessão: um h1, os 5 testes com imagem, endereço do QR e endereço do Hub, sem chamar a API', async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://adai.com.br';
+    const { container } = await renderizarServidor(await QrCodesPage());
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual(['QR codes dos testes']);
+    expect(screen.getAllByRole('img')).toHaveLength(5);
+    expect(screen.getByText('https://adai.com.br/eba/testes/estilo-pessoal')).toBeInTheDocument();
+    expect(screen.getByText('https://eba.adai.com.br/teste/estilo-pessoal')).toBeInTheDocument();
+    expect(container.querySelector('[data-section="equipe-qr-codes"]')).not.toBeNull();
+    expect(api).not.toHaveBeenCalled();
   });
 });

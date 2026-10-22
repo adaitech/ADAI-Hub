@@ -68,7 +68,7 @@ Esta entrega é **parcial de propósito**: o levantamento (seção 2) achou deci
 | `next/src/app/(restrito)/eba/equipe/` | Layout com menu e "Sair", `login`, `consultas`, `consultas/[idStudent]`, `turmas`, `acoes.ts`. |
 | `next/src/components/eba/Equipe/` | Telas de apresentação (login, busca, tabela de alunos, detalhe, turmas). |
 
-Fica para as próximas fatias (dependem das perguntas): aulas, QR codes e ajuda.
+Entrou também a página **QR codes** (`/eba/equipe/qr-codes`, imagens do site atual em `public/eba/qr/`). Fica para as próximas fatias (dependem das perguntas): aulas e ajuda.
 
 ## 6. Medição, SEO e acessibilidade
 
@@ -91,7 +91,7 @@ Fica para as próximas fatias (dependem das perguntas): aulas, QR codes e ajuda.
 | --- | --- | --- | --- |
 | 1 | **O APIM expõe o `/login` do Identity (e o `/refresh`) para o Hub?** Hoje o login é direto no App Service. | O Hub chama `POST {EBA_API_URL}/login`. Se o APIM não expõe, o login não funciona. | Expor `/login` e `/refresh` no produto `adai-hub`. |
 | 2 | **Quem assiste às aulas?** Hoje os vídeos abrem sem login para quem tem o endereço. Os alunos do DNA e do Reset também usam? | Se alunos usam, as aulas **não podem** ficar só atrás do login da equipe. | Decidir por curso: aula pública no Hub (Strapi + Vimeo) ou só da equipe. Hoje o vídeo já é público de fato. |
-| 3 | A equipe terá **papéis** (quem gerencia turma e apaga, quem só consulta)? | Hoje todo usuário faz tudo, e a API não distingue. | Começar igual a hoje, e planejar papéis no Identity. |
+| 3 | ~~A equipe terá **papéis**?~~ **Decidido (22/10/2026): sem papéis por enquanto**, igual ao site atual. | — | Rever quando a API distinguir usuários. |
 | 4 | **Apagar turma:** a API apaga em definitivo, sem checar alunos. O Hub pode recusar quando a turma tem alunos? | Apagar com alunos pode deixar alunos sem turma. | Recusar na tela e pedir confirmação. A API pode checar também. |
 | 5 | **Validade da sessão:** o token do Identity dura o padrão (1 h). Usar `/refresh` (Hub renova sozinho) ou pedir login de novo? | Muda a experiência da equipe. | Renovar com `/refresh` até 8 h de sessão. |
 | 6 | **Vimeo:** os vídeos são "não listados" com hash. O Hub embute o mesmo endereço no Strapi, ou há restrição por domínio no Vimeo? | Restrição por domínio exige incluir o domínio do Hub. | Conferir no Vimeo antes da virada. |

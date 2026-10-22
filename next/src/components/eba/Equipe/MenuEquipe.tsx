@@ -14,6 +14,7 @@ export interface MenuEquipeProps {
 const ITENS = [
   { href: '/eba/equipe/consultas', texto: 'Consultas' },
   { href: '/eba/equipe/turmas', texto: 'Turmas' },
+  { href: '/eba/equipe/qr-codes', texto: 'QR codes' },
 ] as const;
 
 /** Menu da área da equipe: seções, e-mail de quem entrou e "Sair" (apaga a sessão e volta ao login). */

@@ -125,8 +125,9 @@ Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-4-area-logada-design.md`. 
 - [ ] **Sessão:** conferir a validade (a do token do Identity, padrão 1 h, no máximo 8 h) e se a equipe quer renovação automática com `/refresh` (pergunta 5).
 - [ ] **GTM (defesa em profundidade):** no container do Google Tag Manager, excluir `/eba/equipe*` e `/eba/resultado*` de todos os gatilhos (page view e mudança de histórico). O Hub já não carrega o GTM nessas rotas, mas o GTM de uma página do site pode continuar vivo numa navegação interna.
 - [ ] **Medição e leitor de tela:** conferir no `window.dataLayer` que nenhuma ação na área gera evento; leitor de tela no login, na busca, na tabela e no diálogo de apagar turma.
-- [ ] **Perguntas da spec §8 (decidir antes de ligar):** papéis; quem assiste às aulas e onde ficam os vídeos (Vimeo e restrição por domínio); gerenciar aluno e baixar resultado (ficam fora).
-- [ ] **Próximas fatias** (quando as perguntas forem respondidas): aulas em vídeo no Strapi, QR codes dos testes (precisa das imagens do site atual) e redirecionar `/dashboard/*` na virada.
+- [ ] **QR codes** (`/eba/equipe/qr-codes`): conferir as 5 imagens na tela e escanear uma com o celular (deve abrir `https://eba.adai.com.br/teste/<slug>`); depois da virada, conferir que esse endereço redireciona para o Hub (`/eba/testes/<slug>`), senão o QR impresso para de funcionar.
+- [ ] **Perguntas da spec §8 (decidir antes de ligar):** quem assiste às aulas e onde ficam os vídeos (Vimeo e restrição por domínio); gerenciar aluno e baixar resultado (ficam fora).
+- [ ] **Próximas fatias** (quando as perguntas forem respondidas): aulas em vídeo no Strapi e redirecionar `/dashboard/*` na virada. Papéis ficaram de fora por decisão (sem papéis por enquanto).
 
 ## 12. Depois do lançamento (fora da entrega 3)
 
