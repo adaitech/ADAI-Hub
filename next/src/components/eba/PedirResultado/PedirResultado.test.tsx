@@ -104,7 +104,7 @@ describe('PedirResultado', () => {
     expect(a.pedirCodigo).toHaveBeenCalledTimes(2);
   });
 
-  it.each([['limite', 'Muitas tentativas. Aguarde um minuto.'], ['indisponivel', 'Não conseguimos enviar agora. Tente em alguns minutos.'], ['invalido', 'Confira o e-mail digitado.']] as const)(
+  it.each([['limite', 'Muitas tentativas. Aguarde um minuto.'], ['emails', 'Já enviamos códigos demais para este e-mail. Aguarde 15 minutos para pedir outro.'], ['indisponivel', 'Não conseguimos enviar agora. Tente em alguns minutos.'], ['invalido', 'Confira o e-mail digitado.']] as const)(
     'erro %s ao pedir o código → mensagem em role=alert e continua no e-mail',
     async (erro, mensagem) => {
       const a = acoes();

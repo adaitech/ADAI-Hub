@@ -26,6 +26,8 @@ export interface RepositorioVerificacao {
   ultima(emailHash: string): Promise<RegistroVerificacao | null>;
   /** true só se mudou de não usado para usado (dois acertos simultâneos: só um ganha). */
   marcarUsado(id: number): Promise<boolean>;
+  /** Apaga a emissão ainda sem uso nem tentativas (o e-mail não saiu). true só se apagou. */
+  apagarEmitida(emailHash: string, codigoHash: string): Promise<boolean>;
   apagarAntesDe(data: Date): Promise<number>;
 }
 
@@ -66,4 +68,16 @@ export async function conferir(
   }
   if (await repo.ehCodigoAntigo(emailHash, codigoHash)) return VENCIDO;
   return { resultado: 'errado', restantes };
+}
+
+/**
+ * O servidor do Hub não conseguiu enviar o e-mail com o código: apaga a emissão para ela não gastar a
+ * cota de 3 por 15 min. Só apaga emissão sem uso e sem tentativas, e só quem sabe o hash do código
+ * (nunca visto fora do servidor do Hub) consegue indicá-la.
+ */
+export async function cancelar(
+  repo: RepositorioVerificacao,
+  { emailHash, codigoHash }: { emailHash: string; codigoHash: string },
+): Promise<boolean> {
+  return repo.apagarEmitida(emailHash, codigoHash);
 }

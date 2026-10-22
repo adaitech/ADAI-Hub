@@ -876,6 +876,7 @@ describe('Questionario — identificação', () => {
   it.each([
     ['invalido', 'Confira os campos destacados.'],
     ['limite', 'Muitas tentativas. Aguarde um minuto.'],
+    ['emails', 'Já enviamos códigos demais para este e-mail. Aguarde 15 minutos para pedir outro.'],
     ['indisponivel', 'Não conseguimos verificar agora. Tente em alguns minutos.'],
     ['sessao', 'Não conseguimos verificar agora. Tente em alguns minutos.'],
   ])('erro %s → %s', async (erro, mensagem) => {

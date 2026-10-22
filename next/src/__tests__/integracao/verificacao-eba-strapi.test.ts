@@ -6,6 +6,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
+  cancelar,
   conferir,
   emitir,
   MAX_TENTATIVAS,
@@ -45,6 +46,12 @@ function repoEmMemoria() {
       const l = linhas.find((x) => x.id === id);
       if (!l || l.usado) return false;
       l.usado = true;
+      return true;
+    },
+    async apagarEmitida(emailHash, codigoHash) {
+      const i = linhas.findIndex((l) => l.emailHash === emailHash && l.codigoHash === codigoHash && !l.usado && l.tentativas === 0);
+      if (i < 0) return false;
+      linhas.splice(i, 1);
       return true;
     },
     async apagarAntesDe(data) {
@@ -136,5 +143,27 @@ describe('verificacao-eba: tipo privado', () => {
 
   it('as rotas exigem autenticação (nenhuma com auth: false)', () => {
     expect(ler('strapi/src/api/verificacao-eba/routes/verificacao-eba.ts')).not.toMatch(/auth:\s*false/);
+  });
+});
+
+describe('verificacao-eba: cancelar (o e-mail do código não saiu)', () => {
+  it('apaga a emissão e devolve a cota: depois de 3 envios que falharam, ainda dá para emitir', async () => {
+    const { repo, linhas } = repoEmMemoria();
+    for (let i = 0; i < 3; i++) {
+      expect(await emitir(repo, emissao(`c${i}`), min(i))).toBe('emitido');
+      expect(await cancelar(repo, { emailHash: 'e1', codigoHash: `c${i}` })).toBe(true);
+    }
+    expect(linhas).toHaveLength(0);
+    expect(await emitir(repo, emissao('c9'), min(4))).toBe('emitido');
+  });
+
+  it('não cancela código já usado, com tentativa registrada, de outro e-mail ou inexistente', async () => {
+    const { repo, linhas } = repoEmMemoria();
+    await emitir(repo, emissao('c1'), T0);
+    await tentar(repo, 'errado', min(1));
+    expect(await cancelar(repo, { emailHash: 'e1', codigoHash: 'c1' })).toBe(false);
+    expect(await cancelar(repo, { emailHash: 'outro', codigoHash: 'c1' })).toBe(false);
+    expect(await cancelar(repo, { emailHash: 'e1', codigoHash: 'nao-existe' })).toBe(false);
+    expect(linhas).toHaveLength(1);
   });
 });

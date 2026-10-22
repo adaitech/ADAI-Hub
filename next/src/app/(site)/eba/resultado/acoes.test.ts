@@ -3,7 +3,7 @@ import { confirmarLinkResultado, pedirCodigoResultado } from './acoes';
 import { hashDoCodigo, hashDoEmail } from '@/lib/eba/verificacao';
 import { lerLinkResultado } from '@/lib/eba/link-resultado';
 import { enviarEmail, emailConfigurado } from '@/lib/email/mailersend';
-import { conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada } from '@/lib/strapi/verificacao';
+import { cancelarVerificacao, conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada } from '@/lib/strapi/verificacao';
 import { alunoPorEmail } from '@/lib/eba-api/alunos';
 import { EbaApiIndisponivel, ebaApiConfigurada } from '@/lib/eba-api/client';
 
@@ -15,6 +15,7 @@ jest.mock('@/lib/strapi/verificacao', () => ({
   ...jest.requireActual('@/lib/strapi/verificacao'),
   emitirVerificacao: jest.fn(),
   conferirVerificacao: jest.fn(),
+  cancelarVerificacao: jest.fn(),
   verificacaoConfigurada: jest.fn(),
 }));
 jest.mock('@/lib/email/mailersend', () => ({ ...jest.requireActual('@/lib/email/mailersend'), enviarEmail: jest.fn(), emailConfigurado: jest.fn() }));
@@ -70,10 +71,17 @@ describe('pedirCodigoResultado', () => {
     expect(alunoMock).not.toHaveBeenCalled();
   });
 
-  it('limite de envios do e-mail atingido → mesma resposta, sem e-mail', async () => {
+  it('limite de envios do e-mail atingido → avisa ("emails"), sem e-mail e sem fingir que enviou', async () => {
     emitirMock.mockResolvedValue('limite');
-    expect(await pedirCodigoResultado(EMAIL)).toEqual({ ok: true, dados: { emailMascarado: 'a***@exemplo.com' } });
+    expect(await pedirCodigoResultado(EMAIL)).toEqual({ ok: false, erro: 'emails' });
     expect(enviarMock).not.toHaveBeenCalled();
+  });
+
+  it('MailerSend fora → cancela a emissão (a cota não é gasta) e responde indisponivel', async () => {
+    enviarMock.mockRejectedValue(new Error('x'));
+    expect(await pedirCodigoResultado(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+    const emitido = emitirMock.mock.calls[0][0];
+    expect(jest.mocked(cancelarVerificacao)).toHaveBeenCalledWith({ emailHash: emitido.emailHash, codigoHash: emitido.codigoHash });
   });
 
   it.each(['', 'sem-arroba', 'a@b', 'x'.repeat(260) + '@y.com'])('e-mail inválido (%p) → invalido', async (email) => {

@@ -12,13 +12,14 @@ export interface PedirResultadoProps {
 }
 
 type Passo = 'email' | 'codigo' | 'enviado';
-type Falha = 'invalido' | 'limite' | 'indisponivel';
+type Falha = 'invalido' | 'limite' | 'emails' | 'indisponivel';
 type ErroCodigo = { tipo: 'errado'; restantes: number } | { tipo: 'vencido' } | { tipo: 'incompleto' } | { tipo: 'acao'; erro: Falha };
 
 const SEGUNDOS_REENVIO = 60;
 const MENSAGENS: Record<Falha, string> = {
   invalido: 'Confira o e-mail digitado.',
   limite: 'Muitas tentativas. Aguarde um minuto.',
+  emails: 'Já enviamos códigos demais para este e-mail. Aguarde 15 minutos para pedir outro.',
   indisponivel: 'Não conseguimos enviar agora. Tente em alguns minutos.',
 };
 

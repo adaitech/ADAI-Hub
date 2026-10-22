@@ -24,6 +24,7 @@ const CONTROLE = /\p{Cc}/u;
 const MENSAGENS: Record<CodigoErro, string> = {
   invalido: 'Confira os campos destacados.',
   limite: 'Muitas tentativas. Aguarde um minuto.',
+  emails: 'Já enviamos códigos demais para este e-mail. Aguarde 15 minutos para pedir outro.',
   indisponivel: VERIFICAR_DEPOIS,
   sessao: VERIFICAR_DEPOIS,
   recusado: VERIFICAR_DEPOIS,

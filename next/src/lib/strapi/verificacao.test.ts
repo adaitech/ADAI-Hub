@@ -1,5 +1,5 @@
 import { STRAPI_URL } from './client';
-import { conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada } from './verificacao';
+import { conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada, cancelarVerificacao } from './verificacao';
 
 const fetchMock = jest.fn();
 const tokenOriginal = process.env.STRAPI_TOKEN_VERIFICACAO;
@@ -47,6 +47,25 @@ describe('emitirVerificacao', () => {
   it('rede ou timeout → VerificacaoIndisponivel, sem log com o hash', async () => {
     fetchMock.mockRejectedValue(new DOMException('tempo esgotado', 'TimeoutError'));
     await expect(emitirVerificacao({ emailHash: 'hash-secreto', codigoHash: 'c1', expiraEm: EXPIRA })).rejects.toBeInstanceOf(VerificacaoIndisponivel);
+    expect(JSON.stringify(log.map((s) => s.mock.calls))).not.toContain('hash-secreto');
+  });
+});
+
+describe('cancelarVerificacao', () => {
+  it('POST em /cancelar com o token e os dois hashes', async () => {
+    fetchMock.mockResolvedValue(resposta(204));
+    await cancelarVerificacao({ emailHash: 'e1', codigoHash: 'c1' });
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(`${STRAPI_URL}/api/verificacoes-eba/cancelar`);
+    expect(init).toMatchObject({ method: 'POST', cache: 'no-store', headers: { Authorization: `Bearer ${TOKEN}` } });
+    expect(JSON.parse(init.body)).toEqual({ emailHash: 'e1', codigoHash: 'c1' });
+  });
+
+  it('nunca lança (é só um desfazer): Strapi fora, 403 ou timeout passam em silêncio e sem log do hash', async () => {
+    fetchMock.mockRejectedValue(new DOMException('tempo esgotado', 'TimeoutError'));
+    await expect(cancelarVerificacao({ emailHash: 'hash-secreto', codigoHash: 'c1' })).resolves.toBeUndefined();
+    fetchMock.mockResolvedValue(resposta(403));
+    await expect(cancelarVerificacao({ emailHash: 'hash-secreto', codigoHash: 'c1' })).resolves.toBeUndefined();
     expect(JSON.stringify(log.map((s) => s.mock.calls))).not.toContain('hash-secreto');
   });
 });

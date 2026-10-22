@@ -13,7 +13,7 @@ import { ebaApiConfigurada, TIMEOUT_ACAO_MS } from '@/lib/eba-api/client';
 import { emailConfigurado, enviarEmail } from '@/lib/email/mailersend';
 import { DIAS_VALIDADE_LINK } from './validade';
 import { origemDoSite } from '@/lib/seo/json-ld';
-import { conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type ResultadoVerificacao } from '@/lib/strapi/verificacao';
+import { cancelarVerificacao, conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type ResultadoVerificacao } from '@/lib/strapi/verificacao';
 
 /**
  * Pedido do link do resultado (spec 2026-10-22, entrega 3): e-mail → código de 6 dígitos → link
@@ -26,14 +26,14 @@ import { conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type Re
 
 export type RespostaPedido<T = undefined> =
   | { ok: true; dados?: T }
-  | { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' }
+  | { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' }
   | { ok: false; erro: 'codigo'; resultado: Exclude<ResultadoVerificacao['resultado'], 'ok'>; restantes: number };
 
 const limitarTentativas = criarLimitador(10, 60_000);
 const esquemaEmail = z.string().trim().max(254).pipe(z.email());
 const ACAO = { timeoutMs: TIMEOUT_ACAO_MS };
 
-const falha = (erro: 'invalido' | 'limite' | 'indisponivel') => ({ ok: false, erro }) as const;
+const falha = (erro: 'invalido' | 'limite' | 'emails' | 'indisponivel') => ({ ok: false, erro }) as const;
 
 async function dentroDoLimite(): Promise<boolean> {
   const cabecalhos = await headers();
@@ -64,12 +64,17 @@ export async function pedirCodigoResultado(email: string): Promise<RespostaPedid
 
   try {
     const codigo = gerarCodigo();
-    const emitido = await emitirVerificacao({
-      emailHash,
-      codigoHash: hashDoCodigo(emailHash, codigo, config.segredo),
-      expiraEm: new Date(Date.now() + VALIDADE_CODIGO_MS),
-    });
-    if (emitido === 'emitido') await enviarEmail({ para: emailNormalizado, ...emailDoCodigo(codigo, 'resultado') });
+    const codigoHash = hashDoCodigo(emailHash, codigo, config.segredo);
+    const emitido = await emitirVerificacao({ emailHash, codigoHash, expiraEm: new Date(Date.now() + VALIDADE_CODIGO_MS) });
+    // Limite de envios do e-mail: avisa, em vez de mostrar "código enviado" para um e-mail que não sai.
+    if (emitido === 'limite') return falha('emails');
+    try {
+      await enviarEmail({ para: emailNormalizado, ...emailDoCodigo(codigo, 'resultado') });
+    } catch (erro) {
+      // O e-mail não saiu: devolve a cota de envios para a próxima tentativa.
+      await cancelarVerificacao({ emailHash, codigoHash });
+      throw erro;
+    }
     return { ok: true, dados: { emailMascarado: mascararEmail(emailNormalizado) } };
   } catch (erro) {
     registrarFalha('pedirCodigoResultado', erro);

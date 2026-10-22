@@ -41,7 +41,7 @@ import { definicaoDoTeste, UNIDADES, usaPerguntasDaApi, type SlugTeste } from '@
 import { aquecerApi, turmasAtivas, type Turma } from '@/lib/eba-api/turmas';
 import { gerarCodigo, hashDoCodigo, hashDoEmail, soDigitos, VALIDADE_CODIGO_MS } from '@/lib/eba/verificacao';
 import { emailConfigurado, enviarEmail } from '@/lib/email/mailersend';
-import { conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type ResultadoVerificacao } from '@/lib/strapi/verificacao';
+import { cancelarVerificacao, conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type ResultadoVerificacao } from '@/lib/strapi/verificacao';
 
 /**
  * Únicas ações que ligam a tela dos testes à API da EBA. Regras de segurança:
@@ -59,9 +59,9 @@ import { conferirVerificacao, emitirVerificacao, verificacaoConfigurada, type Re
 
 export type RespostaAcao<T = undefined> =
   | { ok: true; dados?: T }
-  | { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
+  | { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
 
-type Falha = { ok: false; erro: 'invalido' | 'limite' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
+type Falha = { ok: false; erro: 'invalido' | 'limite' | 'emails' | 'indisponivel' | 'sessao' | 'recusado' | 'verificacao' };
 
 /** Quem confirmou o código: sessão aberta (aluno cadastrado) ou turmas para o Primeiro acesso. */
 export type Identificado = SessaoVisivel | { novo: true; turmas: Turma[] };
@@ -181,12 +181,18 @@ export async function pedirCodigo(
       return { ok: true, dados: await seguirVerificado(emailNormalizado, config.segredo) };
     }
     const codigo = gerarCodigo();
-    const emitido = await emitirVerificacao({
-      emailHash,
-      codigoHash: hashDoCodigo(emailHash, codigo, config.segredo),
-      expiraEm: new Date(Date.now() + VALIDADE_CODIGO_MS),
-    });
-    if (emitido === 'emitido') await enviarEmail({ para: emailNormalizado, ...emailDoCodigo(codigo) });
+    const codigoHash = hashDoCodigo(emailHash, codigo, config.segredo);
+    const emitido = await emitirVerificacao({ emailHash, codigoHash, expiraEm: new Date(Date.now() + VALIDADE_CODIGO_MS) });
+    // Limite de envios do e-mail: avisa, em vez de mostrar "código enviado" para um e-mail que não sai.
+    // A resposta vale para qualquer e-mail (aluno ou não), então não revela nada do cadastro.
+    if (emitido === 'limite') return falha('emails');
+    try {
+      await enviarEmail({ para: emailNormalizado, ...emailDoCodigo(codigo) });
+    } catch (erro) {
+      // O e-mail não saiu: devolve a cota de envios para a próxima tentativa.
+      await cancelarVerificacao({ emailHash, codigoHash });
+      throw erro;
+    }
     return { ok: true, dados: { codigoEnviado: true, emailMascarado: mascararEmail(emailNormalizado) } };
   } catch (erro) {
     registrarFalha('pedirCodigo', erro);

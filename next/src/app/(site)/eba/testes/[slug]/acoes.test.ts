@@ -3,7 +3,7 @@ import { aquecer, cadastrar, carregarPerguntas, confirmarCodigo, enviar, pedirCo
 import { assinarMarca, COOKIE_APARELHO, COOKIE_EMAIL_VERIFICADO } from '@/lib/eba/aparelho';
 import { hashDoCodigo, hashDoEmail } from '@/lib/eba/verificacao';
 import { EmailIndisponivel, emailConfigurado, enviarEmail } from '@/lib/email/mailersend';
-import { conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada } from '@/lib/strapi/verificacao';
+import { cancelarVerificacao, conferirVerificacao, emitirVerificacao, VerificacaoIndisponivel, verificacaoConfigurada } from '@/lib/strapi/verificacao';
 import { assinarSessao, COOKIE_SESSAO, donoDaSessao, OPCOES_COOKIE } from '@/lib/eba/sessao';
 import { alunoPorEmail, cadastrarAluno } from '@/lib/eba-api/alunos';
 import { EbaApiError, EbaApiIndisponivel, EbaApiRespostaInvalida, ebaApiConfigurada } from '@/lib/eba-api/client';
@@ -35,6 +35,7 @@ jest.mock('@/lib/strapi/verificacao', () => ({
   ...jest.requireActual('@/lib/strapi/verificacao'),
   emitirVerificacao: jest.fn(),
   conferirVerificacao: jest.fn(),
+  cancelarVerificacao: jest.fn(),
   verificacaoConfigurada: jest.fn(),
 }));
 jest.mock('@/lib/email/mailersend', () => ({
@@ -153,10 +154,22 @@ describe('pedirCodigo', () => {
     expect(cookieSet).not.toHaveBeenCalled();
   });
 
-  it('limite de envios no Strapi: mesma resposta e nenhum e-mail', async () => {
+  it('limite de envios do e-mail no Strapi: avisa ("emails"), sem e-mail e sem fingir que enviou', async () => {
     emitirMock.mockResolvedValue('limite');
-    expect(await pedirCodigo(EMAIL)).toEqual(ENVIADO);
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'emails' });
     expect(enviarEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('MailerSend fora: cancela a emissão (a cota de envios não é gasta) e responde indisponivel', async () => {
+    enviarEmailMock.mockRejectedValue(new EmailIndisponivel(500));
+    expect(await pedirCodigo(EMAIL)).toEqual({ ok: false, erro: 'indisponivel' });
+    const emitido = emitirMock.mock.calls[0][0];
+    expect(jest.mocked(cancelarVerificacao)).toHaveBeenCalledWith({ emailHash: emitido.emailHash, codigoHash: emitido.codigoHash });
+  });
+
+  it('e-mail enviado: nada é cancelado', async () => {
+    await pedirCodigo(EMAIL);
+    expect(jest.mocked(cancelarVerificacao)).not.toHaveBeenCalled();
   });
 
   it.each([

@@ -44,10 +44,13 @@ export function criarRepositorio(strapi: Core.Strapi): RepositorioVerificacao {
         .orderBy('id', 'desc')
         .first<Linha | undefined>();
       if (!aberta) return null;
-      const somadas = await db().where({ id: aberta.id, usado: false }).andWhere('tentativas', '<', MAX_TENTATIVAS).increment('tentativas', 1);
-      if (Number(somadas) !== 1) return null;
-      const linha = await db().where({ id: aberta.id }).first<Linha>();
-      return registro(linha);
+      // UPDATE … RETURNING: o registro volta já somado, sem reler a linha (uma segunda leitura veria a soma de outra tentativa simultânea).
+      const somadas = (await db()
+        .where({ id: aberta.id, usado: false })
+        .andWhere('tentativas', '<', MAX_TENTATIVAS)
+        .increment('tentativas', 1)
+        .returning(['id', 'codigo_hash', 'expira_em', 'tentativas', 'usado'])) as unknown as Linha[];
+      return somadas.length === 1 ? registro(somadas[0]) : null;
     },
     async ehCodigoAntigo(emailHash, codigoHash) {
       const linha = await db().where({ email_hash: emailHash, codigo_hash: codigoHash, usado: true }).first('id');
@@ -59,6 +62,9 @@ export function criarRepositorio(strapi: Core.Strapi): RepositorioVerificacao {
     },
     async marcarUsado(id) {
       return Number(await db().where({ id, usado: false }).update({ usado: true })) === 1;
+    },
+    async apagarEmitida(emailHash, codigoHash) {
+      return Number(await db().where({ email_hash: emailHash, codigo_hash: codigoHash, usado: false, tentativas: 0 }).delete()) === 1;
     },
     async apagarAntesDe(data) {
       return Number(await db().where('criado_em', '<', data).delete());

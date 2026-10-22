@@ -1,5 +1,5 @@
 /**
- * verificacao-eba controller: só `emitir` e `conferir`, chamados pelo servidor do Hub com um API token
+ * verificacao-eba controller: só `emitir`, `conferir` e `cancelar`, chamados pelo servidor do Hub com um API token
  * "Custom" (nada público). Recebe e devolve só hashes: o Strapi nunca vê o e-mail nem o código.
  */
 import type { Core } from '@strapi/strapi';
@@ -24,5 +24,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const { emailHash, codigoHash } = (ctx.request.body ?? {}) as Corpo;
     if (!hash(emailHash) || !hash(codigoHash)) return ctx.badRequest();
     ctx.body = await strapi.service(UID).conferir({ emailHash, codigoHash });
+  },
+
+  async cancelar(ctx) {
+    const { emailHash, codigoHash } = (ctx.request.body ?? {}) as Corpo;
+    if (!hash(emailHash) || !hash(codigoHash)) return ctx.badRequest();
+    await strapi.service(UID).cancelar({ emailHash, codigoHash });
+    // Sempre 204: não revela se a emissão existia.
+    ctx.status = 204;
   },
 });
