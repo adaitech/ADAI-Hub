@@ -89,7 +89,7 @@ describe('montarCsp (MDN: CSP estrita com nonce)', () => {
       expect.arrayContaining(["'self'", 'data:', 'blob:', 'https://cms.adai.com.br', 'https://i.ytimg.com', 'https://storage.googleapis.com']),
     );
     expect(csp['connect-src']).toEqual(expect.arrayContaining(["'self'", 'https://*.google-analytics.com']));
-    expect(csp['frame-src']).toEqual(["'self'", 'https://www.youtube-nocookie.com']);
+    expect(csp['frame-src']).toEqual(["'self'", 'https://www.youtube-nocookie.com', 'https://player.vimeo.com']);
   });
 
   it('anti-clickjacking: só o próprio site (vitrine) e o painel do Strapi (pré-visualização) podem emoldurar', () => {

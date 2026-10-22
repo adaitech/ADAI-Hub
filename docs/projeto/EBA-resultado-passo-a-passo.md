@@ -126,8 +126,10 @@ Spec: `docs/superpowers/specs/2026-10-22-migracao-eba-4-area-logada-design.md`. 
 - [ ] **GTM (defesa em profundidade):** no container do Google Tag Manager, excluir `/eba/equipe*` e `/eba/resultado*` de todos os gatilhos (page view e mudança de histórico). O Hub já não carrega o GTM nessas rotas, mas o GTM de uma página do site pode continuar vivo numa navegação interna.
 - [ ] **Medição e leitor de tela:** conferir no `window.dataLayer` que nenhuma ação na área gera evento; leitor de tela no login, na busca, na tabela e no diálogo de apagar turma.
 - [ ] **QR codes** (`/eba/equipe/qr-codes`): conferir as 5 imagens na tela e escanear uma com o celular (deve abrir `https://eba.adai.com.br/teste/<slug>`); depois da virada, conferir que esse endereço redireciona para o Hub (`/eba/testes/<slug>`), senão o QR impresso para de funcionar.
+- [ ] **Aulas em vídeo (Strapi):** (1) criar no Strapi de produção o API token "Custom" **só com `aula.find`** e guardar em `STRAPI_TOKEN_AULAS` (cofre e AKS; **não** usar `STRAPI_API_TOKEN` com esse token, porque o Hub o manda em todas as chamadas); (2) importar o snapshot do Strapi (seed v23, 25 aulas) ou cadastrar as aulas no painel; (3) conferir que `GET /api/aulas` **sem token** responde 403 (tipo privado); (4) abrir `/eba/equipe/aulas/dna` e `/reset` e dar play em uma aula de cada; (5) confirmar no Vimeo se há restrição por domínio e, se houver, incluir o domínio do Hub (pergunta 6 da spec).
+- [ ] **Acesso às aulas (decisão sua):** no site atual os endereços das aulas abrem **sem login**; no Hub só abrem para a equipe logada. Se os alunos do DNA e do Reset assistem pelo endereço antigo, eles perdem o acesso na virada: avisar antes ou liberar as aulas ao público.
 - [ ] **Perguntas da spec §8 (decidir antes de ligar):** quem assiste às aulas e onde ficam os vídeos (Vimeo e restrição por domínio); gerenciar aluno e baixar resultado (ficam fora).
-- [ ] **Próximas fatias** (quando as perguntas forem respondidas): aulas em vídeo no Strapi e redirecionar `/dashboard/*` na virada. Papéis ficaram de fora por decisão (sem papéis por enquanto).
+- [ ] **Na virada:** redirecionar `/dashboard/*` do site atual para o Hub. Papéis ficaram de fora por decisão (sem papéis por enquanto); "Ajuda" é página vazia no site atual e não entrou.
 
 ## 12. Depois do lançamento (fora da entrega 3)
 

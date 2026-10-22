@@ -14,6 +14,8 @@ export interface MenuEquipeProps {
 const ITENS = [
   { href: '/eba/equipe/consultas', texto: 'Consultas' },
   { href: '/eba/equipe/turmas', texto: 'Turmas' },
+  { href: '/eba/equipe/aulas/reset', texto: 'Aulas / Reset' },
+  { href: '/eba/equipe/aulas/dna', texto: 'Aulas / DNA' },
   { href: '/eba/equipe/qr-codes', texto: 'QR codes' },
 ] as const;
 

@@ -15,12 +15,14 @@ beforeEach(() => {
 });
 
 describe('MenuEquipe', () => {
-  it('navegação rotulada com Consultas, Turmas e QR codes, o e-mail de quem entrou e sem erro de acessibilidade', () => {
+  it('navegação rotulada com Consultas, Turmas, Aulas e QR codes, o e-mail de quem entrou e sem erro de acessibilidade', () => {
     const { container } = montar();
     const nav = screen.getByRole('navigation', { name: 'Área da equipe' });
     expect(nav).toContainElement(screen.getByRole('link', { name: 'Consultas' }));
     expect(screen.getByRole('link', { name: 'Turmas' })).toHaveAttribute('href', '/eba/equipe/turmas');
     expect(screen.getByRole('link', { name: 'QR codes' })).toHaveAttribute('href', '/eba/equipe/qr-codes');
+    expect(screen.getByRole('link', { name: 'Aulas / Reset' })).toHaveAttribute('href', '/eba/equipe/aulas/reset');
+    expect(screen.getByRole('link', { name: 'Aulas / DNA' })).toHaveAttribute('href', '/eba/equipe/aulas/dna');
     expect(screen.getByText('ana@adai.com.br')).toBeInTheDocument();
     expect(auditarAcessibilidade(container)).toEqual([]);
   });

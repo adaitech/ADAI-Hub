@@ -70,7 +70,8 @@ export function montarCsp(nonce: string, config: ConfigSeguranca): string {
     'img-src': ["'self'", 'data:', 'blob:', config.strapiUrl, 'https://i.ytimg.com', 'https://storage.googleapis.com', ...GOOGLE_ANALYTICS],
     'font-src': ["'self'"],
     'connect-src': ["'self'", ...GOOGLE_ANALYTICS],
-    'frame-src': ["'self'", 'https://www.youtube-nocookie.com'],
+    // Vimeo: só o player das aulas da área da equipe (`/eba/equipe/aulas`).
+    'frame-src': ["'self'", 'https://www.youtube-nocookie.com', 'https://player.vimeo.com'],
     'frame-ancestors': ["'self'", config.strapiUrl],
     'object-src': ["'none'"],
     'base-uri': ["'none'"],

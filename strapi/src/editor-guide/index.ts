@@ -1,3 +1,4 @@
+import apiAula from './api.aula.json';
 import apiCurso from './api.curso.json';
 import apiGlobal from './api.global.json';
 import apiPage from './api.page.json';
@@ -55,6 +56,7 @@ export const editorGuides: EditorGuide[] = [
   apiUnidade,
   apiCurso,
   apiTeste,
+  apiAula,
   apiVerificacaoEba,
   sectionsHero,
   sectionsPix,
@@ -87,6 +89,7 @@ export const mainFields: Record<string, string> = {
   'api::unidade.unidade': 'nome',
   'api::curso.curso': 'nome',
   'api::teste.teste': 'nome',
+  'api::aula.aula': 'titulo',
   'shared.botao': 'texto',
   'shared.link': 'texto',
   'items.coluna-links': 'titulo',

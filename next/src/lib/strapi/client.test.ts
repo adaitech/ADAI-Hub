@@ -48,6 +48,20 @@ describe('strapiFetch', () => {
     expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: 'Bearer token-de-teste' });
   });
 
+  it('token explícito (opção `token`) vale no lugar do STRAPI_API_TOKEN, e só naquela chamada', async () => {
+    process.env.STRAPI_API_TOKEN = 'token-geral';
+    await strapiFetch('aulas', {}, { token: 'token-so-das-aulas' });
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: 'Bearer token-so-das-aulas' });
+    await strapiFetch('global');
+    expect(fetchMock.mock.calls[1][1].headers).toEqual({ Authorization: 'Bearer token-geral' });
+  });
+
+  it('token explícito vazio → cai no STRAPI_API_TOKEN (variável não configurada)', async () => {
+    process.env.STRAPI_API_TOKEN = 'token-geral';
+    await strapiFetch('aulas', {}, { token: '' });
+    expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: 'Bearer token-geral' });
+  });
+
   it('resposta não-ok → StrapiError com o status (a página decide: 404 vira "não encontrado")', async () => {
     fetchMock.mockResolvedValue(respostaJson({}, 404));
     const erro = await strapiFetch('global').catch((e: unknown) => e);

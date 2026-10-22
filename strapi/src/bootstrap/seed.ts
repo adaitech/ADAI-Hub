@@ -2,12 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import type { Core } from '@strapi/strapi';
 import { ensureCursos, ensurePaginasEba, ensureTestes, type Imagem, type StrapiSeed } from './seed-eba';
+import { ensureAulas, type ImagemDeAula, type StrapiSeedAulas } from './seed-aulas';
 
 /**
  * Suba este número sempre que a Home de desenvolvimento ganhar seções novas no seed.
  * Com a versão maior, as seções da Home e de /exemplos são reconstruídas a partir deste arquivo (só em dev).
  */
-const SEED_VERSION = 22;
+const SEED_VERSION = 23;
 const SEED_DIR = path.join(process.cwd(), 'seed');
 const STORE = { type: 'core', name: 'adai', key: 'seed_version' } as const;
 
@@ -767,6 +768,7 @@ export async function seedInitialContent(strapi: Core.Strapi) {
   const imagemEba: Imagem = (_strapi, arquivo, alt) => image(strapi, arquivo, alt);
   await ensureCursos(strapiEba, imagemEba, storedVersion < SEED_VERSION);
   await ensureTestes(strapiEba, storedVersion < SEED_VERSION);
+  await ensureAulas(strapi as unknown as StrapiSeedAulas, storedVersion < SEED_VERSION, ((_strapi, arquivo, alt) => image(strapi, arquivo, alt)) as ImagemDeAula);
   await ensurePaginasEba(strapiEba, imagemEba, storedVersion < SEED_VERSION);
 
   for (const p of PAGINAS_INSTITUCIONAIS) {

@@ -1,0 +1,104 @@
+{
+  "uid": "api::aula.aula",
+  "nome": "Aula da EBA",
+  "resumo": "Aula em vídeo do DNA ou do Reset. Publicada, ela aparece sozinha na área da equipe da EBA (menu Aulas / DNA e Aulas / Reset), na ordem definida aqui.",
+  "ondeAparece": "Área da equipe da EBA, em /eba/equipe/aulas/<curso>/<endereço>: lista de aulas ao lado do vídeo.",
+  "boasPraticas": [
+    "Este tipo é privado: o site lê com um token, e o endereço do vídeo não aparece em nenhuma página pública.",
+    "Cole o endereço do vídeo no formato que o Vimeo dá em \"Compartilhar > Incorporar\" (https://player.vimeo.com/video/…). Qualquer outro endereço faz a aula não aparecer.",
+    "O endereço da aula (campo Endereço) não pode se repetir dentro do mesmo curso.",
+    "Para tirar uma aula do site, despublique. Não apague: o histórico fica guardado."
+  ],
+  "campos": [
+    {
+      "campo": "titulo",
+      "label": "Título da aula",
+      "descricao": "Nome da aula, como aparece na lista e acima do vídeo.",
+      "placeholder": "Ex.: 01 - Fundamentos, Visão e Pilares",
+      "ondeAparece": "Lista de aulas e título abaixo do vídeo.",
+      "obrigatorio": true,
+      "limite": "Até 120 caracteres",
+      "exemplo": "05 - Família"
+    },
+    {
+      "campo": "curso",
+      "label": "Curso",
+      "descricao": "DNA ou Reset. Define em qual menu a aula aparece.",
+      "placeholder": "dna",
+      "ondeAparece": "Menu Aulas / DNA ou Aulas / Reset.",
+      "obrigatorio": true,
+      "limite": "dna ou reset",
+      "exemplo": "reset"
+    },
+    {
+      "campo": "endereco",
+      "label": "Endereço",
+      "descricao": "Parte final do endereço da aula. Só letras minúsculas, números e hífen. Não repita dentro do mesmo curso.",
+      "placeholder": "Ex.: aula-05",
+      "ondeAparece": "Endereço da página: /eba/equipe/aulas/<curso>/<endereço>.",
+      "obrigatorio": true,
+      "limite": "Só letras minúsculas, números e hífen (até 60 caracteres)",
+      "exemplo": "aula-05"
+    },
+    {
+      "campo": "ordem",
+      "label": "Ordem",
+      "descricao": "Posição na lista do curso (menor aparece primeiro). Use 1 para as boas-vindas, 2 para a aula 1 e assim por diante.",
+      "placeholder": "Ex.: 2",
+      "ondeAparece": "Ordem da lista de aulas.",
+      "obrigatorio": true,
+      "limite": "Número inteiro, 0 ou mais",
+      "exemplo": "2"
+    },
+    {
+      "campo": "autor",
+      "label": "Autor",
+      "descricao": "Quem ministra a aula.",
+      "placeholder": "Ex.: Pr. Rodrigo Soeiro",
+      "ondeAparece": "Abaixo do título, ao lado da foto.",
+      "obrigatorio": false,
+      "limite": "Até 100 caracteres",
+      "exemplo": "Pra. Tati Soeiro"
+    },
+    {
+      "campo": "cargo_autor",
+      "label": "Cargo do autor",
+      "descricao": "Cargo ou função do autor.",
+      "placeholder": "Ex.: Pastor Líder",
+      "ondeAparece": "Abaixo do nome do autor.",
+      "obrigatorio": false,
+      "limite": "Até 60 caracteres",
+      "exemplo": "Pastora Líder"
+    },
+    {
+      "campo": "descricao",
+      "label": "Descrição",
+      "descricao": "Uma frase sobre a aula.",
+      "placeholder": "Ex.: Aula 05 - Família",
+      "ondeAparece": "Abaixo do autor.",
+      "obrigatorio": false,
+      "limite": "Até 300 caracteres",
+      "exemplo": "Aula 05 - Família"
+    },
+    {
+      "campo": "video_url",
+      "label": "Endereço do vídeo (Vimeo)",
+      "descricao": "Endereço de incorporação do Vimeo, no formato https://player.vimeo.com/video/<número>?h=<código>. Outros endereços são ignorados pelo site.",
+      "placeholder": "https://player.vimeo.com/video/1047669729?h=5de9c9b90c",
+      "ondeAparece": "Player de vídeo da aula.",
+      "obrigatorio": true,
+      "limite": "Até 300 caracteres",
+      "exemplo": "https://player.vimeo.com/video/1047669729?h=5de9c9b90c"
+    },
+    {
+      "campo": "foto_autor",
+      "label": "Foto do autor",
+      "descricao": "Foto quadrada do autor. Preencha o texto alternativo (descrição da foto).",
+      "placeholder": "Escolha uma foto quadrada",
+      "ondeAparece": "Círculo ao lado do nome do autor.",
+      "obrigatorio": false,
+      "limite": "Imagem (de preferência quadrada)",
+      "exemplo": "Foto do Pr. Rodrigo Soeiro."
+    }
+  ]
+}

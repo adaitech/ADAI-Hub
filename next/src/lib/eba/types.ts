@@ -93,3 +93,18 @@ export interface TesteView {
   link: string | null;
   ordem: number;
 }
+
+/** JSON cru de uma aula em vídeo (`api::aula.aula`) como a API do Strapi entrega (tipo privado: só com token). */
+export interface StrapiAula {
+  id: number;
+  documentId: string;
+  titulo?: string | null;
+  curso?: string | null;
+  endereco?: string | null;
+  ordem?: number | null;
+  autor?: string | null;
+  cargo_autor?: string | null;
+  descricao?: string | null;
+  video_url?: string | null;
+  foto_autor?: StrapiMedia | null;
+}

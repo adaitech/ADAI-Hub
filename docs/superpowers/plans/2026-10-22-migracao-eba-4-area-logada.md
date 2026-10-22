@@ -42,7 +42,7 @@
 - [ ] `yarn quality`, `yarn build` e `yarn smoke` (rodar a cada fatia).
 
 ## Próximas fatias (dependem das perguntas da spec §8)
-- [ ] **Aulas em vídeo** (Strapi `aula`, 17 do DNA e 8 do Reset; Vimeo): depende da pergunta 2 (quem assiste) e da 6 (Vimeo).
+- [x] **Aulas em vídeo** (Strapi `aula` privado, 17 do DNA e 8 do Reset; Vimeo): decisão do Jonatan (22/10/2026): "fazer igual o atual". Acesso só pela área da equipe (no site atual os endereços abriam sem login; ver pergunta 2 da spec).
 - [x] **QR codes dos testes** (`/eba/equipe/qr-codes`): imagens copiadas do site atual (`adaitech/eba-adai`, `public/assets/qr/`), cinco QR conferidos por decodificação (`https://eba.adai.com.br/teste/<slug>`).
 - [ ] **Ajuda**: página vazia no site atual, sem desenho.
 - [x] **Papéis**: decisão do Jonatan (22/10/2026): **sem papéis por enquanto**, quem tem conta vê tudo, como no site atual.

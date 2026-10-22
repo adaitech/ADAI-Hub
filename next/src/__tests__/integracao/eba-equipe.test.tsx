@@ -11,6 +11,9 @@ import ConsultasPage from '@/app/(restrito)/eba/equipe/consultas/page';
 import DetalhePage from '@/app/(restrito)/eba/equipe/consultas/[idStudent]/page';
 import TurmasPage from '@/app/(restrito)/eba/equipe/turmas/page';
 import QrCodesPage from '@/app/(restrito)/eba/equipe/qr-codes/page';
+import AulasDoCursoPage from '@/app/(restrito)/eba/equipe/aulas/[curso]/page';
+import AulaPage from '@/app/(restrito)/eba/equipe/aulas/[curso]/[aula]/page';
+import aulas from '@/lib/eba/__fixtures__/aulas.json';
 import { abrirSessaoEquipe, COOKIE_EQUIPE } from '@/lib/eba/equipe/sessao';
 import classes from '@/lib/eba-api/__fixtures__/classes.json';
 import pagina from '@/lib/eba-api/__fixtures__/students-pagina.json';
@@ -57,7 +60,12 @@ beforeEach(() => {
   comSessao();
   (cookies as jest.Mock).mockImplementation(async () => ({ get: (nome: string) => (nome === COOKIE_EQUIPE && cookieEquipe ? { value: cookieEquipe } : undefined), set: jest.fn(), delete: jest.fn() }));
   (headers as jest.Mock).mockResolvedValue(new Headers({ 'x-forwarded-for': '203.0.113.5' }));
+  process.env.STRAPI_TOKEN_AULAS = 'token-do-strapi-de-teste';
   api = jest.fn((url: string) => {
+    if (url.includes('/api/aulas')) {
+      const curso = /curso\]\[\$eq\]=(\w+)/.exec(decodeURIComponent(url))?.[1];
+      return resposta(200, { ...aulas, data: aulas.data.filter((a) => a.curso === curso) });
+    }
     if (url.includes('/ClassEBA?')) return resposta(200, turmasPaginadas);
     if (url.includes('/Student?')) return resposta(200, pagina);
     if (url.endsWith(`/Student/${ID}`)) return resposta(200, pagina.data[0]);
@@ -79,6 +87,7 @@ describe('área desligada e guarda de sessão', () => {
     expect(e404(await erroDe(ConsultasPage(props())))).toBe(true);
     expect(e404(await erroDe(TurmasPage()))).toBe(true);
     expect(e404(await erroDe(QrCodesPage()))).toBe(true);
+    expect(e404(await erroDe(AulaPage({ params: Promise.resolve({ curso: 'dna', aula: 'aula-01' }) })))).toBe(true);
     expect(e404(await erroDe(DetalhePage({ params: Promise.resolve({ idStudent: ID }) })))).toBe(true);
     expect(api).not.toHaveBeenCalled();
   });
@@ -87,6 +96,8 @@ describe('área desligada e guarda de sessão', () => {
     ['consultas', () => ConsultasPage(props())],
     ['turmas', () => TurmasPage()],
     ['qr-codes', () => QrCodesPage()],
+    ['aulas (curso)', () => AulasDoCursoPage({ params: Promise.resolve({ curso: 'dna' }) })],
+    ['aula', () => AulaPage({ params: Promise.resolve({ curso: 'dna', aula: 'aula-01' }) })],
     ['detalhe', () => DetalhePage({ params: Promise.resolve({ idStudent: ID }) })],
   ])('%s sem sessão → redireciona ao login, sem chamar a API', async (_nome, chamar) => {
     cookieEquipe = undefined;
@@ -114,7 +125,7 @@ describe('layout e login', () => {
   it('com sessão: menu com Consultas, Turmas e o e-mail de quem entrou', async () => {
     await renderizarServidor(await EquipeLayout({ children: <p>conteúdo</p> }));
     const nav = screen.getByRole('navigation', { name: 'Área da equipe' });
-    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Consultas', 'Turmas', 'QR codes']);
+    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Consultas', 'Turmas', 'Aulas / Reset', 'Aulas / DNA', 'QR codes']);
     expect(screen.getByText('ana@adai.com.br')).toBeInTheDocument();
     expect(screen.getByText('conteúdo')).toBeInTheDocument();
   });
@@ -248,5 +259,52 @@ describe('qr-codes', () => {
     expect(screen.getByText('https://eba.adai.com.br/teste/estilo-pessoal')).toBeInTheDocument();
     expect(container.querySelector('[data-section="equipe-qr-codes"]')).not.toBeNull();
     expect(api).not.toHaveBeenCalled();
+  });
+});
+
+describe('aulas em vídeo', () => {
+  const aula = (curso: string, endereco: string) => AulaPage({ params: Promise.resolve({ curso, aula: endereco }) });
+  const aulasDoCurso = (curso: string) => AulasDoCursoPage({ params: Promise.resolve({ curso }) });
+
+  it('a aula: um h1 com o curso, o player do Vimeo, a lista do curso com a atual marcada e o token do Strapi só no servidor', async () => {
+    const { container } = await renderizarServidor(await aula('dna', 'aula-01'));
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual(['Aulas / DNA']);
+    const quadro = screen.getByTitle('Vídeo da aula: 01 - Fundamentos, Visão e Pilares');
+    expect(quadro.getAttribute('src')).toMatch(/^https:\/\/player\.vimeo\.com\/video\/1047669729/);
+    const nav = screen.getByRole('navigation', { name: 'Aulas do DNA' });
+    expect(within(nav).getAllByRole('link').map((a) => a.textContent)).toEqual(['Boas Vindas', '01 - Fundamentos, Visão e Pilares', '02 - Job']);
+    expect(within(nav).getByRole('link', { name: '01 - Fundamentos, Visão e Pilares' })).toHaveAttribute('aria-current', 'page');
+    const chamada = (api.mock.calls as [string, RequestInit][]).find(([url]) => url.includes('/api/aulas'))!;
+    expect(chamada[1].headers).toMatchObject({ Authorization: 'Bearer token-do-strapi-de-teste' });
+    expect(container.innerHTML).not.toContain('token-do-strapi-de-teste');
+    expect(container.querySelector('[data-section="equipe-aulas"]')).not.toBeNull();
+  });
+
+  it('/aulas/<curso> abre a primeira aula (menu do site atual)', async () => {
+    expect(redirecionaPara(await erroDe(aulasDoCurso('dna')), '/eba/equipe/aulas/dna/boas-vindas')).toBe(true);
+  });
+
+  it('curso sem aulas publicadas → mensagem, sem redirecionar', async () => {
+    await renderizarServidor(await aulasDoCurso('reset'));
+    expect(screen.getByText('Nenhuma aula publicada neste curso ainda.')).toBeInTheDocument();
+  });
+
+  it.each([['start', 'aula-01'], ['../dna', 'aula-01'], ['dna', 'nao-existe'], ['dna', 'Aula-01'], ['reset', 'aula-01']])('curso %p / aula %p inexistente → 404', async (c, a) => {
+    expect(e404(await erroDe(aula(c, a)))).toBe(true);
+  });
+
+  it('curso inexistente na lista de aulas → 404', async () => {
+    expect(e404(await erroDe(aulasDoCurso('start')))).toBe(true);
+  });
+
+  it('Strapi recusando (sem token) ou fora → mensagem em role=alert, sem derrubar a página e sem dado no log', async () => {
+    const aviso = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    api.mockImplementation((url: string) => (url.includes('/api/aulas') ? resposta(403, {}) : resposta(200, {})));
+    await renderizarServidor(await aula('dna', 'aula-01'));
+    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as aulas agora');
+    await renderizarServidor(await aulasDoCurso('dna'));
+    expect(screen.getByRole('alert')).toHaveTextContent('Não conseguimos carregar as aulas agora');
+    expect(JSON.stringify(aviso.mock.calls)).not.toContain('token-do-strapi');
+    aviso.mockRestore();
   });
 });
