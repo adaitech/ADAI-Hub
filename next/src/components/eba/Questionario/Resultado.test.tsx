@@ -66,6 +66,15 @@ describe('Resultado', () => {
     expect(screen.queryByText('NaN')).toBeNull();
   });
 
+  it('nomes repetidos na resposta da API não repetem a chave das linhas', () => {
+    const erro = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const repetido: ResultadoApi = { tipo: 'pontuacao', maximo: 10, itens: ['Temperamento Pessoal', 'Temperamento Pessoal'].map((nome) => ({ nome, total: 5, mensagem: null })) };
+    montar('temperamento-pessoal', repetido);
+    expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(2);
+    expect(erro.mock.calls.flat().join(' ')).not.toContain('same key');
+    erro.mockRestore();
+  });
+
   it('talentos: lista das habilidades escolhidas, sem barras', () => {
     const { container } = montar('talentos-naturais', mock.resultados.talentos as ResultadoApi);
     const lista = screen.getByRole('list');

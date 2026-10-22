@@ -83,11 +83,15 @@ export async function enviarRespostas(
   const valido = esquemaItens.safeParse(retorno);
   if (!valido.success) throw new EbaApiRespostaInvalida('SurveyResponse sem lista de name/totalRate');
   const itens: ItemResultado[] = valido.data
-    .map((i) => ({
-      nome: i.name,
-      total: i.totalRate,
-      mensagem: teste.tipo === 'temperamento' ? descricaoDoTemperamento(i.name) : i.message || null,
-    }))
+    .map((i) => {
+      // Temperamento: a API manda `name` fixo ("Temperamento Pessoal") e o temperamento em `message`.
+      const rotulo = teste.tipo === 'temperamento' ? i.message?.trim() || i.name : i.name;
+      return {
+        nome: rotulo,
+        total: i.totalRate,
+        mensagem: teste.tipo === 'temperamento' ? descricaoDoTemperamento(rotulo) : i.message || null,
+      };
+    })
     .sort((a, b) => b.total - a.total);
 
   const maximo =
