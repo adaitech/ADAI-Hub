@@ -270,7 +270,13 @@ describe('/eba/testes/[slug] — indisponibilidade (nunca 404)', () => {
     ['EBA_SESSAO_SEGREDO curto', () => (process.env.EBA_SESSAO_SEGREDO = 'curto')],
   ])('%s: "Testes indisponíveis no momento", link para /eba/testes, sem questionário nem API', async (_caso, tirar) => {
     tirar();
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     const { container } = await renderizarServidor(await TestePage(params('dons-servico')));
+    // O log diz o que falta (só nomes) e nunca os valores configurados.
+    const log = warn.mock.calls.flat().join(' ');
+    expect(log).toContain('[eba-testes] indisponível');
+    expect(log).not.toContain('chave-de-teste');
+    warn.mockRestore();
     expect(screen.getByRole('heading', { level: 1, name: 'Dons de serviço prático' })).toBeInTheDocument();
     expect(screen.getByText('Testes indisponíveis no momento')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Ver todos os testes' })).toHaveAttribute('href', '/eba/testes');
