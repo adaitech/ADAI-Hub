@@ -15,6 +15,30 @@ npx lighthouse http://localhost:3000 --only-categories=performance \
   --chrome-flags="--headless=new --no-sandbox --disable-extensions --disable-gpu"
 ```
 
+## Mobile como em produção (HTTP/2)
+
+O `next start` serve HTTP/1.1 e infla o LCP simulado em ~1 s (ver `SKILL.md`, pré-requisito 1). Para comparar com a meta (LCP < 2,5 s), pôr o proxy HTTPS + HTTP/2 da skill na frente do servidor:
+
+```bash
+# uma vez: certificado autoassinado em documents/ (ignorado pelo Git). No Git Bash: -subj "//CN=localhost"
+openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj "/CN=localhost" \
+  -keyout documents/lighthouse/k.pem -out documents/lighthouse/c.pem
+node .claude/skills/lighthouse-performance-mcp/h2-proxy.mjs 3443 http://localhost:3000 documents/lighthouse
+
+npx lighthouse https://localhost:3443/ --only-categories=performance \
+  --form-factor=mobile --screenEmulation.mobile --throttling-method=simulate \
+  --output=json --output-path=./documents/lighthouse/home-mobile-h2.json \
+  --chrome-flags="--headless=new --no-sandbox --disable-extensions --disable-gpu --ignore-certificate-errors"
+```
+
+## Ler por que o LCP está alto
+
+No throttling simulado, o LCP é o fim da última requisição (fora imagens de prioridade baixa) que terminou **antes da pintura observada** no carregamento sem limitação. Como em localhost tudo termina em ~100 ms, fontes, todo o JS e o CSS entram na conta. No JSON:
+
+- `metrics.details.items[0]`: `observedLargestContentfulPaint` (pintura real) × `largestContentfulPaint` (simulado);
+- `network-requests`: o que terminou antes da pintura observada (`networkEndTime`) e o protocolo (`protocol`: `http/1.1` × `h2`);
+- `lcp-breakdown-insight` e `render-blocking-insight`: atraso de carregamento/renderização e CSS bloqueante.
+
 ## Desktop
 
 ```bash
