@@ -1,0 +1,133 @@
+From 7f4bff910b69c326491835010525faf9f64f98e9 Mon Sep 17 00:00:00 2001
+From: Jonatan Cardoso Saraiva <jonatan.cardoso@hotmail.com.br>
+Date: Thu, 22 Oct 2026 15:35:31 +0000
+Subject: [PATCH] feat(api): rota de leitura do resultado por aluno para o ADAI
+ Hub, fechada por chave interna
+
+---
+ .../Controllers/HubResultadoController.cs     | 50 +++++++++++++++++
+ eba-adai-api.Tests/HubResultadoTests.cs       | 55 +++++++++++++++++++
+ 2 files changed, 105 insertions(+)
+ create mode 100644 eba-adai-api.API/Controllers/HubResultadoController.cs
+ create mode 100644 eba-adai-api.Tests/HubResultadoTests.cs
+
+diff --git a/eba-adai-api.API/Controllers/HubResultadoController.cs b/eba-adai-api.API/Controllers/HubResultadoController.cs
+new file mode 100644
+index 0000000..ab0ec05
+--- /dev/null
++++ b/eba-adai-api.API/Controllers/HubResultadoController.cs
+@@ -0,0 +1,50 @@
++using System.Security.Cryptography;
++using System.Text;
++using eba_adai_api.Application.UseCases.Survey.SurveyResult.GetSurveyResultQuestion;
++using MediatR;
++using Microsoft.AspNetCore.Authorization;
++using Microsoft.AspNetCore.Mvc;
++
++namespace eba_adai_api.API.Controllers;
++
++/// <summary>
++/// Leitura do resultado salvo de um aluno para o ADAI Hub (página de resultado, sem login da equipe).
++/// Devolve só nome, total, mensagem e o marcador de resultado vigente: sem ids, datas, nome ou e-mail.
++/// Fechada por padrão: só responde com o cabeçalho <c>X-Hub-Key</c> igual a <c>HubResultados:ChaveInterna</c>
++/// (o API Management acrescenta o cabeçalho para a assinatura do Hub e descarta o que o cliente mandar).
++/// Chave ausente, curta ou errada = 404, igual ao "sem resultado": não revela se a rota existe.
++/// </summary>
++[ControllerName("HubResultado")]
++[Route("api/v1/eba")]
++[ApiController]
++public class HubResultadoController(IMediator mediator, IConfiguration configuration) : ControllerBase
++{
++    private const string Cabecalho = "X-Hub-Key";
++    private const int TamanhoMinimoChave = 32;
++
++    private readonly IMediator Mediator = mediator;
++    private readonly IConfiguration Configuration = configuration;
++
++    [AllowAnonymous]
++    [HttpGet("Hub/SurveyResult/Student/{IdStudent}/Question/{IdQuestion}")]
++    public async Task<ActionResult<List<HubResultadoResponse>>> Get([FromRoute] GetSurveyResultQuestionRequest request, CancellationToken cancellationToken)
++    {
++        if (!ChaveValida()) return NotFound();
++
++        var response = await Mediator.Send(request, cancellationToken);
++        return Ok(response.Select(r => new HubResultadoResponse(r.Name, r.TotalRate, r.Message, r.Result)).ToList());
++    }
++
++    private bool ChaveValida()
++    {
++        var esperada = Configuration["HubResultados:ChaveInterna"];
++        if (string.IsNullOrEmpty(esperada) || esperada.Length < TamanhoMinimoChave) return false;
++        if (!Request.Headers.TryGetValue(Cabecalho, out var recebida)) return false;
++
++        var a = Encoding.UTF8.GetBytes(esperada);
++        var b = Encoding.UTF8.GetBytes(recebida.ToString());
++        return a.Length == b.Length && CryptographicOperations.FixedTimeEquals(a, b);
++    }
++}
++
++public sealed record HubResultadoResponse(string? Name, double TotalRate, string? Message, bool Result);
+diff --git a/eba-adai-api.Tests/HubResultadoTests.cs b/eba-adai-api.Tests/HubResultadoTests.cs
+new file mode 100644
+index 0000000..017ead3
+--- /dev/null
++++ b/eba-adai-api.Tests/HubResultadoTests.cs
+@@ -0,0 +1,55 @@
++using System.Net;
++using Microsoft.AspNetCore.Hosting;
++using Microsoft.AspNetCore.Mvc.Testing;
++
++namespace eba_adai_api.Tests;
++
++public class HubResultadoTests(ApiFactory factory) : IClassFixture<ApiFactory>
++{
++    private const string Chave = "chave-interna-de-teste-com-mais-de-32-caracteres";
++    private static readonly string Url = $"/api/v1/eba/Hub/SurveyResult/Student/{Guid.NewGuid()}/Question/{Guid.NewGuid()}";
++
++    private HttpClient Cliente(string? chaveConfigurada) =>
++        factory.WithWebHostBuilder(b =>
++        {
++            if (chaveConfigurada is not null) b.UseSetting("HubResultados:ChaveInterna", chaveConfigurada);
++        }).CreateClient();
++
++    private static HttpRequestMessage Requisicao(string? chave)
++    {
++        var request = new HttpRequestMessage(HttpMethod.Get, Url);
++        if (chave is not null) request.Headers.Add("X-Hub-Key", chave);
++        return request;
++    }
++
++    [Fact]
++    public async Task Sem_chave_configurada_a_rota_fica_desligada()
++    {
++        var response = await Cliente(null).SendAsync(Requisicao(Chave));
++        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
++    }
++
++    [Fact]
++    public async Task Chave_configurada_curta_demais_nao_liga_a_rota()
++    {
++        var response = await Cliente("curta").SendAsync(Requisicao("curta"));
++        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
++    }
++
++    [Theory]
++    [InlineData(null)]
++    [InlineData("")]
++    [InlineData("chave-errada")]
++    public async Task Sem_cabecalho_ou_com_chave_errada_recebe_404_e_nao_401(string? chave)
++    {
++        var response = await Cliente(Chave).SendAsync(Requisicao(chave));
++        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
++    }
++
++    [Fact]
++    public async Task Chave_certa_sem_resultado_para_o_aluno_recebe_404_do_proprio_dominio()
++    {
++        var response = await Cliente(Chave).SendAsync(Requisicao(Chave));
++        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
++    }
++}
+-- 
+2.43.0
+

@@ -1,0 +1,127 @@
+import 'server-only';
+import type { EbaErroApi } from './tipos';
+
+/**
+ * Timeouts por tipo de chamada. O banco da API pausa quando fica ocioso e a primeira chamada depois
+ * da pausa leva de 10 a 45 s: só a renderização da página fica com 10 s (ela não pode travar).
+ */
+/** Perguntas buscadas ao renderizar a página (padrão de `ebaFetch`). */
+export const TIMEOUT_PAGINA_MS = 10_000;
+/** Chamadas dentro de Server Actions (identificar, cadastrar, carregar perguntas). */
+export const TIMEOUT_ACAO_MS = 45_000;
+/**
+ * Aquecimento: o banco começa a acordar com a tentativa de conexão, então não é preciso esperar a
+ * resposta. Curto para não segurar a fila de Server Actions (o Next despacha uma por vez).
+ */
+export const TIMEOUT_AQUECER_MS = 8_000;
+/** `POST SurveyResponse`. */
+export const TIMEOUT_ENVIO_MS = 60_000;
+
+/** Opção aceita pelas funções de `lib/eba-api`; sem ela, vale `TIMEOUT_PAGINA_MS`. */
+export interface OpcoesChamada {
+  timeoutMs?: number;
+}
+
+const PREFIXO = 'api/v1/eba';
+
+/** A API respondeu 4xx/5xx. A mensagem traz só o status e o código: nunca o corpo enviado nem a chave. */
+export class EbaApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly codigo: string | null,
+  ) {
+    super(`[eba-api] HTTP ${status}${codigo ? ` (${codigo})` : ''}`);
+    this.name = 'EbaApiError';
+  }
+}
+
+/** Variáveis ausentes, falha de rede ou timeout. */
+export class EbaApiIndisponivel extends Error {
+  constructor(motivo: string) {
+    super(`[eba-api] indisponível: ${motivo}`);
+    this.name = 'EbaApiIndisponivel';
+  }
+}
+
+/**
+ * A API respondeu 2xx, mas o corpo não tem o formato esperado. A mensagem traz só o motivo:
+ * nunca o corpo recebido, e-mail, nome ou ids.
+ */
+export class EbaApiRespostaInvalida extends Error {
+  constructor(motivo: string) {
+    super(`[eba-api] resposta inválida: ${motivo}`);
+    this.name = 'EbaApiRespostaInvalida';
+  }
+}
+
+function configuracao(): { url: string; chave: string } | null {
+  const url = process.env.EBA_API_URL?.trim();
+  const chave = process.env.EBA_API_KEY?.trim();
+  return url && chave ? { url: url.replace(/\/+$/, ''), chave } : null;
+}
+
+export function ebaApiConfigurada(): boolean {
+  return configuracao() !== null;
+}
+
+interface EbaFetchInit extends OpcoesChamada {
+  metodo?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  corpo?: unknown;
+  cache?: { revalidate: number; tags: string[] };
+  /** Bearer do Identity da equipe (`Authorization: Bearer`). Só servidor; nunca na URL, em log ou em erro. */
+  bearer?: string;
+  /** Caminho a partir da raiz da API, sem o prefixo `api/v1/eba` (ex.: `login`, do Identity). */
+  raiz?: boolean;
+}
+
+/**
+ * Único ponto de acesso à API da EBA, via API Management. Só servidor: `EBA_API_KEY` vai no header
+ * `Ocp-Apim-Subscription-Key` (nunca na URL, em logs ou erros).
+ * `caminho` não é codificado: quem chama deve usar `encodeURIComponent` nos trechos dinâmicos (ex.: e-mail).
+ */
+export async function ebaFetch<T>(caminho: string, init: EbaFetchInit = {}): Promise<T> {
+  const config = configuracao();
+  if (!config) throw new EbaApiIndisponivel('EBA_API_URL/EBA_API_KEY ausentes');
+
+  const metodo = init.metodo ?? 'GET';
+  const base = init.raiz ? config.url : `${config.url}/${PREFIXO}`;
+  const url = `${base}/${caminho.replace(/^\/+/, '')}`;
+  const headers: Record<string, string> = { 'Ocp-Apim-Subscription-Key': config.chave, Accept: 'application/json' };
+  if (init.bearer) headers.Authorization = `Bearer ${init.bearer}`;
+  const comCorpo = metodo === 'POST' || metodo === 'PUT';
+  if (comCorpo) headers['Content-Type'] = 'application/json';
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: metodo,
+      headers,
+      ...(comCorpo
+        ? { body: JSON.stringify(init.corpo ?? {}), cache: 'no-store' as const }
+        : metodo === 'DELETE'
+          ? { cache: 'no-store' as const }
+          : init.cache
+            ? { next: init.cache }
+            : { cache: 'no-store' as const }),
+      signal: AbortSignal.timeout(init.timeoutMs ?? TIMEOUT_PAGINA_MS),
+    });
+  } catch (error) {
+    const timeout = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+    throw new EbaApiIndisponivel(timeout ? 'timeout' : 'rede');
+  }
+
+  if (!response.ok) {
+    const corpo = (await response.json().catch(() => null)) as EbaErroApi | null;
+    throw new EbaApiError(response.status, corpo?.Erros?.[0]?.Code ?? null);
+  }
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    const timeout = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+    const motivo = timeout ? 'timeout' : 'resposta';
+    // POST, PUT ou DELETE com 2xx: a API já gravou ou alterou. Corpo ilegível (vazio, HTML do APIM) ou timeout na leitura não
+    // pode virar "indisponível", senão a tela oferece "Tentar de novo" e reenvia o que já foi gravado.
+    if (metodo !== 'GET') throw new EbaApiRespostaInvalida(`corpo 2xx ilegível (${motivo})`);
+    throw new EbaApiIndisponivel(motivo);
+  }
+}

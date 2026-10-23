@@ -22,6 +22,11 @@ interface StrapiFetchOptions {
   tags?: string[];
   /** Busca rascunhos (draft mode) sem cache. */
   draft?: boolean;
+  /**
+   * Token só desta chamada (ex.: `STRAPI_TOKEN_AULAS`, de um tipo privado), no lugar do `STRAPI_API_TOKEN`. Vazio ou
+   * ausente → usa o `STRAPI_API_TOKEN`. Um token de permissão estreita nunca vai nas outras chamadas.
+   */
+  token?: string;
 }
 
 /**
@@ -31,11 +36,11 @@ interface StrapiFetchOptions {
 export async function strapiFetch<T>(
   path: string,
   query: Record<string, unknown> = {},
-  { tags = [], draft = false }: StrapiFetchOptions = {},
+  { tags = [], draft = false, token: tokenDaChamada }: StrapiFetchOptions = {},
 ): Promise<T> {
   const search = qs.stringify(draft ? { ...query, status: 'draft' } : query, { encodeValuesOnly: true });
   const url = `${STRAPI_URL}/api/${path}${search ? `?${search}` : ''}`;
-  const token = process.env.STRAPI_API_TOKEN;
+  const token = tokenDaChamada || process.env.STRAPI_API_TOKEN;
   const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
   const response = await fetch(

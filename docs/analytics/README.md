@@ -58,6 +58,9 @@ Todo evento também leva `site_ambiente`, `page_path`, `page_location` e `event_
 | `web_vitals` | Core Web Vitals de usuários reais | `metrica` (LCP, CLS, INP, FCP, TTFB), `valor` (CLS × 1000), `avaliacao` | — |
 | `consentimento_cookies` | Escolha no aviso de cookies | `escolha` (aceito, recusado) | — |
 | `inscrever_curso` | Botão de inscrição de um curso da EBA (topo da página do curso ou bloco "Pronto para começar?"; link com `data-curso`). Inscrição por e-mail (`mailto:`) não conta | `origem` (`curso-cabecalho`, `curso-inscricao`), `curso` (slug) | **Sim** |
+| `iniciar_teste` | A primeira pergunta de um teste do CDV aparece (`/eba/testes/<slug>`), uma vez por tela | `teste` (slug) | — |
+| `concluir_teste` | O resultado de um teste do CDV aparece | `teste` (slug) | **Sim** |
+| `confirmar_codigo` | O aluno confere o código de 6 dígitos enviado por e-mail antes de um teste do CDV | `teste` (slug), `resultado` (`ok`, `errado`, `esgotado`, `vencido`) | — |
 
 `origem` = `data-section` da seção (`hero`, `serie-atual`, `proximos-eventos`…), `header`, `footer` ou `pagina`.
 
@@ -103,11 +106,11 @@ Se a importação falhar, criar à mão seguindo a mesma lista (uma variável "V
 
 Em analytics.google.com → **Administrador**:
 
-1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`, `curso`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
+1. **Definições personalizadas → Criar dimensão personalizada** (escopo **Evento**), uma para cada: `origem`, `texto`, `destino`, `unidade`, `serie`, `parte`, `status`, `player`, `evento`, `acao`, `pergunta`, `ministerio`, `loja`, `secao`, `posicao`, `escolha`, `site_ambiente`, `metrica`, `avaliacao`, `curso`, `teste`. Sem isso o parâmetro chega, mas não aparece nos relatórios.
 2. **Métrica personalizada:** `valor` (Web Vitals).
-3. **Eventos-chave:** marcar `planejar_visita`, `contribuir` e `inscrever_curso` (e, quando existirem, `inscricao_gc_enviada` e `pedido_oracao_enviado` — §3.1). O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
+3. **Eventos-chave:** marcar `planejar_visita`, `contribuir`, `inscrever_curso` e `concluir_teste` (e, quando existirem, `inscricao_gc_enviada` e `pedido_oracao_enviado` — §3.1). O GA4 só mostra a estrela depois que o evento aparece em **Exibição de dados → Eventos → Eventos recentes** (até 24h após o primeiro disparo; não há como criar pelo nome antes).
 
-> **Status (2026-10-02, propriedade `G-SCG09PWV8B`):** ✅ 19 dimensões personalizadas (escopo Evento) e a métrica `valor` criadas. ✅ `planejar_visita` e `contribuir` já disparados e vistos no **Tempo real**. ⏳ **Falta marcar a estrela** dos dois em Eventos recentes quando aparecerem (até 24h). Filtro de homologação: não criado.
+> **Status (2026-10-02, propriedade `G-SCG09PWV8B`):** ✅ 19 dimensões personalizadas (escopo Evento) e a métrica `valor` criadas (a lista do passo 1 tem 21: ⏳ criar `curso` e `teste` se ainda não existirem). ✅ `planejar_visita` e `contribuir` já disparados e vistos no **Tempo real**. ⏳ **Falta marcar a estrela** dos dois em Eventos recentes quando aparecerem (até 24h). Filtro de homologação: não criado.
 4. **Filtro de dados** (opcional): excluir `site_ambiente = homologacao` dos relatórios de produção — ou analisar com essa dimensão.
 5. **Retenção de dados:** 14 meses.
 
@@ -142,6 +145,8 @@ Checklist geral (Strapi, segredos, integrações, LGPD): `README.md` → "Antes 
 ## 7. Pendências
 
 - **EBA (`inscrever_curso`, 2026-10-18):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 17 eventos e variável `DLV - curso`), criar a dimensão `curso` no GA4 e marcar `inscrever_curso` como evento-chave quando aparecer em Eventos recentes.
+- **EBA (`confirmar_codigo`, 2026-10-21):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 20 eventos e variável `DLV - resultado`) e criar a dimensão `resultado` no GA4. Nenhum dado pessoal: só o slug do teste e o resultado da conferência.
+- **EBA (`iniciar_teste` e `concluir_teste`, 2026-10-20):** reimportar `gtm-container-adai.json` nos dois containers (gatilho com 19 eventos e variável `DLV - teste`), criar a dimensão `teste` no GA4 e marcar `concluir_teste` como evento-chave quando aparecer em Eventos recentes. Nenhum dado pessoal é enviado: só o slug do teste. O `data-section="teste-eba"` da tela dá a origem a `clique_cta` e `ver_secao`.
 
 ### Agenda e detalhes — atualização de 18/10/2026
 

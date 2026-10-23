@@ -1,0 +1,599 @@
+/*
+ * Tela do teste da EBA (protótipo docs/prototipo/eba/teste-dons-servico.html, "Entrega 2" do eba.css).
+ * Grade: caixa cinza + foto, mesmo raio (--radius-lg) e gap de 12. No celular e no tablet a foto
+ * vira uma faixa 16:9 acima da caixa; a partir de 1024 px fica à direita, com a mesma altura.
+ *
+ * Sem token próprio no design system (🟡, registrado no doc do componente):
+ * - largura da caixa no celular/tablet e altura mínima da foto no desktop (valores do protótipo);
+ * - borda de campo e cor de erro: usam o cinza de texto (5,3:1, acima dos 3:1 da WCAG 1.4.11) e o preto.
+ */
+.tela {
+  --questionario-max: 44rem;
+  --questionario-foto-min: 32rem;
+  padding-block: var(--space-16) var(--space-section);
+  padding-inline: var(--space-gutter);
+}
+
+.grade {
+  display: grid;
+  gap: var(--space-12);
+  max-width: var(--questionario-max);
+  margin-inline: auto;
+}
+
+.caixa {
+  display: grid;
+  align-content: start;
+  gap: var(--space-24);
+  min-width: 0;
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-subtle);
+}
+
+.midia {
+  position: relative;
+  order: -1;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-media);
+}
+
+.foto {
+  object-fit: cover;
+}
+
+.numero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-16);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-bold);
+}
+
+.nome {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: var(--font-size-destaque);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-destaque);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+.subtitulo,
+.titulo4,
+.enunciado {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: var(--font-weight-bold);
+}
+
+.subtitulo,
+.enunciado {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  letter-spacing: var(--letter-spacing-h3);
+}
+
+.titulo4 {
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-h4);
+  letter-spacing: var(--letter-spacing-h4);
+}
+
+.subtitulo:focus:not(:focus-visible),
+.aviso:focus:not(:focus-visible),
+.enunciado:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.corpo {
+  margin: 0;
+  font-size: var(--font-size-corpo);
+  line-height: var(--line-height-text);
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--font-size-corpo-pequeno);
+  line-height: var(--line-height-text);
+}
+
+.dica,
+.ajuda {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-legenda);
+  line-height: var(--line-height-legenda);
+}
+
+.formato {
+  display: grid;
+  gap: var(--space-8);
+  margin: 0;
+  padding-top: var(--space-16);
+  border-top: var(--border-width) solid var(--color-bg-subtle-2);
+  font-size: var(--font-size-legenda);
+  line-height: var(--line-height-legenda);
+}
+
+.formato div {
+  display: grid;
+  grid-template-columns: var(--space-96) minmax(0, 1fr);
+  gap: var(--space-8);
+}
+
+.formato dt {
+  color: var(--color-text-muted);
+}
+
+.formato dd {
+  margin: 0;
+}
+
+.parte {
+  display: grid;
+  gap: var(--space-8);
+  align-content: start;
+  padding: var(--space-20);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+}
+
+/* Formulários (identificação e primeiro acesso) */
+.formulario {
+  display: grid;
+  gap: var(--space-20);
+}
+
+.grupo {
+  display: grid;
+  gap: var(--space-8);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rotulo {
+  padding: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.campo {
+  width: 100%;
+  min-height: var(--button-height-md);
+  padding: var(--space-12) var(--space-24);
+  border: var(--border-width) solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-corpo-pequeno);
+}
+
+.campo:hover {
+  border-color: var(--color-border-strong);
+}
+
+.campo:focus-visible {
+  outline: none;
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 calc(2 * var(--border-width)) var(--color-focus-ring);
+}
+
+.campo[aria-invalid='true'] {
+  border-color: var(--color-border-strong);
+  border-width: calc(2 * var(--border-width));
+}
+
+/* Fieldset da unidade com erro: barra lateral, como o resumo do erro (radios não aceitam aria-invalid). */
+.grupoInvalido {
+  padding-left: var(--space-12);
+  box-shadow: inset var(--space-4) 0 0 var(--color-text-primary);
+}
+
+.erroCampo {
+  margin: 0;
+  font-size: var(--font-size-legenda);
+  font-weight: var(--font-weight-bold);
+}
+
+.erro {
+  margin: 0;
+  padding-left: var(--space-12);
+  box-shadow: inset var(--space-4) 0 0 var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Espera de API fria: "Preparando o teste…" e o aviso depois de 5 s */
+.preparando,
+.espera {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.legal {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-micro);
+}
+
+.legal a {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  text-underline-offset: var(--space-4);
+}
+
+/* Progresso */
+.progresso {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.progressoTexto {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-size: var(--font-size-legenda);
+  font-weight: var(--font-weight-bold);
+}
+
+.barra {
+  height: var(--space-8);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-subtle-2);
+}
+
+.barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-bg-inverse);
+  transition: width var(--duration-base) var(--easing-standard);
+}
+
+/* Perguntas */
+.pergunta {
+  display: grid;
+  gap: var(--space-16);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.enunciado {
+  padding: 0;
+}
+
+.opcoes,
+.listaMarcar {
+  display: grid;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.opcao,
+.marcar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: var(--touch-target-min);
+  border: var(--border-width) solid var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+  cursor: pointer;
+}
+
+.opcao {
+  padding: var(--space-12) var(--space-16);
+}
+
+.marcar {
+  padding: var(--space-8) var(--space-16);
+}
+
+.opcao:hover,
+.marcar:hover {
+  border-color: var(--color-border-strong);
+}
+
+.opcao input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.opcaoNumero {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--space-32);
+  height: var(--space-32);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-subtle);
+  font-weight: var(--font-weight-bold);
+}
+
+.opcao:has(input:checked) {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.opcao:has(input:checked) .opcaoNumero {
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+}
+
+.opcao:has(input:focus-visible),
+.marcar:has(input:focus-visible) {
+  outline: calc(2 * var(--border-width)) solid var(--color-focus-ring);
+  outline-offset: var(--space-4);
+}
+
+.opcoesEstilo {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.opcaoEstilo {
+  justify-content: center;
+  padding: var(--space-8);
+}
+
+.par {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-16);
+  font-weight: var(--font-weight-bold);
+}
+
+.par span:last-child {
+  text-align: right;
+}
+
+.marcar input {
+  flex: none;
+  width: var(--space-20);
+  height: var(--space-20);
+  margin: 0;
+  accent-color: var(--color-bg-inverse);
+}
+
+.marcar:has(input:checked) {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 var(--border-width) var(--color-border-strong);
+}
+
+.marcar:has(input:disabled) {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.navegacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  border-bottom: var(--border-width) solid currentColor;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.voltar::before {
+  content: '←';
+}
+
+.voltar[data-sentido='avancar']::before {
+  content: none;
+}
+
+.voltar[data-sentido='avancar']::after {
+  content: '→';
+}
+
+.voltar:focus-visible,
+.link:focus-visible {
+  outline: var(--border-width) solid var(--color-focus-ring);
+  outline-offset: var(--space-4);
+}
+
+/* Avisos: enviando, erro e sessão encerrada */
+.aviso {
+  display: grid;
+  gap: var(--space-12);
+  justify-items: start;
+  padding: var(--space-24);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+}
+
+.avisoErro {
+  box-shadow: inset var(--space-4) 0 0 var(--color-text-primary);
+}
+
+.girando {
+  width: var(--space-32);
+  height: var(--space-32);
+  border: calc(3 * var(--border-width)) solid var(--color-bg-subtle-2);
+  border-top-color: var(--color-bg-inverse);
+  border-radius: var(--radius-pill);
+  animation: girar calc(4 * var(--duration-base)) linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Resultado */
+.resultado {
+  display: grid;
+  gap: var(--space-10);
+  margin: 0;
+  padding: var(--space-20);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+  list-style: none;
+  counter-reset: item;
+}
+
+.resultado li {
+  display: grid;
+  grid-template-columns: var(--space-24) minmax(0, 2fr) minmax(0, 3fr) var(--space-40);
+  align-items: center;
+  gap: var(--space-12);
+  counter-increment: item;
+  font-size: var(--font-size-legenda);
+}
+
+.resultado li::before {
+  content: counter(item);
+  color: var(--color-text-muted);
+}
+
+.resultado .destaque {
+  font-weight: var(--font-weight-bold);
+}
+
+.resultadoNome {
+  overflow-wrap: anywhere;
+}
+
+.resultadoBarra {
+  height: var(--space-10);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-subtle);
+}
+
+.resultadoBarra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-text-muted);
+}
+
+.resultado .destaque .resultadoBarra span {
+  background: var(--color-bg-inverse);
+}
+
+.resultadoValor {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.talentos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.talentos li {
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-page);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Sessão: "Respondendo como" e "Sair" */
+.trocar,
+.sair {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-legenda);
+}
+
+.link {
+  min-height: var(--touch-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  text-underline-offset: var(--space-4);
+  cursor: pointer;
+}
+
+/* tier: tablet */
+@media (min-width: 769px) {
+  .caixa {
+    padding: var(--space-40);
+  }
+
+  .opcoes,
+  .duasColunas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .opcoesEstilo {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* tier: desktop — foto à direita, mesma altura da caixa (topo e base alinhados) */
+@media (min-width: 1024px) {
+  .grade {
+    max-width: var(--content-max);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: stretch;
+  }
+
+  .midia {
+    order: 0;
+    aspect-ratio: auto;
+    min-height: var(--questionario-foto-min);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .girando {
+    animation: none;
+  }
+
+  .barra span {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .opcao,
+  .marcar,
+  .aviso,
+  .resultado {
+    outline: var(--border-width) solid var(--color-border-strong);
+  }
+}

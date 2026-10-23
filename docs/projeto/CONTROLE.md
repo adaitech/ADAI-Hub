@@ -15,6 +15,7 @@
 | **Euires** | **Dados** | Dados | Idem (dupla com o Yuri) | 🟡 em andamento | _a preencher_ |
 | **Thomaz** | **Infra** | Infra | Azure: AKS (hml e prod), ACR, PostgreSQL do Strapi, Blob, Key Vault, CI/CD no GitHub Actions | 🟡 em andamento | _a preencher_ |
 | **Ton Dev** | **Série** | Experiência / Série atual | Parte de série (seção Série atual: YouTube, partes, player) | 🟡 em andamento | _a preencher_ |
+| **Jonatan Cardoso Saraiva** | **EBA** — migração do site da Escola Bíblica para o Hub | Formação | 4 entregas: 1) editorial (`/eba`, cursos, testes no Strapi) ✅; 2) testes do CDV no Hub pela API da EBA (APIM) 🔵; 3) página de resultado 🔵 (rota, link opaco e busca prontos e desligados; acesso à API e emissão do link dependem de decisão: spec `2026-10-22`, §7); 4) painel e login da equipe 🔵 (login, consulta de aluno, turmas, QR codes e aulas em vídeo prontos e desligados; sem papéis por decisão: spec `2026-10-22-migracao-eba-4`) | 🔵 em revisão | entrega 1: #14 ✅ · entregas 2, 3 e 4 numa branch só: `feat/eba-resultado` → `main` (#20; o #15 foi fechado e incorporado) |
 
 Legenda: ⚪ não iniciado · 🟡 em andamento · 🔵 em revisão (PR aberto) · ✅ mergeado · 🔴 bloqueado.
 
@@ -53,4 +54,5 @@ Cadência: check-in curto no meio da semana (18–23/10); PRs pequenos, um assun
 
 | PR | Autor | Frente | Veredicto da revisão | Merge |
 | --- | --- | --- | --- | --- |
-| _—_ | | | | |
+| #14 | Jonatan Cardoso Saraiva (`jonatanc`) | EBA — entrega 1 (editorial) | Autorrevisão 🎯 ✅ mergear após CI | ✅ 21/10/2026 |
+| #15 | Jonatan Cardoso Saraiva (`jonatanc`) | EBA — entrega 2 (testes do CDV) | Revisão 🔴: identificação só por e-mail (código por e-mail em andamento) e colisão da máscara de e-mail | ⏳ |

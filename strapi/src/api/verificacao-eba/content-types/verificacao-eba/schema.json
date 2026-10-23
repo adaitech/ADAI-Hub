@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "verificacoes_eba",
+  "info": {
+    "singularName": "verificacao-eba",
+    "pluralName": "verificacoes-eba",
+    "displayName": "Verificações de e-mail (EBA)",
+    "description": "Interno: códigos enviados por e-mail aos alunos dos testes da EBA (só hashes, valem 10 min)."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": { "visible": false },
+    "content-type-builder": { "visible": false }
+  },
+  "attributes": {
+    "email_hash": { "type": "string", "required": true, "maxLength": 100 },
+    "codigo_hash": { "type": "string", "required": true, "maxLength": 100 },
+    "expira_em": { "type": "datetime", "required": true },
+    "tentativas": { "type": "integer", "default": 0, "min": 0 },
+    "usado": { "type": "boolean", "default": false },
+    "criado_em": { "type": "datetime", "required": true }
+  }
+}

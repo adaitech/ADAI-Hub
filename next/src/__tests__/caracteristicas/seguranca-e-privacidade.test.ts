@@ -42,6 +42,23 @@ describe('segredos', () => {
     }
   });
 
+  it('variáveis da API da EBA são só de servidor: nenhum arquivo em src/ usa o prefixo público (NEXT_PUBLIC_ + EBA_)', () => {
+    // Inclui testes e test-utils; o padrão é montado para este arquivo não se acusar.
+    const proibido = ['NEXT', 'PUBLIC', 'EBA', ''].join('_');
+    const todos = arquivos(join(next, 'src'), /\.(ts|tsx|js|mjs|json|css)$/);
+    expect(todos.filter((a) => ler(a).includes(proibido)).map(rel)).toEqual([]);
+  });
+
+  it('tokens do código por e-mail são só de servidor e aparecem vazios no .env.example', () => {
+    // Padrões montados para este arquivo não se acusar.
+    const proibidos = [['NEXT', 'PUBLIC', 'MAILERSEND'], ['NEXT', 'PUBLIC', 'STRAPI', 'TOKEN']].map((p) => p.join('_'));
+    const todos = arquivos(join(next, 'src'), /\.(ts|tsx|js|mjs|json|css)$/);
+    expect(todos.filter((a) => proibidos.some((p) => ler(a).includes(p))).map(rel)).toEqual([]);
+    const exemplo = ler(join(next, '.env.example'));
+    expect(exemplo).toMatch(/^MAILERSEND_API_TOKEN=$/m);
+    expect(exemplo).toMatch(/^STRAPI_TOKEN_VERIFICACAO=$/m);
+  });
+
   it('chave de API vai no header, nunca na URL (URL aparece em log e no histórico)', () => {
     expect(codigo.filter((a) => /[?&](key|api_key|apikey|token|secret)=/i.test(ler(a))).map(rel)).toEqual([]);
   });

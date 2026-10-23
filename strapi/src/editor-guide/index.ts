@@ -1,8 +1,10 @@
+import apiAula from './api.aula.json';
 import apiCurso from './api.curso.json';
 import apiGlobal from './api.global.json';
 import apiPage from './api.page.json';
 import apiTeste from './api.teste.json';
 import apiUnidade from './api.unidade.json';
+import apiVerificacaoEba from './api.verificacao-eba.json';
 import itemsCard from './items.card.json';
 import itemsColunaLinks from './items.coluna-links.json';
 import itemsDestaque from './items.destaque.json';
@@ -54,6 +56,8 @@ export const editorGuides: EditorGuide[] = [
   apiUnidade,
   apiCurso,
   apiTeste,
+  apiAula,
+  apiVerificacaoEba,
   sectionsHero,
   sectionsPix,
   sectionsCarrosselCards,
@@ -85,6 +89,7 @@ export const mainFields: Record<string, string> = {
   'api::unidade.unidade': 'nome',
   'api::curso.curso': 'nome',
   'api::teste.teste': 'nome',
+  'api::aula.aula': 'titulo',
   'shared.botao': 'texto',
   'shared.link': 'texto',
   'items.coluna-links': 'titulo',

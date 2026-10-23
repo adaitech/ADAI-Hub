@@ -420,7 +420,7 @@ export const chaveProgresso = (slug: SlugTeste) => `eba-teste:${slug}`;
 
 - [ ] **Passo 1: testes que falham.**
   - **Seed:** o `link_teste` de cada teste é `/eba/testes/${slug}`. O teste do conteúdo que exigia o link do site atual passa a exigir o caminho interno.
-  - **Redirecionamentos:** ligado, `{ source: '/teste/:slug', destination: `${base}/eba/testes/:slug`, statusCode: 301 }`. O teste que impedia `/teste/:path*` de redirecionar passa a impedir só `/dna`, `/login` e `/dashboard/:path*`.
+  - **Redirecionamentos:** ligado, `{ source: '/teste/:slug', destination: `${base}/eba/testes/:slug`, statusCode: 307 }` (temporário; revisão final). O teste que impedia `/teste/:path*` de redirecionar passa a impedir só `/dna`, `/login` e `/dashboard/:path*`.
 - [ ] **Passo 2:** os testes falham. Rodar `yarn test` (next) e `node --test redirecionamentos.test.mjs` (eba-adai-hub).
 - [ ] **Passo 3:** implementar. Atualizar o doc da lista de testes: o botão agora abre o teste no Hub.
 - [ ] **Passo 4:** os testes passam.

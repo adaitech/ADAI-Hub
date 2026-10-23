@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "id": 2,
+      "documentId": "aula-dna-aula-01",
+      "titulo": "01 - Fundamentos, Visão e Pilares",
+      "curso": "dna",
+      "endereco": "aula-01",
+      "ordem": 2,
+      "autor": "Pr. Rodrigo Soeiro",
+      "cargo_autor": "Pastor Líder",
+      "descricao": "Aula 01 - Fundamentos, Visão e Pilares",
+      "video_url": "https://player.vimeo.com/video/1047669729?h=5de9c9b90c&title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479",
+      "foto_autor": { "id": 11, "url": "/uploads/avatar_rodrigo_soeiro.webp", "alternativeText": "Foto do Pr. Rodrigo Soeiro.", "width": 256, "height": 256 }
+    },
+    {
+      "id": 1,
+      "documentId": "aula-dna-boas-vindas",
+      "titulo": "Boas Vindas",
+      "curso": "dna",
+      "endereco": "boas-vindas",
+      "ordem": 1,
+      "autor": "Pr. Rodrigo Soeiro e Pra. Tati Soeiro",
+      "cargo_autor": "Pastores Líderes",
+      "descricao": "Boas Vindas ao curso DNA da ADAI",
+      "video_url": "https://player.vimeo.com/video/1047669656?h=aa973e5d4e&badge=0&autopause=0&player_id=0&app_id=58479",
+      "foto_autor": { "id": 10, "url": "/uploads/avatar_adai.webp", "alternativeText": "Logo da ADAI.", "width": 256, "height": 256 }
+    },
+    {
+      "id": 3,
+      "documentId": "aula-dna-aula-02",
+      "titulo": "02 - Job",
+      "curso": "dna",
+      "endereco": "aula-02",
+      "ordem": 3,
+      "autor": "Pra. Tati Soeiro",
+      "cargo_autor": "Pastora Líder",
+      "descricao": "Aula 02 - Job",
+      "video_url": "https://player.vimeo.com/video/1047669910?h=87f7d427a2&badge=0",
+      "foto_autor": null
+    }
+  ],
+  "meta": { "pagination": { "page": 1, "pageSize": 100, "pageCount": 1, "total": 3 } }
+}

@@ -46,6 +46,12 @@ export interface EventosAnalytics {
   consentimento_cookies: { escolha: 'aceito' | 'recusado' };
   /** Conversão: clique no botão de inscrição de um curso da EBA (`curso` = slug). */
   inscrever_curso: Origem & { curso: string };
+  /** A primeira pergunta de um teste do CDV apareceu (`teste` = slug; sem dado pessoal). */
+  iniciar_teste: { teste: string };
+  /** Conversão: o resultado de um teste do CDV apareceu (`teste` = slug). */
+  concluir_teste: { teste: string };
+  /** O aluno conferiu o código do e-mail na identificação dos testes (sem dado pessoal). */
+  confirmar_codigo: { teste: string; resultado: 'ok' | 'errado' | 'esgotado' | 'vencido' };
 }
 
 export type NomeEvento = keyof EventosAnalytics;
@@ -69,4 +75,7 @@ export const NOMES_EVENTOS: NomeEvento[] = [
   'filtrar_agenda',
   'buscar_evento',
   'inscrever_curso',
+  'iniciar_teste',
+  'concluir_teste',
+  'confirmar_codigo',
 ];

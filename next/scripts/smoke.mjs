@@ -13,8 +13,8 @@
 
 const BASE = (process.argv[2] ?? process.env.SMOKE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 const PAGINAS_DO_SITE = ['/', '/agenda', '/contribua', '/politica-de-privacidade', '/eba', '/eba/cursos', '/eba/cursos/reset', '/eba/testes'];
-/** Páginas internas: precisam de noindex (a /exemplos tem "Meta robots" noindex no Strapi). */
-const PAGINAS_INTERNAS = ['/exemplos'];
+/** Páginas internas (e testes da EBA): precisam de noindex (a /exemplos tem "Meta robots" noindex no Strapi; a página do teste é noindex no código). */
+const PAGINAS_INTERNAS = ['/exemplos', '/eba/testes/dons-servico'];
 const MAX_IMAGENS = 6;
 
 const resultados = [];
@@ -141,6 +141,10 @@ async function principal() {
   for (const caminho of PAGINAS_INTERNAS) await conferirPagina(caminho, { interna: true });
   await conferirSeo();
   await esperarStatus('rota inexistente → 404', '/rota-que-nao-existe-smoke', 404);
+  await esperarStatus('resultado da EBA com código inválido → 404 (falha fechada)', '/eba/resultado/codigo-invalido-smoke', 404);
+  // Área da equipe: sem sessão nunca abre (404 se desligada, redirecionamento ao login se ligada).
+  await esperarStatus('área da equipe sem sessão → 404 ou login', '/eba/equipe/consultas', [307, 308, 404]);
+  await esperarStatus('detalhe de aluno sem sessão → 404 ou login', '/eba/equipe/consultas/11111111-2222-4333-8444-555555555555', [307, 308, 404]);
   await esperarStatus('curso da EBA inexistente → 404', '/eba/cursos/curso-que-nao-existe-smoke', 404);
   const { local } = await esperarStatus('/home → redireciona para /', '/home', [307, 308]);
   if (local && new URL(local, BASE).pathname !== '/') registrar(false, '/home → redireciona para /', `foi para ${local}`);

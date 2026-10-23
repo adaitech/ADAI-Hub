@@ -29,7 +29,8 @@ O caminho completo que precisa funcionar:
 - O painel da equipe (`/dashboard/*`) e o login da equipe: entrega 4.
 - A página de resultado por id (`/teste/resultado/<id>`): entrega 3.
 - Mudar perguntas, escalas, cálculo, mensagens ou o banco da API.
-- Login com senha para o aluno e envio de e-mail com código.
+- Login com senha para o aluno.
+- ~~Envio de e-mail com código~~: **entrou no escopo** depois da revisão do PR #15 (21/10/2026). Desenho em `2026-10-21-migracao-eba-2-codigo-por-email-design.md`.
 
 ## 4. Como funciona hoje (levantado no código de `adaitech/eba-adai`)
 
@@ -77,7 +78,7 @@ Os originais estão em `eba-adai/public/assets/testes/` e somam cerca de 90 MB (
 | --- | --- | --- |
 | `/eba/testes/[slug]` | Página do Next (Server Component + ilha cliente do questionário) | Só os 5 slugs; outro slug → 404. `noindex, nofollow`; fora do sitemap. |
 | `/eba/testes` | Página do Strapi (já existe) | O "Fazer o teste" passa a apontar para `/eba/testes/<slug>`: o seed troca o `link_teste` para o caminho interno. |
-| `eba.adai.com.br/teste/:slug` | Redirecionamento 301 no site atual | Fica em `redirecionamentos.mjs` (branch `feat/redirecionar-para-hub`), desligado até o lançamento. |
+| `eba.adai.com.br/teste/:slug` | Redirecionamento **307 (temporário)** no site atual | Fica em `redirecionamentos.mjs` (branch `feat/redirecionar-para-hub`), desligado até o lançamento. Temporário porque o destino é `noindex` e o rollback é desligar o redirecionamento: um 301 ficaria no cache dos celulares que já leram o QR code. Home e cursos seguem com 301. |
 
 A rota `/eba/testes/[slug]` é mais específica que `/eba/[slug]` e tem precedência.
 
@@ -85,17 +86,17 @@ A rota `/eba/testes/[slug]` é mais específica que `/eba/[slug]` e tem precedê
 
 ```
 lib/eba-api/            ← integração nova (só servidor)
-  client.ts             fetch com base APIM + chave no header, timeout, erro tipado
+  client.ts             fetch com base APIM + chave no header, timeout por chamada, erro tipado
   tipos.ts              JSON cru da API
   testes.ts             mapa slug → idQuestion, tipo de resposta e escala (fonte única)
   perguntas.ts          perguntas normalizadas por teste (cache 1 h, tag `eba-testes`)
   alunos.ts             buscar por e-mail, cadastrar
-  turmas.ts             turmas ativas (cache 10 min)
+  turmas.ts             turmas ativas (cache 10 min) e aquecimento (GET leve, sem cache)
   respostas.ts          enviar respostas → resultado normalizado
 lib/eba/sessao.ts       cria/lê/apaga o cookie de sessão (HMAC-SHA256, expira em 2 h)
 app/(site)/eba/testes/[slug]/
   page.tsx              abertura (Strapi `teste`) + perguntas (API) → <Questionario>
-  acoes.ts              Server Actions: identificar, cadastrar, enviar, sair
+  acoes.ts              Server Actions: identificar, cadastrar, enviar, sair, carregarPerguntas, aquecer
 components/eba/Questionario/   ilha cliente: estados, progresso, sessionStorage
 ```
 
@@ -115,8 +116,22 @@ components/eba/Questionario/   ilha cliente: estados, progresso, sessionStorage
 - **Envio:** o `idStudent` e o `idClass` vêm **da sessão**, nunca do formulário.
 - **Limite de tentativas** da identificação: 10 por minuto por IP, em memória. Freia quem tenta descobrir e-mails cadastrados.
 - **Logs:** nunca registram e-mail nem nome; só o código de erro da API.
+- **API fria (2026-10-21):** o banco Azure SQL da API pausa quando fica ocioso; a primeira chamada depois da pausa leva de 10 a 45 s (medido: `Student/email` em 44 s, a seguinte em 0,6 s). Por isso o timeout é por tipo de chamada (`ebaFetch(caminho, { timeoutMs })`; constantes em `client.ts`):
+
+  | Constante | Valor | Uso |
+  | --- | --- | --- |
+  | `TIMEOUT_PAGINA_MS` | 10 s | Perguntas buscadas ao renderizar a página (padrão de `ebaFetch` e das funções de `lib/eba-api`): a página não pode travar. |
+  | `TIMEOUT_ACAO_MS` | 45 s | Chamadas dentro de Server Actions: `alunoPorEmail`, `cadastrarAluno`, `turmasAtivas`, `carregarPerguntas` e as perguntas da validação do `enviar`. |
+  | `TIMEOUT_ENVIO_MS` | 60 s | `POST SurveyResponse` (padrão de `enviarRespostas`). |
+  | `TIMEOUT_AQUECER_MS` | 8 s | Aquecimento (padrão de `aquecerApi`): o banco começa a acordar com a tentativa de conexão, então não é preciso esperar a resposta. |
+
+  As regras de erro não mudam (POST com 2xx ilegível continua `EbaApiRespostaInvalida`). A página `/eba/testes/[slug]` declara `export const maxDuration = 120` (segmento de rota; as Server Actions da página herdam), para a hospedagem não encerrar uma ação antes dos 45/60 s; no envio, isso poderia levar a gravação dupla.
+- **Aquecimento:** a ação `aquecer()` faz um GET leve e sem cache (`ClassEBA?page-size=1`, 8 s) só para acordar o banco. A tela a chama uma vez, sem esperar, quando monta na abertura (nunca na vitrine). Ela nunca lança nem devolve dados; erros só vão para o log com a classe. Limite próprio de 5 por minuto por IP (mesma chave do `identificar`, sem gastar as tentativas dele); sem variáveis ou sem segredo, não chama a API. Como o Next despacha as Server Actions uma por vez por cliente, um `identificar` feito logo depois espera o aquecimento terminar; por isso o timeout do aquecimento é curto (no máximo 8 s de fila).
+- **Perguntas depois da abertura:** se a busca da página falhar, a ação `carregarPerguntas(slug)` busca de novo com 45 s (slug inválido → `invalido`; falha → `indisponivel`; estilo e temperamento → `[]`, sem chamar a API; mesmo limite por IP do `identificar`). Estilo e temperamento usam conteúdo local: a página nem busca perguntas para eles, então nunca ficam "indisponíveis".
 
 ### 5.3 Sessão
+
+> **Atualização 21/10/2026:** antes de abrir a sessão (ou de cadastrar), o e-mail é comprovado por um código de 6 dígitos enviado pelo MailerSend; o aparelho verificado fica lembrado por 30 dias. Desenho em `2026-10-21-migracao-eba-2-codigo-por-email-design.md`.
 
 - **Conteúdo do cookie `eba_sessao`:** `idStudent`, `idClass`, o e-mail mascarado para exibição (`a***@email.com`) e `emitidoEm`, com assinatura HMAC.
 - **Atributos:** `httpOnly`, `secure` em produção, `sameSite=lax`, `path=/eba/testes` e **sem** `maxAge`, ou seja, um cookie de sessão.
@@ -164,10 +179,15 @@ A tela tem os estados do protótipo:
 
 | Situação | Comportamento |
 | --- | --- |
-| API ou APIM fora ao abrir o teste | A abertura aparece. "Começar" mostra: "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." Não é 404. |
+| API ou APIM fora (ou fria, mais de 10 s) ao abrir o teste | A abertura aparece. "Começar" mostra "Preparando o teste…" (`role="status"`) e chama `carregarPerguntas` (45 s), uma chamada por vez. Sucesso: segue o fluxo normal (identificação ou perguntas), com o progresso salvo restaurado. Falha: "Não conseguimos carregar as perguntas agora. Tente em alguns minutos." e o botão "Tentar de novo", que chama de novo. Não é 404. |
+| API fria na identificação, no cadastro ou no envio | As ações esperam até 45 s (envio: 60 s) em vez de falhar aos 10 s. |
+| Ação demorando (identificar, cadastrar, carregar perguntas, enviar) | Depois de 5 s, junto do estado de espera, aparece "A primeira conexão do dia pode levar até um minuto. Aguarde, por favor." numa região `role="status"`; some quando a ação termina. |
 | Turmas não carregam no Primeiro acesso | Mensagem com "Tentar de novo"; sem cadastro. |
 | A API recusa o envio (400) | "Algumas respostas não foram aceitas." O código da API vai para o log. As respostas são mantidas. |
 | Falha de rede ou 5xx no envio | Estado **Erro no envio**, com "Tentar de novo". |
+| A API grava (2xx), mas o resultado vem fora do formato, vazio (`[]`) ou ilegível (corpo vazio, HTML, timeout na leitura do POST) | Estado de resultado com "Suas respostas foram enviadas para a equipe da EBA. Não conseguimos mostrar o resultado agora.", sem "Tentar de novo" (reenviar duplicaria a gravação). O progresso é apagado e `concluir_teste` dispara. |
+| Aluno (Student) fora do formato (sem `id`/`idClass`) | Identificação e cadastro respondem como API indisponível; nenhuma sessão é aberta. |
+| Envio com a sessão de outra pessoa (trocada em outra aba): o `respondidoComo` do cliente difere do dono da sessão do cookie | `enviar` devolve `sessao` sem chamar a API; a tela mostra "Sua sessão foi encerrada" e, se quem se identifica é outra pessoa, o teste recomeça sem reenviar. O dono é um HMAC do `idStudent` (`donoDaSessao`), não o e-mail mascarado: pessoas com a mesma máscara (`ana@` e `alice@` → `a***@`) se distinguem. (Revisão do PR #15, 21/10: antes era risco aceito.) |
 | Muitas tentativas de e-mail | "Muitas tentativas. Aguarde um minuto." |
 | Variáveis ausentes | "Testes indisponíveis no momento." |
 
@@ -233,7 +253,7 @@ Os testes são o objetivo da área, então ganham **2 eventos novos**, sem dado 
   - nenhuma variável `EBA_` com `NEXT_PUBLIC_`.
 - **Smoke:** `/eba/testes/dons-servico` responde 200 com a abertura. O smoke não envia respostas.
 - **Seed:** `link_teste` aponta para o caminho interno.
-- **Redirecionamentos** (`eba-adai-hub`): `/teste/:slug` → `/eba/testes/:slug` com 301 quando ligado.
+- **Redirecionamentos** (`eba-adai-hub`): `/teste/:slug` → `/eba/testes/:slug` com 307 quando ligado (home e cursos com 301).
 
 ## 10. Pré-requisitos externos (cada um com aprovação do usuário)
 
@@ -246,13 +266,13 @@ Os testes são o objetivo da área, então ganham **2 eventos novos**, sem dado 
 - **Homologação:** variáveis configuradas, teste de ponta a ponta com o aluno de teste e conferência no painel atual.
 - **Lançamento:** junto com o Hub, ligando `REDIRECIONAR_PARA_HUB` no site atual; os QR codes passam a cair no Hub.
 - **Rollback:**
-  - desligar o redirecionamento devolve os QR codes ao site atual, que continua funcionando;
+  - desligar o redirecionamento devolve os QR codes ao site atual, que continua funcionando (o redirecionamento dos testes é 307, temporário, para os celulares não o guardarem em cache);
   - voltar o `link_teste` no Strapi para o site atual.
 
 ## 12. Riscos
 
 - **A API fora derruba os testes.** Hoje também derruba. A mensagem de erro e as respostas guardadas na aba reduzem o impacto.
-- **Enumeração de e-mails.** O Primeiro acesso revela se um e-mail existe. Mitigação: o limite de tentativas e nenhum dado do cadastro na tela.
+- **Enumeração de e-mails.** O Primeiro acesso revela se um e-mail existe. Mitigação: o limite de tentativas e nenhum dado do cadastro na tela. **Fechado** pelo código por e-mail (`2026-10-21-migracao-eba-2-codigo-por-email-design.md` §6): o "é novo?" só aparece depois do código certo.
 - **Turmas inativas.** Sem turma ativa, ninguém consegue se cadastrar. A mensagem orienta a falar com a equipe da EBA.
 - **Divergência de conteúdo local.** As tabelas do estilo e do temperamento ficam copiadas no Hub. Um teste confere a quantidade de itens contra a fonte atual.
 

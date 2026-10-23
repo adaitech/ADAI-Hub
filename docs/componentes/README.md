@@ -34,6 +34,8 @@ Cada componente tem três artefatos coerentes entre si:
 | [texto-rico.md](./texto-rico.md) | Texto (documento) — Política de Privacidade | `sections.texto-rico` | dynamic zone `sections` de `page` | implementado · publicado (dev) |
 | [catalogo-cursos.md](./catalogo-cursos.md) | Catálogo de cursos da EBA (+ Card de curso) | `sections.catalogo-cursos` | dynamic zone `sections` de `page` (`/eba`, `/eba/cursos`) | implementado · seed v20 (dev) |
 | [lista-testes.md](./lista-testes.md) | Lista de testes do CDV (EBA) | `sections.lista-testes` + tipo `teste` | dynamic zone `sections` de `page` (`/eba/testes`) | implementado · seed v20 (dev) |
+| [questionario-eba.md](./questionario-eba.md) | Questionário dos testes da EBA | — (código; textos da abertura do tipo `teste`) | página `/eba/testes/<slug>` | implementado |
+| [equipe-eba.md](./equipe-eba.md) | Área da equipe da EBA (login, consulta de aluno, turmas) | — (código; dados da API da EBA) | páginas `/eba/equipe/*` (grupo `(restrito)`, sem analytics) | implementado, desligado por padrão |
 | [curso-cabecalho.md](./curso-cabecalho.md) | Topo do curso da EBA (+ Informações, Trilha) | — (campos fixos do tipo `curso`) | página `/eba/cursos/<slug>` | implementado |
 | [banner-cookies.md](./banner-cookies.md) | Aviso de cookies (LGPD) | — (código; não vem do Strapi) | layout do site | implementado |
 

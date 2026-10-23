@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "aulas",
+  "info": {
+    "singularName": "aula",
+    "pluralName": "aulas",
+    "displayName": "Aulas da EBA",
+    "description": "Aulas em vídeo do DNA e do Reset, na área da equipe da EBA (/eba/equipe/aulas). Tipo privado: o site lê com token."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "titulo": { "type": "string", "required": true, "maxLength": 120 },
+    "curso": { "type": "enumeration", "enum": ["dna", "reset"], "required": true },
+    "endereco": { "type": "string", "required": true, "maxLength": 60, "regex": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "ordem": { "type": "integer", "required": true, "min": 0, "default": 100 },
+    "autor": { "type": "string", "maxLength": 100 },
+    "cargo_autor": { "type": "string", "maxLength": 60 },
+    "descricao": { "type": "text", "maxLength": 300 },
+    "video_url": { "type": "string", "required": true, "maxLength": 300 },
+    "foto_autor": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+  }
+}
